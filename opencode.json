@@ -1,0 +1,20 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "database": {
+      "type": "local",
+      "command": ["/opt/homebrew/bin/mysql-mcp-server"],
+      "environment": {
+        "MYSQL_DSN": "{env:MYSQL_DSN}"
+      }
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_TOKEN}",
+        "X-MCP-Toolsets": "repos,issues,labels,pull_requests,git,actions,projects,notifications,users"
+      }
+    }
+  }
+}

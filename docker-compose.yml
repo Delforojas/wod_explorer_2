@@ -1,0 +1,25 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: wod_explorer_2
+      MYSQL_USER: ${MYSQL_USER:?Define MYSQL_USER in .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Define MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Define MYSQL_ROOT_PASSWORD in .env}
+    ports:
+      - "${MYSQL_PORT:-3309}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./Docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'MYSQL_PWD="$${MYSQL_PASSWORD}" mysql --protocol=tcp --host=127.0.0.1 --user="$${MYSQL_USER}" --database="$${MYSQL_DATABASE}" --silent --execute="SELECT 1" >/dev/null'
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  mysql_data:
