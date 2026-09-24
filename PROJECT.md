@@ -28,7 +28,7 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 - Ruta base API: Pendiente de definir.
 - Fuente de diseño: `DESIGN.md`; detalles visuales pendientes de definir.
 
-### Comandos
+### Comandos frontend
 
 - Install: Pendiente de definir según el gestor de paquetes del proyecto.
 - Run: Pendiente de definir.
@@ -58,7 +58,7 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 - Testing: Pendiente de definir.
 - Ruta base API: Pendiente de definir.
 
-### Comandosa
+### Comandos backend
 
 - Install: Pendiente de definir.
 - Run: Pendiente de definir.
@@ -86,12 +86,11 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 
 ## Herramientas
 
-### MCP
+## MCPs
 
-- Repository MCP: No configurado.
-- Database MCP: No configurado.
-- Design MCP: No configurado.
-- MCP adicionales: Ninguno configurado.
+- `database`: acceso e inspección del estado real de MySQL.
+- `github`: acceso al repositorio remoto, Issues, Pull Requests, Actions y otros recursos de GitHub.
+- `context7`: consulta de documentación técnica actualizada de librerías, frameworks, SDKs, APIs y herramientas.
 
 ---
 

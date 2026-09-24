@@ -255,6 +255,18 @@ Antes de modificar código:
 No es necesario leer skills que no tengan relación con la tarea actual.
 Si alguno de estos archivos no existe, no asumas su contenido ni inventes reglas en su nombre.
 
+## Documentación técnica externa
+
+El proyecto dispone del MCP `context7` para consultar documentación técnica actualizada.
+
+Usa `context7` cuando una tarea requiera consultar documentación actual de una librería, framework, SDK, API o herramienta.
+
+Prioriza la documentación correspondiente a la tecnología y versión realmente configuradas en el proyecto.
+
+La documentación obtenida mediante `context7` no sustituye ni puede contradecir las decisiones definidas por la constitución, la spec activa, `PRODUCT.md`, `DOMAIN.md`, `PROJECT.md` o los `AGENTS.md` aplicables.
+
+No introduzcas una dependencia, tecnología o cambio arquitectónico únicamente porque aparezca recomendado en la documentación consultada.
+
 ## Prioridad de instrucciones
 
 Cuando varias fuentes de instrucciones sean aplicables, utiliza el siguiente orden de prioridad:
@@ -332,3 +344,20 @@ Los valores `<...>` representan placeholders de la plantilla.
 Durante la inicialización de un proyecto, los placeholders necesarios deben sustituirse por valores concretos.
 
 No asumir valores para placeholders que todavía no hayan sido resueltos.
+
+## Git y GitHub
+
+- Git es el sistema de control de versiones del proyecto.
+- GitHub es la plataforma remota para repositorio, Issues, Pull Requests y workflows.
+- MCP disponible para interactuar con GitHub: `github`.
+
+Cuando una tarea requiera información del estado remoto de GitHub:
+
+- Usa el MCP `github` para consultar el repositorio, Issues, Pull Requests, Actions y demás recursos necesarios.
+- No asumas que el estado local coincide con el estado remoto; compruébalo cuando sea relevante.
+- Utiliza Git local para operaciones sobre el working tree, staging, commits y ramas locales.
+- Utiliza el MCP `github` para operaciones que requieran interactuar con recursos remotos de GitHub.
+
+El acceso al MCP `github` no autoriza por sí mismo operaciones de escritura.
+
+La creación o modificación de Issues, Pull Requests, merge, push, cierre de Issues u otras operaciones remotas solo puede realizarse cuando el workflow correspondiente o una instrucción explícita lo autorice.
