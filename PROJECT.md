@@ -49,14 +49,15 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 ## Backend
 
 - Lenguaje: Java
-- Versión: Pendiente de definir.
+- Versión: 21
 - Framework: Spring Boot
-- Versión del framework: Pendiente de definir.
-- Build tool: Pendiente de definir.
-- Arquitectura: Pendiente de definir según la especificación y la estructura real del backend.
-- Persistencia: Pendiente de definir; no se ha seleccionado ORM ni framework de persistencia.
-- Testing: Pendiente de definir.
-- Ruta base API: Pendiente de definir.
+- Versión del framework: 3.5.5
+- Build tool: Maven Wrapper.
+- Arquitectura: capas sencillas `Controller → Service → Repository → Spring Data JPA/Hibernate → MySQL`; DTOs para los contratos de la API y validación en la entrada. Mantener esta arquitectura simple y no añadir capas o patrones sin necesidad de la spec activa.
+- Persistencia: Spring Data JPA / Hibernate.
+- Base de datos: MySQL 8.4.
+- Testing: JUnit 5 + Spring Boot Test.
+- Ruta base API: `/api`.
 
 ### Comandos backend
 

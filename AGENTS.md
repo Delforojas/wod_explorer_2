@@ -6,9 +6,9 @@ Aplicación web Full Stack para explorar WODs y ejercicios de CrossFit, registra
 
 El frontend está desarrollado con React + TypeScript.
 
-La persistencia principal se realiza en MySQL 8.4 ejecutado mediante Docker Compose.
+La persistencia principal se realiza en MySQL 8.4 mediante Docker Compose.
 
-El backend se implementará con Java + Spring Boot cuando la spec correspondiente lo solicite.
+El backend de WOD Explorer 2.0 utiliza Java 21, Spring Boot 3.5.5, Maven Wrapper y Spring Data JPA/Hibernate, con MySQL 8.4. Las reglas técnicas del backend se definen en `backend/AGENTS.md`; la configuración real del repositorio y `PROJECT.md` determinan las dependencias y comandos disponibles.
 
 Los archivos JSON existentes pertenecen a la versión inicial del proyecto y no deben considerarse la fuente de verdad una vez que la funcionalidad sea migrada a la base de datos.
 
@@ -18,20 +18,7 @@ Los archivos JSON existentes pertenecen a la versión inicial del proyecto y no 
 
 ### Frontend
 
-- Framework o librería principal: `<framework>`
-
-- Lenguaje de programación: `<lenguaje>`
-
-- Sistema de estilos: `<sistema-de-estilos>`
-
-- Validación y tipado de dato
-
-Lee también:
-`frontend/AGENTS.md`
-Sus reglas son obligatorias para cualquier cambio relacionado con frontend.
-El lenguaje, framework, herramientas y arquitectura utilizados deben obtenerse
-de `frontend/AGENTS.md` y de la configuración real del proyecto.
-No asumas un stack frontend concreto desde este archivo raíz.
+Para cualquier trabajo relacionado con frontend, consulta `frontend/AGENTS.md` si existe y revisa la configuración real del proyecto. Sus instrucciones son obligatorias dentro de su ámbito. Si el archivo no existe, no inventes sus reglas ni presupongas un stack a partir de esta guía raíz.
 
 ### Backend
 
@@ -50,9 +37,9 @@ Para cualquier trabajo relacionado con:
 lee también:
 `backend/AGENTS.md`
 Sus reglas son obligatorias para cualquier cambio relacionado con backend.
-El lenguaje, framework, herramientas y arquitectura utilizados deben obtenerse
-de `backend/AGENTS.md` y de la configuración real del proyecto.
-No asumas un stack backend concreto desde este archivo raíz.
+Las reglas detalladas de lenguaje, framework, herramientas y arquitectura se obtienen
+de `backend/AGENTS.md` y de la configuración real del proyecto. La mención del stack
+en la sección Proyecto es una referencia general; ante discrepancias, verifica esas fuentes antes de implementar.
 
 ### Base de datos
 
@@ -64,12 +51,12 @@ No asumas un stack backend concreto desde este archivo raíz.
 
 Para cualquier trabajo relacionado con base de datos o persistencia:
 
-1. Lee también `database/AGENTS.md`.
+1. Lee también `Docker/AGENTS.md`.
 2. Sus reglas son obligatorias para cualquier cambio relacionado con base de datos o persistencia.
 3. Usa el MCP `database` cuando sea necesario conocer o verificar el estado real de la base de datos.
 4. No asumas que el estado de la base de datos coincide con entidades, scripts, migraciones o documentación: compruébalo cuando sea relevante.
 
-La estrategia de migraciones y la arquitectura de persistencia deben obtenerse de `database/AGENTS.md` y de la configuración real del proyecto.
+La estrategia de migraciones y la arquitectura de persistencia deben obtenerse de `Docker/AGENTS.md` y de la configuración real del proyecto.
 
 El motor es MySQL 8.4 y el entorno de ejecución es Docker Compose.
 
@@ -77,7 +64,7 @@ No sustituyas MySQL 8.4 ni Docker Compose por otra tecnología sin autorización
 
 ## Ejecución de comandos
 
-Antes de ejecutar cualquier comando, identifica el área del proyecto en la que estás trabajando y consulta sus instrucciones específicas:
+Antes de ejecutar comandos, identifica el área afectada y consulta sus instrucciones específicas y la configuración real del proyecto:
 
 - Para frontend, lee `frontend/AGENTS.md`.
 
@@ -122,17 +109,17 @@ Para reglas específicas de estructura y arquitectura:
 ## Datos y persistencia
 
 Respeta la estrategia de persistencia y las fuentes de datos definidas por el proyecto.
-No asumas un motor de base de datos, sistema de almacenamiento, ORM o mecanismo de persistencia concreto.
+El motor y la infraestructura definidos para el proyecto son MySQL 8.4 y Docker Compose. Para estrategia de esquema, migraciones, ORM y procedimientos concretos, sigue `Docker/AGENTS.md` y la configuración real del proyecto.
 No modifiques el esquema, modelo de datos, migraciones o estructura de persistencia sin que el alcance de la tarea o la spec activa lo autorice.
 Evita mantener múltiples fuentes de verdad para los mismos datos.
 Cuando una fuente de datos sea sustituida o migrada, utiliza la fuente definida como principal por la arquitectura del proyecto y elimina dependencias obsoletas cuando el alcance de la tarea lo permita.
 Valida los datos en las fronteras correspondientes de la aplicación.
 Mantén separadas, cuando corresponda, la lógica de negocio y la lógica de acceso a datos.
 Para cualquier trabajo relacionado con base de datos o persistencia, consulta:
-`database/AGENTS.md`
+`Docker/AGENTS.md`
 
 Sus reglas son obligatorias para cualquier cambio relacionado con datos y persistencia.
-La tecnología, herramientas, estrategia de migraciones, modelo de datos y procedimientos específicos deben obtenerse de `database/AGENTS.md` y de la configuración real del proyecto.
+La tecnología, herramientas, estrategia de migraciones, modelo de datos y procedimientos específicos deben obtenerse de `Docker/AGENTS.md` y de la configuración real del proyecto.
 
 ## Skills
 
@@ -160,7 +147,7 @@ Por ejemplo:
 
 - las skills relacionadas con frontend deben definirse en `frontend/AGENTS.md`;
 - las skills relacionadas con backend deben definirse en `backend/AGENTS.md`;
-- las skills relacionadas con base de datos y persistencia deben definirse en `database/AGENTS.md`.
+- las skills relacionadas con base de datos y persistencia deben definirse en `Docker/AGENTS.md`.
 
 Una skill no autoriza por sí sola a:
 
@@ -188,8 +175,6 @@ Utiliza las skills como conocimiento especializado, no como fuente de requisitos
 - No cambies versiones principales de lenguajes, frameworks, dependencias o herramientas sin autorización explícita.
 - No realices commits, push, merge, creación de PR o cierre de Issues automáticamente salvo que el workflow correspondiente o una instrucción explícita lo autorice.
 
-cuta únicamente las verificaciones aplicables a las áreas del proyecto modificadas.
-
 Las verificaciones concretas deben obtenerse de la configuración real del proyecto y del `AGENTS.md` específico de cada área.
 
 ## Al terminar cualquier tarea
@@ -212,7 +197,7 @@ Ejecuta las verificaciones de tests, compilación, build, ejecución y otras com
 ### Si se modifica base de datos o persistencia
 
 Consulta:
-`database/AGENTS.md`
+`Docker/AGENTS.md`
 Ejecuta las verificaciones de esquema, migraciones, integridad, persistencia y otras comprobaciones definidas allí que sean aplicables a la tarea.
 
 ### Reglas generales de verificación
@@ -339,11 +324,7 @@ Los `AGENTS.md` especializados pueden añadir guardrails adicionales para su ám
 
 Los `AGENTS.md` especializados deben consultar `PROJECT.md` para conocer las tecnologías, versiones, herramientas, comandos, MCPs y fuentes de verdad configuradas.
 
-Los valores `<...>` representan placeholders de la plantilla.
-
-Durante la inicialización de un proyecto, los placeholders necesarios deben sustituirse por valores concretos.
-
-No asumir valores para placeholders que todavía no hayan sido resueltos.
+Los placeholders que aún existan en documentos del proyecto no son valores configurados. No asumir sus valores: consultar `PROJECT.md`, los agentes específicos y la configuración real antes de tomar decisiones.
 
 ## Git y GitHub
 
