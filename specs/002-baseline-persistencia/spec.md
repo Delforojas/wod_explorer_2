@@ -24,6 +24,7 @@ La implementación debe respetar `DOMAIN.md` y las decisiones cerradas por la Is
 - `backend/pom.xml` utiliza Spring Boot 3.5.5, Java 21 y starters compatibles con esa versión.
 - Maven Wrapper se ejecuta desde `backend/`.
 - La aplicación local puede resolver el puerto MySQL documentado sin depender de valores secretos incluidos en Git.
+- Las ejecuciones Maven desde `backend/` importan opcionalmente el `.env` de la raíz; las variables de entorno explícitas y Docker Compose conservan prioridad.
 - Docker Compose mantiene MySQL 8.4, el servicio `mysql`, el backend dependiente de su healthcheck y la configuración por variables de entorno.
 - Hibernate valida el esquema existente, pero no lo crea ni lo modifica automáticamente.
 
@@ -49,6 +50,7 @@ La implementación debe respetar `DOMAIN.md` y las decisiones cerradas por la Is
 
 - [ ] Spring Boot efectivo y starters de `backend/pom.xml` están alineados con Spring Boot 3.5.5 y Java 21.
 - [ ] Los comandos reproducibles de Maven Wrapper, Docker Compose y configuración local están documentados sin secretos reales.
+- [ ] Una ejecución de `./mvnw -q test` desde `backend/` puede resolver la configuración JDBC mediante `../.env` o variables de entorno exportadas.
 - [ ] La fuente autoritativa del esquema y la estrategia de evolución versionada están registradas en `PROJECT.md`.
 - [ ] El baseline SQL está numerado, versionado y permite inicializar una base vacía mediante Docker Compose.
 - [ ] `WodOrigin.PERSONAL` y `wods.origin` usan el mismo valor persistido.

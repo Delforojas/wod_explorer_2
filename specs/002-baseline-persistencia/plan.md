@@ -9,7 +9,7 @@ La estrategia de esquema será SQL versionado dentro de `Docker/mysql/init/`, us
 ## Componentes y archivos afectados
 
 - `backend/pom.xml`: parent y starters compatibles con Spring Boot 3.5.5.
-- `backend/src/main/resources/application.properties`: puerto local documentado y validación Hibernate del esquema.
+- `backend/src/main/resources/application.properties`: importación local opcional de `../.env`, puerto documentado y validación Hibernate del esquema.
 - `backend/src/main/java/.../entity/WodOrigin.java`: alineación del enum con el valor persistido.
 - `backend/src/main/java/.../entity/Exercise.java`: longitudes explícitas compatibles con MySQL.
 - `Docker/mysql/init/001_baseline.sql`: baseline SQL versionado, `user_identities` y restricciones existentes coherentes.
@@ -23,7 +23,7 @@ No se modificarán `DOMAIN.md`, endpoints, servicios de negocio, autenticación,
 ## Cambios técnicos previstos
 
 1. Cambiar Spring Boot 4.1.1 por 3.5.5 y sustituir únicamente los starters que no existen o no corresponden al baseline 3.5.5.
-2. Configurar `spring.jpa.hibernate.ddl-auto=validate` y un valor por defecto local para `MYSQL_PORT`, sin incluir credenciales.
+2. Configurar la importación opcional de `../.env`, `spring.jpa.hibernate.ddl-auto=validate` y un valor por defecto local para `MYSQL_PORT`, sin incluir credenciales.
 3. Renombrar el dump de inicialización a `001_baseline.sql` y conservar sus datos de catálogo existentes.
 4. Añadir `user_identities` con las dos restricciones únicas ya declaradas por `UserIdentity`.
 5. Mantener las relaciones de WOD, versiones, composición y resultados, incluyendo `deleted_at`, `wod_version_id` y las claves de composición.
@@ -39,3 +39,4 @@ No se modificarán `DOMAIN.md`, endpoints, servicios de negocio, autenticación,
 - Verificar mediante `database` que MySQL 8.4 está accesible y que tablas, columnas, claves, relaciones e índices afectados coinciden con el baseline.
 - Consultar la integridad referencial de WOD, versiones, composición, resultados e identidades sin modificar datos.
 - Ejecutar `git diff --check` y revisar que no haya secretos ni cambios fuera del alcance.
+- Repetir `./mvnw -q test` desde `backend/` con JDK 21 y la configuración local definida en `../.env`.

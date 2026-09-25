@@ -13,7 +13,7 @@ Las tareas 2 y 3 dependen de la configuración y decisiones documentadas en la t
 ## Tareas ejecutables
 
 - [x] Alinear `backend/pom.xml` con Spring Boot 3.5.5, Java 21 y starters compatibles, sin añadir dependencias innecesarias.
-- [x] Configurar validación explícita del esquema mediante Hibernate y documentar el puerto local resuelto por defecto.
+- [x] Configurar la importación local opcional de `../.env`, la validación explícita del esquema mediante Hibernate y documentar el puerto local resuelto por defecto.
 - [x] Corregir `.env.example` para usar placeholders no sensibles y valores coherentes con Docker Compose.
 - [x] Renombrar el SQL inicial a `Docker/mysql/init/001_baseline.sql` sin perder los datos de catálogo existentes.
 - [x] Añadir `user_identities` al baseline con su relación a `users` y restricciones únicas por proveedor.

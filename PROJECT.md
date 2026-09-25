@@ -62,10 +62,13 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 ### Comandos backend
 
 - Install: Pendiente de definir.
-- Run: `./mvnw spring-boot:run` desde `backend/`, con las variables de entorno requeridas.
-- Validate: `./mvnw -q -DskipTests validate` desde `backend/`.
-- Test: `./mvnw -q test` desde `backend/`.
-- Build: `./mvnw -q package` desde `backend/`.
+- Preparación local: crear `../.env` desde `.env.example` y completar sus variables requeridas; `application.properties` importa ese archivo opcionalmente cuando Maven se ejecuta desde `backend/`.
+- Run: `./mvnw spring-boot:run` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
+- Validate: `./mvnw -q -DskipTests validate` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
+- Test: `./mvnw -q test` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
+- Build: `./mvnw -q package` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
+
+Maven no carga automáticamente el archivo `.env` por sí mismo. La aplicación importa `../.env` para las ejecuciones locales desde `backend/`; las variables exportadas explícitamente y las variables inyectadas por Docker Compose tienen prioridad. `JWT_SECRET`, `MYSQL_USER`, `MYSQL_PASSWORD`, `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` deben estar definidos antes de ejecutar tests o la aplicación.
 
 ---
 
