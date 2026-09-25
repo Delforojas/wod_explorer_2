@@ -202,7 +202,7 @@ Atributos conceptuales mínimos:
 - fecha y hora de realización;
 - resultado según la modalidad del WOD;
 - estado de finalización, cuando sea necesario distinguir un WOD completado de uno no completado;
-- notas opcionales.
+- las notas no forman parte de la primera versión.
 
 El resultado puede adoptar distintas formas según el tipo de WOD, por ejemplo:
 
@@ -213,6 +213,14 @@ El resultado puede adoptar distintas formas según el tipo de WOD, por ejemplo:
 
 No debe forzarse una única cifra genérica que pierda el significado deportivo del resultado.
 
+Las modalidades iniciales admitidas son `FOR_TIME`, `AMRAP` y `EMOM`. No se admiten modalidades adicionales hasta que exista una decisión explícita que defina su resultado y comparación.
+
+- En `FOR_TIME`, un resultado completado contiene un tiempo positivo. Un resultado no completado puede conservar el progreso alcanzado mediante los campos de progreso definidos para la versión ejecutada. Solo los resultados completados y compatibles participan en la mejor marca.
+- En `AMRAP`, un resultado contiene rondas completas y repeticiones adicionales no negativas. La comparación se realiza primero por rondas y después por repeticiones adicionales.
+- En `EMOM`, un resultado conserva la ronda alcanzada y, cuando proceda, el elemento y la métrica de progreso alcanzados. Solo se comparan resultados compatibles de la misma versión y regla de progreso.
+
+Los campos de resultado deben ser compatibles con la modalidad del WOD.
+
 Reglas:
 
 - solo un usuario autenticado puede registrar un resultado;
@@ -221,7 +229,9 @@ Reglas:
 - registrar un nuevo intento no sustituye los anteriores;
 - el resultado debe ser compatible con la modalidad del WOD;
 - todos los resultados son personales y privados;
-- un usuario solo puede consultar, modificar o eliminar sus propios resultados.
+- un resultado es inmutable después de registrarse y no puede modificarse ni corregirse;
+- un usuario solo puede consultar y eliminar sus propios resultados;
+- eliminar un resultado no elimina ni modifica los demás intentos.
 
 ### 5.6. Historial personal
 
@@ -240,13 +250,13 @@ Puede ofrecer búsqueda, filtrado y ordenación sin cambiar la propiedad ni la p
 
 Es un valor derivado de los resultados válidos de un usuario para un WOD determinado.
 
-No constituye un resultado adicional ni debe introducir una segunda fuente de verdad. Si un resultado se corrige o elimina, la mejor marca debe recalcularse.
+No constituye un resultado adicional ni debe introducir una segunda fuente de verdad. Si se crea o elimina un resultado, la mejor marca se deriva de nuevo a partir de los resultados existentes.
 
 La comparación depende de la modalidad:
 
 - en `FOR_TIME`, normalmente gana el menor tiempo entre intentos completados equivalentes;
 - en `AMRAP`, gana la mayor cantidad de trabajo, comparando primero rondas completas y después repeticiones adicionales;
-- en otras modalidades, la regla debe definirse de forma explícita antes de calcular la marca.
+- no se calculan mejores marcas para modalidades no admitidas explícitamente.
 
 Solo deben compararse resultados compatibles del mismo WOD. No se agregan resultados de WOD distintos aunque compartan nombre.
 
@@ -266,9 +276,9 @@ La composición se crea, modifica y valida a través del WOD. No debe quedar un 
 El resultado es una raíz independiente que referencia:
 
 - al usuario propietario;
-- al WOD realizado.
+- al WOD realizado y a la versión concreta ejecutada.
 
-El histórico de resultados debe conservar su significado aunque el WOD personal cambie posteriormente. La implementación deberá decidir y documentar si guarda una instantánea de la definición realizada o impide cambios que alteren retroactivamente los registros. No es aceptable que un resultado antiguo termine describiendo silenciosamente un entrenamiento diferente.
+El histórico de resultados debe conservar su significado aunque el WOD personal cambie posteriormente. Cada modificación de un WOD personal con resultados crea una nueva versión; los resultados existentes mantienen la referencia a la versión ejecutada y no se alteran retroactivamente. Un WOD personal con resultados se archiva en lugar de eliminarse físicamente y no admite nuevos resultados mientras esté archivado.
 
 ### Propiedad de los recursos
 
@@ -277,7 +287,7 @@ El histórico de resultados debe conservar su significado aunque el WOD personal
 | Ejercicio de catálogo | Sistema                 | Pública     | Sistema                  |
 | WOD genérico          | Sistema                 | Pública     | Sistema                  |
 | WOD personal          | Usuario creador         | Privada     | Su propietario           |
-| Resultado             | Usuario que lo registra | Privada     | Su propietario           |
+| Resultado             | Usuario que lo registra | Privada     | Nadie; su propietario puede eliminarlo |
 | Historial             | Derivado del usuario    | Privada     | No se edita directamente |
 | Mejor marca           | Derivada del usuario    | Privada     | No se edita directamente |
 
@@ -293,11 +303,12 @@ El histórico de resultados debe conservar su significado aunque el WOD personal
 8. Un usuario solo puede modificar o eliminar sus propios WOD.
 9. Un usuario puede registrar varios resultados para el mismo WOD.
 10. Cada resultado pertenece a un único usuario y nunca es público.
-11. El usuario solo puede acceder a su historial y a sus mejores marcas.
-12. El historial y las mejores marcas se derivan de los resultados; no se editan directamente.
-13. Los datos personales del usuario se limitan a los necesarios para el registro y la identificación.
-14. El acceso a un recurso privado debe validarse por propiedad, no solo por conocer su identificador.
-15. La eliminación o modificación de un WOD no puede falsear el significado de resultados históricos ya registrados.
+11. Un resultado es inmutable después de registrarse; solo su propietario puede eliminarlo.
+12. El usuario solo puede acceder a su historial y a sus mejores marcas.
+13. El historial y las mejores marcas se derivan de los resultados; no se editan ni almacenan como segunda fuente de verdad.
+14. Los datos personales del usuario se limitan a los necesarios para el registro y la identificación.
+15. El acceso a un recurso privado debe validarse por propiedad, no solo por conocer su identificador.
+16. La eliminación o modificación de un WOD no puede falsear el significado de resultados históricos ya registrados.
 
 ## 8. Invariantes
 
@@ -308,6 +319,7 @@ Las siguientes condiciones deben cumplirse siempre:
 - todas las posiciones de la composición permiten reconstruir un orden determinista;
 - cada ejercicio referenciado existe en el catálogo;
 - cada resultado tiene un usuario, un WOD y una fecha de realización;
+- un resultado no puede modificarse después de registrarse;
 - la representación del resultado coincide con la modalidad del WOD;
 - ningún usuario puede leer o alterar recursos privados de otro usuario;
 - una mejor marca siempre puede justificarse mediante un resultado existente y válido.
@@ -357,7 +369,7 @@ Los filtros no deben permitir que aparezca información privada de otros usuario
 - eliminar un WOD personal propio;
 - registrar un resultado en un WOD genérico;
 - registrar un resultado en un WOD personal propio;
-- corregir o eliminar un resultado propio;
+- consultar y eliminar un resultado propio;
 - consultar el historial propio;
 - consultar las mejores marcas propias.
 
@@ -365,15 +377,9 @@ Los filtros no deben permitir que aparezca información privada de otros usuario
 
 Antes de implementar funcionalidades que dependan de ellas, habrá que decidir explícitamente:
 
-- qué modalidades de WOD se admiten definitivamente además de `FOR_TIME`, `AMRAP` y `EMOM`;
-- qué campos exactos componen el resultado de cada modalidad;
-- cómo se preserva la definición histórica de un WOD cuando ya tiene resultados;
-- si un WOD personal con resultados puede eliminarse físicamente o debe archivarse;
-- qué prescripciones admite cada ejercicio dentro de un WOD;
 - cómo se gestionan las versiones del catálogo de ejercicios;
-- si las notas de un resultado se incluyen desde la primera versión.
 
-Estas decisiones deben resolverse en especificaciones posteriores. No deben completarse por intuición durante la implementación.
+La única decisión pendiente de esta sección es cómo se gestionan las versiones del catálogo de ejercicios. No debe resolverse por intuición durante la implementación.
 
 ## 12. Evolución futura
 
