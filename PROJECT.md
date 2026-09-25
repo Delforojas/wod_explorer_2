@@ -110,7 +110,7 @@ Maven no carga automáticamente el archivo `.env` por sí mismo. La aplicación 
 - Reglas backend: `backend/AGENTS.md`
 - Reglas de base de datos: `Docker/AGENTS.md`
 - Especificaciones: `specs/`
-- Esquema de base de datos: Pendiente de definir en la configuración del área database.
+- Esquema de base de datos: `Docker/mysql/init/001_baseline.sql` y los scripts numerados posteriores.
 
 ---
 
