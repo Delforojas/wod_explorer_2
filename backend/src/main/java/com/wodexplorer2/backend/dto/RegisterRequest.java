@@ -1,0 +1,7 @@
+package com.wodexplorer2.backend.dto;
+
+public record RegisterRequest(
+    String username,
+    String email,
+    String password) {
+}
