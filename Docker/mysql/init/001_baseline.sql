@@ -19,7 +19,6 @@
 -- Table structure for table `exercise_results`
 --
 
-DROP TABLE IF EXISTS `exercise_results`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `exercise_results` (
@@ -54,7 +53,6 @@ UNLOCK TABLES;
 -- Table structure for table `exercises`
 --
 
-DROP TABLE IF EXISTS `exercises`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `exercises` (
@@ -84,7 +82,6 @@ UNLOCK TABLES;
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
@@ -109,10 +106,24 @@ LOCK TABLES `users` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `user_identities`
+--
+
+CREATE TABLE `user_identities` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint unsigned NOT NULL,
+  `provider` varchar(50) NOT NULL,
+  `provider_user_id` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_user_identities_provider_user` (`provider`,`provider_user_id`),
+  UNIQUE KEY `uq_user_identities_user_provider` (`user_id`,`provider`),
+  CONSTRAINT `fk_user_identities_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
 -- Table structure for table `wod_results`
 --
 
-DROP TABLE IF EXISTS `wod_results`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `wod_results` (
@@ -153,7 +164,6 @@ UNLOCK TABLES;
 -- Table structure for table `wod_version_items`
 --
 
-DROP TABLE IF EXISTS `wod_version_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `wod_version_items` (
@@ -188,7 +198,6 @@ UNLOCK TABLES;
 -- Table structure for table `wod_versions`
 --
 
-DROP TABLE IF EXISTS `wod_versions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `wod_versions` (
@@ -222,7 +231,6 @@ UNLOCK TABLES;
 -- Table structure for table `wods`
 --
 
-DROP TABLE IF EXISTS `wods`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `wods` (

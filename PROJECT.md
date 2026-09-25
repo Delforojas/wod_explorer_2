@@ -62,10 +62,10 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 ### Comandos backend
 
 - Install: Pendiente de definir.
-- Run: Pendiente de definir.
-- Validate: Pendiente de definir.
-- Test: Pendiente de definir.
-- Build: Pendiente de definir.
+- Run: `./mvnw spring-boot:run` desde `backend/`, con las variables de entorno requeridas.
+- Validate: `./mvnw -q -DskipTests validate` desde `backend/`.
+- Test: `./mvnw -q test` desde `backend/`.
+- Build: `./mvnw -q package` desde `backend/`.
 
 ---
 
@@ -73,15 +73,16 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 
 - Motor: MySQL
 - Versión: 8.4
-- Nombre: Pendiente de definir.
-- Servicio Docker Compose: Pendiente de definir.
-- Contenedor: Pendiente de definir.
-- Puerto local: Pendiente de definir.
-- Puerto interno: Pendiente de definir; usar el valor estándar de MySQL solo cuando se confirme en la configuración.
-- Volumen: Pendiente de definir.
-- Scripts de inicialización: Pendiente de definir.
-- Sistema de migraciones: Pendiente de definir.
-- Fuente de verdad del esquema: Pendiente de definir; debe acordarse en `database/AGENTS.md` o en la especificación de base de datos.
+- Nombre: `wod_explorer_2`.
+- Servicio Docker Compose: `mysql`.
+- Imagen: `mysql:8.4`.
+- Puerto local: `${MYSQL_PORT:-3309}`.
+- Puerto interno: `3306`.
+- Volumen: `mysql_data`.
+- Scripts de inicialización: `Docker/mysql/init/NNN_*.sql`.
+- Sistema de migraciones: scripts SQL versionados y numerados, ejecutados en orden por Docker Compose al inicializar un volumen vacío.
+- Fuente de verdad del esquema: `Docker/mysql/init/001_baseline.sql` y los scripts numerados posteriores.
+- Evolución: los scripts aplicados no se editan; una evolución de un volumen existente requiere un script posterior y una ejecución de migración explícita. No se introduce un gestor de migraciones en esta Issue.
 
 ---
 

@@ -20,11 +20,11 @@ public class Exercise {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
     private ExerciseCategory category;
 
-    @Column(name = "measurement_type", nullable = false)
+    @Column(name = "measurement_type", nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
     private MeasurementType measurementType;
 
