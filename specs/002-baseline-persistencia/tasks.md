@@ -33,4 +33,4 @@ Las tareas 2 y 3 dependen de la configuración y decisiones documentadas en la t
 - [x] `database_ping` y `database_server_info` confirman MySQL 8.4 accesible.
 - [x] `database` confirma el esquema y la integridad referencial relevantes.
 - [x] `git diff --check`.
-- [ ] Revisión de secretos, alcance y estado Git antes y después del commit.
+- [x] Revisión de secretos, alcance y estado Git antes y después del commit.
