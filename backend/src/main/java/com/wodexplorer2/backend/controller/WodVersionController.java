@@ -1,6 +1,10 @@
 package com.wodexplorer2.backend.controller;
 
 import com.wodexplorer2.backend.entity.WodVersion;
+import com.wodexplorer2.backend.dto.WodVersionRequest;
+import com.wodexplorer2.backend.dto.WodVersionResponse;
+import com.wodexplorer2.backend.mapper.WodVersionMapper;
+import jakarta.validation.Valid;
 import com.wodexplorer2.backend.service.WodVersionService;
 
 import org.springframework.web.bind.annotation.*;
@@ -13,24 +17,30 @@ import java.util.Optional;
 public class WodVersionController {
 
     private final WodVersionService wodVersionService;
+    private final WodVersionMapper wodVersionMapper;
 
-    public WodVersionController(WodVersionService wodVersionService) {
+    public WodVersionController(
+            WodVersionService wodVersionService,
+            WodVersionMapper wodVersionMapper) {
         this.wodVersionService = wodVersionService;
+        this.wodVersionMapper = wodVersionMapper;
     }
 
     @GetMapping
-    public List<WodVersion> findAll() {
-        return wodVersionService.findAll();
+    public List<WodVersionResponse> findAll() {
+        return wodVersionService.findAll().stream()
+                .map(wodVersionMapper::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<WodVersion> findById(@PathVariable Long id) {
-        return wodVersionService.findById(id);
+    public WodVersionResponse findById(@PathVariable Long id) {
+        return wodVersionMapper.toResponse(wodVersionService.findById(id));
     }
 
     @PostMapping
-    public WodVersion create(@RequestBody WodVersion wodVersion) {
-        return wodVersionService.create(wodVersion);
+    public WodVersionResponse create(@Valid @RequestBody WodVersionRequest request) {
+        return wodVersionMapper.toResponse(wodVersionService.create(request));
     }
 
     @DeleteMapping("/{id}")

@@ -1,12 +1,11 @@
 package com.wodexplorer2.backend.controller;
 
-import com.wodexplorer2.backend.entity.User;
+import com.wodexplorer2.backend.dto.UserResponse;
+import com.wodexplorer2.backend.dto.UserUpdateRequest;
+import jakarta.validation.Valid;
 import com.wodexplorer2.backend.service.UserService;
 
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -19,30 +18,32 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> findAll() {
-        return userService.findAll();
+    public UserResponse findCurrent() {
+        return toResponse(userService.findCurrent());
     }
 
     @GetMapping("/{id}")
-    public Optional<User> findById(@PathVariable Long id) {
-        return userService.findById(id);
-    }
-
-    @PostMapping
-    public User create(@RequestBody User user) {
-        return userService.create(user);
+    public UserResponse findById(@PathVariable Long id) {
+        return toResponse(userService.requireOwned(id));
     }
 
     @PutMapping("/{id}")
-    public User update(
+    public UserResponse update(
             @PathVariable Long id,
-            @RequestBody User user) {
-
-        return userService.update(id, user);
+            @Valid @RequestBody UserUpdateRequest request) {
+        return toResponse(userService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        userService.deleteById(id);
+        userService.delete(id);
+    }
+
+    private UserResponse toResponse(com.wodexplorer2.backend.entity.User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt());
     }
 }

@@ -9,9 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import io.jsonwebtoken.JwtException;
 
 import java.io.IOException;
 
@@ -44,26 +46,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     String token = authHeader.substring(7);
-    String username = jwtService.extractUsername(token);
 
-    if (username != null
-        && SecurityContextHolder.getContext().getAuthentication() == null) {
+    try {
+      String username = jwtService.extractUsername(token);
 
-      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+      if (username != null
+          && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-      if (jwtService.isTokenValid(token, userDetails.getUsername())) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.getAuthorities());
+        if (jwtService.isTokenValid(token, userDetails.getUsername())) {
 
-        authentication.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(request));
+          UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+              userDetails,
+              null,
+              userDetails.getAuthorities());
 
-        SecurityContextHolder.getContext()
-            .setAuthentication(authentication);
+          authentication.setDetails(
+              new WebAuthenticationDetailsSource().buildDetails(request));
+
+          SecurityContextHolder.getContext()
+              .setAuthentication(authentication);
+        }
       }
+    } catch (JwtException | UsernameNotFoundException exception) {
+      SecurityContextHolder.clearContext();
     }
 
     filterChain.doFilter(request, response);

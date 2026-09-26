@@ -1,48 +1,56 @@
 package com.wodexplorer2.backend.controller;
 
-import com.wodexplorer2.backend.entity.Wod;
+import com.wodexplorer2.backend.dto.WodRequest;
+import com.wodexplorer2.backend.dto.WodResponse;
+import com.wodexplorer2.backend.mapper.WodMapper;
+import jakarta.validation.Valid;
 import com.wodexplorer2.backend.service.WodService;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/wods")
 public class WodController {
 
-    private final WodService wodService;
+  private final WodService wodService;
+  private final WodMapper wodMapper;
 
-    public WodController(WodService wodService) {
+    public WodController(
+            WodService wodService,
+            WodMapper wodMapper) {
         this.wodService = wodService;
+        this.wodMapper = wodMapper;
     }
 
     @GetMapping
-    public List<Wod> findAll() {
-        return wodService.findAll();
+    public List<WodResponse> findAll() {
+        return wodService.findVisible().stream()
+                .map(wodMapper::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<Wod> findById(@PathVariable Long id) {
-        return wodService.findById(id);
+    public WodResponse findById(@PathVariable Long id) {
+        return wodMapper.toResponse(wodService.findVisibleById(id));
     }
 
     @PostMapping
-    public Wod create(@RequestBody Wod wod) {
-        return wodService.create(wod);
+    public WodResponse create(@Valid @RequestBody WodRequest request) {
+        return wodMapper.toResponse(wodService.create(request));
     }
 
     @PutMapping("/{id}")
-    public Wod update(
+    public WodResponse update(
             @PathVariable Long id,
-            @RequestBody Wod wod) {
+            @Valid @RequestBody WodRequest request) {
 
-        return wodService.update(id, wod);
+        return wodMapper.toResponse(wodService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        wodService.deleteById(id);
+        wodService.archive(id);
     }
 }
