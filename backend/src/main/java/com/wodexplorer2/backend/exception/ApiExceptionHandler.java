@@ -66,6 +66,13 @@ public class ApiExceptionHandler {
     return response(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", exception.getMessage(), request);
   }
 
+  @ExceptionHandler(InvalidWodDefinitionException.class)
+  public ResponseEntity<ApiErrorResponse> handleInvalidWodDefinition(
+      InvalidWodDefinitionException exception,
+      HttpServletRequest request) {
+    return response(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", exception.getMessage(), request);
+  }
+
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       ResourceNotFoundException exception,
