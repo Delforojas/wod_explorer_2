@@ -7,5 +7,5 @@ import java.util.List;
 public interface WodVersionItemRepository
         extends JpaRepository<WodVersionItem, Long> {
 
-    List<WodVersionItem> findByWodVersionId(Long wodVersionId);
+    List<WodVersionItem> findByWodVersionIdOrderByPositionAsc(Long wodVersionId);
 }

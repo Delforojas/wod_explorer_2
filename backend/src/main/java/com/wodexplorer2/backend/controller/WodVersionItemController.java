@@ -1,15 +1,12 @@
 package com.wodexplorer2.backend.controller;
 
-import com.wodexplorer2.backend.dto.WodVersionItemRequest;
 import com.wodexplorer2.backend.dto.WodVersionItemResponse;
 import com.wodexplorer2.backend.mapper.WodVersionItemMapper;
-import jakarta.validation.Valid;
 import com.wodexplorer2.backend.service.WodVersionItemService;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/wod-version-items")
@@ -37,15 +34,4 @@ public class WodVersionItemController {
         return wodVersionItemMapper.toResponse(wodVersionItemService.findById(id));
     }
 
-    @PostMapping
-    public WodVersionItemResponse create(
-            @Valid @RequestBody WodVersionItemRequest request) {
-        return wodVersionItemMapper.toResponse(
-                wodVersionItemService.create(request, request.wodVersionId()));
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        wodVersionItemService.deleteById(id);
-    }
 }

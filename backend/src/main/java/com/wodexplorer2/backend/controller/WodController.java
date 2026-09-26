@@ -1,10 +1,9 @@
 package com.wodexplorer2.backend.controller;
 
-import com.wodexplorer2.backend.dto.WodRequest;
-import com.wodexplorer2.backend.dto.WodResponse;
-import com.wodexplorer2.backend.mapper.WodMapper;
+import com.wodexplorer2.backend.dto.WodAggregateResponse;
+import com.wodexplorer2.backend.dto.WodDefinitionRequest;
 import jakarta.validation.Valid;
-import com.wodexplorer2.backend.service.WodService;
+import com.wodexplorer2.backend.service.WodAggregateService;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -14,43 +13,36 @@ import java.util.List;
 @RequestMapping("/api/wods")
 public class WodController {
 
-  private final WodService wodService;
-  private final WodMapper wodMapper;
+  private final WodAggregateService wodAggregateService;
 
-    public WodController(
-            WodService wodService,
-            WodMapper wodMapper) {
-        this.wodService = wodService;
-        this.wodMapper = wodMapper;
-    }
+  public WodController(WodAggregateService wodAggregateService) {
+    this.wodAggregateService = wodAggregateService;
+  }
 
-    @GetMapping
-    public List<WodResponse> findAll() {
-        return wodService.findVisible().stream()
-                .map(wodMapper::toResponse)
-                .toList();
-    }
+  @GetMapping
+  public List<WodAggregateResponse> findAll() {
+    return wodAggregateService.findAll();
+  }
 
-    @GetMapping("/{id}")
-    public WodResponse findById(@PathVariable Long id) {
-        return wodMapper.toResponse(wodService.findVisibleById(id));
-    }
+  @GetMapping("/{id}")
+  public WodAggregateResponse findById(@PathVariable Long id) {
+    return wodAggregateService.findById(id);
+  }
 
-    @PostMapping
-    public WodResponse create(@Valid @RequestBody WodRequest request) {
-        return wodMapper.toResponse(wodService.create(request));
-    }
+  @PostMapping
+  public WodAggregateResponse create(@Valid @RequestBody WodDefinitionRequest request) {
+    return wodAggregateService.create(request);
+  }
 
-    @PutMapping("/{id}")
-    public WodResponse update(
-            @PathVariable Long id,
-            @Valid @RequestBody WodRequest request) {
+  @PutMapping("/{id}")
+  public WodAggregateResponse update(
+      @PathVariable Long id,
+      @Valid @RequestBody WodDefinitionRequest request) {
+    return wodAggregateService.update(id, request);
+  }
 
-        return wodMapper.toResponse(wodService.update(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        wodService.archive(id);
-    }
+  @DeleteMapping("/{id}")
+  public void delete(@PathVariable Long id) {
+    wodAggregateService.archive(id);
+  }
 }
