@@ -73,6 +73,13 @@ public class ApiExceptionHandler {
     return response(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", exception.getMessage(), request);
   }
 
+  @ExceptionHandler(InvalidWodResultException.class)
+  public ResponseEntity<ApiErrorResponse> handleInvalidWodResult(
+      InvalidWodResultException exception,
+      HttpServletRequest request) {
+    return response(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", exception.getMessage(), request);
+  }
+
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       ResourceNotFoundException exception,

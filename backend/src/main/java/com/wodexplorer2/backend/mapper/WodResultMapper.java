@@ -38,7 +38,11 @@ public class WodResultMapper {
   public WodResultResponse toResponse(WodResult wodResult) {
     return new WodResultResponse(
         wodResult.getId(),
+        wodResult.getWodVersion().getWod().getId(),
+        wodResult.getWodVersion().getWod().getName(),
+        wodResult.getWodVersion().getWod().getOrigin(),
         wodResult.getWodVersion().getId(),
+        wodResult.getWodVersion().getType(),
         wodResult.getPerformedAt(),
         wodResult.getCompleted(),
         wodResult.getTimeSeconds(),
