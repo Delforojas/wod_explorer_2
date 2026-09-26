@@ -1,36 +1,44 @@
 package com.wodexplorer2.backend.controller;
 
-import com.wodexplorer2.backend.entity.WodResult;
+import com.wodexplorer2.backend.dto.WodResultRequest;
+import com.wodexplorer2.backend.dto.WodResultResponse;
+import com.wodexplorer2.backend.mapper.WodResultMapper;
+import jakarta.validation.Valid;
 import com.wodexplorer2.backend.service.WodResultService;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/wod-results")
 public class WodResultController {
 
     private final WodResultService wodResultService;
+    private final WodResultMapper wodResultMapper;
 
-    public WodResultController(WodResultService wodResultService) {
+    public WodResultController(
+            WodResultService wodResultService,
+            WodResultMapper wodResultMapper) {
         this.wodResultService = wodResultService;
+        this.wodResultMapper = wodResultMapper;
     }
 
     @GetMapping
-    public List<WodResult> findAll() {
-        return wodResultService.findAll();
+    public List<WodResultResponse> findAll() {
+        return wodResultService.findAll().stream()
+                .map(wodResultMapper::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<WodResult> findById(@PathVariable Long id) {
-        return wodResultService.findById(id);
+    public WodResultResponse findById(@PathVariable Long id) {
+        return wodResultMapper.toResponse(wodResultService.findById(id));
     }
 
     @PostMapping
-    public WodResult create(@RequestBody WodResult wodResult) {
-        return wodResultService.create(wodResult);
+    public WodResultResponse create(@Valid @RequestBody WodResultRequest request) {
+        return wodResultMapper.toResponse(wodResultService.create(request));
     }
 
     @DeleteMapping("/{id}")

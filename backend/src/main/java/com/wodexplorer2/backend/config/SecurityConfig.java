@@ -1,6 +1,8 @@
 package com.wodexplorer2.backend.config;
 
 import com.wodexplorer2.backend.security.JwtAuthenticationFilter;
+import com.wodexplorer2.backend.exception.ApiErrorWriter;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,9 +16,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final ApiErrorWriter apiErrorWriter;
 
-  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+  public SecurityConfig(
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      ApiErrorWriter apiErrorWriter) {
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.apiErrorWriter = apiErrorWriter;
   }
 
   @Bean
@@ -31,9 +37,28 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/oauth2/**").permitAll()
             .requestMatchers("/login/oauth2/**").permitAll()
-            .requestMatchers("/api/exercises/**").permitAll()
-            .requestMatchers("/api/wods/**").permitAll()
+            .requestMatchers(
+                HttpMethod.GET,
+                "/api/exercises/**",
+                "/api/wods/**",
+                "/api/wod-versions/**",
+                "/api/wod-version-items/**")
+            .permitAll()
             .anyRequest().authenticated())
+
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> apiErrorWriter.write(
+                request,
+                response,
+                401,
+                "UNAUTHORIZED",
+                "Autenticación requerida"))
+            .accessDeniedHandler((request, response, accessDeniedException) -> apiErrorWriter.write(
+                request,
+                response,
+                403,
+                "FORBIDDEN",
+                "No tienes permisos para realizar esta operación")))
 
         .oauth2Login(oauth2 -> {
         })

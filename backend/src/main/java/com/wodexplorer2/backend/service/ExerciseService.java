@@ -16,14 +16,14 @@ public class ExerciseService {
         this.exerciseRepository = exerciseRepository;
     }
 
-    // READ ALL
-    public List<Exercise> findAll() {
-        return exerciseRepository.findAll();
+    public List<Exercise> findPublic() {
+        return exerciseRepository.findByActiveTrue();
     }
 
-    // READ ONE
-    public Optional<Exercise> findById(Long id) {
-        return exerciseRepository.findById(id);
+    public Exercise findPublicById(Long id) {
+        return exerciseRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new com.wodexplorer2.backend.exception.ResourceNotFoundException(
+                        "Ejercicio no encontrado"));
     }
 
     // CREATE

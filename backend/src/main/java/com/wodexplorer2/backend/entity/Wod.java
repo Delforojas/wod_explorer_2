@@ -67,6 +67,10 @@ public class Wod {
     this.name = name;
   }
 
+  public void archive() {
+    this.deletedAt = LocalDateTime.now();
+  }
+
   public Wod(
       User owner,
       String name,

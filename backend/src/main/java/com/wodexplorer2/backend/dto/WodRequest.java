@@ -1,5 +1,8 @@
 package com.wodexplorer2.backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public record WodRequest(
-    String name) {
+    @NotBlank @Size(max = 100) String name) {
 }

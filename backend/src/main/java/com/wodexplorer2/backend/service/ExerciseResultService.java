@@ -1,38 +1,63 @@
 package com.wodexplorer2.backend.service;
 
+import com.wodexplorer2.backend.dto.ExerciseResultRequest;
+import com.wodexplorer2.backend.entity.Exercise;
 import com.wodexplorer2.backend.entity.ExerciseResult;
+import com.wodexplorer2.backend.entity.User;
+import com.wodexplorer2.backend.exception.ForbiddenException;
+import com.wodexplorer2.backend.exception.ResourceNotFoundException;
+import com.wodexplorer2.backend.mapper.ExerciseResultMapper;
+import com.wodexplorer2.backend.repository.ExerciseRepository;
 import com.wodexplorer2.backend.repository.ExerciseResultRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ExerciseResultService {
 
     private final ExerciseResultRepository exerciseResultRepository;
+    private final ExerciseRepository exerciseRepository;
+    private final ExerciseResultMapper exerciseResultMapper;
+    private final CurrentUserService currentUserService;
 
-    public ExerciseResultService(ExerciseResultRepository exerciseResultRepository) {
+    public ExerciseResultService(
+            ExerciseResultRepository exerciseResultRepository,
+            ExerciseRepository exerciseRepository,
+            ExerciseResultMapper exerciseResultMapper,
+            CurrentUserService currentUserService) {
         this.exerciseResultRepository = exerciseResultRepository;
+        this.exerciseRepository = exerciseRepository;
+        this.exerciseResultMapper = exerciseResultMapper;
+        this.currentUserService = currentUserService;
     }
 
-    // READ ALL
     public List<ExerciseResult> findAll() {
-        return exerciseResultRepository.findAll();
+        return exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(
+                currentUserService.require().getId());
     }
 
-    // READ ONE
-    public Optional<ExerciseResult> findById(Long id) {
-        return exerciseResultRepository.findById(id);
+    public ExerciseResult findById(Long id) {
+        return requireOwned(id);
     }
 
-    // CREATE
-    public ExerciseResult create(ExerciseResult exerciseResult) {
-        return exerciseResultRepository.save(exerciseResult);
+    public ExerciseResult create(ExerciseResultRequest request) {
+        User user = currentUserService.require();
+        Exercise exercise = exerciseRepository.findByIdAndActiveTrue(request.exerciseId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ejercicio no encontrado"));
+        return exerciseResultRepository.save(exerciseResultMapper.toEntity(request, user, exercise));
     }
 
-    // DELETE
     public void deleteById(Long id) {
-        exerciseResultRepository.deleteById(id);
+        exerciseResultRepository.delete(requireOwned(id));
+    }
+
+    private ExerciseResult requireOwned(Long id) {
+        User currentUser = currentUserService.require();
+        ExerciseResult result = exerciseResultRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Resultado de ejercicio no encontrado"));
+        if (!result.getUser().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("No tienes permisos para acceder a este resultado");
+        }
+        return result;
     }
 }

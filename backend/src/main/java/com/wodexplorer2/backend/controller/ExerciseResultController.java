@@ -1,36 +1,44 @@
 package com.wodexplorer2.backend.controller;
 
-import com.wodexplorer2.backend.entity.ExerciseResult;
+import com.wodexplorer2.backend.dto.ExerciseResultRequest;
+import com.wodexplorer2.backend.dto.ExerciseResultResponse;
+import com.wodexplorer2.backend.mapper.ExerciseResultMapper;
+import jakarta.validation.Valid;
 import com.wodexplorer2.backend.service.ExerciseResultService;
 
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/exercise-results")
 public class ExerciseResultController {
 
     private final ExerciseResultService exerciseResultService;
+    private final ExerciseResultMapper exerciseResultMapper;
 
-    public ExerciseResultController(ExerciseResultService exerciseResultService) {
+    public ExerciseResultController(
+            ExerciseResultService exerciseResultService,
+            ExerciseResultMapper exerciseResultMapper) {
         this.exerciseResultService = exerciseResultService;
+        this.exerciseResultMapper = exerciseResultMapper;
     }
 
     @GetMapping
-    public List<ExerciseResult> findAll() {
-        return exerciseResultService.findAll();
+    public List<ExerciseResultResponse> findAll() {
+        return exerciseResultService.findAll().stream()
+                .map(exerciseResultMapper::toResponse)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Optional<ExerciseResult> findById(@PathVariable Long id) {
-        return exerciseResultService.findById(id);
+    public ExerciseResultResponse findById(@PathVariable Long id) {
+        return exerciseResultMapper.toResponse(exerciseResultService.findById(id));
     }
 
     @PostMapping
-    public ExerciseResult create(@RequestBody ExerciseResult exerciseResult) {
-        return exerciseResultService.create(exerciseResult);
+    public ExerciseResultResponse create(@Valid @RequestBody ExerciseResultRequest request) {
+        return exerciseResultMapper.toResponse(exerciseResultService.create(request));
     }
 
     @DeleteMapping("/{id}")
