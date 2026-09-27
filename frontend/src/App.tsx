@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import AppLayout from "./components/layout/AppLayout";
 import HomePage from "./pages/HomePage";
 import WodsPage from "./pages/WodsPage";
 import ExercisesPage from "./pages/ExercisesPage";
@@ -8,9 +8,7 @@ import GoogleCallbackPage from "./pages/GoogleCallbackPage";
 
 function App() {
   return (
-    <>
-      <Navbar />
-
+    <AppLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/exercises" element={<ExercisesPage />} />
@@ -18,7 +16,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
       </Routes>
-    </>
+    </AppLayout>
   );
 }
 
