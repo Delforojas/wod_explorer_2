@@ -22,8 +22,9 @@ También existe una integración Google parcial en el código actual:
 - `GoogleOAuthService` busca o crea usuarios y emite el JWT propio.
 - `UserIdentity` relaciona un usuario con `AuthProvider.GOOGLE` y un
   `providerUserId`.
-- `LoginPage` solo muestra el botón y `GoogleCallbackPage` todavía no procesa
-  el resultado.
+- `LoginPage` inicia ahora la navegación al endpoint backend
+  `/oauth2/authorization/google`; `GoogleCallbackPage` todavía no procesa el
+  resultado.
 - El handler actual envía el JWT en el fragmento `#token` de la redirección.
 
 La integración parcial se documenta para evitar duplicar decisiones. No se
@@ -82,7 +83,8 @@ Estado de autenticacion del frontend
 
 ### Paso a paso
 
-1. `LoginPage` inicia una navegación al endpoint OAuth2 del backend.
+1. `LoginPage` inicia una navegación al endpoint OAuth2 del backend mediante el
+   botón existente.
 2. Spring Security genera y conserva el estado de la autorización y redirige a
    Google con los scopes OIDC necesarios.
 3. Google autentica a la persona y devuelve el authorization code al callback
@@ -107,7 +109,7 @@ página y no ofrece consumo de un solo uso.
 
 ### Frontend
 
-- Iniciar el flujo navegando al backend.
+- Iniciar el flujo navegando al backend desde el botón existente.
 - No construir la autorización de Google ni almacenar secrets.
 - Recibir únicamente el handoff opaco.
 - Intercambiarlo mediante un servicio de autenticación.
@@ -274,7 +276,6 @@ La arquitectura permite separar el trabajo posterior en unidades manejables:
 
 ## Fuera de alcance de esta Issue
 
-- Botón funcional de Google.
 - Flujo OAuth/OIDC ejecutable.
 - Endpoints o callbacks funcionales.
 - Cambios en la base de datos, migraciones o entidades.

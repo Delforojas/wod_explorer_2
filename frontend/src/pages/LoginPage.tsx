@@ -20,6 +20,12 @@ function LoginPage() {
     navigate("/");
   }
 
+  function handleGoogleLogin() {
+    window.location.assign(
+      "http://localhost:8080/oauth2/authorization/google",
+    );
+  }
+
   return (
     <section>
       <h1>Iniciar sesión</h1>
@@ -52,7 +58,9 @@ function LoginPage() {
 
       <p>o</p>
 
-      <button type="button">Continuar con Google</button>
+      <button type="button" onClick={handleGoogleLogin}>
+        Continuar con Google
+      </button>
     </section>
   );
 }
