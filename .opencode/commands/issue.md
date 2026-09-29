@@ -1007,6 +1007,12 @@ Cuando el proyecto defina comandos específicos para preparar el entorno de vali
 
 No inventes comandos de desarrollo que no existan en el proyecto.
 
+- archivos modificados por la Issue, indicando su estado:
+  - `M` → modificado;
+  - `A` → añadido;
+  - `D` → eliminado;
+  - `R` → renombrado;
+
 El siguiente paso después de aprobar todas las validaciones manuales es:
 
 `/finish-issue $1`
