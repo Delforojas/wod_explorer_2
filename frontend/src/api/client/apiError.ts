@@ -13,6 +13,16 @@ export const API_ERROR_MESSAGES = {
     DELETE: "Error al eliminar el WOD",
   },
 
+  WOD_VERSIONS: {
+    GET_ALL: "Error al obtener las versiones de los WODs",
+    GET_BY_ID: "Error al obtener la versión del WOD",
+  },
+
+  WOD_VERSION_ITEMS: {
+    GET_ALL: "Error al obtener los elementos de las versiones de los WODs",
+    GET_BY_ID: "Error al obtener el elemento de la versión del WOD",
+  },
+
   WOD_RESULTS: {
     GET_ALL: "Error al obtener los resultados de WOD",
     GET_PERSONAL_BESTS: "Error al obtener las mejores marcas",

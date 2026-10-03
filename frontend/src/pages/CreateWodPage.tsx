@@ -7,6 +7,7 @@ import type {
 } from "../types/Wod";
 import { getExercises } from "../api/exercisesApi";
 import { createWod } from "../api/wodsApi";
+import CreateWodView from "../views/create-wod/CreateWodView";
 
 function CreateWodPage() {
   const [exercises, setExercises] = useState<ExerciseResponse[]>([]);
@@ -61,6 +62,14 @@ function CreateWodPage() {
     };
 
     setItems(newItems);
+  }
+
+  function handleTypeChange(newType: WodType) {
+    setType(newType);
+
+    if (newType !== "FOR_TIME") {
+      setRounds(undefined);
+    }
   }
 
   function handleRepsChange(index: number, reps: number | undefined) {
@@ -145,307 +154,31 @@ function CreateWodPage() {
     }
   }
 
-  if (loading) {
-    return <p>Cargando ejercicios...</p>;
-  }
-
   return (
-    <section>
-      <header>
-        <h1>Crear WOD</h1>
-        <p>Crea un nuevo entrenamiento personal.</p>
-      </header>
-
-      {error && <p>{error}</p>}
-      {success && <p>{success}</p>}
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Nombre</label>
-
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="type">Modalidad</label>
-
-          <select
-            id="type"
-            value={type}
-            onChange={(event) => {
-              const newType = event.target.value as WodType;
-
-              setType(newType);
-
-              if (newType !== "FOR_TIME") {
-                setRounds(undefined);
-              }
-            }}
-          >
-            <option value="FOR_TIME">For Time</option>
-            <option value="AMRAP">AMRAP</option>
-            <option value="EMOM">EMOM</option>
-          </select>
-        </div>
-
-        {type === "FOR_TIME" && (
-          <>
-            <div>
-              <label htmlFor="rounds">Rondas</label>
-
-              <input
-                id="rounds"
-                type="number"
-                min="1"
-                value={rounds ?? ""}
-                onChange={(event) =>
-                  setRounds(
-                    event.target.value === ""
-                      ? undefined
-                      : Number(event.target.value),
-                  )
-                }
-              />
-            </div>
-
-            <div>
-              <label htmlFor="time-cap">Tiempo límite (segundos)</label>
-
-              <input
-                id="time-cap"
-                type="number"
-                min="1"
-                value={timeCapSeconds ?? ""}
-                onChange={(event) =>
-                  setTimeCapSeconds(
-                    event.target.value === ""
-                      ? undefined
-                      : Number(event.target.value),
-                  )
-                }
-              />
-            </div>
-          </>
-        )}
-
-        {(type === "AMRAP" || type === "EMOM") && (
-          <div>
-            <label htmlFor="time-cap">Duración (segundos)</label>
-
-            <input
-              id="time-cap"
-              type="number"
-              min="1"
-              value={timeCapSeconds ?? ""}
-              onChange={(event) =>
-                setTimeCapSeconds(
-                  event.target.value === ""
-                    ? undefined
-                    : Number(event.target.value),
-                )
-              }
-              required
-            />
-          </div>
-        )}
-
-        <h2>Ejercicios</h2>
-
-        {items.length === 0 && <p>Todavía no has añadido ejercicios.</p>}
-
-        {items.map((item, index) => {
-          const exercise = getExercise(item.exerciseId);
-
-          return (
-            <div key={index}>
-              <h3>Ejercicio {index + 1}</h3>
-
-              <div>
-                <label>Ejercicio</label>
-
-                <select
-                  value={item.exerciseId}
-                  onChange={(event) =>
-                    handleExerciseChange(index, Number(event.target.value))
-                  }
-                >
-                  {exercises.map((availableExercise) => (
-                    <option
-                      key={availableExercise.id}
-                      value={availableExercise.id}
-                    >
-                      {availableExercise.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {exercise?.measurementType === "REPS" && (
-                <div>
-                  <label>Repeticiones</label>
-
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.reps ?? ""}
-                    onChange={(event) =>
-                      handleRepsChange(
-                        index,
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              )}
-
-              {exercise?.measurementType === "WEIGHT" && (
-                <>
-                  <div>
-                    <label>Repeticiones</label>
-
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.reps ?? ""}
-                      onChange={(event) =>
-                        handleRepsChange(
-                          index,
-                          event.target.value === ""
-                            ? undefined
-                            : Number(event.target.value),
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label>Peso (kg)</label>
-
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.weightKg ?? ""}
-                      onChange={(event) =>
-                        handleWeightChange(
-                          index,
-                          event.target.value === ""
-                            ? undefined
-                            : Number(event.target.value),
-                        )
-                      }
-                    />
-                  </div>
-                </>
-              )}
-
-              {exercise?.measurementType === "DISTANCE" && (
-                <div>
-                  <label>Distancia (m)</label>
-
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={item.distanceM ?? ""}
-                    onChange={(event) =>
-                      handleDistanceChange(
-                        index,
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              )}
-
-              {exercise?.measurementType === "TIME" && (
-                <div>
-                  <label>Duración (segundos)</label>
-
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.durationSeconds ?? ""}
-                    onChange={(event) =>
-                      handleDurationChange(
-                        index,
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              )}
-
-              {exercise?.measurementType === "WEIGHT_DISTANCE" && (
-                <>
-                  <div>
-                    <label>Peso (kg)</label>
-
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.weightKg ?? ""}
-                      onChange={(event) =>
-                        handleWeightChange(
-                          index,
-                          event.target.value === ""
-                            ? undefined
-                            : Number(event.target.value),
-                        )
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label>Distancia (m)</label>
-
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.distanceM ?? ""}
-                      onChange={(event) =>
-                        handleDistanceChange(
-                          index,
-                          event.target.value === ""
-                            ? undefined
-                            : Number(event.target.value),
-                        )
-                      }
-                    />
-                  </div>
-                </>
-              )}
-
-              <button type="button" onClick={() => handleRemoveExercise(index)}>
-                Eliminar ejercicio
-              </button>
-            </div>
-          );
-        })}
-
-        <button type="button" onClick={handleAddExercise}>
-          + Añadir ejercicio
-        </button>
-
-        <button type="submit" disabled={items.length === 0}>
-          Crear WOD
-        </button>
-      </form>
-    </section>
+    <CreateWodView
+      exercises={exercises}
+      name={name}
+      type={type}
+      rounds={rounds}
+      timeCapSeconds={timeCapSeconds}
+      items={items}
+      loading={loading}
+      error={error}
+      success={success}
+      getExercise={getExercise}
+      onNameChange={setName}
+      onTypeChange={handleTypeChange}
+      onRoundsChange={setRounds}
+      onTimeCapChange={setTimeCapSeconds}
+      onExerciseChange={handleExerciseChange}
+      onRepsChange={handleRepsChange}
+      onWeightChange={handleWeightChange}
+      onDistanceChange={handleDistanceChange}
+      onDurationChange={handleDurationChange}
+      onAddExercise={handleAddExercise}
+      onRemoveExercise={handleRemoveExercise}
+      onSubmit={handleSubmit}
+    />
   );
 }
 
