@@ -26,6 +26,16 @@ export const API_ENDPOINTS = {
     BY_ID: (id: number) => `/wods/${id}`,
   },
 
+  WOD_VERSIONS: {
+    BASE: "/wod-versions",
+    BY_ID: (id: number) => `/wod-versions/${id}`,
+  },
+
+  WOD_VERSION_ITEMS: {
+    BASE: "/wod-version-items",
+    BY_ID: (id: number) => `/wod-version-items/${id}`,
+  },
+
   WOD_RESULTS: {
     BASE: "/wod-results",
     BY_ID: (id: number) => `/wod-results/${id}`,

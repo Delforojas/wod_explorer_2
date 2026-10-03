@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../api/authApi";
 import { useNavigate } from "react-router-dom";
+import LoginView from "../views/login/LoginView";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -27,41 +28,14 @@ function LoginPage() {
   }
 
   return (
-    <section>
-      <h1>Iniciar sesión</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Nombre de usuario</label>
-          <input
-            id="username"
-            type="text"
-            name="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </div>
-
-        <button type="submit">Iniciar sesión</button>
-      </form>
-
-      <p>o</p>
-
-      <button type="button" onClick={handleGoogleLogin}>
-        Continuar con Google
-      </button>
-    </section>
+    <LoginView
+      username={username}
+      password={password}
+      onUsernameChange={setUsername}
+      onPasswordChange={setPassword}
+      onSubmit={handleSubmit}
+      onGoogleLogin={handleGoogleLogin}
+    />
   );
 }
 
