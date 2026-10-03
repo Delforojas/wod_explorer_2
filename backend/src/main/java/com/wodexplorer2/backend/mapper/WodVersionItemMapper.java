@@ -33,6 +33,7 @@ public class WodVersionItemMapper {
         item.getId(),
         item.getWodVersion().getId(),
         item.getExercise().getId(),
+        item.getExercise().getName(),
         item.getPosition(),
         item.getReps(),
         item.getWeightKg(),

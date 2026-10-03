@@ -177,18 +177,19 @@ public class WodAggregateService {
   }
 
   private WodAggregateResponse toResponse(Wod wod, WodVersion version) {
-    List<WodVersionItemResponse> items =
-        wodVersionItemRepository.findByWodVersionIdOrderByPositionAsc(version.getId()).stream()
-            .map(item -> new WodVersionItemResponse(
-                item.getId(),
-                version.getId(),
-                item.getExercise().getId(),
-                item.getPosition(),
-                item.getReps(),
-                item.getWeightKg(),
-                item.getDistanceM(),
-                item.getDurationSeconds()))
-            .toList();
+    List<WodVersionItemResponse> items = wodVersionItemRepository.findByWodVersionIdOrderByPositionAsc(version.getId())
+        .stream()
+        .map(item -> new WodVersionItemResponse(
+            item.getId(),
+            version.getId(),
+            item.getExercise().getId(),
+            item.getExercise().getName(),
+            item.getPosition(),
+            item.getReps(),
+            item.getWeightKg(),
+            item.getDistanceM(),
+            item.getDurationSeconds()))
+        .toList();
     return new WodAggregateResponse(
         wod.getId(),
         wod.getOwner() != null ? wod.getOwner().getId() : null,
@@ -198,6 +199,7 @@ public class WodAggregateService {
         new WodVersionResponse(
             version.getId(),
             wod.getId(),
+            wod.getName(),
             version.getVersionNumber(),
             version.getType(),
             version.getTimeCapSeconds(),

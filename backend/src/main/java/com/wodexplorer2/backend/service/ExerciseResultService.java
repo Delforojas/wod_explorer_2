@@ -42,22 +42,106 @@ public class ExerciseResultService {
 
     public ExerciseResult create(ExerciseResultRequest request) {
         User user = currentUserService.require();
+
         Exercise exercise = exerciseRepository.findByIdAndActiveTrue(request.exerciseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Ejercicio no encontrado"));
-        return exerciseResultRepository.save(exerciseResultMapper.toEntity(request, user, exercise));
+
+        validateResult(request, exercise);
+
+        return exerciseResultRepository.save(
+                exerciseResultMapper.toEntity(request, user, exercise));
     }
 
     public void deleteById(Long id) {
         exerciseResultRepository.delete(requireOwned(id));
     }
 
+    private void validateResult(
+            ExerciseResultRequest request,
+            Exercise exercise) {
+
+        switch (exercise.getMeasurementType()) {
+
+            case WEIGHT -> {
+                if (request.reps() == null || request.weightKg() == null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de peso requiere repeticiones y peso");
+                }
+
+                if (request.distanceM() != null || request.durationSeconds() != null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de peso solo puede contener repeticiones y peso");
+                }
+            }
+
+            case REPS -> {
+                if (request.reps() == null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de repeticiones requiere repeticiones");
+                }
+
+                if (request.weightKg() != null
+                        || request.distanceM() != null
+                        || request.durationSeconds() != null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de repeticiones solo puede contener repeticiones");
+                }
+            }
+
+            case TIME -> {
+                if (request.durationSeconds() == null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de tiempo requiere duración");
+                }
+
+                if (request.reps() != null
+                        || request.weightKg() != null
+                        || request.distanceM() != null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de tiempo solo puede contener duración");
+                }
+            }
+
+            case DISTANCE -> {
+                if (request.distanceM() == null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de distancia requiere distancia");
+                }
+
+                if (request.reps() != null
+                        || request.weightKg() != null
+                        || request.durationSeconds() != null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de distancia solo puede contener distancia");
+                }
+            }
+
+            case WEIGHT_DISTANCE -> {
+                if (request.weightKg() == null || request.distanceM() == null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de peso y distancia requiere peso y distancia");
+                }
+
+                if (request.reps() != null || request.durationSeconds() != null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de peso y distancia solo puede contener peso y distancia");
+                }
+            }
+        }
+    }
+
     private ExerciseResult requireOwned(Long id) {
         User currentUser = currentUserService.require();
+
         ExerciseResult result = exerciseResultRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Resultado de ejercicio no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Resultado de ejercicio no encontrado"));
+
         if (!result.getUser().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("No tienes permisos para acceder a este resultado");
+            throw new ForbiddenException(
+                    "No tienes permisos para acceder a este resultado");
         }
+
         return result;
     }
 }

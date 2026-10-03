@@ -2,7 +2,6 @@ package com.wodexplorer2.backend.controller;
 
 import com.wodexplorer2.backend.dto.WodResultRequest;
 import com.wodexplorer2.backend.dto.WodResultResponse;
-import com.wodexplorer2.backend.dto.WodResultUpdateRequest;
 import com.wodexplorer2.backend.entity.WodOrigin;
 import com.wodexplorer2.backend.entity.WodType;
 import com.wodexplorer2.backend.mapper.WodResultMapper;
@@ -57,12 +56,6 @@ public class WodResultController {
         return wodResultMapper.toResponse(wodResultService.create(request));
     }
 
-    @PutMapping("/{id}")
-    public WodResultResponse update(
-            @PathVariable Long id,
-            @Valid @RequestBody WodResultUpdateRequest request) {
-        return wodResultMapper.toResponse(wodResultService.update(id, request));
-    }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {

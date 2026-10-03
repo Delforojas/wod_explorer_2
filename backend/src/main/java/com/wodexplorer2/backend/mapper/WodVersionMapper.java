@@ -29,6 +29,7 @@ public class WodVersionMapper {
     return new WodVersionResponse(
         wodVersion.getId(),
         wodVersion.getWod().getId(),
+        wodVersion.getWod().getName(),
         wodVersion.getVersionNumber(),
         wodVersion.getType(),
         wodVersion.getTimeCapSeconds(),
