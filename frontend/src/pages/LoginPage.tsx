@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { login } from "../api/authApi";
+import { GOOGLE_OAUTH_URL } from "../api/client/apiEndpoints";
 import { useNavigate } from "react-router-dom";
 import LoginView from "../views/login/LoginView";
 
@@ -22,9 +23,7 @@ function LoginPage() {
   }
 
   function handleGoogleLogin() {
-    window.location.assign(
-      "http://localhost:8080/oauth2/authorization/google",
-    );
+    window.location.assign(GOOGLE_OAUTH_URL);
   }
 
   return (

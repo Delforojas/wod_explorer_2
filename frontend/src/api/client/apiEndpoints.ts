@@ -1,4 +1,28 @@
-export const API_URL = "http://localhost:8080/api";
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+
+if (!configuredApiUrl) {
+  throw new Error(
+    "Falta configurar VITE_API_URL para conectar el frontend con la API.",
+  );
+}
+
+let apiUrl: URL;
+
+try {
+  apiUrl = new URL(configuredApiUrl);
+} catch {
+  throw new Error("VITE_API_URL debe ser una URL absoluta válida.");
+}
+
+if (apiUrl.protocol !== "http:" && apiUrl.protocol !== "https:") {
+  throw new Error("VITE_API_URL debe utilizar http o https.");
+}
+
+export const API_URL = configuredApiUrl.replace(/\/+$/, "");
+export const GOOGLE_OAUTH_URL = new URL(
+  "/oauth2/authorization/google",
+  apiUrl.origin,
+).toString();
 
 export const API_ENDPOINTS = {
   AUTH: {
