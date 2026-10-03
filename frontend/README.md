@@ -1,5 +1,24 @@
 # React + TypeScript + Vite
 
+## Configuracion local
+
+Desde `frontend/`, crea el archivo local de entorno y configura la URL publica
+de la API:
+
+```bash
+cp .env.example .env.local
+```
+
+La variable `VITE_API_URL` debe apuntar a la API completa, incluyendo `/api`.
+Las variables `VITE_*` son visibles en el navegador y no deben contener
+secretos.
+
+Despues puedes iniciar el frontend con:
+
+```bash
+npm run dev
+```
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
