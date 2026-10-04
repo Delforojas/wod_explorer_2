@@ -24,17 +24,17 @@ Mientras exista alguna verificación aplicable fallida relacionada con la Issue:
 
 2. aplica el `Repair Guard` definido en:
 
-   `.agents/guardrails/repair.md`
+   `.opencode/commands/guardarails/repair.md`
 
 3. si el `Repair Guard` permite continuar, aplica únicamente la corrección mínima necesaria;
 
 4. vuelve a ejecutar las verificaciones afectadas mediante el `Verification Gate Hook` definido en:
 
-   `.agents/hooks/verification-gate.md`
+   `.opencode/commands/hooks/verification-gate.md`
 
 5. aplica nuevamente el `Verification Guard` definido en:
 
-   `.agents/guardrails/verification.md`
+   `.opencode/commands/guardarails/verification.md`
 
 6. comprueba el resultado.
 

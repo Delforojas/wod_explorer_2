@@ -16,7 +16,7 @@ Extrae y comprende:
 Considera la GitHub Issue como la fuente principal de requisitos para este workflow.
 Aplica el `Issue Guard` definido en:
 
-`.agents/guardrails/issue.md`
+`.opencode/commands/guardarails/issue.md`
 
 Solo continúa al punto 2 si el guardrail ha sido superado.
 
@@ -56,7 +56,7 @@ No asumas comportamientos que contradigan:
 
 Aplica el `Context Guard` definido en:
 
-`.agents/guardrails/context.md`
+`.opencode/commands/guardarails/context.md`
 
 Solo continúa al punto 3 si el guardrail ha sido superado.
 
@@ -68,7 +68,7 @@ Este paso es obligatorio y debe completarse antes de modificar cualquier archivo
 
 Ejecuta el `Branch Check Hook` definido en:
 
-`.agents/hooks/branch-check.md`
+`.opencode/commands/hooks/branch-check.md`
 
 Utiliza el estado obtenido por el hook para determinar de forma segura la rama de trabajo.
 
@@ -138,7 +138,7 @@ La rama debe existir realmente en el repositorio local y ser la rama activa.
 
 Aplica el `Branch Guard` definido en:
 
-`.agents/guardrails/branch.md`
+`.opencode/commands/guardarails/branch.md`
 
 Solo continúa al punto 4 si el guardrail ha sido superado.
 
@@ -238,7 +238,7 @@ No inventes requisitos funcionales que no estén respaldados por estas fuentes.
 
 Aplica el `SDD Guard` definido en:
 
-`.agents/guardrails/sdd.md`
+`.opencode/commands/guardarails/sdd.md`
 
 Solo continúa al punto 5 si el guardrail ha sido superado.
 
@@ -282,7 +282,7 @@ Cada criterio de aceptación debe estar representado por trabajo planificado y d
 
 Aplica el `Planning Guard` definido en:
 
-`.agents/guardrails/planning.md`
+`.opencode/commands/guardarails/planning.md`
 
 Si el `Planning Guard` ha sido superado:
 
@@ -292,7 +292,7 @@ Si el `Planning Guard` detecta un problema de planificación que puede corregirs
 
 ejecuta el `Planning Loop` definido en:
 
-`.agents/loops/planning.md`
+`.opencode/commands/loops/planning.md`
 
 Si el loop finaliza superando el `Planning Guard`:
 
@@ -336,13 +336,13 @@ Durante la implementación:
 
 Aplica durante toda la implementación el `Implementation Guard` definido en:
 
-`.agents/guardrails/implementation.md`
+`.opencode/commands/guardarails/implementation.md`
 
 ### Ejecutar las tasks
 
 Ejecuta el `Task Loop` definido en:
 
-`.agents/loops/task.md`
+`.opencode/commands/loops/task.md`
 
 El loop debe procesar las tasks pendientes de `tasks.md` respetando:
 
@@ -416,7 +416,7 @@ No inventes comandos de verificación si el proyecto ya define los mecanismos qu
 
 Ejecuta el `Verification Gate Hook` definido en:
 
-`.agents/hooks/verification-gate.md`
+`.opencode/commands/hooks/verification-gate.md`
 
 Proporciona al hook las verificaciones aplicables determinadas anteriormente.
 
@@ -432,7 +432,7 @@ Para cada verificación ejecutada, conserva:
 
 Aplica el `Verification Guard` definido en:
 
-`.agents/guardrails/verification.md`
+`.opencode/commands/guardarails/verification.md`
 
 Si el guardrail ha sido superado:
 
@@ -470,7 +470,7 @@ Para cada fallo:
 
 Antes de aplicar cualquier corrección, aplica el `Repair Guard` definido en:
 
-`.agents/guardrails/repair.md`
+`.opencode/commands/guardarails/repair.md`
 
 El `Repair Guard` determina si el fallo puede resolverse de forma segura dentro del alcance de la GitHub Issue #$1.
 
@@ -490,7 +490,7 @@ Informa al usuario del bloqueo concreto y solicita únicamente la intervención 
 
 Si el `Repair Guard` permite continuar, ejecuta el `Verification / Repair Loop` definido en:
 
-`.agents/loops/verification-repair.md`
+`.opencode/commands/loops/repair.md`
 
 Proporciona al loop:
 
@@ -534,7 +534,7 @@ Antes de preparar el commit, revisa el estado real del repositorio y determina e
 
 Ejecuta el `Pre-Stage Check Hook` definido en:
 
-`.agents/hooks/pre-stage-check.md`
+`.opencode/commands/hooks/pre-stage-check.md`
 
 Utiliza el estado obtenido por el hook para identificar los cambios existentes antes de preparar el staging.
 
@@ -562,7 +562,7 @@ Cada cambio que vaya a formar parte del commit debe poder justificarse por el tr
 
 Aplica el `Change Review Guard` definido en:
 
-`.agents/guardrails/change-review.md`
+`.opencode/commands/guardarails/change-review.md`
 
 Solo continúa hacia la preparación del commit si el guardrail ha sido superado.
 
@@ -604,7 +604,7 @@ No descartes, sobrescribas, elimines ni modifiques trabajo ajeno para preparar e
 
 Ejecuta el `Pre-Commit Hook` definido en:
 
-`.agents/hooks/pre-commit.md`
+`.opencode/commands/hooks/pre-commit.md`
 
 Utiliza el resultado del hook para confirmar que el estado Git permite crear de forma segura el commit de la GitHub Issue #$1.
 
@@ -632,7 +632,7 @@ Después de crear el commit:
 
 Aplica el `Commit Guard` definido en:
 
-`.agents/guardrails/commit.md`
+`.opencode/commands/guardarails/commit.md`
 
 Solo continúa al punto 11 si el guardrail ha sido superado.
 
@@ -652,7 +652,7 @@ Este paso solo puede comenzar cuando el `Commit Guard` del punto anterior haya s
 
 Después de crear el commit, ejecuta el `Post-Commit Hook` definido en:
 
-`.agents/hooks/post-commit.md`
+`.opencode/commands/hooks/post-commit.md`
 
 Utiliza el estado obtenido por el hook para verificar que:
 
@@ -684,7 +684,7 @@ Si existen:
 
 Aplica el `Post-Commit Guard` definido en:
 
-`.agents/guardrails/post-commit.md`
+`.opencode/commands/guardarails/post-commit.md`
 
 Solo continúa al punto 12 si el guardrail ha sido superado.
 
@@ -756,7 +756,7 @@ Indica claramente que:
 
 Aplica el `GitHub Documentation Guard` definido en:
 
-`.agents/guardrails/github-documentation.md`
+`.opencode/commands/guardarails/github-documentation.md`
 
 Solo continúa al punto 13 si el guardrail ha sido superado.
 
@@ -780,7 +780,7 @@ Este paso es obligatorio.
 
 Antes de avanzar a la fase de validación manual, ejecuta el `Final Workflow Check Hook` definido en:
 
-`.agents/hooks/final-workflow-check.md`
+`.opencode/commands/hooks/finish-workflow-check.md`
 
 Utiliza el estado obtenido por el hook para realizar la verificación final del workflow.
 
@@ -806,7 +806,7 @@ Comprueba además que:
 
 Aplica el `Final Workflow Guard` definido en:
 
-`.agents/guardrails/final-workflow.md`
+`.opencode/commands/guardarails/final-workflow.md`
 
 Solo continúa al punto 14 si el guardrail ha sido superado.
 
@@ -902,7 +902,7 @@ Si no existe ninguna validación manual razonable:
 
 Aplica el `Manual Validation Guard` definido en:
 
-`.agents/guardrails/manual-validation.md`
+`.opencode/commands/guardarails/manual-validation.md`
 
 Solo continúa al punto 15 si el guardrail ha sido superado.
 
@@ -960,7 +960,7 @@ La GitHub Issue debe permanecer abierta después de completar `/issue $1`.
 
 Aplica el `Workflow Handoff Guard` definido en:
 
-`.agents/guardrails/workflow-handoff.md`
+`.opencode/commands/guardarails/workflow-handoff.md`
 
 Solo considera `/issue $1` completado si el guardrail ha sido superado.
 

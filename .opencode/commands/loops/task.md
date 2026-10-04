@@ -24,7 +24,7 @@ Mientras existan tasks pendientes:
 3. identifica los archivos o componentes afectados;
 4. aplica el `Implementation Guard` definido en:
 
-   `.agents/guardrails/implementation.md`
+   `.opencode/commands/guardarails/implementation.md`
 
 5. si el guardrail permite continuar, implementa únicamente el trabajo correspondiente a la task;
 6. realiza las comprobaciones razonables necesarias para determinar que la task está terminada;

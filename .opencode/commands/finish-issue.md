@@ -68,7 +68,7 @@ No implementes trabajo desde este comando.
 
 ## 2. Comprobar la rama y el working tree
 
-Aplica las reglas definidas en `.agents/hooks/branch-check.md`
+Aplica las reglas definidas en `.opencode/commands/hooks/branch-check.md`
 
 para obtener el estado Git necesario de la rama actual.
 
@@ -188,19 +188,19 @@ Comprueba que no queden cambios de la Issue pendientes de commit.
 
 Y existen cambios correspondientes a la Issue pendientes:
 
-1. aplica las reglas definidas en `.agents/hooks/pre-stage-check.md`;
+1. aplica las reglas definidas en `.opencode/commands/hooks/pre-stage-check.md`;
 
 2. si `pre-stage-check` falla, DETENTE;
 
 3. añade al staging únicamente los archivos identificados como pertenecientes a la Issue;
 
-4. aplica las reglas definidas en `.agents/hooks/pre-commit.md`;
+4. aplica las reglas definidas en `.opencode/commands/hooks/pre-commit.md`;
 
 5. si `pre-commit` falla, DETENTE;
 
 6. crea el commit final correspondiente a la Issue;
 
-7. aplica las reglas definidas en `.agents/hooks/post-commit.md`;
+7. aplica las reglas definidas en `.opencode/commands/hooks/post-commit.md`;
 
 8. si `post-commit` falla, DETENTE.
 
@@ -230,11 +230,11 @@ inequívocamente a la Issue.
 
 Antes de crearlo aplica igualmente:
 
-- `.agents/hooks/pre-stage-check.md`;
+- `.opencode/commands/hooks/pre-stage-check.md`;
 
-- `.agents/hooks/pre-commit.md`;
+- `.opencode/commands/hooks/pre-commit.md`;
 
-- `.agents/hooks/post-commit.md`.
+- `.opencode/commands/hooks/post-commit.md`.
 
 No reescribas commits existentes.
 
@@ -244,7 +244,7 @@ No hagas rebase automáticamente.
 
 ## 6. Verificar el estado previo al push
 
-Aplica las reglas definidas en `.agents/hooks/pre-push-check.md`.
+Aplica las reglas definidas en `.opencode/commands/hooks/pre-push-check.md`.
 
 Si `pre-push-check` falla:
 
@@ -278,7 +278,7 @@ Conserva esta lista para:
 
 ## 7. Publicar la rama
 
-Únicamente después de que `.agents/hooks/pre-push-check.md` haya devuelto `PASS`,
+Únicamente después de que `.opencode/commands/hooks/pre-push-check.md` haya devuelto `PASS`,
 publica la rama actual.
 
 Si la rama todavía no tiene upstream:
@@ -600,7 +600,7 @@ Si la Issue ya estaba cerrada antes de ejecutar este comando:
 
 ## 11. Verificación final
 
-Aplica las reglas definidas en `.agents/hooks/finish-workflow-check.md`.
+Aplica las reglas definidas en `.opencode/commands/hooks/finish-workflow-check.md`.
 
 El check debe verificar como mínimo que:
 
@@ -666,7 +666,7 @@ No modifiques cambios locales ajenos para conseguirlo.
 
 ## 12. Resumen final
 
-Después de superar correctamente `.agents/hooks/finish-workflow-check.md`,
+Después de superar correctamente `.opencode/commands/hooks/finish-workflow-check.md`,
 muestra el resumen final del workflow.
 
 La salida final DEBE incluir obligatoriamente:
