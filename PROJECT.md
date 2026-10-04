@@ -17,26 +17,28 @@ Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las 
 
 - Framework: React
 - Lenguaje: TypeScript
-- Versión: Pendiente de definir según la configuración del proyecto.
-- Build tool: Pendiente de definir.
-- Arquitectura: Pendiente de definir según la estructura real del frontend.
-- Styling: Pendiente de definir.
-- Validación: Pendiente de definir.
-- Estado: Pendiente de definir.
-- Testing: Pendiente de definir.
+- Versión: TypeScript 5.x
+- Build tool: Vite
+- Arquitectura: feature-based
+- Styling: CSS
+- Validación: Zod
+- Estado: React (`useState`, `useReducer` y Context cuando corresponda)
+- Testing: Vitest
 - Idioma de interfaz: español
-- Ruta base API: Pendiente de definir.
-- Fuente de diseño: `DESIGN.md`; detalles visuales pendientes de definir.
+- Ruta base API: `/api`
+- Fuente de diseño: `DESIGN.md`
+
+La arquitectura y las reglas específicas del frontend están definidas en `frontend/AGENTS.md`.
 
 ### Comandos frontend
 
-- Install: Pendiente de definir según el gestor de paquetes del proyecto.
-- Run: Pendiente de definir.
-- Lint: Pendiente de definir.
-- Test: Pendiente de definir.
-- Build: Pendiente de definir.
+- Install: `npm install`
+- Run: `npm run dev`
+- Lint: `npm run lint`
+- Test: `npm run test`
+- Build: `npm run build`
 
----
+Los scripts definidos en `frontend/package.json` son la fuente de verdad para los comandos disponibles.
 
 ## Diseño
 
