@@ -336,6 +336,10 @@ time {
   box-shadow: 0 -8px 20px rgb(0 0 0 / 18%);
 }
 
+.mobile-navigation-integrated {
+  box-shadow: none;
+}
+
 .mobile-nav-list,
 .mobile-auth-actions {
   display: flex;
@@ -374,6 +378,22 @@ time {
 
 .mobile-nav-list .nav-link-active {
   color: var(--color-accent);
+}
+
+.mobile-navigation-integrated .nav-link,
+.mobile-navigation-integrated .mobile-more-button {
+  position: relative;
+}
+
+.mobile-navigation-integrated .nav-link-active::after {
+  position: absolute;
+  right: 50%;
+  bottom: var(--space-2);
+  left: 50%;
+  height: 2px;
+  transform: translateX(-50%);
+  background: var(--color-accent);
+  content: "";
 }
 
 .mobile-more {
@@ -592,6 +612,40 @@ time {
   color: var(--color-text);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.exercise-row-action {
+  align-self: center;
+  justify-self: end;
+  color: var(--color-text-muted);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.exercise-row-action:hover:not(:disabled) {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.editorial-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--space-4);
+  row-gap: var(--space-1);
+}
+
+.editorial-row > header {
+  grid-column: 1;
+  display: block;
+}
+
+.editorial-row > .resource-meta {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.editorial-row > .exercise-row-action {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 .resource-meta {

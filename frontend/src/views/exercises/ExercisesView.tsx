@@ -24,17 +24,22 @@ function ExercisesView({
 
       <div className="resource-list">
         {exercises.map((exercise) => (
-          <article className="resource-row" key={exercise.id}>
+          <article className="resource-row editorial-row" key={exercise.id}>
             <header>
               <h2>{exercise.name}</h2>
-              <span className="resource-meta">{exercise.category}</span>
             </header>
             <div className="resource-meta">
+              <span>{exercise.category}</span>
               <span>{exercise.measurementType}</span>
             </div>
 
-            <button className="row-action" onClick={() => onSelectExercise(exercise.id)}>
-              Abrir
+            <button
+              className="row-action exercise-row-action"
+              type="button"
+              aria-label={`Abrir detalle de ${exercise.name}`}
+              onClick={() => onSelectExercise(exercise.id)}
+            >
+              <span aria-hidden="true">→</span>
             </button>
           </article>
         ))}

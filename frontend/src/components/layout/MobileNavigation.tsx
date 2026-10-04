@@ -24,7 +24,7 @@ function MobileNavigation({
   }
 
   return (
-    <nav className="mobile-navigation" aria-label="Navegación móvil">
+    <nav className="mobile-navigation mobile-navigation-integrated" aria-label="Navegación móvil">
       <NavigationLinks
         items={primaryNavigation}
         listClassName="mobile-nav-list"
