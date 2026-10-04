@@ -9,7 +9,7 @@ function DesktopNavigation({
   isAuthenticated,
 }: DesktopNavigationProps) {
   return (
-    <div className="desktop-navigation">
+    <nav className="desktop-navigation" aria-label="Navegación principal">
       <NavigationLinks items={publicNavigation} />
       {isAuthenticated && (
         <div className="nav-group">
@@ -17,7 +17,7 @@ function DesktopNavigation({
           <NavigationLinks items={personalNavigation} />
         </div>
       )}
-    </div>
+    </nav>
   );
 }
 
