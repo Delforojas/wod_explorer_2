@@ -1,12 +1,4 @@
-import type { ExerciseResponse } from "../../types/Exercise";
-
-interface ExercisesViewProps {
-  exercises: ExerciseResponse[];
-  selectedExercise: ExerciseResponse | null;
-  loading: boolean;
-  error: string | null;
-  onSelectExercise: (id: number) => void;
-}
+import type { ExercisesViewProps } from "./ExercisesView.Types";
 
 function ExercisesView({
   exercises,
@@ -20,7 +12,7 @@ function ExercisesView({
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   return (

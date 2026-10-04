@@ -1,13 +1,5 @@
-import type { WodVersionItemResponse, WodVersionResponse } from "../../types/Wod";
-
-interface WodVersionsViewProps {
-  versions: WodVersionResponse[];
-  selectedVersion: WodVersionResponse | null;
-  selectedItems: WodVersionItemResponse[];
-  loading: boolean;
-  error: string | null;
-  onSelectVersion: (id: number) => void;
-}
+import type { WodVersionResponse } from "../../types/Wod";
+import type { WodVersionsViewProps } from "./WodVersionsView.Types";
 
 function formatWodType(type: WodVersionResponse["type"]) {
   return type === "FOR_TIME" ? "For Time" : type === "AMRAP" ? "AMRAP" : "EMOM";
@@ -26,7 +18,7 @@ function WodVersionsView({
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   return (

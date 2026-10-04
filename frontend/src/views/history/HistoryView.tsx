@@ -1,10 +1,5 @@
 import type { WodResultResponse } from "../../types/WodResult";
-
-interface HistoryViewProps {
-  results: WodResultResponse[];
-  loading: boolean;
-  error: string | null;
-}
+import type { HistoryViewProps } from "./HistoryView.Types";
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("es-ES", {
@@ -78,7 +73,7 @@ function HistoryView({ results, loading, error }: HistoryViewProps) {
     return (
       <section className="placeholder-page">
         <h1>Historial</h1>
-        <p>{error}</p>
+        <p role="alert">{error}</p>
       </section>
     );
   }

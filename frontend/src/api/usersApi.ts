@@ -1,10 +1,14 @@
 import type { UserResponse, UserUpdateRequest } from "./apiTypes";
 
-import { apiRequest, getAuthHeaders } from "./client/apiClient";
+import { apiRequest, getAuthHeaders, parseJson } from "./client/apiClient";
 
 import { API_ENDPOINTS } from "./client/apiEndpoints";
 
 import { API_ERROR_MESSAGES, handleApiError } from "./client/apiError";
+import {
+  userResponseSchema,
+  userUpdateRequestSchema,
+} from "../schemas/userSchemas";
 
 export async function getCurrentUser(): Promise<UserResponse> {
   const response = await apiRequest(API_ENDPOINTS.USERS.BASE, {
@@ -13,7 +17,7 @@ export async function getCurrentUser(): Promise<UserResponse> {
 
   handleApiError(response, API_ERROR_MESSAGES.USERS.GET_CURRENT);
 
-  return response.json();
+  return parseJson(response, userResponseSchema);
 }
 
 export async function getUserById(id: number): Promise<UserResponse> {
@@ -23,13 +27,15 @@ export async function getUserById(id: number): Promise<UserResponse> {
 
   handleApiError(response, API_ERROR_MESSAGES.USERS.GET_BY_ID);
 
-  return response.json();
+  return parseJson(response, userResponseSchema);
 }
 
 export async function updateUser(
   id: number,
   request: UserUpdateRequest,
 ): Promise<UserResponse> {
+  userUpdateRequestSchema.parse(request);
+
   const response = await apiRequest(API_ENDPOINTS.USERS.BY_ID(id), {
     method: "PUT",
     headers: {
@@ -41,7 +47,7 @@ export async function updateUser(
 
   handleApiError(response, API_ERROR_MESSAGES.USERS.UPDATE);
 
-  return response.json();
+  return parseJson(response, userResponseSchema);
 }
 
 export async function deleteUser(id: number): Promise<void> {

@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+# WOD Explorer 2.0 frontend
 
 ## Configuracion local
 
@@ -17,6 +17,16 @@ Despues puedes iniciar el frontend con:
 
 ```bash
 npm run dev
+```
+
+## Verificaciones
+
+Desde `frontend/`:
+
+```bash
+npm run lint
+npm run test
+npm run build
 ```
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

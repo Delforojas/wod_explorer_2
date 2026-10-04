@@ -2,8 +2,14 @@ import type { LoginRequest, RegisterRequest } from "./apiTypes";
 import { apiRequest } from "./client/apiClient";
 import { API_ENDPOINTS } from "./client/apiEndpoints";
 import { API_ERROR_MESSAGES, handleApiError } from "./client/apiError";
+import {
+  loginRequestSchema,
+  registerRequestSchema,
+} from "../schemas/authSchemas";
 
 export async function login(request: LoginRequest): Promise<string> {
+  loginRequestSchema.parse(request);
+
   const response = await apiRequest(API_ENDPOINTS.AUTH.LOGIN, {
     method: "POST",
     headers: {
@@ -18,6 +24,8 @@ export async function login(request: LoginRequest): Promise<string> {
 }
 
 export async function register(request: RegisterRequest): Promise<string> {
+  registerRequestSchema.parse(request);
+
   const response = await apiRequest(API_ENDPOINTS.AUTH.REGISTER, {
     method: "POST",
     headers: {

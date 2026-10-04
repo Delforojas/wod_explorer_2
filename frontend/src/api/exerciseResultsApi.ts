@@ -1,7 +1,12 @@
 import type { ExerciseResultRequest, ExerciseResultResponse } from "./apiTypes";
-import { apiRequest, getAuthHeaders } from "./client/apiClient";
+import { apiRequest, getAuthHeaders, parseJson } from "./client/apiClient";
 import { API_ENDPOINTS } from "./client/apiEndpoints";
 import { API_ERROR_MESSAGES, handleApiError } from "./client/apiError";
+import {
+  exerciseResultRequestSchema,
+  exerciseResultResponseListSchema,
+  exerciseResultResponseSchema,
+} from "../schemas/exerciseResultSchemas";
 
 export async function getExerciseResults(): Promise<ExerciseResultResponse[]> {
   const response = await apiRequest(API_ENDPOINTS.EXERCISE_RESULTS.BASE, {
@@ -10,12 +15,14 @@ export async function getExerciseResults(): Promise<ExerciseResultResponse[]> {
 
   handleApiError(response, API_ERROR_MESSAGES.EXERCISE_RESULTS.GET_ALL);
 
-  return response.json();
+  return parseJson(response, exerciseResultResponseListSchema);
 }
 
 export async function createExerciseResult(
   request: ExerciseResultRequest,
 ): Promise<ExerciseResultResponse> {
+  exerciseResultRequestSchema.parse(request);
+
   const response = await apiRequest(API_ENDPOINTS.EXERCISE_RESULTS.BASE, {
     method: "POST",
     headers: {
@@ -27,7 +34,7 @@ export async function createExerciseResult(
 
   handleApiError(response, API_ERROR_MESSAGES.EXERCISE_RESULTS.CREATE);
 
-  return response.json();
+  return parseJson(response, exerciseResultResponseSchema);
 }
 
 export async function deleteExerciseResult(id: number): Promise<void> {

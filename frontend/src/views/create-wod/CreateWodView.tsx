@@ -1,34 +1,5 @@
-import type { FormEvent } from "react";
-import type { ExerciseResponse } from "../../types/Exercise";
-import type {
-  WodCompositionItemRequest,
-  WodType,
-} from "../../types/Wod";
-
-interface CreateWodViewProps {
-  exercises: ExerciseResponse[];
-  name: string;
-  type: WodType;
-  rounds: number | undefined;
-  timeCapSeconds: number | undefined;
-  items: WodCompositionItemRequest[];
-  loading: boolean;
-  error: string | null;
-  success: string | null;
-  getExercise: (exerciseId: number) => ExerciseResponse | undefined;
-  onNameChange: (value: string) => void;
-  onTypeChange: (value: WodType) => void;
-  onRoundsChange: (value: number | undefined) => void;
-  onTimeCapChange: (value: number | undefined) => void;
-  onExerciseChange: (index: number, exerciseId: number) => void;
-  onRepsChange: (index: number, reps: number | undefined) => void;
-  onWeightChange: (index: number, weightKg: number | undefined) => void;
-  onDistanceChange: (index: number, distanceM: number | undefined) => void;
-  onDurationChange: (index: number, durationSeconds: number | undefined) => void;
-  onAddExercise: () => void;
-  onRemoveExercise: (index: number) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}
+import type { WodType } from "../../types/Wod";
+import type { CreateWodViewProps } from "./CreateWodView.Types";
 
 function CreateWodView({
   exercises,
@@ -65,7 +36,7 @@ function CreateWodView({
         <p>Crea un nuevo entrenamiento personal.</p>
       </header>
 
-      {error && <p>{error}</p>}
+      {error && <p role="alert">{error}</p>}
       {success && <p>{success}</p>}
 
       <form onSubmit={onSubmit}>
@@ -168,9 +139,10 @@ function CreateWodView({
               <h3>Ejercicio {index + 1}</h3>
 
               <div>
-                <label>Ejercicio</label>
+                <label htmlFor={`exercise-${index}`}>Ejercicio</label>
 
                 <select
+                  id={`exercise-${index}`}
                   value={item.exerciseId}
                   onChange={(event) =>
                     onExerciseChange(index, Number(event.target.value))
@@ -189,9 +161,10 @@ function CreateWodView({
 
               {exercise?.measurementType === "REPS" && (
                 <div>
-                  <label>Repeticiones</label>
+                  <label htmlFor={`reps-${index}`}>Repeticiones</label>
 
                   <input
+                    id={`reps-${index}`}
                     type="number"
                     min="1"
                     value={item.reps ?? ""}
@@ -210,9 +183,10 @@ function CreateWodView({
               {exercise?.measurementType === "WEIGHT" && (
                 <>
                   <div>
-                    <label>Repeticiones</label>
+                    <label htmlFor={`reps-${index}`}>Repeticiones</label>
 
                     <input
+                      id={`reps-${index}`}
                       type="number"
                       min="1"
                       value={item.reps ?? ""}
@@ -228,9 +202,10 @@ function CreateWodView({
                   </div>
 
                   <div>
-                    <label>Peso (kg)</label>
+                    <label htmlFor={`weight-${index}`}>Peso (kg)</label>
 
                     <input
+                      id={`weight-${index}`}
                       type="number"
                       min="0"
                       step="0.01"
@@ -250,9 +225,10 @@ function CreateWodView({
 
               {exercise?.measurementType === "DISTANCE" && (
                 <div>
-                  <label>Distancia (m)</label>
+                  <label htmlFor={`distance-${index}`}>Distancia (m)</label>
 
                   <input
+                    id={`distance-${index}`}
                     type="number"
                     min="0"
                     step="0.01"
@@ -271,9 +247,12 @@ function CreateWodView({
 
               {exercise?.measurementType === "TIME" && (
                 <div>
-                  <label>Duración (segundos)</label>
+                  <label htmlFor={`duration-${index}`}>
+                    Duración (segundos)
+                  </label>
 
                   <input
+                    id={`duration-${index}`}
                     type="number"
                     min="1"
                     value={item.durationSeconds ?? ""}
@@ -292,9 +271,10 @@ function CreateWodView({
               {exercise?.measurementType === "WEIGHT_DISTANCE" && (
                 <>
                   <div>
-                    <label>Peso (kg)</label>
+                    <label htmlFor={`weight-${index}`}>Peso (kg)</label>
 
                     <input
+                      id={`weight-${index}`}
                       type="number"
                       min="0"
                       step="0.01"
@@ -311,9 +291,10 @@ function CreateWodView({
                   </div>
 
                   <div>
-                    <label>Distancia (m)</label>
+                    <label htmlFor={`distance-${index}`}>Distancia (m)</label>
 
                     <input
+                      id={`distance-${index}`}
                       type="number"
                       min="0"
                       step="0.01"

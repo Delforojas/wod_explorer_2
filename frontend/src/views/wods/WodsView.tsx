@@ -1,13 +1,5 @@
 import type { WodAggregateResponse } from "../../types/Wod";
-
-interface WodsViewProps {
-  wods: WodAggregateResponse[];
-  selectedWod: WodAggregateResponse | null;
-  loading: boolean;
-  error: string | null;
-  onSelectWod: (id: number) => void;
-  onBack: () => void;
-}
+import type { WodsViewProps } from "./WodsView.Types";
 
 function formatWodType(type: WodAggregateResponse["version"]["type"]) {
   return type === "FOR_TIME" ? "For Time" : type === "AMRAP" ? "AMRAP" : "EMOM";
@@ -26,7 +18,7 @@ function WodsView({
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   if (selectedWod) {

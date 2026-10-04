@@ -9,8 +9,13 @@ interface AppLayoutProps {
 function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="app-layout">
+      <a className="skip-link" href="#main-content">
+        Saltar al contenido
+      </a>
       <Navbar />
-      <main className="app-main">{children}</main>
+      <main id="main-content" className="app-main" tabIndex={-1}>
+        {children}
+      </main>
       <Footer />
     </div>
   );

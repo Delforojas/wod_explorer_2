@@ -1,12 +1,5 @@
-import type { ExerciseResponse } from "../../types/Exercise";
 import type { ExerciseResultResponse } from "../../types/ExerciseResult";
-
-interface MyExerciseResultsViewProps {
-  results: ExerciseResultResponse[];
-  exercises: ExerciseResponse[];
-  loading: boolean;
-  error: string | null;
-}
+import type { MyExerciseResultsViewProps } from "./MyExerciseResultsView.Types";
 
 function MyExerciseResultsView({
   results,
@@ -64,7 +57,7 @@ function MyExerciseResultsView({
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   return (

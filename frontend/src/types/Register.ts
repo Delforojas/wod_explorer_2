@@ -1,5 +1,1 @@
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-}
+export type { RegisterRequest } from "../schemas/authSchemas";
