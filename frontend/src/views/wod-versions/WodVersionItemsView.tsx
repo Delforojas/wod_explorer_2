@@ -9,11 +9,11 @@ function WodVersionItemsView({
   onSelectItem,
 }: WodVersionItemsViewProps) {
   if (loading) {
-    return <p>Cargando elementos...</p>;
+    return <p className="ui-loading">Cargando elementos...</p>;
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return <p className="ui-error" role="alert">{error}</p>;
   }
 
   function getWodName(wodVersionId: number) {
@@ -21,16 +21,17 @@ function WodVersionItemsView({
   }
 
   return (
-    <section>
-      <header>
+    <section className="page">
+      <header className="page-header">
+        <p className="page-eyebrow">Catálogo</p>
         <h1>Elementos de las versiones</h1>
         <p>Ejercicios que forman las distintas versiones de los WODs.</p>
       </header>
 
-      {items.length === 0 && <p>No hay elementos disponibles.</p>}
+      {items.length === 0 && <p className="ui-empty">No hay elementos disponibles.</p>}
 
-      {items.map((item) => (
-        <article key={item.id}>
+      <div className="resource-list">{items.map((item) => (
+        <article className="resource-row" key={item.id}>
           <h2>Item #{item.id}</h2>
 
           <p>WOD: {getWodName(item.wodVersionId)}</p>
@@ -49,10 +50,10 @@ function WodVersionItemsView({
 
           <button onClick={() => onSelectItem(item.id)}>Ver detalle</button>
         </article>
-      ))}
+      ))}</div>
 
       {selectedItem && (
-        <article>
+        <article className="surface detail-section">
           <h2>Detalle del elemento</h2>
 
           <p>Item #{selectedItem.id}</p>

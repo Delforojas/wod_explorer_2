@@ -14,37 +14,36 @@ function WodsView({
   onBack,
 }: WodsViewProps) {
   if (loading) {
-    return <p>Cargando WODs...</p>;
+    return <p className="ui-loading">Cargando WODs...</p>;
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return <p className="ui-error" role="alert">{error}</p>;
   }
 
   if (selectedWod) {
     return (
-      <section>
-        <button onClick={onBack}>← Volver</button>
+      <section className="page">
+        <button className="button-tertiary back-button" onClick={onBack}>← Volver</button>
 
-        <h1>{selectedWod.name}</h1>
-
-        <p>{formatWodType(selectedWod.version.type)}</p>
+        <header className="page-header">
+          <h1>{selectedWod.name}</h1>
+          <p><span className="badge">{formatWodType(selectedWod.version.type)}</span></p>
 
         {selectedWod.version.timeCapSeconds && (
-          <p>
-            Tiempo límite: {Math.floor(selectedWod.version.timeCapSeconds / 60)}{" "}
-            min
-          </p>
+          <p className="metric-row"><span className="metric-value">{Math.floor(selectedWod.version.timeCapSeconds / 60)} min</span><span className="metric-label">Tiempo límite</span></p>
         )}
 
         {selectedWod.version.rounds && (
-          <p>Rondas: {selectedWod.version.rounds}</p>
+          <p className="resource-meta">Rondas: {selectedWod.version.rounds}</p>
         )}
+        </header>
 
-        <h2>Entrenamiento</h2>
+        <section className="detail-section">
+          <h2>Entrenamiento</h2>
 
-        {selectedWod.composition.map((item) => (
-          <article key={item.id}>
+        <ol className="exercise-sequence">{selectedWod.composition.map((item) => (
+          <li key={item.id}>
             <p>
               <strong>Ejercicio {item.exerciseId}</strong>
             </p>
@@ -58,34 +57,30 @@ function WodsView({
             {item.durationSeconds !== null && (
               <p>{item.durationSeconds} segundos</p>
             )}
-          </article>
-        ))}
+          </li>
+        ))}</ol>
+        </section>
       </section>
     );
   }
 
   return (
-    <section>
-      <header>
+    <section className="page">
+      <header className="page-header">
+        <p className="page-eyebrow">Catálogo</p>
         <h1>WODs</h1>
         <p>Elige un entrenamiento y consulta sus ejercicios.</p>
       </header>
 
-      {wods.map((wod) => (
-        <article key={wod.id}>
-          <h2>{wod.name}</h2>
+      <div className="resource-list">{wods.map((wod) => (
+        <article className="resource-row" key={wod.id}>
+          <header><h2>{wod.name}</h2><span className="badge">{formatWodType(wod.version.type)}</span></header>
 
-          <p>{formatWodType(wod.version.type)}</p>
-
-          {wod.version.timeCapSeconds && (
-            <p>{Math.floor(wod.version.timeCapSeconds / 60)} min</p>
-          )}
-
-          <p>{wod.composition.length} ejercicios</p>
+          <p className="resource-meta">{wod.version.timeCapSeconds && `${Math.floor(wod.version.timeCapSeconds / 60)} min · `}{wod.composition.length} ejercicios</p>
 
           <button onClick={() => onSelectWod(wod.id)}>Ver WOD</button>
         </article>
-      ))}
+      ))}</div>
     </section>
   );
 }

@@ -26,21 +26,22 @@ function CreateWodView({
   onSubmit,
 }: CreateWodViewProps) {
   if (loading) {
-    return <p>Cargando ejercicios...</p>;
+    return <p className="ui-loading">Cargando ejercicios...</p>;
   }
 
   return (
-    <section>
-      <header>
+    <section className="page">
+      <header className="page-header">
+        <p className="page-eyebrow">WOD personal</p>
         <h1>Crear WOD</h1>
         <p>Crea un nuevo entrenamiento personal.</p>
       </header>
 
-      {error && <p role="alert">{error}</p>}
-      {success && <p>{success}</p>}
+      {error && <p className="ui-error" role="alert">{error}</p>}
+      {success && <p className="ui-success">{success}</p>}
 
-      <form onSubmit={onSubmit}>
-        <div>
+      <form className="form-layout surface" onSubmit={onSubmit}>
+        <div className="form-field">
           <label htmlFor="name">Nombre</label>
 
           <input
@@ -52,7 +53,7 @@ function CreateWodView({
           />
         </div>
 
-        <div>
+        <div className="form-field">
           <label htmlFor="type">Modalidad</label>
 
           <select
@@ -129,13 +130,13 @@ function CreateWodView({
 
         <h2>Ejercicios</h2>
 
-        {items.length === 0 && <p>Todavía no has añadido ejercicios.</p>}
+        {items.length === 0 && <p className="ui-empty">Todavía no has añadido ejercicios.</p>}
 
         {items.map((item, index) => {
           const exercise = getExercise(item.exerciseId);
 
           return (
-            <div key={index}>
+            <div className="repeatable-item" key={index}>
               <h3>Ejercicio {index + 1}</h3>
 
               <div>

@@ -62,40 +62,36 @@ function renderResult(result: WodResultResponse) {
 function HistoryView({ results, loading, error }: HistoryViewProps) {
   if (loading) {
     return (
-      <section className="placeholder-page">
+      <section className="page placeholder-page">
         <h1>Historial</h1>
-        <p>Cargando historial...</p>
+        <p className="ui-loading">Cargando historial...</p>
       </section>
     );
   }
 
   if (error) {
     return (
-      <section className="placeholder-page">
+      <section className="page placeholder-page">
         <h1>Historial</h1>
-        <p role="alert">{error}</p>
+        <p className="ui-error" role="alert">{error}</p>
       </section>
     );
   }
 
   return (
-    <section className="placeholder-page">
-      <h1>Historial</h1>
+    <section className="page placeholder-page">
+      <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Historial</h1></header>
 
       {results.length === 0 ? (
-        <p>Todavía no has registrado ningún resultado.</p>
+        <p className="ui-empty">Todavía no has registrado ningún resultado.</p>
       ) : (
-        results.map((result) => (
-          <article key={result.id}>
-            <h2>{result.wodName}</h2>
-
-            <p>{result.type}</p>
-
-            <p>{formatDate(result.performedAt)}</p>
-
+        <div className="resource-list">{results.map((result) => (
+          <article className="resource-row" key={result.id}>
+            <header><h2>{result.wodName}</h2><span className="badge">{result.type}</span></header>
+            <p className="resource-meta">{formatDate(result.performedAt)}</p>
             {renderResult(result)}
           </article>
-        ))
+        ))}</div>
       )}
     </section>
   );

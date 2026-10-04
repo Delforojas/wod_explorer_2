@@ -14,25 +14,26 @@ function WodVersionsView({
   onSelectVersion,
 }: WodVersionsViewProps) {
   if (loading) {
-    return <p>Cargando versiones...</p>;
+    return <p className="ui-loading">Cargando versiones...</p>;
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return <p className="ui-error" role="alert">{error}</p>;
   }
 
   return (
-    <section>
-      <header>
+    <section className="page">
+      <header className="page-header">
+        <p className="page-eyebrow">Catálogo</p>
         <h1>Versiones de WODs</h1>
         <p>Consulta las diferentes versiones de los entrenamientos.</p>
       </header>
 
-      {versions.length === 0 && <p>No hay versiones disponibles.</p>}
+      {versions.length === 0 && <p className="ui-empty">No hay versiones disponibles.</p>}
 
-      {versions.map((version) => (
-        <article key={version.id}>
-          <h2>{version.wodName}</h2>
+      <div className="resource-list">{versions.map((version) => (
+        <article className="resource-row" key={version.id}>
+          <header><h2>{version.wodName}</h2><span className="badge">{formatWodType(version.type)}</span></header>
 
           <p>Versión {version.versionNumber}</p>
 
@@ -50,10 +51,10 @@ function WodVersionsView({
             Ver detalle
           </button>
         </article>
-      ))}
+      ))}</div>
 
       {selectedVersion && (
-        <article>
+        <article className="surface detail-section">
           <h3>Ejercicios</h3>
 
           {selectedItems.length === 0 ? (
