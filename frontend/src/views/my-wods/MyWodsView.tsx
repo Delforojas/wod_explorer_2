@@ -44,23 +44,23 @@ function MyWodsView({
   onCreateAmrapResult,
 }: MyWodsViewProps) {
   if (loading) {
-    return <p>Cargando tus WODs...</p>;
+    return <p className="ui-loading">Cargando tus WODs...</p>;
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return <p className="ui-error" role="alert">{error}</p>;
   }
 
   if (editingWod) {
     return (
-      <section>
-        <button type="button" onClick={onCancelEdit}>
+      <section className="page">
+        <button className="button-tertiary back-button" type="button" onClick={onCancelEdit}>
           ← Volver
         </button>
 
         <h1>Editar WOD</h1>
 
-        <form onSubmit={onUpdateWod}>
+        <form className="form-layout surface" onSubmit={onUpdateWod}>
           <div>
             <label htmlFor="edit-name">Nombre</label>
 
@@ -156,7 +156,7 @@ function MyWodsView({
             const exercise = getExercise(item.exerciseId);
 
             return (
-              <div key={index}>
+            <div className="repeatable-item" key={index}>
                 <h3>Ejercicio {index + 1}</h3>
 
                 <div>
@@ -367,30 +367,31 @@ function MyWodsView({
 
   if (selectedWod) {
     return (
-      <section>
-        <button type="button" onClick={onBack}>
+      <section className="page">
+        <button className="button-tertiary back-button" type="button" onClick={onBack}>
           ← Volver
         </button>
 
-        <h1>{selectedWod.name}</h1>
-
-        <p>{selectedWod.version.type}</p>
+        <header className="page-header">
+          <h1>{selectedWod.name}</h1>
+          <p><span className="badge">{selectedWod.version.type}</span></p>
 
         {selectedWod.version.rounds !== null && (
-          <p>Rondas: {selectedWod.version.rounds}</p>
+          <p className="resource-meta">Rondas: {selectedWod.version.rounds}</p>
         )}
 
         {selectedWod.version.timeCapSeconds !== null && (
-          <p>
+          <p className="metric-row">
             Tiempo límite: {Math.floor(selectedWod.version.timeCapSeconds / 60)}{" "}
             min
           </p>
         )}
+        </header>
 
         <h2>Entrenamiento</h2>
 
-        {selectedWod.composition.map((item) => (
-          <article key={item.id}>
+        <ol className="exercise-sequence">{selectedWod.composition.map((item) => (
+          <li key={item.id}>
             <strong>{item.exerciseName}</strong>
 
             {item.reps !== null && <p>{item.reps} repeticiones</p>}
@@ -402,10 +403,10 @@ function MyWodsView({
             {item.durationSeconds !== null && (
               <p>{item.durationSeconds} segundos</p>
             )}
-          </article>
-        ))}
+          </li>
+        ))}</ol>
 
-        {resultSuccess && <p>{resultSuccess}</p>}
+        {resultSuccess && <p className="ui-success">{resultSuccess}</p>}
 
         {!registeringResult && (
           <button type="button" onClick={onStartRegisterResult}>
@@ -414,7 +415,7 @@ function MyWodsView({
         )}
 
         {registeringResult && selectedWod.version.type === "AMRAP" && (
-          <div>
+          <div className="surface form-section">
             <h2>Registrar resultado</h2>
 
             <form onSubmit={onCreateAmrapResult}>
@@ -498,18 +499,14 @@ function MyWodsView({
   }
 
   return (
-    <section className="placeholder-page">
-      <h1>Mis WODs</h1>
+    <section className="page placeholder-page">
+      <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Mis WODs</h1><p>Esta sección permitirá gestionar tus WOD personales.</p></header>
 
-      <p>Esta sección permitirá gestionar tus WOD personales.</p>
+      <div className="resource-list">{wods.map((wod) => (
+        <article className="resource-row" key={wod.id}>
+          <header><h2>{wod.name}</h2><span className="badge">{wod.version.type}</span></header>
 
-      {wods.map((wod) => (
-        <article key={wod.id}>
-          <h2>{wod.name}</h2>
-
-          <p>{wod.version.type}</p>
-
-          <button type="button" onClick={() => onSelectWod(wod.id)}>
+          <div className="resource-actions"><button type="button" onClick={() => onSelectWod(wod.id)}>
             Ver WOD
           </button>
 
@@ -519,9 +516,9 @@ function MyWodsView({
 
           <button type="button" onClick={() => onDeleteWod(wod.id)}>
             Eliminar
-          </button>
+          </button></div>
         </article>
-      ))}
+      ))}</div>
     </section>
   );
 }

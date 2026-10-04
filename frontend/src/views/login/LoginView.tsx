@@ -9,11 +9,14 @@ function LoginView({
   onGoogleLogin,
 }: LoginViewProps) {
   return (
-    <section>
-      <h1>Iniciar sesión</h1>
+    <section className="page auth-page">
+      <header className="page-header">
+        <p className="page-eyebrow">WOD Explorer</p>
+        <h1>Iniciar sesión</h1>
+      </header>
 
-      <form onSubmit={onSubmit}>
-        <div>
+      <form className="form-layout" onSubmit={onSubmit}>
+        <div className="form-field">
           <label htmlFor="username">Nombre de usuario</label>
           <input
             id="username"
@@ -24,7 +27,7 @@ function LoginView({
           />
         </div>
 
-        <div>
+        <div className="form-field">
           <label htmlFor="password">Contraseña</label>
           <input
             id="password"
@@ -38,7 +41,7 @@ function LoginView({
         <button type="submit">Iniciar sesión</button>
       </form>
 
-      <p>o</p>
+      <p className="auth-separator">o</p>
 
       <button type="button" onClick={onGoogleLogin}>
         Continuar con Google

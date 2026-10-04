@@ -53,31 +53,29 @@ function MyExerciseResultsView({
   }
 
   if (loading) {
-    return <p>Cargando tus marcas...</p>;
+    return <p className="ui-loading">Cargando tus marcas...</p>;
   }
 
   if (error) {
-    return <p role="alert">{error}</p>;
+    return <p className="ui-error" role="alert">{error}</p>;
   }
 
   return (
-    <section>
-      <h1>Mis marcas</h1>
-
-      <p>Aquí puedes consultar tus resultados de ejercicios.</p>
+    <section className="page">
+      <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Mis marcas</h1><p>Aquí puedes consultar tus resultados de ejercicios.</p></header>
 
       {results.length === 0 ? (
-        <p>Todavía no has registrado ninguna marca.</p>
+        <p className="ui-empty">Todavía no has registrado ninguna marca.</p>
       ) : (
-        results.map((result) => (
-          <article key={result.id}>
-            <h2>{getExerciseName(result.exerciseId)}</h2>
+        <div className="resource-list">{results.map((result) => (
+          <article className="resource-row" key={result.id}>
+            <header><h2>{getExerciseName(result.exerciseId)}</h2></header>
 
             {renderResult(result)}
 
-            <p>{formatDate(result.performedAt)}</p>
+            <p className="resource-meta">{formatDate(result.performedAt)}</p>
           </article>
-        ))
+        ))}</div>
       )}
     </section>
   );

@@ -1,6 +1,6 @@
 function GoogleCallbackPage() {
   return (
-    <section>
+    <section className="page placeholder-page">
       <h1>Iniciando sesión con Google...</h1>
     </section>
   );
