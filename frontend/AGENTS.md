@@ -589,95 +589,81 @@ No introducir tecnologías, dependencias o decisiones arquitectónicas únicamen
 MCPs configurados para el frontend:
 
 ```text
-
-Design MCP: <design_mcp>
-
-Repository MCP: <repository_mcp>
-
-Additional MCP: <additional_mcp>
-
+Design MCP: 21st
+Repository MCP: github
+Documentation MCP: context7
+Database MCP: database
 ```
 
 No asumir que un MCP está disponible si no ha sido configurado explícitamente.
 
 ### MCP de diseño
 
-Cuando `<design_mcp>` esté configurado, utilizarlo cuando resulte relevante para:
+`21st` es el MCP de diseño configurado para WOD Explorer.
+
+Utilizarlo cuando resulte relevante para:
 
 - consultar referencias visuales;
-
 - explorar layouts;
-
 - analizar componentes;
-
 - estudiar patrones de interfaz;
-
 - obtener propuestas visuales;
-
 - apoyar decisiones de composición e interacción.
 
-Cuando exista una referencia visual configurada:
-
-```text
-
-<design_reference>
-
-```
-
-utilizarla como referencia mediante el MCP cuando la tarea lo requiera.
-
-Las propuestas obtenidas mediante MCP deben adaptarse a:
+Las propuestas obtenidas mediante `21st` deben adaptarse a:
 
 1. la spec activa;
-
 2. `DESIGN.md`;
-
 3. el sistema visual existente;
-
 4. la arquitectura frontend;
-
 5. los requisitos de accesibilidad;
-
 6. los Guardrails.
 
-El MCP puede proponer o ayudar a explorar soluciones.
+`21st` puede proponer, explorar y servir de apoyo para definir soluciones visuales.
 
 No sustituye a `DESIGN.md` como fuente de verdad visual.
 
-No aplicar automáticamente una propuesta obtenida mediante MCP si contradice decisiones ya establecidas.
+No aplicar automáticamente una propuesta obtenida mediante `21st` si contradice decisiones ya establecidas.
 
 ### MCP de repositorio
 
-Cuando `<repository_mcp>` esté configurado, puede utilizarse para:
+`github` es el MCP de repositorio configurado para el proyecto.
+
+Puede utilizarse para:
 
 - consultar Issues;
-
 - revisar requisitos;
-
 - consultar Pull Requests;
-
 - revisar ramas;
-
-- comprobar estado remoto;
-
+- comprobar el estado remoto;
 - verificar trabajo relacionado con una tarea.
 
 No realizar acciones destructivas o irreversibles sin autorización cuando estén protegidas por los Guardrails.
 
-### MCP adicionales
+### MCP de documentación
 
-Utilizar `<additional_mcp>` únicamente dentro del ámbito para el que haya sido configurado.
+`context7` puede utilizarse para consultar documentación técnica actualizada de librerías y frameworks cuando resulte necesario para implementar o verificar una tarea.
+
+La documentación obtenida mediante `context7` no sustituye las decisiones arquitectónicas establecidas por el proyecto.
+
+### MCP de base de datos
+
+`database` proporciona acceso a la base de datos del proyecto dentro del ámbito para el que haya sido configurado.
+
+Puede utilizarse cuando una tarea frontend requiera verificar estructuras, datos o contratos relacionados con la integración con el backend.
+
+No utilizar el acceso a base de datos para introducir dependencias directas entre frontend y persistencia.
+
+El frontend debe continuar comunicándose con el backend mediante los contratos API definidos por el proyecto.
+
+### Reglas generales
 
 Los MCPs y herramientas externas no sustituyen:
 
 - la spec activa;
-
 - `DESIGN.md`;
-
 - los `AGENTS.md`;
-
 - los Guardrails;
-
 - las fuentes de verdad definidas por el proyecto.
 
 ---

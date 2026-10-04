@@ -15,6 +15,14 @@
         "Authorization": "Bearer {env:GITHUB_TOKEN}",
         "X-MCP-Toolsets": "repos,issues,labels,pull_requests,git,actions,projects,notifications,users"
       }
+    },
+    "21st": {
+      "type": "remote",
+      "url": "https://21st.dev/api/mcp",
+      "oauth": false,
+      "headers": {
+        "x-api-key": "{env:TWENTYFIRST_API_KEY}"
+      }
     }
   }
 }
