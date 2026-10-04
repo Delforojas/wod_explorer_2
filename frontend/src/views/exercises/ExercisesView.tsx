@@ -16,7 +16,7 @@ function ExercisesView({
   }
 
   return (
-    <section className="page">
+    <section className="page page--catalog">
       <header className="page-header">
         <p className="page-eyebrow">Catálogo</p>
         <h1>Ejercicios</h1>
@@ -27,14 +27,14 @@ function ExercisesView({
           <article className="resource-row" key={exercise.id}>
             <header>
               <h2>{exercise.name}</h2>
-              <span className="badge">{exercise.category}</span>
+              <span className="resource-meta">{exercise.category}</span>
             </header>
             <div className="resource-meta">
-              <span>Medición: {exercise.measurementType}</span>
+              <span>{exercise.measurementType}</span>
             </div>
 
-            <button onClick={() => onSelectExercise(exercise.id)}>
-              Ver detalle
+            <button className="row-action" onClick={() => onSelectExercise(exercise.id)}>
+              Abrir
             </button>
           </article>
         ))}
