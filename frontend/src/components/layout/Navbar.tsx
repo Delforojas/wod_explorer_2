@@ -1,30 +1,22 @@
-import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import AuthActions from "./AuthActions";
 import DesktopNavigation from "./DesktopNavigation";
-import MobileMenuButton from "./MobileMenuButton";
 import MobileNavigation from "./MobileNavigation";
 
 function Navbar() {
   useLocation();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isAuthenticated = Boolean(localStorage.getItem("token"));
-
-  function closeMobileMenu() {
-    setIsMobileMenuOpen(false);
-  }
 
   function handleLogout() {
     localStorage.removeItem("token");
-    closeMobileMenu();
     navigate("/");
   }
 
   return (
-    <nav className="site-navbar" aria-label="Navegación principal">
+    <header className="site-navbar">
       <div className="navbar-header">
-        <NavLink className="navbar-brand" to="/" onClick={closeMobileMenu}>
+        <NavLink className="navbar-brand" to="/">
           WOD EXPLORER
         </NavLink>
         <DesktopNavigation isAuthenticated={isAuthenticated} />
@@ -34,20 +26,13 @@ function Navbar() {
             isAuthenticated={isAuthenticated}
             onLogout={handleLogout}
           />
-          <MobileMenuButton
-            isOpen={isMobileMenuOpen}
-            onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
-          />
         </div>
       </div>
-      {isMobileMenuOpen && (
-        <MobileNavigation
-          isAuthenticated={isAuthenticated}
-          onLogout={handleLogout}
-          onNavigate={closeMobileMenu}
-        />
-      )}
-    </nav>
+      <MobileNavigation
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
+      />
+    </header>
   );
 }
 
