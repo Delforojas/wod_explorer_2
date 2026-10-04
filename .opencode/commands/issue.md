@@ -780,7 +780,7 @@ Este paso es obligatorio.
 
 Antes de avanzar a la fase de validación manual, ejecuta el `Final Workflow Check Hook` definido en:
 
-`.opencode/commands/hooks/finish-workflow-check.md`
+`.opencode/commands/hooks/final-workflow-check.md`
 
 Utiliza el estado obtenido por el hook para realizar la verificación final del workflow.
 
