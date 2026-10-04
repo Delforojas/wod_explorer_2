@@ -1,13 +1,4 @@
-import type { WodVersionItemResponse, WodVersionResponse } from "../../types/Wod";
-
-interface WodVersionItemsViewProps {
-  items: WodVersionItemResponse[];
-  versions: WodVersionResponse[];
-  selectedItem: WodVersionItemResponse | null;
-  loading: boolean;
-  error: string | null;
-  onSelectItem: (id: number) => void;
-}
+import type { WodVersionItemsViewProps } from "./WodVersionItemsView.Types";
 
 function WodVersionItemsView({
   items,
@@ -22,7 +13,7 @@ function WodVersionItemsView({
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   function getWodName(wodVersionId: number) {

@@ -5,15 +5,23 @@ import type {
   WodResultFilters,
 } from "./apiTypes";
 
-import { apiRequest, getAuthHeaders } from "./client/apiClient";
+import { apiRequest, getAuthHeaders, parseJson } from "./client/apiClient";
 
 import { API_ENDPOINTS } from "./client/apiEndpoints";
 
 import { API_ERROR_MESSAGES, handleApiError } from "./client/apiError";
+import {
+  wodResultFiltersSchema,
+  wodResultRequestSchema,
+  wodResultResponseListSchema,
+  wodResultResponseSchema,
+} from "../schemas/wodResultSchemas";
 
 export async function getWodResults(
   filters: WodResultFilters = {},
 ): Promise<WodResultResponse[]> {
+  wodResultFiltersSchema.parse(filters);
+
   const params = new URLSearchParams();
 
   if (filters.wodId !== undefined) {
@@ -47,7 +55,7 @@ export async function getWodResults(
 
   handleApiError(response, API_ERROR_MESSAGES.WOD_RESULTS.GET_ALL);
 
-  return response.json();
+  return parseJson(response, wodResultResponseListSchema);
 }
 
 export async function getPersonalBests(): Promise<WodResultResponse[]> {
@@ -57,7 +65,7 @@ export async function getPersonalBests(): Promise<WodResultResponse[]> {
 
   handleApiError(response, API_ERROR_MESSAGES.WOD_RESULTS.GET_PERSONAL_BESTS);
 
-  return response.json();
+  return parseJson(response, wodResultResponseListSchema);
 }
 
 export async function getWodResultById(id: number): Promise<WodResultResponse> {
@@ -67,12 +75,14 @@ export async function getWodResultById(id: number): Promise<WodResultResponse> {
 
   handleApiError(response, API_ERROR_MESSAGES.WOD_RESULTS.GET_BY_ID);
 
-  return response.json();
+  return parseJson(response, wodResultResponseSchema);
 }
 
 export async function createWodResult(
   request: WodResultRequest,
 ): Promise<WodResultResponse> {
+  wodResultRequestSchema.parse(request);
+
   const response = await apiRequest(API_ENDPOINTS.WOD_RESULTS.BASE, {
     method: "POST",
     headers: {
@@ -84,7 +94,7 @@ export async function createWodResult(
 
   handleApiError(response, API_ERROR_MESSAGES.WOD_RESULTS.CREATE);
 
-  return response.json();
+  return parseJson(response, wodResultResponseSchema);
 }
 
 export async function deleteWodResult(id: number): Promise<void> {

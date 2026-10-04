@@ -1,4 +1,1 @@
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
+export type { LoginRequest } from "../schemas/authSchemas";

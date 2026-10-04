@@ -1,13 +1,4 @@
-import type { FormEvent } from "react";
-
-interface LoginViewProps {
-  username: string;
-  password: string;
-  onUsernameChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onGoogleLogin: () => void;
-}
+import type { LoginViewProps } from "./LoginView.Types";
 
 function LoginView({
   username,

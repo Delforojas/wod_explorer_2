@@ -1,56 +1,5 @@
-import type { FormEvent } from "react";
-import type { ExerciseResponse } from "../../types/Exercise";
-import type {
-  WodAggregateResponse,
-  WodCompositionItemRequest,
-  WodType,
-} from "../../types/Wod";
-
-interface MyWodsViewProps {
-  wods: WodAggregateResponse[];
-  exercises: ExerciseResponse[];
-  selectedWod: WodAggregateResponse | null;
-  registeringResult: boolean;
-  resultPerformedAt: string;
-  amrapRounds: number | undefined;
-  amrapExtraReps: number | undefined;
-  resultSuccess: string | null;
-  editingWod: WodAggregateResponse | null;
-  editName: string;
-  editType: WodType;
-  editRounds: number | undefined;
-  editTimeCapSeconds: number | undefined;
-  editItems: WodCompositionItemRequest[];
-  loading: boolean;
-  error: string | null;
-  getExercise: (exerciseId: number) => ExerciseResponse | undefined;
-  onSelectWod: (id: number) => void;
-  onEditWod: (wod: WodAggregateResponse) => void;
-  onDeleteWod: (id: number) => void;
-  onCancelEdit: () => void;
-  onEditNameChange: (value: string) => void;
-  onEditTypeChange: (value: WodType) => void;
-  onEditRoundsChange: (value: number | undefined) => void;
-  onEditTimeCapChange: (value: number | undefined) => void;
-  onEditExerciseChange: (index: number, exerciseId: number) => void;
-  onEditRepsChange: (index: number, reps: number | undefined) => void;
-  onEditWeightChange: (index: number, weightKg: number | undefined) => void;
-  onEditDistanceChange: (index: number, distanceM: number | undefined) => void;
-  onEditDurationChange: (
-    index: number,
-    durationSeconds: number | undefined,
-  ) => void;
-  onAddEditExercise: () => void;
-  onRemoveEditExercise: (index: number) => void;
-  onUpdateWod: (event: FormEvent<HTMLFormElement>) => void;
-  onBack: () => void;
-  onStartRegisterResult: () => void;
-  onCancelRegisterResult: () => void;
-  onResultPerformedAtChange: (value: string) => void;
-  onAmrapRoundsChange: (value: number | undefined) => void;
-  onAmrapExtraRepsChange: (value: number | undefined) => void;
-  onCreateAmrapResult: (event: FormEvent<HTMLFormElement>) => void;
-}
+import type { WodType } from "../../types/Wod";
+import type { MyWodsViewProps } from "./MyWodsView.Types";
 
 function MyWodsView({
   wods,
@@ -99,7 +48,7 @@ function MyWodsView({
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p role="alert">{error}</p>;
   }
 
   if (editingWod) {
@@ -211,9 +160,10 @@ function MyWodsView({
                 <h3>Ejercicio {index + 1}</h3>
 
                 <div>
-                  <label>Ejercicio</label>
+                  <label htmlFor={`edit-exercise-${index}`}>Ejercicio</label>
 
                   <select
+                    id={`edit-exercise-${index}`}
                     value={item.exerciseId}
                     onChange={(event) =>
                       onEditExerciseChange(index, Number(event.target.value))
@@ -232,9 +182,10 @@ function MyWodsView({
 
                 {exercise?.measurementType === "REPS" && (
                   <div>
-                    <label>Repeticiones</label>
+                    <label htmlFor={`edit-reps-${index}`}>Repeticiones</label>
 
                     <input
+                      id={`edit-reps-${index}`}
                       type="number"
                       min="1"
                       value={item.reps ?? ""}
@@ -253,9 +204,12 @@ function MyWodsView({
                 {exercise?.measurementType === "WEIGHT" && (
                   <>
                     <div>
-                      <label>Repeticiones</label>
+                      <label htmlFor={`edit-reps-${index}`}>
+                        Repeticiones
+                      </label>
 
                       <input
+                        id={`edit-reps-${index}`}
                         type="number"
                         min="1"
                         value={item.reps ?? ""}
@@ -271,9 +225,10 @@ function MyWodsView({
                     </div>
 
                     <div>
-                      <label>Peso (kg)</label>
+                      <label htmlFor={`edit-weight-${index}`}>Peso (kg)</label>
 
                       <input
+                        id={`edit-weight-${index}`}
                         type="number"
                         min="0"
                         step="0.01"
@@ -293,9 +248,12 @@ function MyWodsView({
 
                 {exercise?.measurementType === "DISTANCE" && (
                   <div>
-                    <label>Distancia (m)</label>
+                    <label htmlFor={`edit-distance-${index}`}>
+                      Distancia (m)
+                    </label>
 
                     <input
+                      id={`edit-distance-${index}`}
                       type="number"
                       min="0"
                       step="0.01"
@@ -314,9 +272,12 @@ function MyWodsView({
 
                 {exercise?.measurementType === "TIME" && (
                   <div>
-                    <label>Duración (segundos)</label>
+                    <label htmlFor={`edit-duration-${index}`}>
+                      Duración (segundos)
+                    </label>
 
                     <input
+                      id={`edit-duration-${index}`}
                       type="number"
                       min="1"
                       value={item.durationSeconds ?? ""}
@@ -335,9 +296,10 @@ function MyWodsView({
                 {exercise?.measurementType === "WEIGHT_DISTANCE" && (
                   <>
                     <div>
-                      <label>Peso (kg)</label>
+                      <label htmlFor={`edit-weight-${index}`}>Peso (kg)</label>
 
                       <input
+                        id={`edit-weight-${index}`}
                         type="number"
                         min="0"
                         step="0.01"
@@ -354,9 +316,12 @@ function MyWodsView({
                     </div>
 
                     <div>
-                      <label>Distancia (m)</label>
+                      <label htmlFor={`edit-distance-${index}`}>
+                        Distancia (m)
+                      </label>
 
                       <input
+                        id={`edit-distance-${index}`}
                         type="number"
                         min="0"
                         step="0.01"
