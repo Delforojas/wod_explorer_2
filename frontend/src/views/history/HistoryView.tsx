@@ -87,7 +87,7 @@ function HistoryView({ results, loading, error }: HistoryViewProps) {
       ) : (
         <div className="resource-list">{results.map((result) => (
           <article className="resource-row" key={result.id}>
-            <header><h2>{result.wodName}</h2><span className="badge">{result.type}</span></header>
+            <header><h2>{result.wodName}</h2><span className="resource-meta">{result.type}</span></header>
             <p className="resource-meta">{formatDate(result.performedAt)}</p>
             {renderResult(result)}
           </article>

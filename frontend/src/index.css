@@ -333,7 +333,7 @@ time {
   justify-content: center;
   border-top: 1px solid var(--color-border);
   background: var(--color-bg-raised);
-  box-shadow: var(--shadow-raised);
+  box-shadow: 0 -8px 20px rgb(0 0 0 / 18%);
 }
 
 .mobile-nav-list,
@@ -547,7 +547,7 @@ time {
   display: grid;
   gap: var(--space-3);
   border-bottom: 1px solid var(--color-border);
-  padding: var(--space-4) 0;
+  padding: var(--space-3) 0;
 }
 
 .resource-row > header,
@@ -569,12 +569,39 @@ time {
 
 .resource-row h2,
 .resource-row h3 {
-  font-size: 16px;
+  font-size: 18px;
   line-height: 24px;
 }
 
 .resource-actions {
   justify-content: flex-start;
+}
+
+.row-action {
+  min-width: 44px;
+  border-color: transparent;
+  padding-inline: var(--space-2);
+  background: transparent;
+  color: var(--color-info);
+  font-size: 14px;
+}
+
+.row-action:hover:not(:disabled) {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.resource-meta {
+  letter-spacing: 0.01em;
+}
+
+.resource-meta span + span::before {
+  margin-right: var(--space-2);
+  color: var(--color-text-muted);
+  content: "·";
 }
 
 .resource-actions button,
@@ -595,6 +622,14 @@ time {
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 36px;
+}
+
+.page--catalog .resource-list {
+  border-top-color: transparent;
+}
+
+.page--catalog .resource-row:first-child {
+  padding-top: 0;
 }
 
 .metric-label {
@@ -711,6 +746,10 @@ time {
   .resource-row {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
+  }
+
+  .page--catalog {
+    max-width: 960px;
   }
 
   .resource-row > header {

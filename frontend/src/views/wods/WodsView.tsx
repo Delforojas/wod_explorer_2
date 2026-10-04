@@ -65,7 +65,7 @@ function WodsView({
   }
 
   return (
-    <section className="page">
+    <section className="page page--catalog">
       <header className="page-header">
         <p className="page-eyebrow">Catálogo</p>
         <h1>WODs</h1>
@@ -74,11 +74,11 @@ function WodsView({
 
       <div className="resource-list">{wods.map((wod) => (
         <article className="resource-row" key={wod.id}>
-          <header><h2>{wod.name}</h2><span className="badge">{formatWodType(wod.version.type)}</span></header>
+          <header><h2>{wod.name}</h2><span className="resource-meta">{formatWodType(wod.version.type)}</span></header>
 
           <p className="resource-meta">{wod.version.timeCapSeconds && `${Math.floor(wod.version.timeCapSeconds / 60)} min · `}{wod.composition.length} ejercicios</p>
 
-          <button onClick={() => onSelectWod(wod.id)}>Ver WOD</button>
+          <button className="row-action" onClick={() => onSelectWod(wod.id)}>Abrir</button>
         </article>
       ))}</div>
     </section>
