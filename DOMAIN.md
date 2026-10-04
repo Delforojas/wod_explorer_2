@@ -225,8 +225,8 @@ Reglas:
 - registrar un nuevo intento no sustituye los anteriores;
 - el resultado debe ser compatible con la modalidad del WOD;
 - todos los resultados son personales y privados;
-- un usuario puede modificar o corregir únicamente sus propios resultados.
-- un usuario solo puede consultar, modificar y eliminar sus propios resultados.
+- un resultado es inmutable después de registrarse; no puede modificarse ni corregirse.
+- su propietario puede consultar y eliminar un resultado propio; para corregirlo debe eliminar el intento y registrar uno nuevo.
 - eliminar un resultado no elimina ni modifica los demás intentos.
 
 ### 5.6. Historial personal
@@ -256,7 +256,7 @@ La comparación depende de la modalidad:
 
 Solo deben compararse resultados compatibles del mismo WOD. No se agregan resultados de WOD distintos aunque compartan nombre.
 
-Si se crea, modifica o elimina un resultado, la mejor marca se deriva de nuevo a partir de los resultados existentes.
+Si se crea o elimina un resultado, la mejor marca se deriva de nuevo a partir de los resultados existentes.
 
 ## 6. Agregados y propiedad
 
@@ -285,7 +285,7 @@ El histórico de resultados debe conservar su significado aunque el WOD personal
 | Ejercicio de catálogo | Sistema                 | Pública     | Sistema                                |
 | WOD genérico          | Sistema                 | Pública     | Sistema                                |
 | WOD personal          | Usuario creador         | Privada     | Su propietario                         |
-| Resultado             | Usuario que lo registra | Privada     | Su propietario |
+| Resultado             | Usuario que lo registra | Privada     | No se modifica; su propietario puede eliminarlo |
 | Historial             | Derivado del usuario    | Privada     | No se edita directamente               |
 | Mejor marca           | Derivada del usuario    | Privada     | No se edita directamente               |
 
@@ -301,7 +301,7 @@ El histórico de resultados debe conservar su significado aunque el WOD personal
 8. Un usuario solo puede modificar o eliminar sus propios WOD.
 9. Un usuario puede registrar varios resultados para el mismo WOD.
 10. Cada resultado pertenece a un único usuario y nunca es público.
-11. Un resultado solo puede ser consultado, modificado o eliminado por su propietario.
+11. Un resultado solo puede ser consultado o eliminado por su propietario; no puede modificarse. Para corregirlo, se elimina el intento y se registra uno nuevo.
 12. El usuario solo puede acceder a su historial y a sus mejores marcas.
 13. El historial y las mejores marcas se derivan de los resultados; no se editan ni almacenan como segunda fuente de verdad.
 14. Los datos personales del usuario se limitan a los necesarios para el registro y la identificación.
