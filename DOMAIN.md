@@ -162,7 +162,6 @@ Atributos conceptuales mínimos:
 - identificador;
 - nombre;
 - modalidad o tipo de WOD;
-- nivel, cuando proceda;
 - límite de tiempo, cuando proceda;
 - número de rondas, cuando proceda;
 - origen: genérico o personal;
@@ -209,15 +208,12 @@ El resultado puede adoptar distintas formas según el tipo de WOD, por ejemplo:
 - tiempo total en un WOD `FOR_TIME`;
 - rondas y repeticiones en un `AMRAP`;
 
-- repeticiones o carga alcanzada en un `EMOM`, si la definición concreta del entrenamiento lo requiere.
-
 No debe forzarse una única cifra genérica que pierda el significado deportivo del resultado.
 
-Las modalidades iniciales admitidas son `FOR_TIME`, `AMRAP` y `EMOM`. No se admiten modalidades adicionales hasta que exista una decisión explícita que defina su resultado y comparación.
+Las modalidades iniciales admitidas son `FOR_TIME` y `AMRAP`. No se admiten modalidades adicionales hasta que exista una decisión explícita que defina su resultado y comparación.
 
 - En `FOR_TIME`, un resultado completado contiene un tiempo positivo. Un resultado no completado puede conservar el progreso alcanzado mediante los campos de progreso definidos para la versión ejecutada. Solo los resultados completados y compatibles participan en la mejor marca.
 - En `AMRAP`, un resultado contiene rondas completas y repeticiones adicionales no negativas. La comparación se realiza primero por rondas y después por repeticiones adicionales.
-- En `EMOM`, un resultado conserva la ronda alcanzada y, cuando proceda, el elemento y la métrica de progreso alcanzados. Solo se comparan resultados compatibles de la misma versión y regla de progreso.
 
 Los campos de resultado deben ser compatibles con la modalidad del WOD.
 
@@ -340,7 +336,6 @@ Los WOD genéricos y la colección personal del usuario deben poder consultarse 
 
 - texto o nombre;
 - modalidad;
-- nivel, cuando exista;
 - origen, cuando se muestren conjuntamente.
 
 El historial personal debe poder consultarse al menos por:
