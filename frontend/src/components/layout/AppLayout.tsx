@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Footer from "./Footer";
 import Navbar from "./Navbar";
+import PulsarGridBackground from "./PulsarGridBackground";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -14,7 +15,8 @@ function AppLayout({ children }: AppLayoutProps) {
       </a>
       <Navbar />
       <main id="main-content" className="app-main" tabIndex={-1}>
-        {children}
+        <PulsarGridBackground />
+        <div className="app-main-content">{children}</div>
       </main>
       <Footer />
     </div>
