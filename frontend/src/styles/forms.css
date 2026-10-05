@@ -1,0 +1,136 @@
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-input-background);
+  color: var(--color-text);
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--color-input-focus-border);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--color-button-primary-focus-ring);
+}
+
+.form-layout,
+.form-section,
+.repeatable-item {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.form-primary-actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.form-add-exercise {
+  justify-self: start;
+}
+
+.form-submit-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-submit-actions > button {
+  width: 100%;
+}
+
+.form-layout {
+  max-width: 760px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-surface);
+}
+
+.form-section,
+.repeatable-item {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+}
+
+.form-section h2,
+.repeatable-item h3 {
+  margin: 0;
+}
+
+.form-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.form-field label {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ui-error,
+.ui-success,
+.ui-empty,
+.ui-loading {
+  margin: 0;
+}
+
+.ui-loading {
+  min-height: 96px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-surface);
+}
+
+.result-value {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.result-progress {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.auth-page {
+  max-width: 440px;
+}
+
+.auth-separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+  height: 1px;
+  flex: 1;
+  background: var(--color-border);
+  content: "";
+}

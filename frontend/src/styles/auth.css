@@ -1,0 +1,19 @@
+.auth-page {
+  max-width: 440px;
+}
+
+.auth-separator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+  height: 1px;
+  flex: 1;
+  background: var(--color-border);
+  content: "";
+}

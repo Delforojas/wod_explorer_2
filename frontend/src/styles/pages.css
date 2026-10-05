@@ -1,0 +1,126 @@
+.placeholder-page {
+  max-width: 72ch;
+}
+
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.home-page {
+  max-width: 760px;
+  padding-top: var(--space-4);
+}
+
+.home-intro {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 30rem;
+}
+
+.home-intro h1,
+.home-intro p {
+  margin: 0;
+}
+
+.home-intro h1 {
+  font-size: 40px;
+  letter-spacing: -0.04em;
+  line-height: 44px;
+}
+
+.home-intro > p:last-child {
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.home-primary-action {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+}
+
+.home-primary-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-foreground);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-routes {
+  display: grid;
+  border-top: 1px solid var(--color-border);
+}
+
+.home-routes a {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-routes a > span:last-child {
+  color: var(--color-text-muted);
+  font-size: 20px;
+}
+
+.home-routes a:hover {
+  color: var(--color-accent);
+}
+
+@media (min-width: 900px) {
+  .home-page {
+    padding-top: var(--space-12);
+  }
+}
+
+.page-header {
+  display: grid;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-5);
+}
+
+.page-header h1,
+.page-header h2,
+.page-header p,
+.resource-row h2,
+.resource-row h3,
+.resource-row p,
+.detail-section h2,
+.detail-section p {
+  margin: 0;
+}
+
+.page-header p,
+.resource-meta,
+.resource-meta time,
+.resource-meta p {
+  color: var(--color-text-secondary);
+}
+
+.page-eyebrow,
+.resource-meta,
+.resource-meta p {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.page-eyebrow {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
