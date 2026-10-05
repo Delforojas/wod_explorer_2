@@ -790,6 +790,10 @@ time {
   background: var(--color-surface-interactive);
 }
 
+.resource-row-static:hover {
+  background: var(--color-surface);
+}
+
 .resource-row > header,
 .resource-row > div,
 .resource-actions,
@@ -947,6 +951,10 @@ time {
   font-variant-numeric: tabular-nums;
 }
 
+.detail-data--stacked {
+  grid-template-columns: 1fr;
+}
+
 .form-layout,
 .form-section,
 .repeatable-item {
@@ -993,7 +1001,28 @@ time {
 }
 
 .ui-loading {
+  min-height: 96px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
+  box-shadow: var(--shadow-surface);
+}
+
+.result-value {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.result-progress {
+  display: grid;
+  gap: var(--space-1);
 }
 
 .auth-page {
@@ -1032,6 +1061,10 @@ time {
   .resource-row {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
+  }
+
+  .detail-data--stacked {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .page--catalog {

@@ -61,7 +61,7 @@ function MyWodsView({
         <h1>Editar WOD</h1>
 
         <form className="form-layout surface" onSubmit={onUpdateWod}>
-          <div>
+          <div className="form-field">
             <label htmlFor="edit-name">Nombre</label>
 
             <input
@@ -73,7 +73,7 @@ function MyWodsView({
             />
           </div>
 
-          <div>
+          <div className="form-field">
             <label htmlFor="edit-type">Modalidad</label>
 
             <select
@@ -91,7 +91,7 @@ function MyWodsView({
 
           {editType === "FOR_TIME" && (
             <>
-              <div>
+              <div className="form-field">
                 <label htmlFor="edit-rounds">Rondas</label>
 
                 <input
@@ -109,7 +109,7 @@ function MyWodsView({
                 />
               </div>
 
-              <div>
+              <div className="form-field">
                 <label htmlFor="edit-time-cap">Tiempo límite (segundos)</label>
 
                 <input
@@ -130,7 +130,7 @@ function MyWodsView({
           )}
 
           {(editType === "AMRAP" || editType === "EMOM") && (
-            <div>
+            <div className="form-field">
               <label htmlFor="edit-time-cap">Duración (segundos)</label>
 
               <input
@@ -159,7 +159,7 @@ function MyWodsView({
             <div className="repeatable-item" key={index}>
                 <h3>Ejercicio {index + 1}</h3>
 
-                <div>
+                <div className="form-field">
                   <label htmlFor={`edit-exercise-${index}`}>Ejercicio</label>
 
                   <select
@@ -181,7 +181,7 @@ function MyWodsView({
                 </div>
 
                 {exercise?.measurementType === "REPS" && (
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`edit-reps-${index}`}>Repeticiones</label>
 
                     <input
@@ -203,7 +203,7 @@ function MyWodsView({
 
                 {exercise?.measurementType === "WEIGHT" && (
                   <>
-                    <div>
+                    <div className="form-field">
                       <label htmlFor={`edit-reps-${index}`}>
                         Repeticiones
                       </label>
@@ -224,7 +224,7 @@ function MyWodsView({
                       />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                       <label htmlFor={`edit-weight-${index}`}>Peso (kg)</label>
 
                       <input
@@ -247,7 +247,7 @@ function MyWodsView({
                 )}
 
                 {exercise?.measurementType === "DISTANCE" && (
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`edit-distance-${index}`}>
                       Distancia (m)
                     </label>
@@ -271,7 +271,7 @@ function MyWodsView({
                 )}
 
                 {exercise?.measurementType === "TIME" && (
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`edit-duration-${index}`}>
                       Duración (segundos)
                     </label>
@@ -295,7 +295,7 @@ function MyWodsView({
 
                 {exercise?.measurementType === "WEIGHT_DISTANCE" && (
                   <>
-                    <div>
+                    <div className="form-field">
                       <label htmlFor={`edit-weight-${index}`}>Peso (kg)</label>
 
                       <input
@@ -315,7 +315,7 @@ function MyWodsView({
                       />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                       <label htmlFor={`edit-distance-${index}`}>
                         Distancia (m)
                       </label>
@@ -419,8 +419,8 @@ function MyWodsView({
           <div className="surface form-section">
             <h2>Registrar resultado</h2>
 
-            <form onSubmit={onCreateAmrapResult}>
-              <div>
+            <form className="form-layout" onSubmit={onCreateAmrapResult}>
+              <div className="form-field">
                 <label htmlFor="result-performed-at">Fecha y hora</label>
 
                 <input
@@ -434,7 +434,7 @@ function MyWodsView({
                 />
               </div>
 
-              <div>
+              <div className="form-field">
                 <label htmlFor="amrap-rounds">Rondas completas</label>
 
                 <input
@@ -453,7 +453,7 @@ function MyWodsView({
                 />
               </div>
 
-              <div>
+              <div className="form-field">
                 <label htmlFor="amrap-extra-reps">Repeticiones extra</label>
 
                 <input
@@ -482,7 +482,7 @@ function MyWodsView({
         )}
 
         {registeringResult && selectedWod.version.type !== "AMRAP" && (
-          <div>
+          <div className="surface form-section">
             <h2>Registrar resultado</h2>
 
             <p>

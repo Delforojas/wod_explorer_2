@@ -23,33 +23,33 @@ function MyExerciseResultsView({
   function renderResult(result: ExerciseResultResponse) {
     if (result.weightKg !== null && result.reps !== null) {
       return (
-        <p>
+        <p className="result-value">
           {result.weightKg} kg × {result.reps} reps
         </p>
       );
     }
 
     if (result.reps !== null) {
-      return <p>{result.reps} reps</p>;
+      return <p className="result-value">{result.reps} reps</p>;
     }
 
     if (result.durationSeconds !== null) {
-      return <p>{result.durationSeconds} segundos</p>;
+      return <p className="result-value">{result.durationSeconds} segundos</p>;
     }
 
     if (result.distanceM !== null && result.weightKg !== null) {
       return (
-        <p>
+        <p className="result-value">
           {result.weightKg} kg · {result.distanceM} m
         </p>
       );
     }
 
     if (result.distanceM !== null) {
-      return <p>{result.distanceM} m</p>;
+      return <p className="result-value">{result.distanceM} m</p>;
     }
 
-    return <p>Resultado sin datos</p>;
+    return <p className="result-value">Resultado sin datos</p>;
   }
 
   if (loading) {
@@ -68,7 +68,7 @@ function MyExerciseResultsView({
         <p className="ui-empty">Todavía no has registrado ninguna marca.</p>
       ) : (
         <div className="resource-list">{results.map((result) => (
-          <article className="resource-row" key={result.id}>
+          <article className="resource-row resource-row-static" key={result.id}>
             <header><h2>{getExerciseName(result.exerciseId)}</h2></header>
 
             {renderResult(result)}

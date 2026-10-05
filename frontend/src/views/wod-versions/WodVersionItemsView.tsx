@@ -34,18 +34,18 @@ function WodVersionItemsView({
         <article className="resource-row" key={item.id}>
           <h2>Item #{item.id}</h2>
 
-          <p>WOD: {getWodName(item.wodVersionId)}</p>
-          <p>Ejercicio: {item.exerciseName}</p>
-          <p>Posición: {item.position}</p>
+          <p className="resource-meta">WOD: {getWodName(item.wodVersionId)}</p>
+          <p className="resource-meta">Ejercicio: {item.exerciseName}</p>
+          <p className="resource-meta">Posición: {item.position}</p>
 
-          {item.reps !== null && <p>Repeticiones: {item.reps}</p>}
+          {item.reps !== null && <p className="resource-meta">Repeticiones: {item.reps}</p>}
 
-          {item.weightKg !== null && <p>Peso: {item.weightKg} kg</p>}
+          {item.weightKg !== null && <p className="resource-meta">Peso: {item.weightKg} kg</p>}
 
-          {item.distanceM !== null && <p>Distancia: {item.distanceM} m</p>}
+          {item.distanceM !== null && <p className="resource-meta">Distancia: {item.distanceM} m</p>}
 
           {item.durationSeconds !== null && (
-            <p>Duración: {item.durationSeconds} s</p>
+            <p className="resource-meta">Duración: {item.durationSeconds} s</p>
           )}
 
           <button className="button-secondary" onClick={() => onSelectItem(item.id)}>Ver detalle</button>
@@ -56,28 +56,16 @@ function WodVersionItemsView({
         <article className="surface detail-section">
           <h2>Detalle del elemento</h2>
 
-          <p>Item #{selectedItem.id}</p>
-
-          <p>WOD: {getWodName(selectedItem.wodVersionId)}</p>
-
-          <p>Ejercicio: {selectedItem.exerciseName}</p>
-          <p>Posición: {selectedItem.position}</p>
-
-          {selectedItem.reps !== null && (
-            <p>Repeticiones: {selectedItem.reps}</p>
-          )}
-
-          {selectedItem.weightKg !== null && (
-            <p>Peso: {selectedItem.weightKg} kg</p>
-          )}
-
-          {selectedItem.distanceM !== null && (
-            <p>Distancia: {selectedItem.distanceM} m</p>
-          )}
-
-          {selectedItem.durationSeconds !== null && (
-            <p>Duración: {selectedItem.durationSeconds} s</p>
-          )}
+          <dl className="detail-data detail-data--stacked">
+            <div><dt>Item</dt><dd>#{selectedItem.id}</dd></div>
+            <div><dt>WOD</dt><dd>{getWodName(selectedItem.wodVersionId)}</dd></div>
+            <div><dt>Ejercicio</dt><dd>{selectedItem.exerciseName}</dd></div>
+            <div><dt>Posición</dt><dd>{selectedItem.position}</dd></div>
+            {selectedItem.reps !== null && <div><dt>Repeticiones</dt><dd>{selectedItem.reps}</dd></div>}
+            {selectedItem.weightKg !== null && <div><dt>Peso</dt><dd>{selectedItem.weightKg} kg</dd></div>}
+            {selectedItem.distanceM !== null && <div><dt>Distancia</dt><dd>{selectedItem.distanceM} m</dd></div>}
+            {selectedItem.durationSeconds !== null && <div><dt>Duración</dt><dd>{selectedItem.durationSeconds} s</dd></div>}
+          </dl>
         </article>
       )}
     </section>
