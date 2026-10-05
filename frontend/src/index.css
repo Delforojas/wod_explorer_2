@@ -117,6 +117,9 @@ textarea {
 }
 
 button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-width: 44px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -125,7 +128,32 @@ button {
   color: var(--color-text);
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+
+button::before {
+  position: absolute;
+  inset: -50%;
+  z-index: -1;
+  background: conic-gradient(from 0deg, transparent 0deg 280deg, var(--color-primary-300) 315deg, transparent 360deg);
+  animation: button-border-orbit 3.6s linear infinite;
+  content: "";
+  opacity: 0;
+}
+
+button::after {
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: calc(var(--radius-md) - 1px);
+  background: var(--color-bg-raised);
+  content: "";
+}
+
+@keyframes button-border-orbit {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 button:hover:not(:disabled) {
@@ -135,15 +163,26 @@ button:hover:not(:disabled) {
 
 .button-primary,
 button[type="submit"] {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
+  border-color: transparent;
+  background: var(--color-bg-raised);
   color: var(--color-foreground);
+  box-shadow: inset 0 0 0 1px var(--color-accent), 0 0 16px rgb(55 88 249 / 16%);
+}
+
+.button-primary::before,
+button[type="submit"]::before {
+  opacity: 1;
+}
+
+.button-primary::after,
+button[type="submit"]::after {
+  background: var(--color-bg-raised);
 }
 
 .button-primary:hover:not(:disabled),
 button[type="submit"]:hover:not(:disabled) {
-  border-color: var(--color-accent-hover);
-  background: var(--color-accent-hover);
+  background: var(--color-surface-raised);
+  box-shadow: inset 0 0 0 1px var(--color-accent-hover), 0 0 20px var(--color-button-primary-focus-ring);
 }
 
 .button-secondary,
@@ -151,6 +190,13 @@ button[type="submit"]:hover:not(:disabled) {
   border-color: var(--color-border);
   background: var(--color-bg-raised);
   color: var(--color-foreground-soft);
+}
+
+.button-secondary:hover:not(:disabled)::before,
+.button-secondary:focus-visible::before,
+.button-outline:hover:not(:disabled)::before,
+.button-outline:focus-visible::before {
+  opacity: 0.5;
 }
 
 .button-tertiary {
@@ -170,6 +216,15 @@ button[type="submit"]:hover:not(:disabled) {
   color: var(--color-foreground);
 }
 
+.button-destructive::before {
+  background: conic-gradient(from 0deg, transparent 0deg 280deg, var(--color-error) 315deg, transparent 360deg);
+}
+
+.button-destructive:hover:not(:disabled)::before,
+.button-destructive:focus-visible::before {
+  opacity: 0.6;
+}
+
 .button-destructive:hover:not(:disabled) {
   border-color: var(--color-error);
   background: var(--color-button-error-hover-background);
@@ -184,6 +239,11 @@ textarea:disabled {
   background: var(--color-surface-raised);
   color: var(--color-button-disabled);
   opacity: 1;
+}
+
+button:disabled::before {
+  animation-play-state: paused;
+  opacity: 0;
 }
 
 input,
@@ -1185,5 +1245,9 @@ time {
 
   .text-roll-line-secondary {
     display: none;
+  }
+
+  button::before {
+    animation: none;
   }
 }
