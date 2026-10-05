@@ -25,6 +25,7 @@ function Navbar() {
             className="desktop-auth-actions"
             isAuthenticated={isAuthenticated}
             onLogout={handleLogout}
+            withTextRoll
           />
         </div>
       </div>

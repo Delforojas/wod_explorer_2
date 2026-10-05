@@ -1,10 +1,12 @@
 import { NavLink } from "react-router-dom";
 import type { NavigationIconName, NavigationItem } from "./navigation";
+import TextRoll from "./TextRoll";
 
 interface NavigationLinksProps {
   items: readonly NavigationItem[];
   listClassName?: string;
   onNavigate?: () => void;
+  withTextRoll?: boolean;
 }
 
 function NavigationIcon({ icon }: { icon: NavigationIconName }) {
@@ -28,6 +30,7 @@ function NavigationLinks({
   items,
   listClassName = "nav-list",
   onNavigate,
+  withTextRoll = false,
 }: NavigationLinksProps) {
   return (
     <ul className={listClassName}>
@@ -36,12 +39,13 @@ function NavigationLinks({
           <NavLink
             to={item.to}
             onClick={onNavigate}
+            aria-label={withTextRoll ? item.label : undefined}
             className={({ isActive }) =>
               isActive ? "nav-link nav-link-active" : "nav-link"
             }
           >
             <NavigationIcon icon={item.icon} />
-            <span>{item.label}</span>
+            {withTextRoll ? <TextRoll label={item.label} /> : <span>{item.label}</span>}
           </NavLink>
         </li>
       ))}
