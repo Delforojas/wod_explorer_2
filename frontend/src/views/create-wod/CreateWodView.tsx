@@ -320,13 +320,17 @@ function CreateWodView({
           );
         })}
 
-        <button className="button-secondary" type="button" onClick={onAddExercise}>
-          + Añadir ejercicio
-        </button>
+        <div className="form-primary-actions">
+          <button className="button-secondary form-add-exercise" type="button" onClick={onAddExercise}>
+            + Añadir ejercicio
+          </button>
 
-        <button type="submit" disabled={items.length === 0}>
-          Crear WOD
-        </button>
+          <div className="form-submit-actions">
+            <button type="submit" disabled={items.length === 0}>
+              Crear WOD
+            </button>
+          </div>
+        </div>
       </form>
     </section>
   );

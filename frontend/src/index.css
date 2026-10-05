@@ -507,7 +507,7 @@ time {
   left: 0;
   z-index: 20;
   display: flex;
-  min-height: 72px;
+  min-height: calc(72px + env(safe-area-inset-bottom));
   align-items: stretch;
   justify-content: center;
   border-top: 1px solid var(--color-border);
@@ -548,6 +548,7 @@ time {
   border: 0;
   border-radius: 0;
   padding: var(--space-2);
+  padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
   background: transparent;
   color: var(--color-foreground-muted);
   font-size: 12px;
@@ -629,7 +630,7 @@ time {
   max-width: 1280px;
   flex: 1;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-4) calc(96px + var(--space-6));
+  padding: var(--space-6) var(--space-4);
   background: var(--color-bg-raised);
 }
 
@@ -648,7 +649,7 @@ time {
 }
 
 .site-footer {
-  margin-bottom: 72px;
+  margin-bottom: calc(72px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--color-border);
   padding: var(--space-4);
   color: var(--color-text-muted);
@@ -1086,6 +1087,24 @@ time {
   gap: var(--space-4);
 }
 
+.form-primary-actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.form-add-exercise {
+  justify-self: start;
+}
+
+.form-submit-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-submit-actions > button {
+  width: 100%;
+}
+
 .form-layout {
   max-width: 760px;
   border: 1px solid var(--color-border);
@@ -1206,7 +1225,7 @@ time {
 
 @media (min-width: 600px) {
   .app-main {
-    padding: var(--space-8) var(--space-6) calc(96px + var(--space-8));
+    padding: var(--space-8) var(--space-6);
   }
 
   .surface,
@@ -1243,6 +1262,10 @@ time {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-4);
+  }
+
+  .form-submit-actions > button {
+    width: auto;
   }
 }
 
