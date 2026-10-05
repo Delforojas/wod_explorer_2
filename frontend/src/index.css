@@ -643,11 +643,58 @@ time {
 
 .site-footer {
   margin-bottom: calc(72px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--color-border);
-  padding: var(--space-4);
-  color: var(--color-text-muted);
-  font-size: 14px;
-  text-align: center;
+}
+
+.delfo-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin: var(--space-6) var(--space-4) calc(72px + env(safe-area-inset-bottom));
+  border-radius: 20px;
+  padding: 28px 20px 16px;
+  background: radial-gradient(ellipse at 50% 115%, rgb(28 100 145 / 22%), transparent 65%), #080a0c;
+  color: var(--color-foreground);
+}
+
+.delfo-footer__top { display: grid; gap: 28px; }
+.delfo-footer__brand, .delfo-footer__heading, .delfo-footer__copyright { margin: 0; }
+.delfo-footer__brand { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
+.delfo-footer__description { max-width: 28ch; margin: var(--space-3) 0 0; color: #aeb8c6; font-size: 14px; line-height: 1.6; }
+.delfo-footer__heading { margin-bottom: 18px; font-size: 14px; font-weight: 600; }
+.delfo-footer__links { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.delfo-footer a { color: #bcc5d1; font-size: 14px; text-decoration: none; transition: color 160ms ease; }
+.delfo-footer a:hover { color: var(--color-info); }
+.delfo-footer a:focus-visible { outline: 2px solid var(--color-info); outline-offset: 5px; border-radius: 3px; }
+.delfo-footer__bottom { margin-top: 28px; padding-top: var(--space-5); border-top: 1px solid rgb(148 163 184 / 18%); }
+.delfo-footer__copyright { color: #aeb8c6; font-size: 12px; line-height: 1.5; }
+.delfo-footer__wordmark { display: block; width: 100%; height: auto; margin-top: var(--space-3); pointer-events: none; }
+.delfo-footer__wordmark text { font-family: var(--font-sans); font-size: 180px; font-weight: 900; letter-spacing: -0.07em; }
+.delfo-footer__wordmark-base { fill: none; stroke: rgb(91 147 186 / 35%); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.delfo-footer__wordmark-light { fill: none; stroke: url(#delfo-light); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: 0; }
+.delfo-footer:hover .delfo-footer__wordmark-light { opacity: 1; }
+
+.delfo-footer__wordmark-light {
+  stroke: url(#delfo-pointer-light);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.85;
+}
+
+@media (min-width: 640px) {
+  .delfo-footer {
+    padding: 48px 40px 20px;
+    border-radius: 24px;
+  }
+  .delfo-footer__top {
+    grid-template-columns: minmax(220px, 1.4fr) repeat(auto-fit, minmax(140px, 1fr));
+    gap: 40px;
+  }
+  .delfo-footer__bottom { margin-top: 40px; padding-top: 20px; }
+  .delfo-footer__copyright { text-align: right; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .delfo-footer a { transition: none; }
 }
 
 .surface,
