@@ -43,7 +43,7 @@ function LoginView({
 
       <p className="auth-separator">o</p>
 
-      <button type="button" onClick={onGoogleLogin}>
+      <button className="button-secondary" type="button" onClick={onGoogleLogin}>
         Continuar con Google
       </button>
     </section>

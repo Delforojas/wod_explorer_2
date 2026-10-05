@@ -340,6 +340,7 @@ function MyWodsView({
                 )}
 
                 <button
+                  className="button-destructive"
                   type="button"
                   onClick={() => onRemoveEditExercise(index)}
                 >
@@ -349,7 +350,7 @@ function MyWodsView({
             );
           })}
 
-          <button type="button" onClick={onAddEditExercise}>
+          <button className="button-secondary" type="button" onClick={onAddEditExercise}>
             + Añadir ejercicio
           </button>
 
@@ -357,7 +358,7 @@ function MyWodsView({
             Guardar cambios
           </button>
 
-          <button type="button" onClick={onCancelEdit}>
+          <button className="button-secondary" type="button" onClick={onCancelEdit}>
             Cancelar
           </button>
         </form>
@@ -409,7 +410,7 @@ function MyWodsView({
         {resultSuccess && <p className="ui-success">{resultSuccess}</p>}
 
         {!registeringResult && (
-          <button type="button" onClick={onStartRegisterResult}>
+          <button className="button-primary" type="button" onClick={onStartRegisterResult}>
             Registrar resultado
           </button>
         )}
@@ -473,7 +474,7 @@ function MyWodsView({
 
               <button type="submit">Guardar resultado</button>
 
-              <button type="button" onClick={onCancelRegisterResult}>
+              <button className="button-secondary" type="button" onClick={onCancelRegisterResult}>
                 Cancelar
               </button>
             </form>
@@ -489,7 +490,7 @@ function MyWodsView({
               que implementemos.
             </p>
 
-            <button type="button" onClick={onCancelRegisterResult}>
+            <button className="button-secondary" type="button" onClick={onCancelRegisterResult}>
               Cancelar
             </button>
           </div>
@@ -506,15 +507,15 @@ function MyWodsView({
         <article className="resource-row" key={wod.id}>
           <header><h2>{wod.name}</h2><span className="badge">{wod.version.type}</span></header>
 
-          <div className="resource-actions"><button type="button" onClick={() => onSelectWod(wod.id)}>
+          <div className="resource-actions"><button className="button-secondary" type="button" onClick={() => onSelectWod(wod.id)}>
             Ver WOD
           </button>
 
-          <button type="button" onClick={() => onEditWod(wod)}>
+          <button className="button-primary" type="button" onClick={() => onEditWod(wod)}>
             Editar
           </button>
 
-          <button type="button" onClick={() => onDeleteWod(wod.id)}>
+          <button className="button-destructive" type="button" onClick={() => onDeleteWod(wod.id)}>
             Eliminar
           </button></div>
         </article>
