@@ -85,7 +85,7 @@ function HistoryView({ results, loading, error }: HistoryViewProps) {
       {results.length === 0 ? (
         <p className="ui-empty">Todavía no has registrado ningún resultado.</p>
       ) : (
-        <div className="resource-list">{results.map((result) => (
+        <div className="resource-list glass-panel">{results.map((result) => (
           <article className="resource-row resource-row-static" key={result.id}>
             <header><h2>{result.wodName}</h2><span className="resource-meta">{result.type}</span></header>
             <p className="resource-meta">{formatDate(result.performedAt)}</p>

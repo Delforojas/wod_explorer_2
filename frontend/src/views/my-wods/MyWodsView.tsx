@@ -60,7 +60,7 @@ function MyWodsView({
 
         <h1>Editar WOD</h1>
 
-        <form className="form-layout surface" onSubmit={onUpdateWod}>
+        <form className="form-layout surface glass-panel" onSubmit={onUpdateWod}>
           <div className="form-field">
             <label htmlFor="edit-name">Nombre</label>
 
@@ -416,7 +416,7 @@ function MyWodsView({
         )}
 
         {registeringResult && selectedWod.version.type === "AMRAP" && (
-          <div className="surface form-section">
+          <div className="surface form-section glass-panel">
             <h2>Registrar resultado</h2>
 
             <form className="form-layout" onSubmit={onCreateAmrapResult}>
@@ -482,7 +482,7 @@ function MyWodsView({
         )}
 
         {registeringResult && selectedWod.version.type !== "AMRAP" && (
-          <div className="surface form-section">
+          <div className="surface form-section glass-panel">
             <h2>Registrar resultado</h2>
 
             <p>
@@ -503,7 +503,7 @@ function MyWodsView({
     <section className="page placeholder-page">
       <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Mis WODs</h1><p>Esta sección permitirá gestionar tus WOD personales.</p></header>
 
-      <div className="resource-list">{wods.map((wod) => (
+      <div className="resource-list glass-panel">{wods.map((wod) => (
         <article className="resource-row" key={wod.id}>
           <header><h2>{wod.name}</h2><span className="badge">{wod.version.type}</span></header>
 

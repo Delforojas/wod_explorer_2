@@ -31,7 +31,7 @@ function WodVersionsView({
 
       {versions.length === 0 && <p className="ui-empty">No hay versiones disponibles.</p>}
 
-      <div className="resource-list">{versions.map((version) => (
+      <div className="resource-list glass-panel">{versions.map((version) => (
         <article className="resource-row" key={version.id}>
           <header><h2>{version.wodName}</h2><span className="badge">{formatWodType(version.type)}</span></header>
 
@@ -54,7 +54,7 @@ function WodVersionsView({
       ))}</div>
 
       {selectedVersion && (
-        <article className="surface detail-section">
+        <article className="surface detail-section glass-panel">
           <h3>Ejercicios</h3>
 
           {selectedItems.length === 0 ? (

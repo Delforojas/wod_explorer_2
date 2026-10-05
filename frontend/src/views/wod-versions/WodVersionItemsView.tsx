@@ -30,7 +30,7 @@ function WodVersionItemsView({
 
       {items.length === 0 && <p className="ui-empty">No hay elementos disponibles.</p>}
 
-      <div className="resource-list">{items.map((item) => (
+      <div className="resource-list glass-panel">{items.map((item) => (
         <article className="resource-row" key={item.id}>
           <h2>Item #{item.id}</h2>
 
@@ -53,7 +53,7 @@ function WodVersionItemsView({
       ))}</div>
 
       {selectedItem && (
-        <article className="surface detail-section">
+        <article className="surface detail-section glass-panel">
           <h2>Detalle del elemento</h2>
 
           <dl className="detail-data detail-data--stacked">
