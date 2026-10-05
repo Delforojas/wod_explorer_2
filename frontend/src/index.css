@@ -355,6 +355,47 @@ time {
   color: var(--color-primary-400);
 }
 
+.text-roll {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  line-height: inherit;
+}
+
+.text-roll-line {
+  display: block;
+  white-space: pre;
+}
+
+.text-roll-line-secondary {
+  position: absolute;
+  inset: 0;
+}
+
+.text-roll-character {
+  display: inline-block;
+  white-space: pre;
+  transition: transform 180ms ease-in-out;
+}
+
+.text-roll-line-secondary .text-roll-character {
+  transform: translateY(100%);
+}
+
+.nav-link:hover .text-roll-line-primary .text-roll-character,
+.nav-link:focus-visible .text-roll-line-primary .text-roll-character,
+.auth-logout:hover .text-roll-line-primary .text-roll-character,
+.auth-logout:focus-visible .text-roll-line-primary .text-roll-character {
+  transform: translateY(-100%);
+}
+
+.nav-link:hover .text-roll-line-secondary .text-roll-character,
+.nav-link:focus-visible .text-roll-line-secondary .text-roll-character,
+.auth-logout:hover .text-roll-line-secondary .text-roll-character,
+.auth-logout:focus-visible .text-roll-line-secondary .text-roll-character {
+  transform: translateY(0);
+}
+
 .nav-icon {
   width: 20px;
   height: 20px;
@@ -1092,5 +1133,9 @@ time {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .text-roll-line-secondary {
+    display: none;
   }
 }

@@ -10,11 +10,11 @@ function DesktopNavigation({
 }: DesktopNavigationProps) {
   return (
     <nav className="desktop-navigation" aria-label="Navegación principal">
-      <NavigationLinks items={publicNavigation} />
+      <NavigationLinks items={publicNavigation} withTextRoll />
       {isAuthenticated && (
         <div className="nav-group">
           <span className="nav-section-label">Mi actividad</span>
-          <NavigationLinks items={personalNavigation} />
+          <NavigationLinks items={personalNavigation} withTextRoll />
         </div>
       )}
     </nav>
