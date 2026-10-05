@@ -67,7 +67,7 @@ function MyExerciseResultsView({
       {results.length === 0 ? (
         <p className="ui-empty">Todavía no has registrado ninguna marca.</p>
       ) : (
-        <div className="resource-list">{results.map((result) => (
+        <div className="resource-list glass-panel">{results.map((result) => (
           <article className="resource-row resource-row-static" key={result.id}>
             <header><h2>{getExerciseName(result.exerciseId)}</h2></header>
 
