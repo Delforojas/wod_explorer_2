@@ -501,6 +501,8 @@ time {
 }
 
 .mobile-navigation {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   min-height: calc(72px + env(safe-area-inset-bottom));
@@ -597,6 +599,7 @@ time {
   padding: var(--space-2);
   background: var(--color-surface-raised);
   box-shadow: var(--shadow-modal);
+  z-index: 1;
 }
 
 .mobile-more-list .nav-link {
