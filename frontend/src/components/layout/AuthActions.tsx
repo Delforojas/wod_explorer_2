@@ -22,7 +22,7 @@ function AuthActions({
     return (
       <div className={classes}>
         <NavLink
-          className="nav-link"
+          className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}
           to="/login"
           onClick={onNavigate}
           aria-label={withTextRoll ? "Iniciar sesión" : undefined}

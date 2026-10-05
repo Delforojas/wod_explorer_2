@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
+import MobileNavigation from "./MobileNavigation";
 import Navbar from "./Navbar";
 import PulsarGridBackground from "./PulsarGridBackground";
 
@@ -8,6 +10,14 @@ interface AppLayoutProps {
 }
 
 function AppLayout({ children }: AppLayoutProps) {
+  const navigate = useNavigate();
+  const isAuthenticated = Boolean(localStorage.getItem("token"));
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/");
+  }
+
   return (
     <div className="app-layout">
       <a className="skip-link" href="#main-content">
@@ -18,6 +28,7 @@ function AppLayout({ children }: AppLayoutProps) {
         <PulsarGridBackground />
         <div className="app-main-content">{children}</div>
       </main>
+      <MobileNavigation isAuthenticated={isAuthenticated} onLogout={handleLogout} />
       <Footer />
     </div>
   );
