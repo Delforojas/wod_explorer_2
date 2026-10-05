@@ -18,39 +18,39 @@ function formatTime(seconds: number) {
 function renderResult(result: WodResultResponse) {
   if (result.type === "AMRAP") {
     return (
-      <p>
+      <p className="result-value">
         {result.amrapRounds ?? 0} rondas + {result.amrapExtraReps ?? 0} reps
       </p>
     );
   }
 
   if (result.type === "EMOM") {
-    return <p>{result.completed ? "Completado" : "No completado"}</p>;
+    return <p className="result-value">{result.completed ? "Completado" : "No completado"}</p>;
   }
 
   if (result.type === "FOR_TIME") {
     if (result.completed && result.timeSeconds !== null) {
-      return <p>Tiempo: {formatTime(result.timeSeconds)}</p>;
+      return <p className="result-value">Tiempo: {formatTime(result.timeSeconds)}</p>;
     }
 
     return (
-      <div>
-        <p>No completado</p>
+      <div className="result-progress">
+        <p className="result-value">No completado</p>
 
         {result.progressRounds !== null && (
-          <p>Rondas completadas: {result.progressRounds}</p>
+          <p className="resource-meta">Rondas completadas: {result.progressRounds}</p>
         )}
 
         {result.progressReps !== null && (
-          <p>Progreso: {result.progressReps} reps</p>
+          <p className="resource-meta">Progreso: {result.progressReps} reps</p>
         )}
 
         {result.progressDistanceM !== null && (
-          <p>Progreso: {result.progressDistanceM} m</p>
+          <p className="resource-meta">Progreso: {result.progressDistanceM} m</p>
         )}
 
         {result.progressDurationSeconds !== null && (
-          <p>Progreso: {result.progressDurationSeconds} segundos</p>
+          <p className="resource-meta">Progreso: {result.progressDurationSeconds} segundos</p>
         )}
       </div>
     );
@@ -63,7 +63,7 @@ function HistoryView({ results, loading, error }: HistoryViewProps) {
   if (loading) {
     return (
       <section className="page placeholder-page">
-        <h1>Historial</h1>
+        <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Historial</h1></header>
         <p className="ui-loading">Cargando historial...</p>
       </section>
     );
@@ -72,7 +72,7 @@ function HistoryView({ results, loading, error }: HistoryViewProps) {
   if (error) {
     return (
       <section className="page placeholder-page">
-        <h1>Historial</h1>
+        <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Historial</h1></header>
         <p className="ui-error" role="alert">{error}</p>
       </section>
     );
@@ -86,7 +86,7 @@ function HistoryView({ results, loading, error }: HistoryViewProps) {
         <p className="ui-empty">Todavía no has registrado ningún resultado.</p>
       ) : (
         <div className="resource-list">{results.map((result) => (
-          <article className="resource-row" key={result.id}>
+          <article className="resource-row resource-row-static" key={result.id}>
             <header><h2>{result.wodName}</h2><span className="resource-meta">{result.type}</span></header>
             <p className="resource-meta">{formatDate(result.performedAt)}</p>
             {renderResult(result)}

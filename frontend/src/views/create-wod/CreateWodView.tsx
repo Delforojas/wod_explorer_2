@@ -69,7 +69,7 @@ function CreateWodView({
 
         {type === "FOR_TIME" && (
           <>
-            <div>
+            <div className="form-field">
               <label htmlFor="rounds">Rondas</label>
 
               <input
@@ -87,7 +87,7 @@ function CreateWodView({
               />
             </div>
 
-            <div>
+            <div className="form-field">
               <label htmlFor="time-cap">Tiempo límite (segundos)</label>
 
               <input
@@ -108,7 +108,7 @@ function CreateWodView({
         )}
 
         {(type === "AMRAP" || type === "EMOM") && (
-          <div>
+          <div className="form-field">
             <label htmlFor="time-cap">Duración (segundos)</label>
 
             <input
@@ -139,7 +139,7 @@ function CreateWodView({
             <div className="repeatable-item" key={index}>
               <h3>Ejercicio {index + 1}</h3>
 
-              <div>
+              <div className="form-field">
                 <label htmlFor={`exercise-${index}`}>Ejercicio</label>
 
                 <select
@@ -161,7 +161,7 @@ function CreateWodView({
               </div>
 
               {exercise?.measurementType === "REPS" && (
-                <div>
+                <div className="form-field">
                   <label htmlFor={`reps-${index}`}>Repeticiones</label>
 
                   <input
@@ -183,7 +183,7 @@ function CreateWodView({
 
               {exercise?.measurementType === "WEIGHT" && (
                 <>
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`reps-${index}`}>Repeticiones</label>
 
                     <input
@@ -202,7 +202,7 @@ function CreateWodView({
                     />
                   </div>
 
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`weight-${index}`}>Peso (kg)</label>
 
                     <input
@@ -225,7 +225,7 @@ function CreateWodView({
               )}
 
               {exercise?.measurementType === "DISTANCE" && (
-                <div>
+                <div className="form-field">
                   <label htmlFor={`distance-${index}`}>Distancia (m)</label>
 
                   <input
@@ -247,7 +247,7 @@ function CreateWodView({
               )}
 
               {exercise?.measurementType === "TIME" && (
-                <div>
+                <div className="form-field">
                   <label htmlFor={`duration-${index}`}>
                     Duración (segundos)
                   </label>
@@ -271,7 +271,7 @@ function CreateWodView({
 
               {exercise?.measurementType === "WEIGHT_DISTANCE" && (
                 <>
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`weight-${index}`}>Peso (kg)</label>
 
                     <input
@@ -291,7 +291,7 @@ function CreateWodView({
                     />
                   </div>
 
-                  <div>
+                  <div className="form-field">
                     <label htmlFor={`distance-${index}`}>Distancia (m)</label>
 
                     <input

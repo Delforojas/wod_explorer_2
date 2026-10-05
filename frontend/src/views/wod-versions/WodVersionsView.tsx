@@ -35,17 +35,17 @@ function WodVersionsView({
         <article className="resource-row" key={version.id}>
           <header><h2>{version.wodName}</h2><span className="badge">{formatWodType(version.type)}</span></header>
 
-          <p>Versión {version.versionNumber}</p>
+          <p className="resource-meta">Versión {version.versionNumber}</p>
 
-          <p>Modalidad: {formatWodType(version.type)}</p>
+          <p className="resource-meta">Modalidad: {formatWodType(version.type)}</p>
 
           {version.timeCapSeconds !== null && (
-            <p>Tiempo límite: {Math.floor(version.timeCapSeconds / 60)} min</p>
+            <p className="resource-meta">Tiempo límite: {Math.floor(version.timeCapSeconds / 60)} min</p>
           )}
 
-          {version.rounds !== null && <p>Rondas: {version.rounds}</p>}
+          {version.rounds !== null && <p className="resource-meta">Rondas: {version.rounds}</p>}
 
-          <p>Creada: {new Date(version.createdAt).toLocaleDateString()}</p>
+          <p className="resource-meta">Creada: {new Date(version.createdAt).toLocaleDateString()}</p>
 
           <button className="button-secondary" onClick={() => onSelectVersion(version.id)}>
             Ver detalle
@@ -60,27 +60,19 @@ function WodVersionsView({
           {selectedItems.length === 0 ? (
             <p>No hay ejercicios en esta versión.</p>
           ) : (
-            [...selectedItems]
-              .sort((a, b) => a.position - b.position)
-              .map((item) => (
-                <div key={item.id}>
-                  <h4>
-                    {item.position}. {item.exerciseName}
-                  </h4>
-
-                  {item.reps !== null && <p>Repeticiones: {item.reps}</p>}
-
-                  {item.weightKg !== null && <p>Peso: {item.weightKg} kg</p>}
-
-                  {item.distanceM !== null && (
-                    <p>Distancia: {item.distanceM} m</p>
-                  )}
-
-                  {item.durationSeconds !== null && (
-                    <p>Duración: {item.durationSeconds} s</p>
-                  )}
-                </div>
-              ))
+            <ol className="exercise-sequence">
+              {[...selectedItems]
+                .sort((a, b) => a.position - b.position)
+                .map((item) => (
+                  <li key={item.id}>
+                    <h4>{item.position}. {item.exerciseName}</h4>
+                    {item.reps !== null && <p className="resource-meta">Repeticiones: {item.reps}</p>}
+                    {item.weightKg !== null && <p className="resource-meta">Peso: {item.weightKg} kg</p>}
+                    {item.distanceM !== null && <p className="resource-meta">Distancia: {item.distanceM} m</p>}
+                    {item.durationSeconds !== null && <p className="resource-meta">Duración: {item.durationSeconds} s</p>}
+                  </li>
+                ))}
+            </ol>
           )}
         </article>
       )}
