@@ -48,7 +48,7 @@ function WodVersionItemsView({
             <p>Duración: {item.durationSeconds} s</p>
           )}
 
-          <button onClick={() => onSelectItem(item.id)}>Ver detalle</button>
+          <button className="button-secondary" onClick={() => onSelectItem(item.id)}>Ver detalle</button>
         </article>
       ))}</div>
 

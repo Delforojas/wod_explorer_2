@@ -313,14 +313,14 @@ function CreateWodView({
                 </>
               )}
 
-              <button type="button" onClick={() => onRemoveExercise(index)}>
+              <button className="button-destructive" type="button" onClick={() => onRemoveExercise(index)}>
                 Eliminar ejercicio
               </button>
             </div>
           );
         })}
 
-        <button type="button" onClick={onAddExercise}>
+        <button className="button-secondary" type="button" onClick={onAddExercise}>
           + Añadir ejercicio
         </button>
 

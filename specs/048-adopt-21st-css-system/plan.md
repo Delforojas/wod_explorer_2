@@ -43,6 +43,16 @@
 - `frontend/src/index.css`: redefinir tokens globales y sus consumidores compartidos sin cambiar estructura o comportamiento.
 - `DESIGN.md`: sustituir la tabla de roles visuales, sombras y patrones de controles por las decisiones adoptadas.
 
+## Corrección tras validación manual no aprobada
+
+La primera validación determinó que el cambio era poco perceptible: los tokens estaban declarados, pero los submits y acciones existentes seguían usando el control genérico, las listas no consumían surfaces y sidebar/bottom navigation compartían el mismo fondo que el canvas.
+
+- Los submits existentes pasan a usar primary; las acciones existentes de soporte usan outline y las eliminaciones ya existentes usan destructive, sin modificar handlers.
+- El canvas principal usa el nivel dark elevado, mientras sidebar y bottom navigation mantienen el nivel base. Los resource rows, formularios y detalles consumen surface.
+- El estado activo de navegación móvil añade un fondo primary translúcido, además del color e indicador existentes.
+- Error y éxito usan fondo semántico translúcido, borde y texto.
+- Se carga DM Sans mediante el stylesheet oficial de Google Fonts con `display=swap`; no se añade ninguna dependencia de styling.
+
 ## Verificación
 
 - Ejecutar `21st review` sobre los archivos modificados, `npm run lint`, `npm run test`, `npm run build` y `git diff --check`.

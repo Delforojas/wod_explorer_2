@@ -81,7 +81,7 @@ Los valores siguientes son la base para variables CSS compartidas. No introducir
 
 ### Tipografía y escala
 
-- Familia: `"DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. No se carga una fuente remota; se usan fallbacks del sistema si DM Sans no está disponible.
+- Familia: `"DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. DM Sans se carga con el stylesheet oficial de Google Fonts y conserva fallbacks del sistema.
 - Usar figuras tabulares para tiempos, fechas, rondas y repeticiones cuando el navegador las soporte.
 - Pesos: 400 para cuerpo, 500 para controles, 600 para títulos y 700 para métricas.
 
@@ -134,6 +134,7 @@ Los valores siguientes son la base para variables CSS compartidas. No introducir
 
 ## Layout y grid
 
+- Canvas principal: `#111827`; sidebar y navegación inferior: `#030712`; las surfaces se sitúan sobre el canvas en `#1E2634`.
 - Contenedor principal: ancho máximo de `1280px`.
 - Gutter exterior: `16px` en móvil, `24px` en tablet y `32px` en escritorio.
 - Escritorio: navegación persistente, contenido principal y columna contextual opcional cuando aporte información ya disponible.
@@ -171,6 +172,7 @@ El diseño es mobile-first: primero se resuelven lectura vertical, controles tá
 - Los destinos disponibles se muestran con etiquetas visibles y jerarquía consistente.
 - En móvil, utilizar navegación inferior fija con un máximo de cinco destinos y etiquetas siempre visibles.
 - En escritorio, utilizar navegación lateral persistente con icono y etiqueta.
+- El destino activo usa texto primary y fondo primary translúcido; en móvil conserva además un indicador inferior primary.
 - Las acciones proporcionadas por la aplicación se agrupan en el contexto visual del recurso que representan.
 - Las áreas y estados privados proporcionados se distinguen mediante etiquetas y contexto visual consistentes.
 
@@ -211,6 +213,7 @@ El diseño es mobile-first: primero se resuelven lectura vertical, controles tá
 
 - Card estándar: superficie, borde estándar, radio medio, sombra de superficie y padding definido por breakpoint.
 - Card interactiva: misma base, con elevación suave, borde `#374151` y capa `#FFFFFF08` en hover.
+- Resource rows, formularios y detalles reutilizan la jerarquía de superficies sin alterar su flujo o contenido.
 - Card de métrica: cifra como foco y contexto textual debajo; no requiere gráficos decorativos.
 - Card de WOD: nombre, modalidad, origen y composición resumida cuando esos datos estén disponibles.
 - La composición usa una secuencia numerada de ejercicios para preservar el orden visualmente.

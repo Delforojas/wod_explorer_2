@@ -47,7 +47,7 @@ function WodVersionsView({
 
           <p>Creada: {new Date(version.createdAt).toLocaleDateString()}</p>
 
-          <button onClick={() => onSelectVersion(version.id)}>
+          <button className="button-secondary" onClick={() => onSelectVersion(version.id)}>
             Ver detalle
           </button>
         </article>
