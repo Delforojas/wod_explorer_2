@@ -1,0 +1,116 @@
+.mobile-navigation {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: calc(72px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+  background: var(--color-mobile-nav-background);
+  box-shadow: var(--shadow-mobile-navigation);
+}
+
+.mobile-navigation-integrated {
+  box-shadow: none;
+}
+
+.mobile-nav-list,
+.mobile-auth-actions {
+  display: contents;
+}
+
+.mobile-nav-list {
+  width: auto;
+}
+
+.mobile-nav-list .nav-link,
+.mobile-more-button,
+.mobile-auth-actions .nav-link {
+  width: 100%;
+  min-width: 44px;
+  min-height: 72px;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  border: 0;
+  border-radius: 0;
+  padding: var(--space-2);
+  padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+  background: transparent;
+  color: var(--color-foreground-muted);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.mobile-nav-list .nav-link-active {
+  background: var(--color-accent-subtle);
+  color: var(--color-primary-400);
+}
+
+.mobile-nav-list .nav-link:hover,
+.mobile-auth-actions .nav-link:hover,
+.mobile-more-button:hover:not(:disabled) {
+  background: var(--color-bg-raised);
+}
+
+.mobile-navigation-integrated .nav-link,
+.mobile-navigation-integrated .mobile-more-button {
+  position: relative;
+}
+
+.mobile-navigation-integrated .nav-link-active::after {
+  position: absolute;
+  right: 50%;
+  bottom: var(--space-2);
+  left: 50%;
+  height: 2px;
+  transform: translateX(-50%);
+  background: var(--color-primary-500);
+  content: "";
+}
+
+.mobile-more {
+  position: relative;
+  display: block;
+  width: auto;
+}
+
+.mobile-more-button {
+  cursor: pointer;
+}
+
+.mobile-more-icon {
+  height: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 12px;
+}
+
+.mobile-more-menu {
+  position: absolute;
+  right: var(--space-2);
+  bottom: calc(100% + var(--space-2));
+  width: min(280px, calc(100vw - var(--space-4)));
+  max-height: calc(100dvh - 88px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-modal);
+  z-index: 1;
+  overflow-y: auto;
+}
+
+.mobile-more-list .nav-link {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.mobile-more-close {
+  width: 100%;
+  margin-top: var(--space-2);
+}
