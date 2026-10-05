@@ -40,7 +40,7 @@ function CreateWodView({
       {error && <p className="ui-error" role="alert">{error}</p>}
       {success && <p className="ui-success">{success}</p>}
 
-      <form className="form-layout surface" onSubmit={onSubmit}>
+      <form className="form-layout surface glass-panel" onSubmit={onSubmit}>
         <div className="form-field">
           <label htmlFor="name">Nombre</label>
 
