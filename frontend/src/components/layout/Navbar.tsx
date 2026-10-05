@@ -1,8 +1,13 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import AuthActions from "./AuthActions";
-import DesktopNavigation from "./DesktopNavigation";
+import SidebarToggle from "./SidebarToggle";
 
-function Navbar() {
+interface NavbarProps {
+  sidebarCollapsed: boolean;
+  onToggleSidebar: () => void;
+}
+
+function Navbar({ sidebarCollapsed, onToggleSidebar }: NavbarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthenticated = Boolean(localStorage.getItem("token"));
@@ -18,7 +23,7 @@ function Navbar() {
         <NavLink className="navbar-brand" to="/">
           WOD EXPLORER
         </NavLink>
-        <DesktopNavigation isAuthenticated={isAuthenticated} />
+        <SidebarToggle collapsed={sidebarCollapsed} onToggle={onToggleSidebar} />
         <div className="navbar-actions">
           {isAuthenticated || location.pathname !== "/login" ? (
             <AuthActions
