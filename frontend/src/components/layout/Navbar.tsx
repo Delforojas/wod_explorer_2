@@ -1,7 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import AuthActions from "./AuthActions";
 import DesktopNavigation from "./DesktopNavigation";
-import MobileNavigation from "./MobileNavigation";
 
 function Navbar() {
   useLocation();
@@ -29,10 +28,6 @@ function Navbar() {
           />
         </div>
       </div>
-      <MobileNavigation
-        isAuthenticated={isAuthenticated}
-        onLogout={handleLogout}
-      />
     </header>
   );
 }
