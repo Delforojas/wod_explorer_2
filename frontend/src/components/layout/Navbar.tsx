@@ -3,7 +3,7 @@ import AuthActions from "./AuthActions";
 import DesktopNavigation from "./DesktopNavigation";
 
 function Navbar() {
-  useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
@@ -20,12 +20,14 @@ function Navbar() {
         </NavLink>
         <DesktopNavigation isAuthenticated={isAuthenticated} />
         <div className="navbar-actions">
-          <AuthActions
-            className="desktop-auth-actions"
-            isAuthenticated={isAuthenticated}
-            onLogout={handleLogout}
-            withTextRoll
-          />
+          {isAuthenticated || location.pathname !== "/login" ? (
+            <AuthActions
+              className="desktop-auth-actions"
+              isAuthenticated={isAuthenticated}
+              onLogout={handleLogout}
+              withTextRoll
+            />
+          ) : null}
         </div>
       </div>
     </header>
