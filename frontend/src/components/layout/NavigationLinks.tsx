@@ -7,6 +7,7 @@ interface NavigationLinksProps {
   listClassName?: string;
   onNavigate?: () => void;
   withTextRoll?: boolean;
+  collapsed?: boolean;
 }
 
 function NavigationIcon({ icon }: { icon: NavigationIconName }) {
@@ -31,6 +32,7 @@ function NavigationLinks({
   listClassName = "nav-list",
   onNavigate,
   withTextRoll = false,
+  collapsed = false,
 }: NavigationLinksProps) {
   return (
     <ul className={listClassName}>
@@ -43,9 +45,10 @@ function NavigationLinks({
             className={({ isActive }) =>
               isActive ? "nav-link nav-link-active" : "nav-link"
             }
+            title={collapsed ? item.label : undefined}
           >
             <NavigationIcon icon={item.icon} />
-            {withTextRoll ? <TextRoll label={item.label} /> : <span>{item.label}</span>}
+            {!collapsed && (withTextRoll ? <TextRoll label={item.label} /> : <span>{item.label}</span>)}
           </NavLink>
         </li>
       ))}
