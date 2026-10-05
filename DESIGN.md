@@ -39,7 +39,7 @@ Las decisiones visuales no pueden modificar los requisitos funcionales, las regl
 - Nombre del producto: `WOD Explorer`.
 - Dirección: `Pizarra de Rendimiento Mobile-First`.
 - Carácter: herramienta personal de rendimiento, precisa, sobria y atlética.
-- Lenguaje: superficies oscuras, datos de alto contraste y jerarquía guiada por cifras y estructura.
+- Lenguaje: superficies dark azuladas, primary índigo y jerarquía guiada por cifras y estructura.
 - Debe evitar una estética de competición, red social, comunidad, gamificación o ranking.
 - Idioma de interfaz: español.
 
@@ -59,19 +59,21 @@ Los valores siguientes son la base para variables CSS compartidas. No introducir
 
 | Rol | Valor | Uso visual |
 | --- | --- | --- |
-| Fondo base | `#101314` | Fondo de la aplicación |
-| Fondo elevado | `#171B1D` | Navegación y áreas persistentes |
-| Superficie | `#1E2426` | Cards, formularios y listas |
-| Superficie elevada | `#283033` | Hover, panel secundario y fila destacada |
-| Borde | `#394345` | Separación de superficies y controles |
-| Texto principal | `#F1F5F2` | Títulos, cifras y contenido primario |
-| Texto secundario | `#B4BFBA` | Metadatos y labels |
-| Texto tenue | `#7F8C87` | Ayuda y placeholders |
-| Acento principal | `#B6E642` | Acción primaria, foco destacado y dato principal |
-| Información | `#73C7E3` | Información neutral y enlaces |
-| Éxito | `#56C596` | Confirmación de interfaz |
-| Advertencia | `#F2B45B` | Atención no destructiva |
-| Error | `#EF6B6B` | Error, validación y acción destructiva |
+| Fondo base | `#030712` | Fondo de la aplicación y sidebar |
+| Fondo elevado | `#111827` | Áreas persistentes, controles outline y navegación móvil |
+| Superficie | `#1E2634` | Cards, formularios y paneles |
+| Superficie elevada | `#1F2937` | Panel secundario y superficie interactiva |
+| Superficie interactiva | `#FFFFFF08` | Hover de cards y capas ligeras |
+| Borde | `#1F2937` | Separación de superficies y controles |
+| Texto principal | `#FFFFFFCC` | Títulos, cifras y contenido primario |
+| Texto secundario | `#9CA3AF` | Metadatos y labels |
+| Texto tenue | `#6B7280` | Ayuda y placeholders |
+| Primary | `#3758F9` | Acción primaria y navegación activa |
+| Primary hover | `#2237EE` | Hover de acción primaria |
+| Información | `#0EA5E9` | Información neutral y enlaces |
+| Éxito | `#22C55E` | Confirmación de interfaz |
+| Advertencia | `#EAB308` | Atención no destructiva |
+| Error | `#EF4444` | Error, validación y acción destructiva |
 
 - El color nunca es el único medio para comunicar origen, modalidad, estado de finalización, error o éxito.
 - El acento principal no implica por sí mismo una mejora, marca personal o estado deportivo.
@@ -79,7 +81,7 @@ Los valores siguientes son la base para variables CSS compartidas. No introducir
 
 ### Tipografía y escala
 
-- Familia: `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`.
+- Familia: `"DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. No se carga una fuente remota; se usan fallbacks del sistema si DM Sans no está disponible.
 - Usar figuras tabulares para tiempos, fechas, rondas y repeticiones cuando el navegador las soporte.
 - Pesos: 400 para cuerpo, 500 para controles, 600 para títulos y 700 para métricas.
 
@@ -121,9 +123,9 @@ Los valores siguientes son la base para variables CSS compartidas. No introducir
 
 | Token | Valor | Uso |
 | --- | --- | --- |
-| `shadow-surface` | `0 1px 2px rgb(0 0 0 / 18%)` | Superficie estándar |
-| `shadow-raised` | `0 8px 24px rgb(0 0 0 / 28%)` | Panel o card elevada |
-| `shadow-modal` | `0 20px 48px rgb(0 0 0 / 45%)` | Modal |
+| `shadow-surface` | `0 1px 2px rgb(16 24 40 / 5%)` | Superficie estándar |
+| `shadow-raised` | `0 4px 8px -2px rgb(16 24 40 / 10%), 0 2px 4px -2px rgb(16 24 40 / 6%)` | Panel o card elevada |
+| `shadow-modal` | `0 32px 64px rgb(16 24 40 / 14%)` | Modal |
 
 - Las sombras indican elevación, no estados semánticos.
 - No usar efectos glow decorativos como patrón general.
@@ -187,18 +189,18 @@ El diseño es mobile-first: primero se resuelven lectura vertical, controles tá
 ### Botones
 
 - Altura estándar: `44px`; objetivo táctil mínimo: `44px × 44px`.
-- Primario: fondo de acento principal, texto de fondo base y peso 600.
-- Secundario: superficie elevada, borde estándar y texto principal.
-- Terciario: sin fondo persistente, texto principal o de información.
-- Destructivo: color de error, reservado para acciones destructivas ya definidas por el producto.
+- Primario: fondo `#3758F9`, hover `#2237EE`, texto blanco y peso 600.
+- Secundario: fondo `#111827`, borde `#1F2937` y texto `#E5E7EB`.
+- Terciario: sin fondo persistente, texto tenue; hover con fondo `#111827` y texto `#D1D5DB`.
+- Destructivo: fondo `#DC2626`, hover `#B91C1C`, borde de error y texto blanco; reservado para acciones destructivas ya definidas por el producto.
 - Estados visuales obligatorios: default, hover, focus-visible, disabled y loading.
-- Focus visible: anillo de `3px` en el acento principal, separado `2px` del control.
+- Focus visible: anillo de `3px` en `#91AEFF`, separado `2px` del control. Controles primary usan además un halo `rgb(55 88 249 / 20%)`.
 
 ### Inputs y formularios
 
 - Altura mínima: `44px`.
-- Fondo: fondo elevado; borde: borde estándar; texto: texto principal.
-- Focus: borde de acento y anillo visible.
+- Fondo: `#FFFFFF0D`; borde: borde estándar; texto: texto principal.
+- Focus: borde `#91AEFF` y halo visible del primary.
 - Label persistente sobre cada control; el placeholder es solo ayuda contextual.
 - Texto de ayuda: `text-xs`.
 - Error: icono, color y mensaje textual; no depender únicamente del borde rojo.
@@ -208,7 +210,7 @@ El diseño es mobile-first: primero se resuelven lectura vertical, controles tá
 ### Cards y superficies
 
 - Card estándar: superficie, borde estándar, radio medio, sombra de superficie y padding definido por breakpoint.
-- Card interactiva: misma base, con elevación suave y borde más visible en hover.
+- Card interactiva: misma base, con elevación suave, borde `#374151` y capa `#FFFFFF08` en hover.
 - Card de métrica: cifra como foco y contexto textual debajo; no requiere gráficos decorativos.
 - Card de WOD: nombre, modalidad, origen y composición resumida cuando esos datos estén disponibles.
 - La composición usa una secuencia numerada de ejercicios para preservar el orden visualmente.
@@ -225,7 +227,7 @@ El diseño es mobile-first: primero se resuelven lectura vertical, controles tá
 
 ### Badges y estados de entidad
 
-- Badge compacto: `text-xs`, radio pequeño y padding horizontal de `8px`.
+- Badge compacto: `text-xs`, radio pequeño y padding horizontal de `8px`; el neutral usa fondo `#4B5563` y texto `#E5E7EB`.
 - Puede representar visualmente modalidad, origen de WOD, categoría, tipo de medición, estado de finalización cuando corresponda y archivado cuando exista ese dato.
 - Un badge nunca es la única representación de un dato relevante.
 
