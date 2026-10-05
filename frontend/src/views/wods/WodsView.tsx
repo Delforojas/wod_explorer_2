@@ -39,7 +39,7 @@ function WodsView({
         )}
         </header>
 
-        <section className="detail-section">
+        <section className="detail-section glass-panel">
           <h2>Entrenamiento</h2>
 
         <ol className="exercise-sequence">{selectedWod.composition.map((item) => (
@@ -72,7 +72,7 @@ function WodsView({
         <p>Elige un entrenamiento y consulta sus ejercicios.</p>
       </header>
 
-      <div className="resource-list">{wods.map((wod) => (
+      <div className="resource-list glass-panel">{wods.map((wod) => (
         <article className="resource-row" key={wod.id}>
           <header><h2>{wod.name}</h2><span className="resource-meta">{formatWodType(wod.version.type)}</span></header>
 

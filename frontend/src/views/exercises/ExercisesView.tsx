@@ -22,7 +22,7 @@ function ExercisesView({
         <h1>Ejercicios</h1>
       </header>
 
-      <div className="resource-list">
+      <div className="resource-list glass-panel">
         {exercises.map((exercise) => (
           <article className="resource-row editorial-row" key={exercise.id}>
             <header>
@@ -46,7 +46,7 @@ function ExercisesView({
       </div>
 
       {selectedExercise && (
-        <section className="surface detail-section">
+        <section className="surface detail-section glass-panel">
           <h3>Detalle del ejercicio</h3>
 
           <dl className="detail-data">

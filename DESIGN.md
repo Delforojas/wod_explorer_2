@@ -219,6 +219,13 @@ El diseño es mobile-first: primero se resuelven lectura vertical, controles tá
 - La composición usa una secuencia numerada de ejercicios para preservar el orden visualmente.
 - No usar imágenes deportivas de stock como requisito de la identidad.
 
+#### Variante Liquid Glass
+
+- Los paneles Liquid Glass se reservan para contenidos interiores que deban dejar percibir un fondo ambiental existente.
+- Usan tinte azul oscuro translúcido, `backdrop-filter` moderado, borde primary tenue, reflejo superior y sombra suave; no se aplican filtros separados a filas internas.
+- Los campos dentro de un panel glass usan una superficie más sólida para conservar contraste y foco visible.
+- Debe existir fallback opaco y una alternativa sin transparencia para preferencias del usuario.
+
 ### Listas y tablas
 
 - En móvil, usar filas o cards de una columna: título primero y metadatos debajo.
