@@ -1,50 +1,136 @@
-import { useRef } from "react";
-import { Link } from "react-router-dom";
+const LINKEDIN_URL = "https://www.linkedin.com/in/delfinrojas/";
+const GITHUB_URL = "https://github.com/Delforojas";
+const PORTFOLIO_URL = "https://delforojas.es";
+const EMAIL = "delfinrojasespina@email.com";
 
-function Footer() {
-  const footerRef = useRef<HTMLElement>(null);
+interface FooterProps {
+  isAuthenticated: boolean;
+}
 
-  function handlePointerMove(event: React.PointerEvent<HTMLElement>) {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    footerRef.current?.style.setProperty("--footer-light-x", `${event.clientX - bounds.left}px`);
-    footerRef.current?.style.setProperty("--footer-light-y", `${event.clientY - bounds.top}px`);
-  }
-
+function Footer({ isAuthenticated }: FooterProps) {
   return (
     <footer
-      ref={footerRef}
-      className="site-footer delfo-footer"
-      onPointerMove={handlePointerMove}
-      onPointerLeave={() => footerRef.current?.style.removeProperty("--footer-light-x")}
+      className={`site-footer delfo-footer ${
+        isAuthenticated ? "delfo-footer--authenticated" : ""
+      }`}
     >
-      <div className="delfo-footer__top">
-        <div>
-          <p className="delfo-footer__brand">delfo</p>
-          <p className="delfo-footer__description">Explora entrenamientos, crea tus WODs y registra tu progreso.</p>
-        </div>
-        <div>
-          <p className="delfo-footer__heading">Explorar</p>
-          <nav aria-label="Enlaces del footer">
-            <ul className="delfo-footer__links">
-              <li><Link to="/exercises">Ejercicios</Link></li>
-              <li><Link to="/wods">WODs</Link></li>
-            </ul>
-          </nav>
+      <div className="delfo-footer__aurora" aria-hidden="true" />
+      <div className="delfo-footer__grid" aria-hidden="true" />
+
+      <div className="delfo-footer__marquee">
+        <div className="delfo-footer__marquee-track">
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn de Delfín Rojas"
+          >
+            <img
+              src="/icons/linkedin.svg"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>LINKEDIN</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
+
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub de Delfín Rojas"
+          >
+            <img
+              src="/icons/github.svg"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>GITHUB</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
+
+          <a href={`mailto:${EMAIL}`} aria-label="Enviar email a Delfín Rojas">
+            <img
+              src="/icons/mail.svg"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>CONTACTO</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
+
+          {/* Repetición para marquee infinito */}
+
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="LinkedIn de Delfín Rojas"
+          >
+            <img
+              src="/icons/linkedin.svg"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>LINKEDIN</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
+
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub de Delfín Rojas"
+          >
+            <img
+              src="/icons/github.svg"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>GITHUB</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
+
+          <a
+            href={PORTFOLIO_URL}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Portfolio de Delfín Rojas"
+          >
+            <img
+              src="/icons/glove.ico"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>PORTFOLIO</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
+
+          <a href={`mailto:${EMAIL}`} aria-label="Enviar email a Delfín Rojas">
+            <img
+              src="/icons/mail.svg"
+              alt=""
+              className="delfo-footer__social-icon"
+            />
+            <span>CONTACTO</span>
+          </a>
+
+          <span aria-hidden="true">✦</span>
         </div>
       </div>
+
+      <div className="delfo-footer__content">
+        <p className="delfo-footer__tagline">ENTRENA. REGISTRA. SUPÉRATE.</p>
+      </div>
+
       <div className="delfo-footer__bottom">
-        <p className="delfo-footer__copyright">© 2026 delfo</p>
-        <svg className="delfo-footer__wordmark" viewBox="0 0 1000 180" aria-hidden="true" focusable="false">
-          <defs>
-            <radialGradient id="delfo-pointer-light" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#1e88e5" stopOpacity="0" />
-              <stop offset="50%" stopColor="#0ea5e9" stopOpacity="0.45" />
-              <stop offset="100%" stopColor="#0891b2" stopOpacity="0" />
-            </radialGradient>
-          </defs>
-          <text className="delfo-footer__wordmark-base" x="0" y="145">DELFO</text>
-          <text className="delfo-footer__wordmark-light" x="0" y="145">DELFO</text>
-        </svg>
+        <p className="delfo-footer__copyright">© 2026 DELFO</p>
       </div>
     </footer>
   );

@@ -14,6 +14,7 @@ export const measurementTypeSchema = z.enum([
   "TIME",
   "DISTANCE",
   "WEIGHT_DISTANCE",
+  "DISTANCE_TIME",
 ]);
 
 export const exerciseRequestSchema = z.object({

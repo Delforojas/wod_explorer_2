@@ -7,6 +7,7 @@ interface Point {
 
 const GRID_SPACING = 36;
 const MAX_DEVICE_PIXEL_RATIO = 2;
+const DEFAULT_PULSAR_COLOR = "#ff6b00";
 
 function hexToRgba(color: string, opacity: number) {
   const hex = color.replace("#", "");
@@ -41,8 +42,14 @@ function PulsarGridBackground() {
     }
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
     const coarsePointer = window.matchMedia("(pointer: coarse)");
-    const accent = getComputedStyle(container).getPropertyValue("--color-primary-500").trim();
+
+    // Color naranja configurable desde CSS.
+    const accent =
+      getComputedStyle(canvas).getPropertyValue("--pulsar-color").trim() ||
+      DEFAULT_PULSAR_COLOR;
+
     let points: Point[] = [];
     let width = 0;
     let height = 0;
@@ -56,13 +63,22 @@ function PulsarGridBackground() {
       context.clearRect(0, 0, width, height);
 
       for (const point of points) {
-        const distance = Math.hypot(point.x - mousePositionRef.current.x, point.y - mousePositionRef.current.y);
-        const wave = animated ? Math.max(0, Math.sin(distance * 0.035 - time * 0.003)) : 0;
+        const distance = Math.hypot(
+          point.x - mousePositionRef.current.x,
+          point.y - mousePositionRef.current.y,
+        );
+
+        const wave = animated
+          ? Math.max(0, Math.sin(distance * 0.035 - time * 0.003))
+          : 0;
+
         const radius = 0.65 + wave * 1.35;
         const opacity = animated ? 0.035 + wave * 0.2 : 0.07;
 
         context.beginPath();
         context.arc(point.x, point.y, radius, 0, Math.PI * 2);
+
+        // Dibujar los puntos en naranja.
         context.fillStyle = hexToRgba(accent, opacity);
         context.fill();
       }
@@ -83,6 +99,7 @@ function PulsarGridBackground() {
 
       time += 1;
       draw(true);
+
       animationFrame = requestAnimationFrame(animate);
     };
 
@@ -94,12 +111,20 @@ function PulsarGridBackground() {
 
     const resize = () => {
       const bounds = container.getBoundingClientRect();
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO);
+
+      const pixelRatio = Math.min(
+        window.devicePixelRatio || 1,
+        MAX_DEVICE_PIXEL_RATIO,
+      );
+
       width = Math.max(1, bounds.width);
       height = Math.max(1, bounds.height);
+
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
+
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
       points = [];
 
       for (let x = GRID_SPACING / 2; x < width; x += GRID_SPACING) {
@@ -108,8 +133,14 @@ function PulsarGridBackground() {
         }
       }
 
-      if (mousePositionRef.current.x === 0 && mousePositionRef.current.y === 0) {
-        mousePositionRef.current = { x: width / 2, y: height / 2 };
+      if (
+        mousePositionRef.current.x === 0 &&
+        mousePositionRef.current.y === 0
+      ) {
+        mousePositionRef.current = {
+          x: width / 2,
+          y: height / 2,
+        };
       }
 
       draw(!isStatic());
@@ -117,6 +148,7 @@ function PulsarGridBackground() {
 
     const handlePointerMove = (event: PointerEvent) => {
       const bounds = container.getBoundingClientRect();
+
       mousePositionRef.current = {
         x: event.clientX - bounds.left,
         y: event.clientY - bounds.top,
@@ -140,20 +172,32 @@ function PulsarGridBackground() {
     };
 
     const observer = new ResizeObserver(resize);
+
     observer.observe(container);
-    container.addEventListener("pointermove", handlePointerMove, { passive: true });
+
+    container.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
+
     reducedMotion.addEventListener("change", handleMotionPreferenceChange);
+
     coarsePointer.addEventListener("change", handleMotionPreferenceChange);
+
     resize();
     startAnimation();
 
     return () => {
       stopAnimation();
       observer.disconnect();
+
       container.removeEventListener("pointermove", handlePointerMove);
+
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+
       reducedMotion.removeEventListener("change", handleMotionPreferenceChange);
+
       coarsePointer.removeEventListener("change", handleMotionPreferenceChange);
     };
   }, []);

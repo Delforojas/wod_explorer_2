@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import type { ExerciseResultResponse } from "../../types/ExerciseResult";
 import type { MyExerciseResultsViewProps } from "./MyExerciseResultsView.Types";
 
@@ -20,7 +21,22 @@ function MyExerciseResultsView({
     }).format(new Date(date));
   }
 
+  function formatDuration(totalSeconds: number): string {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+
   function renderResult(result: ExerciseResultResponse) {
+    if (result.distanceM !== null && result.durationSeconds !== null) {
+      return (
+        <p className="result-value">
+          {result.distanceM} m · {formatDuration(result.durationSeconds)}
+        </p>
+      );
+    }
+
     if (result.weightKg !== null && result.reps !== null) {
       return (
         <p className="result-value">
@@ -34,7 +50,9 @@ function MyExerciseResultsView({
     }
 
     if (result.durationSeconds !== null) {
-      return <p className="result-value">{result.durationSeconds} segundos</p>;
+      return (
+        <p className="result-value">{formatDuration(result.durationSeconds)}</p>
+      );
     }
 
     if (result.distanceM !== null && result.weightKg !== null) {
@@ -52,30 +70,63 @@ function MyExerciseResultsView({
     return <p className="result-value">Resultado sin datos</p>;
   }
 
-  if (loading) {
-    return <p className="ui-loading">Cargando tus marcas...</p>;
-  }
-
-  if (error) {
-    return <p className="ui-error" role="alert">{error}</p>;
-  }
-
   return (
     <section className="page">
-      <header className="page-header"><p className="page-eyebrow">Registro personal</p><h1>Mis marcas</h1><p>Aquí puedes consultar tus resultados de ejercicios.</p></header>
+      <header className="page-header">
+        <p className="page-eyebrow">Seguimiento personal</p>
+        <h1>Marcas</h1>
+        <p>
+          Registra tus resultados, consulta tus marcas y sigue tus progresos.
+        </p>
+      </header>
 
-      {results.length === 0 ? (
+      {/* Navegación secundaria */}
+
+      <nav className="marks-navigation" aria-label="Secciones de marcas">
+        <NavLink
+          to="/personal-bests"
+          className={({ isActive }) =>
+            isActive ? "marks-nav-link marks-nav-link-active" : "marks-nav-link"
+          }
+        >
+          Mejores marcas
+        </NavLink>
+
+        <NavLink
+          to="/exercise-results/new"
+          className="marks-nav-link marks-nav-action"
+        >
+          + Registrar marca
+        </NavLink>
+      </nav>
+
+      {/* Contenido */}
+
+      {loading ? (
+        <p className="ui-loading">Cargando tus marcas...</p>
+      ) : error ? (
+        <p className="ui-error" role="alert">
+          {error}
+        </p>
+      ) : results.length === 0 ? (
         <p className="ui-empty">Todavía no has registrado ninguna marca.</p>
       ) : (
-        <div className="resource-list glass-panel">{results.map((result) => (
-          <article className="resource-row resource-row-static" key={result.id}>
-            <header><h2>{getExerciseName(result.exerciseId)}</h2></header>
+        <div className="resource-list glass-panel">
+          {results.map((result) => (
+            <article
+              className="resource-row resource-row-static"
+              key={result.id}
+            >
+              <header>
+                <h2>{getExerciseName(result.exerciseId)}</h2>
+              </header>
 
-            {renderResult(result)}
+              {renderResult(result)}
 
-            <p className="resource-meta">{formatDate(result.performedAt)}</p>
-          </article>
-        ))}</div>
+              <p className="resource-meta">{formatDate(result.performedAt)}</p>
+            </article>
+          ))}
+        </div>
       )}
     </section>
   );

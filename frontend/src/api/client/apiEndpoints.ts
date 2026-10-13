@@ -9,7 +9,7 @@ if (!configuredApiUrl) {
 let apiUrl: URL;
 
 try {
-  apiUrl = new URL(configuredApiUrl);
+  apiUrl = new URL(configuredApiUrl, window.location.origin);
 } catch {
   throw new Error("VITE_API_URL debe ser una URL absoluta válida.");
 }

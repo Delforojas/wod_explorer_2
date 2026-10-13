@@ -12,7 +12,11 @@ function ExercisesView({
   }
 
   if (error) {
-    return <p className="ui-error" role="alert">{error}</p>;
+    return (
+      <p className="ui-error" role="alert">
+        {error}
+      </p>
+    );
   }
 
   return (
@@ -22,12 +26,18 @@ function ExercisesView({
         <h1>Ejercicios</h1>
       </header>
 
+      {/* LISTADO DE EJERCICIOS */}
+
       <div className="resource-list glass-panel">
         {exercises.map((exercise) => (
-          <article className="resource-row editorial-row" key={exercise.id}>
+          <article
+            className="resource-row resource-row-static"
+            key={exercise.id}
+          >
             <header>
               <h2>{exercise.name}</h2>
             </header>
+
             <div className="resource-meta">
               <span>{exercise.category}</span>
               <span>{exercise.measurementType}</span>
@@ -45,16 +55,37 @@ function ExercisesView({
         ))}
       </div>
 
+      {/* DETALLE DEL EJERCICIO */}
+
       {selectedExercise && (
         <section className="surface detail-section glass-panel">
           <h3>Detalle del ejercicio</h3>
 
           <dl className="detail-data">
-            <div><dt>ID</dt><dd>{selectedExercise.id}</dd></div>
-            <div><dt>Nombre</dt><dd>{selectedExercise.name}</dd></div>
-            <div><dt>Categoría</dt><dd>{selectedExercise.category}</dd></div>
-            <div><dt>Medición</dt><dd>{selectedExercise.measurementType}</dd></div>
-            <div><dt>Activo</dt><dd>{selectedExercise.active ? "Sí" : "No"}</dd></div>
+            <div>
+              <dt>ID</dt>
+              <dd>{selectedExercise.id}</dd>
+            </div>
+
+            <div>
+              <dt>Nombre</dt>
+              <dd>{selectedExercise.name}</dd>
+            </div>
+
+            <div>
+              <dt>Categoría</dt>
+              <dd>{selectedExercise.category}</dd>
+            </div>
+
+            <div>
+              <dt>Medición</dt>
+              <dd>{selectedExercise.measurementType}</dd>
+            </div>
+
+            <div>
+              <dt>Activo</dt>
+              <dd>{selectedExercise.active ? "Sí" : "No"}</dd>
+            </div>
           </dl>
         </section>
       )}

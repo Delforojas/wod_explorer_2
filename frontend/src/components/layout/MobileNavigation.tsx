@@ -1,11 +1,7 @@
-import { useState } from "react";
 import AuthActions from "./AuthActions";
 import NavigationLinks from "./NavigationLinks";
-import {
-  mobileMoreNavigation,
-  mobilePrimaryNavigation,
-  publicNavigation,
-} from "./navigation";
+
+import { mobilePrimaryNavigation, publicNavigation } from "./navigation";
 
 interface MobileNavigationProps {
   isAuthenticated: boolean;
@@ -16,54 +12,27 @@ function MobileNavigation({
   isAuthenticated,
   onLogout,
 }: MobileNavigationProps) {
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const primaryNavigation = isAuthenticated ? mobilePrimaryNavigation : publicNavigation;
-
-  function closeMoreMenu() {
-    setIsMoreOpen(false);
-  }
+  const navigationItems = isAuthenticated
+    ? mobilePrimaryNavigation
+    : publicNavigation;
 
   return (
-    <nav className="mobile-navigation mobile-navigation-integrated" aria-label="Navegación móvil">
+    <nav
+      className="mobile-navigation mobile-navigation-integrated"
+      aria-label="Navegación móvil"
+    >
       <NavigationLinks
-        items={primaryNavigation}
+        items={navigationItems}
         listClassName="mobile-nav-list"
-        onNavigate={closeMoreMenu}
       />
-      {isAuthenticated && (
-        <div className="mobile-more">
-          <button
-            type="button"
-            className="mobile-more-button"
-            aria-controls="mobile-more-menu"
-            aria-expanded={isMoreOpen}
-            onClick={() => setIsMoreOpen((isOpen) => !isOpen)}
-          >
-            <span className="mobile-more-icon" aria-hidden="true">...</span>
-            <span>Más</span>
-          </button>
-          {isMoreOpen ? (
-            <div id="mobile-more-menu" className="mobile-more-menu">
-              <NavigationLinks
-                items={mobileMoreNavigation}
-                listClassName="mobile-more-list"
-                onNavigate={closeMoreMenu}
-              />
-              <button type="button" className="mobile-more-close" onClick={closeMoreMenu}>
-                Cerrar menú
-              </button>
-            </div>
-          ) : null}
-        </div>
-      )}
-      {!isAuthenticated ? (
+
+      {!isAuthenticated && (
         <AuthActions
           className="mobile-auth-actions"
           isAuthenticated={isAuthenticated}
           onLogout={onLogout}
-          onNavigate={closeMoreMenu}
         />
-      ) : null}
+      )}
     </nav>
   );
 }

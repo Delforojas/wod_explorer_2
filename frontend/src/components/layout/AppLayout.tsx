@@ -23,13 +23,21 @@ function AppLayout({ children }: AppLayoutProps) {
       <a className="skip-link" href="#main-content">
         Saltar al contenido
       </a>
+
       <Navbar />
+
       <main id="main-content" className="app-main" tabIndex={-1}>
         <PulsarGridBackground />
+
         <div className="app-main-content">{children}</div>
       </main>
-      <MobileNavigation isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      <Footer />
+
+      <MobileNavigation
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
+      />
+
+      <Footer isAuthenticated={isAuthenticated} />
     </div>
   );
 }

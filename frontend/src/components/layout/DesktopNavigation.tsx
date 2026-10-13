@@ -1,22 +1,19 @@
 import NavigationLinks from "./NavigationLinks";
-import { personalNavigation, publicNavigation } from "./navigation";
+
+import { mobilePrimaryNavigation, publicNavigation } from "./navigation";
 
 interface DesktopNavigationProps {
   isAuthenticated: boolean;
 }
 
-function DesktopNavigation({
-  isAuthenticated,
-}: DesktopNavigationProps) {
+function DesktopNavigation({ isAuthenticated }: DesktopNavigationProps) {
+  const navigationItems = isAuthenticated
+    ? mobilePrimaryNavigation
+    : publicNavigation;
+
   return (
     <nav className="desktop-navigation" aria-label="Navegación principal">
-      <NavigationLinks items={publicNavigation} withTextRoll />
-      {isAuthenticated && (
-        <div className="nav-group">
-          <span className="nav-section-label">Mi actividad</span>
-          <NavigationLinks items={personalNavigation} withTextRoll />
-        </div>
-      )}
+      <NavigationLinks items={navigationItems} listClassName="nav-list" />
     </nav>
   );
 }

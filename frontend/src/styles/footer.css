@@ -1,50 +1,766 @@
+/* =========================================================
+   DELFO — CINEMATIC FOOTER
+   Altura máxima aproximada: 20% del viewport
+   ========================================================= */
+
 .delfo-footer {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  margin: var(--space-6) var(--space-4) calc(72px + env(safe-area-inset-bottom));
-  border-radius: 20px;
-  padding: 28px 20px 16px;
-  background: radial-gradient(ellipse at 50% 115%, rgb(28 100 145 / 22%), transparent 65%), #080a0c;
+
+  width: 100%;
+  height: 5vh;
+
+  margin: 0;
+  padding: 3vh 4% 2vh;
+
+  border: 0;
+  border-radius: 0;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(206, 121, 24, 0.14),
+      transparent 55%
+    ),
+    #080a0c;
+
   color: var(--color-foreground);
 }
 
-.delfo-footer__top { display: grid; gap: 28px; }
-.delfo-footer__brand, .delfo-footer__heading, .delfo-footer__copyright { margin: 0; }
-.delfo-footer__brand { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
-.delfo-footer__description { max-width: 28ch; margin: var(--space-3) 0 0; color: #aeb8c6; font-size: 14px; line-height: 1.6; }
-.delfo-footer__heading { margin-bottom: 18px; font-size: 14px; font-weight: 600; }
-.delfo-footer__links { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
-.delfo-footer a { color: #bcc5d1; font-size: 14px; text-decoration: none; transition: color 160ms ease; }
-.delfo-footer a:hover { color: var(--color-info); }
-.delfo-footer a:focus-visible { outline: 2px solid var(--color-info); outline-offset: 5px; border-radius: 3px; }
-.delfo-footer__bottom { margin-top: 28px; padding-top: var(--space-5); border-top: 1px solid rgb(148 163 184 / 18%); }
-.delfo-footer__copyright { color: #aeb8c6; font-size: 12px; line-height: 1.5; }
-.delfo-footer__wordmark { display: block; width: 100%; height: auto; margin-top: var(--space-3); pointer-events: none; }
-.delfo-footer__wordmark text { font-family: var(--font-sans); font-size: 180px; font-weight: 900; letter-spacing: -0.07em; }
-.delfo-footer__wordmark-base { fill: none; stroke: rgb(91 147 186 / 35%); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.delfo-footer__wordmark-light {
-  fill: none;
-  stroke: url(#delfo-pointer-light);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  opacity: 0.85;
+/* =========================================================
+   BACKGROUND — AURORA
+   ========================================================= */
+
+.delfo-footer__aurora {
+  position: absolute;
+  z-index: -2;
+
+  top: 50%;
+  left: 50%;
+
+  width: 90%;
+  height: 80%;
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(178, 209, 77, 0.18) 0%,
+    rgba(213, 114, 14, 0.1) 35%,
+    transparent 70%
+  );
+
+  filter: blur(4vw);
+
+  transform: translate(-50%, -50%);
+
+  animation: delfo-footer-breathe 8s ease-in-out infinite alternate;
 }
-.delfo-footer:hover .delfo-footer__wordmark-light { opacity: 1; }
+
+/* =========================================================
+   BACKGROUND — GRID
+   ========================================================= */
+
+.delfo-footer__grid {
+  position: absolute;
+  z-index: -1;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background-size: 4vw 4vw;
+
+  background-image:
+    linear-gradient(to right, rgba(0, 231, 231, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(21, 93, 193, 0.04) 1px, transparent 1px);
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 20%,
+    black 75%,
+    transparent
+  );
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 20%,
+    black 75%,
+    transparent
+  );
+}
+
+/* =========================================================
+   MARQUEE
+   ========================================================= */
+
+.delfo-footer__marquee {
+  position: absolute;
+  z-index: 3;
+
+  top: 8%;
+  left: -5%;
+
+  width: 110%;
+
+  overflow: hidden;
+
+  padding: 0.5vh 0;
+
+  border-top: 1px solid rgb(148 163 184 / 15%);
+  border-bottom: 1px solid rgb(148 163 184 / 15%);
+
+  background: rgba(33, 88, 88, 0.65);
+
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
+
+  transform: rotate(-1deg);
+}
+
+.delfo-footer__marquee-track {
+  display: flex;
+
+  width: max-content;
+
+  align-items: center;
+
+  gap: 2rem;
+
+  color: #d6dade;
+
+  font-size: 0.6rem;
+  font-weight: 700;
+
+  letter-spacing: 0.28em;
+
+  white-space: nowrap;
+
+  animation: delfo-footer-marquee 24s linear infinite;
+}
+
+/* Estrellas */
+
+.delfo-footer__marquee-track > span {
+  color: #0ea5e9;
+}
+
+/* Enlaces del marquee */
+
+.delfo-footer__marquee-track a {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  color: #fda000;
+
+  text-decoration: none;
+
+  transition:
+    color 180ms ease,
+    text-shadow 180ms ease;
+}
+
+/* Iconos SVG */
+
+.delfo-footer__social-icon {
+  width: 1rem;
+  height: 1rem;
+
+  flex-shrink: 0;
+  object-fit: contain;
+
+  opacity: 1;
+
+  /* Blanco suave */
+  filter: brightness(0) invert(90%);
+
+  transition:
+    filter 180ms ease,
+    transform 180ms ease;
+}
+
+/* Hover: texto + icono pasan al mismo azul */
+
+.delfo-footer__marquee-track a:hover {
+  color: #38bdf8;
+
+  text-shadow: 0 0 1rem rgb(56 189 248 / 45%);
+}
+
+.delfo-footer__marquee-track a:hover .delfo-footer__social-icon {
+  filter: brightness(0) saturate(100%) invert(71%) sepia(77%) saturate(1777%)
+    hue-rotate(166deg) brightness(101%) contrast(95%);
+
+  transform: scale(1.15);
+}
+
+/* Focus teclado */
+
+.delfo-footer__marquee-track a:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 0.25rem;
+
+  border-radius: 0.2rem;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.delfo-footer__content {
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+
+  width: 100%;
+  height: 100%;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding-top: 1vh;
+  padding-bottom: 2vh;
+
+  text-align: center;
+}
+
+/* =========================================================
+   EYEBROW
+   ========================================================= */
+
+.delfo-footer__eyebrow {
+  margin: 0 0 0.4vh;
+
+  color: #38bdf8;
+
+  font-size: clamp(0.45rem, 0.6vw, 0.65rem);
+  font-weight: 700;
+
+  letter-spacing: 0.32em;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.delfo-footer__title {
+  max-width: 90%;
+
+  margin: 0;
+
+  font-size: clamp(1.2rem, 2.8vw, 2.8rem);
+  font-weight: 800;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.055em;
+
+  background: linear-gradient(180deg, #ffffff 0%, #b8c2cc 65%, #66717d 100%);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+
+  -webkit-text-fill-color: transparent;
+
+  filter: drop-shadow(0 0 1.5rem rgb(255 255 255 / 8%));
+}
+
+/* =========================================================
+   DESCRIPTION
+   ========================================================= */
+
+.delfo-footer__description {
+  max-width: 48ch;
+
+  margin: 0.6vh auto 0;
+
+  color: #9aa6b4;
+
+  font-size: clamp(0.55rem, 0.75vw, 0.8rem);
+
+  line-height: 1.4;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.delfo-footer__navigation {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  margin-top: 0.8vh;
+}
+
+/* =========================================================
+   GLASS PILLS
+   ========================================================= */
+
+.delfo-footer__pill {
+  display: inline-flex;
+
+  min-height: 3vh;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.35vh 1rem;
+
+  border: 1px solid rgb(148 163 184 / 15%);
+  border-radius: 999px;
+
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 6%),
+    rgb(255 255 255 / 2%)
+  );
+
+  box-shadow:
+    0 0.6rem 1.5rem rgb(0 0 0 / 25%),
+    inset 0 1px 1px rgb(255 255 255 / 8%);
+
+  color: #b9c3ce;
+
+  font-size: clamp(0.55rem, 0.65vw, 0.7rem);
+  font-weight: 600;
+
+  text-decoration: none;
+
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
+
+  transition:
+    transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 250ms ease,
+    background 250ms ease,
+    color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.delfo-footer__pill:hover {
+  transform: translateY(-10%);
+
+  border-color: rgb(56 189 248 / 40%);
+
+  background: linear-gradient(
+    145deg,
+    rgb(56 189 248 / 12%),
+    rgb(255 255 255 / 3%)
+  );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 0.8rem 2rem rgb(0 0 0 / 35%),
+    0 0 1.5rem rgb(14 165 233 / 8%),
+    inset 0 1px 1px rgb(255 255 255 / 12%);
+}
+
+.delfo-footer__pill:focus-visible {
+  outline: 2px solid #38bdf8;
+
+  outline-offset: 0.25rem;
+}
+
+/* =========================================================
+   GIANT DELFO WORDMARK
+   ========================================================= */
+
+.delfo-footer__giant-wordmark {
+  position: absolute;
+  z-index: 1;
+
+  bottom: -8%;
+  left: 50%;
+
+  width: max-content;
+
+  pointer-events: none;
+
+  user-select: none;
+
+  color: transparent;
+
+  font-family: var(--font-sans);
+
+  font-size: clamp(4rem, 12vw, 10rem);
+  font-weight: 900;
+
+  line-height: 0.7;
+
+  letter-spacing: -0.075em;
+
+  white-space: nowrap;
+
+  transform: translateX(-50%);
+
+  -webkit-text-stroke: 1px rgb(91 147 186 / 20%);
+
+  background: linear-gradient(
+    180deg,
+    rgb(91 147 186 / 12%) 0%,
+    rgb(14 165 233 / 3%) 45%,
+    transparent 80%
+  );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+/* =========================================================
+   BOTTOM BAR
+   ========================================================= */
+
+.delfo-footer__bottom {
+  position: absolute;
+  z-index: 6;
+
+  right: 3%;
+  bottom: 6%;
+  left: 3%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+}
+
+/* =========================================================
+   COPYRIGHT
+   ========================================================= */
+
+.delfo-footer__copyright {
+  margin: 0;
+
+  color: #778391;
+
+  font-size: clamp(0.45rem, 0.55vw, 0.6rem);
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   BACK TO TOP
+   ========================================================= */
+
+.delfo-footer__back-to-top {
+  display: inline-flex;
+
+  width: clamp(1.8rem, 2.5vw, 2.5rem);
+
+  aspect-ratio: 1;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid rgb(148 163 184 / 16%);
+  border-radius: 50%;
+
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 7%),
+    rgb(255 255 255 / 2%)
+  );
+
+  box-shadow:
+    0 0.5rem 1.5rem rgb(0 0 0 / 30%),
+    inset 0 1px 1px rgb(255 255 255 / 8%);
+
+  color: #9ba8b6;
+
+  font-size: clamp(0.75rem, 1vw, 1rem);
+
+  cursor: pointer;
+
+  backdrop-filter: blur(1rem);
+  -webkit-backdrop-filter: blur(1rem);
+
+  transition:
+    transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 250ms ease,
+    color 250ms ease,
+    box-shadow 250ms ease;
+}
+
+.delfo-footer__back-to-top:hover {
+  transform: translateY(-10%);
+
+  border-color: rgb(56 189 248 / 40%);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 0.8rem 2rem rgb(0 0 0 / 40%),
+    0 0 1.5rem rgb(14 165 233 / 12%);
+}
+
+.delfo-footer__back-to-top:focus-visible {
+  outline: 2px solid #38bdf8;
+
+  outline-offset: 0.25rem;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes delfo-footer-breathe {
+  from {
+    opacity: 0.6;
+
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes delfo-footer-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 639px) {
+  .delfo-footer {
+    height: 5vh;
+
+    min-height: 170px;
+    max-height: 200px;
+
+    padding: 3vh 4% 2vh;
+  }
+
+  .delfo-footer__marquee {
+    top: 5%;
+  }
+
+  .delfo-footer__description {
+    display: none;
+  }
+
+  .delfo-footer__navigation {
+    margin-top: 0.8vh;
+  }
+
+  .delfo-footer__giant-wordmark {
+    font-size: clamp(3.5rem, 20vw, 7rem);
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
 
 @media (min-width: 640px) {
   .delfo-footer {
-    padding: 48px 40px 20px;
-    border-radius: 24px;
+    height: 20vh;
+
+    min-height: 180px;
+    max-height: 220px;
+
+    padding: 3vh 4% 2vh;
   }
-  .delfo-footer__top {
-    grid-template-columns: minmax(220px, 1.4fr) repeat(auto-fit, minmax(140px, 1fr));
-    gap: 40px;
-  }
-  .delfo-footer__bottom { margin-top: 40px; padding-top: 20px; }
-  .delfo-footer__copyright { text-align: right; }
 }
 
+/* =========================================================
+   LARGE DESKTOP
+   ========================================================= */
+
+@media (min-width: 1024px) {
+  .delfo-footer {
+    height: 20vh;
+
+    min-height: 180px;
+    max-height: 220px;
+
+    padding: 3vh 4% 2vh;
+  }
+
+  .delfo-footer__marquee {
+    top: 8%;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
-  .delfo-footer a { transition: none; }
+  .delfo-footer__aurora,
+  .delfo-footer__marquee-track {
+    animation: none;
+  }
+
+  .delfo-footer__pill,
+  .delfo-footer__back-to-top,
+  .delfo-footer__marquee-track a,
+  .delfo-footer__social-icon {
+    transition: none;
+  }
+
+  .delfo-footer__pill:hover,
+  .delfo-footer__back-to-top:hover {
+    transform: none;
+  }
+
+  .delfo-footer__marquee-track a:hover .delfo-footer__social-icon {
+    transform: none;
+  }
+}
+/* ==========================================
+   WOD EXPLORER — FOOTER COMPACTO
+   ========================================== */
+
+.delfo-footer {
+  height: 100px;
+  min-height: 100px;
+  max-height: 100px;
+
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+/* Reducir el espacio interior */
+
+.delfo-footer__content {
+  padding: 8px 0;
+}
+
+/* Ajustar la barra de redes sociales */
+
+.delfo-footer__marquee {
+  top: 0;
+  padding: 3px 0;
+}
+
+/* Reducir el título */
+
+.delfo-footer__title {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* Ocultar el texto gigante decorativo */
+
+.delfo-footer__giant-wordmark {
+  display: none;
+}
+
+/* Móvil */
+
+@media (max-width: 639px) {
+  .delfo-footer {
+    height: 90px;
+    min-height: 90px;
+    max-height: 90px;
+  }
+}
+
+.delfo-footer__tagline {
+  margin: 0;
+
+  color: #a1a1aa;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(10px, 1vw, 12px);
+  font-weight: 500;
+
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ==========================================
+   HALASKA — FOOTER BOTTOM
+   ========================================== */
+
+.delfo-footer__bottom {
+  position: absolute;
+
+  right: 16px;
+  bottom: 8px;
+  left: 16px;
+
+  z-index: 6;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.delfo-footer__copyright {
+  margin: 0;
+
+  color: #a1a1aa;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.delfo-footer__back-to-top {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border: 1px solid #262626;
+  border-radius: 6px;
+
+  background: #000;
+  color: #ff6b00;
+
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .delfo-footer__back-to-top:hover {
+    border-color: #ff6b00;
+    background: rgb(255 107 0 / 12%);
+    color: #ff6b00;
+  }
 }

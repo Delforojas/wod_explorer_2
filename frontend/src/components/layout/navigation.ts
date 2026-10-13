@@ -12,28 +12,48 @@ export type NavigationIconName =
   | "plus"
   | "trophy";
 
+/* ========================================
+   NAVEGACIÓN PÚBLICA
+   ======================================== */
+
 export const publicNavigation: readonly NavigationItem[] = [
   { label: "Ejercicios", to: "/exercises", icon: "activity" },
   { label: "WODs", to: "/wods", icon: "barbell" },
 ];
 
+/* ========================================
+   NAVEGACIÓN PERSONAL
+   ======================================== */
+
 export const personalNavigation: readonly NavigationItem[] = [
   { label: "Mis WODs", to: "/my-wods", icon: "document" },
   { label: "Crear WOD", to: "/create-wod", icon: "plus" },
   { label: "Historial", to: "/history", icon: "clock" },
+  { label: "Registrar marca", to: "/exercise-results/new", icon: "plus" },
   { label: "Mis marcas", to: "/my-exercise-results", icon: "activity" },
   { label: "Mejores marcas", to: "/personal-bests", icon: "trophy" },
 ];
 
+/* ========================================
+   DOCK MÓVIL — 5 SECCIONES
+   ======================================== */
+
 export const mobilePrimaryNavigation: readonly NavigationItem[] = [
-  publicNavigation[0],
-  publicNavigation[1],
-  personalNavigation[1],
-  personalNavigation[2],
+  publicNavigation[0], // Ejercicios
+  publicNavigation[1], // WODs
+  personalNavigation[0], // Mis WODs
+
+  {
+    label: "Marcas",
+    to: "/my-exercise-results",
+    icon: "trophy",
+  },
+
+  personalNavigation[2], // Historial
 ];
 
-export const mobileMoreNavigation: readonly NavigationItem[] = [
-  personalNavigation[0],
-  personalNavigation[3],
-  personalNavigation[4],
-];
+/* ========================================
+   NAVEGACIÓN SECUNDARIA
+   ======================================== */
+
+export const mobileMoreNavigation: readonly NavigationItem[] = [];

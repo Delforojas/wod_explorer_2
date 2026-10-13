@@ -44,7 +44,8 @@ public class ExerciseResultService {
         User user = currentUserService.require();
 
         Exercise exercise = exerciseRepository.findByIdAndActiveTrue(request.exerciseId())
-                .orElseThrow(() -> new ResourceNotFoundException("Ejercicio no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Ejercicio no encontrado"));
 
         validateResult(request, exercise);
 
@@ -68,7 +69,8 @@ public class ExerciseResultService {
                             "Un resultado de peso requiere repeticiones y peso");
                 }
 
-                if (request.distanceM() != null || request.durationSeconds() != null) {
+                if (request.distanceM() != null
+                        || request.durationSeconds() != null) {
                     throw new IllegalArgumentException(
                             "Un resultado de peso solo puede contener repeticiones y peso");
                 }
@@ -122,9 +124,24 @@ public class ExerciseResultService {
                             "Un resultado de peso y distancia requiere peso y distancia");
                 }
 
-                if (request.reps() != null || request.durationSeconds() != null) {
+                if (request.reps() != null
+                        || request.durationSeconds() != null) {
                     throw new IllegalArgumentException(
                             "Un resultado de peso y distancia solo puede contener peso y distancia");
+                }
+            }
+
+            case DISTANCE_TIME -> {
+                if (request.distanceM() == null
+                        || request.durationSeconds() == null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de distancia y tiempo requiere distancia y duración");
+                }
+
+                if (request.reps() != null
+                        || request.weightKg() != null) {
+                    throw new IllegalArgumentException(
+                            "Un resultado de distancia y tiempo solo puede contener distancia y duración");
                 }
             }
         }

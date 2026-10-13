@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 
 import { deleteWod, getMyWods, getWodById, updateWod } from "../api/wodsApi";
+
 import { getExercises } from "../api/exercisesApi";
-import { createWodResult } from "../api/wodsResultsApi";
 
 import type { ExerciseResponse } from "../types/Exercise";
 
@@ -12,6 +13,7 @@ import type {
   WodDefinitionRequest,
   WodType,
 } from "../types/Wod";
+
 import MyWodsView from "../views/my-wods/MyWodsView";
 
 function MyWodsPage() {
@@ -22,61 +24,74 @@ function MyWodsPage() {
     null,
   );
 
-  const [registeringResult, setRegisteringResult] = useState(false);
-
-  const [resultPerformedAt, setResultPerformedAt] = useState("");
-  const [amrapRounds, setAmrapRounds] = useState<number | undefined>();
-  const [amrapExtraReps, setAmrapExtraReps] = useState<number | undefined>();
-  const [resultSuccess, setResultSuccess] = useState<string | null>(null);
-
   const [editingWod, setEditingWod] = useState<WodAggregateResponse | null>(
     null,
   );
 
   const [editName, setEditName] = useState("");
   const [editType, setEditType] = useState<WodType>("FOR_TIME");
+
   const [editRounds, setEditRounds] = useState<number | undefined>();
   const [editTimeCapSeconds, setEditTimeCapSeconds] = useState<
     number | undefined
   >();
+
   const [editItems, setEditItems] = useState<WodCompositionItemRequest[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Cargar WODs y ejercicios
+
   useEffect(() => {
+    let active = true;
+
     Promise.all([getMyWods(), getExercises()])
       .then(([wodsData, exercisesData]) => {
+        if (!active) return;
+
         setWods(wodsData);
         setExercises(exercisesData);
       })
       .catch(() => {
-        setError("No se pudieron cargar los datos");
+        if (active) {
+          setError("No se pudieron cargar los datos");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+    };
   }, []);
+
+  // Obtener ejercicio
 
   function getExercise(exerciseId: number) {
     return exercises.find((exercise) => exercise.id === exerciseId);
   }
 
+  // Consultar WOD
+
   async function handleSelectWod(id: number) {
     try {
       setError(null);
-      setResultSuccess(null);
-      setRegisteringResult(false);
 
       const wod = await getWodById(id);
-
       setSelectedWod(wod);
     } catch {
       setError("No se pudo cargar el WOD");
     }
   }
 
+  // Preparar edición
+
   function handleEditWod(wod: WodAggregateResponse) {
+    setSelectedWod(null);
     setEditingWod(wod);
 
     setEditName(wod.name);
@@ -108,64 +123,52 @@ function MyWodsPage() {
     }
   }
 
+  // Modificar ejercicios del WOD
+
   function handleEditExerciseChange(index: number, exerciseId: number) {
-    const newItems = [...editItems];
-
-    newItems[index] = {
-      exerciseId,
-    };
-
-    setEditItems(newItems);
+    setEditItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { exerciseId } : item,
+      ),
+    );
   }
 
   function handleEditRepsChange(index: number, reps: number | undefined) {
-    const newItems = [...editItems];
-
-    newItems[index] = {
-      ...newItems[index],
-      reps,
-    };
-
-    setEditItems(newItems);
+    setEditItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, reps } : item,
+      ),
+    );
   }
 
   function handleEditWeightChange(index: number, weightKg: number | undefined) {
-    const newItems = [...editItems];
-
-    newItems[index] = {
-      ...newItems[index],
-      weightKg,
-    };
-
-    setEditItems(newItems);
+    setEditItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, weightKg } : item,
+      ),
+    );
   }
 
   function handleEditDistanceChange(
     index: number,
     distanceM: number | undefined,
   ) {
-    const newItems = [...editItems];
-
-    newItems[index] = {
-      ...newItems[index],
-      distanceM,
-    };
-
-    setEditItems(newItems);
+    setEditItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, distanceM } : item,
+      ),
+    );
   }
 
   function handleEditDurationChange(
     index: number,
     durationSeconds: number | undefined,
   ) {
-    const newItems = [...editItems];
-
-    newItems[index] = {
-      ...newItems[index],
-      durationSeconds,
-    };
-
-    setEditItems(newItems);
+    setEditItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, durationSeconds } : item,
+      ),
+    );
   }
 
   function handleAddEditExercise() {
@@ -173,11 +176,9 @@ function MyWodsPage() {
       return;
     }
 
-    setEditItems([
-      ...editItems,
-      {
-        exerciseId: exercises[0].id,
-      },
+    setEditItems((currentItems) => [
+      ...currentItems,
+      { exerciseId: exercises[0].id },
     ]);
   }
 
@@ -187,7 +188,9 @@ function MyWodsPage() {
     );
   }
 
-  async function handleUpdateWod(event: React.FormEvent<HTMLFormElement>) {
+  // Guardar cambios
+
+  async function handleUpdateWod(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!editingWod) {
@@ -218,6 +221,8 @@ function MyWodsPage() {
     }
   }
 
+  // Eliminar WOD
+
   async function handleDeleteWod(id: number) {
     try {
       setError(null);
@@ -225,55 +230,18 @@ function MyWodsPage() {
       await deleteWod(id);
 
       setWods((currentWods) => currentWods.filter((wod) => wod.id !== id));
+
+      if (selectedWod?.id === id) {
+        setSelectedWod(null);
+      }
     } catch {
       setError("No se pudo eliminar el WOD");
     }
   }
 
-  async function handleCreateAmrapResult(
-    event: React.FormEvent<HTMLFormElement>,
-  ) {
-    event.preventDefault();
-
-    if (!selectedWod) {
-      return;
-    }
-
-    if (amrapRounds === undefined || amrapExtraReps === undefined) {
-      setError("Debes indicar las rondas y las repeticiones extra");
-      return;
-    }
-
-    try {
-      setError(null);
-      setResultSuccess(null);
-
-      await createWodResult({
-        wodVersionId: selectedWod.version.id,
-        performedAt: resultPerformedAt,
-        amrapRounds,
-        amrapExtraReps,
-      });
-
-      setResultSuccess("Resultado guardado correctamente");
-      setRegisteringResult(false);
-
-      setResultPerformedAt("");
-      setAmrapRounds(undefined);
-      setAmrapExtraReps(undefined);
-    } catch {
-      setError("No se pudo guardar el resultado");
-    }
-  }
-
-  function handleStartRegisterResult() {
-    setResultSuccess(null);
-    setRegisteringResult(true);
-  }
+  // Volver al listado
 
   function handleBack() {
-    setRegisteringResult(false);
-    setResultSuccess(null);
     setSelectedWod(null);
   }
 
@@ -282,11 +250,6 @@ function MyWodsPage() {
       wods={wods}
       exercises={exercises}
       selectedWod={selectedWod}
-      registeringResult={registeringResult}
-      resultPerformedAt={resultPerformedAt}
-      amrapRounds={amrapRounds}
-      amrapExtraReps={amrapExtraReps}
-      resultSuccess={resultSuccess}
       editingWod={editingWod}
       editName={editName}
       editType={editType}
@@ -313,12 +276,6 @@ function MyWodsPage() {
       onRemoveEditExercise={handleRemoveEditExercise}
       onUpdateWod={handleUpdateWod}
       onBack={handleBack}
-      onStartRegisterResult={handleStartRegisterResult}
-      onCancelRegisterResult={() => setRegisteringResult(false)}
-      onResultPerformedAtChange={setResultPerformedAt}
-      onAmrapRoundsChange={setAmrapRounds}
-      onAmrapExtraRepsChange={setAmrapExtraReps}
-      onCreateAmrapResult={handleCreateAmrapResult}
     />
   );
 }
