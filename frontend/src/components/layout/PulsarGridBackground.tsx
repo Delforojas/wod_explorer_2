@@ -5,11 +5,19 @@ interface Point {
   y: number;
 }
 
+/* ==========================================
+   CONFIGURACIÓN
+========================================== */
+
 const GRID_SPACING = 36;
 const MAX_DEVICE_PIXEL_RATIO = 2;
 const DEFAULT_PULSAR_COLOR = "#ff6b00";
 
-function hexToRgba(color: string, opacity: number) {
+/* ==========================================
+   CONVERSIÓN HEX → RGBA
+========================================== */
+
+function hexToRgba(color: string, opacity: number): string {
   const hex = color.replace("#", "");
 
   if (hex.length !== 6) {
@@ -20,12 +28,20 @@ function hexToRgba(color: string, opacity: number) {
   const green = Number.parseInt(hex.slice(2, 4), 16);
   const blue = Number.parseInt(hex.slice(4, 6), 16);
 
-  return `rgb(${red} ${green} ${blue} / ${opacity})`;
+  return `rgba(${red}, ${green}, ${blue}, ${opacity})`;
 }
+
+/* ==========================================
+   PULSAR GRID BACKGROUND
+========================================== */
 
 function PulsarGridBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mousePositionRef = useRef({ x: 0, y: 0 });
+
+  const mousePositionRef = useRef({
+    x: 0,
+    y: 0,
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -35,29 +51,50 @@ function PulsarGridBackground() {
       return;
     }
 
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext("2d", {
+      alpha: true,
+    });
 
     if (!context) {
       return;
     }
 
+    /* ==========================================
+       PREFERENCIAS DEL DISPOSITIVO
+    ========================================== */
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const coarsePointer = window.matchMedia("(pointer: coarse)");
 
-    // Color naranja configurable desde CSS.
+    /* ==========================================
+       COLOR DEL GRID
+    ========================================== */
+
     const accent =
       getComputedStyle(canvas).getPropertyValue("--pulsar-color").trim() ||
       DEFAULT_PULSAR_COLOR;
 
+    /* ==========================================
+       ESTADO INTERNO
+    ========================================== */
+
     let points: Point[] = [];
+
     let width = 0;
     let height = 0;
+
     let animationFrame = 0;
+
     let isVisible = document.visibilityState === "visible";
+
     let time = 0;
 
     const isStatic = () => reducedMotion.matches || coarsePointer.matches;
+
+    /* ==========================================
+       DIBUJAR GRID
+    ========================================== */
 
     const draw = (animated: boolean) => {
       context.clearRect(0, 0, width, height);
@@ -72,17 +109,28 @@ function PulsarGridBackground() {
           ? Math.max(0, Math.sin(distance * 0.035 - time * 0.003))
           : 0;
 
-        const radius = 0.65 + wave * 1.35;
-        const opacity = animated ? 0.035 + wave * 0.2 : 0.07;
+        /*
+         * Escritorio: animación original.
+         * Móvil: puntos estáticos más visibles.
+         */
+
+        const radius = animated ? 0.65 + wave * 1.35 : 1.2;
+
+        const opacity = animated ? 0.035 + wave * 0.2 : 0.25;
 
         context.beginPath();
+
         context.arc(point.x, point.y, radius, 0, Math.PI * 2);
 
-        // Dibujar los puntos en naranja.
         context.fillStyle = hexToRgba(accent, opacity);
+
         context.fill();
       }
     };
+
+    /* ==========================================
+       DETENER ANIMACIÓN
+    ========================================== */
 
     const stopAnimation = () => {
       if (animationFrame) {
@@ -91,6 +139,10 @@ function PulsarGridBackground() {
       }
     };
 
+    /* ==========================================
+       ANIMACIÓN
+    ========================================== */
+
     const animate = () => {
       if (!isVisible || isStatic()) {
         animationFrame = 0;
@@ -98,16 +150,25 @@ function PulsarGridBackground() {
       }
 
       time += 1;
+
       draw(true);
 
       animationFrame = requestAnimationFrame(animate);
     };
+
+    /* ==========================================
+       INICIAR ANIMACIÓN
+    ========================================== */
 
     const startAnimation = () => {
       if (!animationFrame && isVisible && !isStatic()) {
         animationFrame = requestAnimationFrame(animate);
       }
     };
+
+    /* ==========================================
+       REDIMENSIONAR CANVAS
+    ========================================== */
 
     const resize = () => {
       const bounds = container.getBoundingClientRect();
@@ -117,37 +178,83 @@ function PulsarGridBackground() {
         MAX_DEVICE_PIXEL_RATIO,
       );
 
-      width = Math.max(1, bounds.width);
-      height = Math.max(1, bounds.height);
+      /*
+       * IMPORTANTE:
+       *
+       * El ancho corresponde al contenido principal.
+       * La altura corresponde únicamente al viewport.
+       *
+       * No utilizamos bounds.height porque en
+       * Ejercicios puede superar los 30.000 px.
+       */
+
+      const nextWidth = Math.max(1, bounds.width);
+      const nextHeight = Math.max(1, window.innerHeight);
+
+      /*
+       * Mantener el Canvas alineado con .app-main.
+       * En escritorio respeta el desplazamiento
+       * provocado por la sidebar.
+       */
+
+      canvas.style.left = `${bounds.left}px`;
+      canvas.style.width = `${nextWidth}px`;
+
+      /*
+       * Evitar recrear el buffer cuando solamente
+       * cambia la altura total del contenido.
+       */
+
+      if (width === nextWidth && height === nextHeight) {
+        return;
+      }
+
+      width = nextWidth;
+      height = nextHeight;
+
+      /* Resolución interna limitada */
 
       canvas.width = Math.round(width * pixelRatio);
+
       canvas.height = Math.round(height * pixelRatio);
 
+      /* Coordenadas CSS */
+
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+      /* ==========================================
+         GENERAR PUNTOS
+      ========================================== */
 
       points = [];
 
       for (let x = GRID_SPACING / 2; x < width; x += GRID_SPACING) {
         for (let y = GRID_SPACING / 2; y < height; y += GRID_SPACING) {
-          points.push({ x, y });
+          points.push({
+            x,
+            y,
+          });
         }
       }
 
-      if (
-        mousePositionRef.current.x === 0 &&
-        mousePositionRef.current.y === 0
-      ) {
-        mousePositionRef.current = {
-          x: width / 2,
-          y: height / 2,
-        };
-      }
+      mousePositionRef.current = {
+        x: width / 2,
+        y: height / 2,
+      };
 
       draw(!isStatic());
     };
 
+    /* ==========================================
+       SEGUIMIENTO DEL RATÓN
+    ========================================== */
+
     const handlePointerMove = (event: PointerEvent) => {
-      const bounds = container.getBoundingClientRect();
+      if (isStatic()) {
+        return;
+      }
+
+      const bounds = canvas.getBoundingClientRect();
 
       mousePositionRef.current = {
         x: event.clientX - bounds.left,
@@ -155,25 +262,46 @@ function PulsarGridBackground() {
       };
     };
 
+    /* ==========================================
+       VISIBILIDAD DE LA PÁGINA
+    ========================================== */
+
     const handleVisibilityChange = () => {
       isVisible = document.visibilityState === "visible";
 
       if (isVisible) {
+        draw(!isStatic());
         startAnimation();
       } else {
         stopAnimation();
       }
     };
 
+    /* ==========================================
+       CAMBIO DE PREFERENCIAS
+    ========================================== */
+
     const handleMotionPreferenceChange = () => {
       stopAnimation();
+
       draw(!isStatic());
+
       startAnimation();
     };
+
+    /* ==========================================
+       OBSERVAR CAMBIOS DE TAMAÑO
+    ========================================== */
 
     const observer = new ResizeObserver(resize);
 
     observer.observe(container);
+
+    /* ==========================================
+       EVENTOS
+    ========================================== */
+
+    window.addEventListener("resize", resize);
 
     container.addEventListener("pointermove", handlePointerMove, {
       passive: true,
@@ -185,12 +313,24 @@ function PulsarGridBackground() {
 
     coarsePointer.addEventListener("change", handleMotionPreferenceChange);
 
+    /* ==========================================
+       INICIALIZACIÓN
+    ========================================== */
+
     resize();
+
     startAnimation();
+
+    /* ==========================================
+       LIMPIEZA
+    ========================================== */
 
     return () => {
       stopAnimation();
+
       observer.disconnect();
+
+      window.removeEventListener("resize", resize);
 
       container.removeEventListener("pointermove", handlePointerMove);
 

@@ -24,9 +24,12 @@ import RegisterExerciseResultPage from "./pages/RegisterExerciseResultPage";
 import MyWodResultsPage from "./pages/MyWodResultsPage";
 import RegisterWodResultPage from "./pages/RegisterWodResultPage";
 
+import RegisterPage from "./pages/RegisterPage";
+
 function App() {
   return (
     <AppLayout>
+
       <Routes>
         {/* Páginas públicas */}
 
@@ -43,6 +46,8 @@ function App() {
         {/* Autenticación */}
 
         <Route path="/login" element={<LoginPage />} />
+
+        <Route path="/register" element={<RegisterPage />} />
 
         <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
 

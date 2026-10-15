@@ -1,94 +1,43 @@
 import type { ExercisesViewProps } from "./ExercisesView.Types";
 
+import ExercisesList from "./components/ExercisesList";
+import ExerciseDetail from "./components/ExerciseDetail";
+
 function ExercisesView({
   exercises,
   selectedExercise,
   loading,
   error,
-  onSelectExercise,
 }: ExercisesViewProps) {
   if (loading) {
-    return <p className="ui-loading">Cargando ejercicios...</p>;
+    return (
+      <section className="exercise-page">
+        <p className="exercise-empty" role="status">
+          Cargando ejercicios...
+        </p>
+      </section>
+    );
   }
 
   if (error) {
     return (
-      <p className="ui-error" role="alert">
-        {error}
-      </p>
+      <section className="exercise-page">
+        <p className="exercise-error" role="alert">
+          {error}
+        </p>
+      </section>
     );
   }
 
   return (
-    <section className="page page--catalog">
-      <header className="page-header">
-        <p className="page-eyebrow">Catálogo</p>
-        <h1>Ejercicios</h1>
-      </header>
+    <section className="exercise-page">
+      <div className="exercise-container">
+        <ExercisesList exercises={exercises} />
 
-      {/* LISTADO DE EJERCICIOS */}
-
-      <div className="resource-list glass-panel">
-        {exercises.map((exercise) => (
-          <article
-            className="resource-row resource-row-static"
-            key={exercise.id}
-          >
-            <header>
-              <h2>{exercise.name}</h2>
-            </header>
-
-            <div className="resource-meta">
-              <span>{exercise.category}</span>
-              <span>{exercise.measurementType}</span>
-            </div>
-
-            <button
-              className="row-action exercise-row-action"
-              type="button"
-              aria-label={`Abrir detalle de ${exercise.name}`}
-              onClick={() => onSelectExercise(exercise.id)}
-            >
-              <span aria-hidden="true">→</span>
-            </button>
-          </article>
-        ))}
+        {selectedExercise && (
+          <ExerciseDetail selectedExercise={selectedExercise} />
+        )}
       </div>
-
-      {/* DETALLE DEL EJERCICIO */}
-
-      {selectedExercise && (
-        <section className="surface detail-section glass-panel">
-          <h3>Detalle del ejercicio</h3>
-
-          <dl className="detail-data">
-            <div>
-              <dt>ID</dt>
-              <dd>{selectedExercise.id}</dd>
-            </div>
-
-            <div>
-              <dt>Nombre</dt>
-              <dd>{selectedExercise.name}</dd>
-            </div>
-
-            <div>
-              <dt>Categoría</dt>
-              <dd>{selectedExercise.category}</dd>
-            </div>
-
-            <div>
-              <dt>Medición</dt>
-              <dd>{selectedExercise.measurementType}</dd>
-            </div>
-
-            <div>
-              <dt>Activo</dt>
-              <dd>{selectedExercise.active ? "Sí" : "No"}</dd>
-            </div>
-          </dl>
-        </section>
-      )}
     </section>
   );
 }

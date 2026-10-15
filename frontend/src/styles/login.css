@@ -1,0 +1,490 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   LOGIN + REGISTER — GLASSMORPHISM
+========================================== */
+
+/* ==========================================
+   CONTENEDOR PRINCIPAL
+========================================== */
+
+.login-page {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  width: 100%;
+  min-height: 100%;
+
+  padding: 24px 20px 100px;
+
+  box-sizing: border-box;
+
+  background: transparent;
+  color: #ffffff;
+}
+
+/* ==========================================
+   TARJETA GLASSMORPHISM
+========================================== */
+
+.login-card {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 430px;
+
+  padding: 40px 35px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 28px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================
+   LOGOTIPO
+========================================== */
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 58px;
+  height: 58px;
+
+  margin-bottom: 24px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.login-logo span {
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  letter-spacing: -1px;
+  color: #ffffff;
+}
+
+/* ==========================================
+   ENCABEZADO
+========================================== */
+
+.login-header {
+  width: 100%;
+  text-align: center;
+
+  margin-bottom: 32px;
+}
+
+.login-eyebrow {
+  margin: 0 0 10px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 3px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.login-header h1 {
+  margin: 0 0 12px;
+
+  font-family: "Space Grotesk", sans-serif;
+
+  font-size: 29px;
+  font-weight: 600;
+
+  letter-spacing: -1px;
+  line-height: 1.2;
+
+  color: #ffffff;
+}
+
+.login-description {
+  max-width: 300px;
+
+  margin: 0 auto;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ==========================================
+   FORMULARIO
+========================================== */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: 20px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: 9px;
+}
+
+.login-field label {
+  font-size: 12px;
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ==========================================
+   INPUTS
+========================================== */
+
+.login-field input {
+  width: 100%;
+  min-height: 48px;
+
+  padding: 13px 17px;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.login-field input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.login-field input:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.login-field input:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+
+  background: rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.07);
+}
+
+.login-field input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   BOTÓN PRINCIPAL
+========================================== */
+
+.login-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  margin-top: 8px;
+
+  padding: 13px 20px;
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(255, 255, 255, 0.12);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.login-submit:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22);
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.login-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.login-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================
+   SEPARADOR
+========================================== */
+
+.login-divider {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  gap: 15px;
+
+  margin: 28px 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+
+  flex: 1;
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.login-divider span {
+  font-size: 11px;
+  white-space: nowrap;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================
+   BOTÓN GOOGLE
+========================================== */
+
+.login-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+  gap: 12px;
+
+  padding: 13px 20px;
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: linear-gradient(180deg, #232526, #2d2e30);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    filter 0.25s ease,
+    transform 0.25s ease;
+}
+
+.login-google:hover:not(:disabled) {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+.login-google svg {
+  flex-shrink: 0;
+}
+
+.login-google:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   ENLACES LOGIN / REGISTER
+========================================== */
+
+.login-register {
+  margin: 25px 0 0;
+
+  text-align: center;
+
+  font-size: 12px;
+  line-height: 1.6;
+
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.login-register a {
+  color: #ffffff;
+
+  font-weight: 600;
+
+  text-decoration: underline;
+  text-underline-offset: 4px;
+
+  transition: opacity 0.2s ease;
+}
+
+.login-register a:hover {
+  opacity: 0.7;
+}
+
+/* ==========================================
+   MENSAJES DE ERROR
+========================================== */
+
+.auth-error {
+  width: 100%;
+
+  margin: 0;
+  padding: 12px 16px;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+
+  background: rgba(239, 68, 68, 0.08);
+
+  color: #fca5a5;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   ACCESIBILIDAD
+========================================== */
+
+.login-submit:focus-visible,
+.login-google:focus-visible,
+.login-register a:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 768px) {
+  .login-page {
+    padding: 16px 20px 110px;
+  }
+
+  .login-card {
+    padding: 35px 30px;
+  }
+}
+
+/* ==========================================
+   MÓVILES
+========================================== */
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 8px 16px 110px;
+  }
+
+  .login-card {
+    padding: 32px 24px;
+    border-radius: 22px;
+  }
+
+  .login-logo {
+    width: 52px;
+    height: 52px;
+
+    margin-bottom: 20px;
+  }
+
+  .login-header {
+    margin-bottom: 28px;
+  }
+
+  .login-header h1 {
+    font-size: 25px;
+  }
+
+  .login-description {
+    font-size: 12px;
+  }
+
+  .login-form {
+    gap: 18px;
+  }
+
+  .login-register {
+    margin-top: 22px;
+  }
+}
+
+/* ==========================================
+   MOVIMIENTO REDUCIDO
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .login-field input,
+  .login-submit,
+  .login-google,
+  .login-register a {
+    transition: none;
+  }
+
+  .login-submit:hover,
+  .login-google:hover {
+    transform: none;
+  }
+}

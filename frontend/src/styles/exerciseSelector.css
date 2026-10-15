@@ -1,0 +1,354 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EXERCISE SELECTOR — GLASSMORPHISM
+========================================== */
+
+.exercise-selector {
+  --selector-orange: #ff6b00;
+  --selector-orange-light: #ff9a3c;
+  --selector-border: rgba(255, 255, 255, 0.09);
+
+  --selector-background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 12px;
+}
+
+/* ==========================================
+   ETIQUETA
+========================================== */
+
+.exercise-selector-label {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ==========================================
+   CONTENEDOR DEL BUSCADOR
+========================================== */
+
+.exercise-selector-control {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-height: 52px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+
+  background: var(--selector-background);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* FOCO */
+
+.exercise-selector-control:focus-within {
+  border-color: var(--selector-orange);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    0 0 0 3px rgba(255, 107, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================
+   INPUT
+========================================== */
+
+.exercise-selector-input {
+  display: block;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 52px;
+
+  margin: 0;
+  padding: 14px 48px 14px 20px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 20px;
+
+  background: transparent;
+
+  color: #ffffff;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  line-height: 1.4;
+
+  outline: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.exercise-selector-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+  opacity: 1;
+}
+
+/* ==========================================
+   FLECHA
+========================================== */
+
+.exercise-selector-arrow {
+  position: absolute;
+
+  right: 20px;
+  top: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translateY(-50%);
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 20px;
+  line-height: 1;
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   EJERCICIO SELECCIONADO
+========================================== */
+
+.exercise-selector-selected {
+  width: 100%;
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 1.6;
+
+  color: var(--selector-orange-light);
+}
+
+/* ==========================================
+   LISTA DESPLEGABLE
+========================================== */
+
+.exercise-selector-list {
+  position: absolute;
+
+  top: calc(100% + 6px);
+  left: 0;
+
+  z-index: 1000;
+
+  width: 100%;
+  max-height: 280px;
+
+  margin: 0;
+  padding: 8px;
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  list-style: none;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+
+  background: #181818;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(255, 107, 0, 0.05);
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 107, 0, 0.5) transparent;
+}
+
+/* SCROLLBAR — CHROME / SAFARI */
+
+.exercise-selector-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.exercise-selector-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.exercise-selector-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 0, 0.4);
+  border-radius: 10px;
+}
+
+/* ==========================================
+   OPCIONES
+========================================== */
+
+.exercise-selector-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 54px;
+
+  padding: 10px 14px;
+
+  box-sizing: border-box;
+
+  gap: 5px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* OPCIÓN ACTIVA */
+
+.exercise-selector-option-active,
+.exercise-selector-option[aria-selected="true"] {
+  border-color: rgba(255, 107, 0, 0.25);
+  background: rgba(255, 107, 0, 0.12);
+}
+
+/* HOVER */
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-selector-control:hover {
+    border-color: rgba(255, 107, 0, 0.5);
+  }
+
+  .exercise-selector-option:hover {
+    border-color: rgba(255, 107, 0, 0.3);
+    background: rgba(255, 107, 0, 0.14);
+  }
+}
+
+/* ==========================================
+   NOMBRE DEL EJERCICIO
+========================================== */
+
+.exercise-selector-option-name {
+  width: 100%;
+
+  color: #ffffff;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.4;
+
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   CATEGORÍA
+========================================== */
+
+.exercise-selector-option-category {
+  font-size: 10px;
+  font-weight: 500;
+
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ==========================================
+   SIN RESULTADOS
+========================================== */
+
+.exercise-selector-empty {
+  padding: 20px 14px;
+
+  text-align: center;
+
+  font-size: 12px;
+  line-height: 1.6;
+
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================
+   MÓVILES
+========================================== */
+
+@media (max-width: 480px) {
+  .exercise-selector {
+    width: 100%;
+  }
+
+  .exercise-selector-control,
+  .exercise-selector-input {
+    min-height: 50px;
+  }
+
+  .exercise-selector-input {
+    padding: 14px 44px 14px 18px;
+    font-size: 16px;
+  }
+
+  .exercise-selector-list {
+    max-height: min(280px, 45vh);
+    border-radius: 16px;
+  }
+
+  .exercise-selector-option {
+    min-height: 52px;
+    padding: 12px;
+  }
+
+  .exercise-selector-option-name {
+    font-size: 13px;
+  }
+}
+
+/* ==========================================
+   ACCESIBILIDAD
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-selector-control,
+  .exercise-selector-option {
+    transition: none;
+  }
+}

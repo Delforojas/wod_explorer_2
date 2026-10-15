@@ -1,0 +1,175 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EXERCISE RESULT — FORM
+========================================== */
+
+.exercise-result-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  margin: 0;
+  padding: 32px;
+
+  box-sizing: border-box;
+
+  gap: 24px;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* SELECTOR */
+
+.exercise-result-selector {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: 12px;
+}
+
+.exercise-result-selector label {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.exercise-result-selector select {
+  width: 100%;
+  min-height: 52px;
+
+  padding: 14px 20px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+
+  background: #222222;
+  color: #ffffff;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+
+  outline: none;
+}
+
+.exercise-result-selector select:focus-visible {
+  border-color: #ff6b00;
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+}
+
+/* TIPO DE MEDICIÓN */
+
+.exercise-result-measurement {
+  margin: 0;
+
+  padding: 10px 14px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 0, 0.18);
+
+  background: rgba(255, 107, 0, 0.08);
+
+  color: #ff9a3c;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* BOTÓN */
+
+.exercise-result-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 50px;
+
+  margin-top: 8px;
+  padding: 14px 22px;
+
+  border: 1px solid #ff6b00;
+  border-radius: 50px;
+
+  background: #ff6b00;
+  color: #ffffff;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.exercise-result-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.exercise-result-submit:focus-visible {
+  outline: 2px solid #ff9a3c;
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-result-submit:not(:disabled) {
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .exercise-result-submit:not(:disabled):hover {
+    background: #ff8533;
+    transform: translateY(-2px);
+  }
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .exercise-result-form {
+    width: calc(100% - 48px);
+
+    padding: 24px 20px;
+    gap: 20px;
+
+    border-radius: 20px;
+  }
+
+  .exercise-result-selector select {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-result-submit {
+    transition: none;
+  }
+
+  .exercise-result-submit:hover {
+    transform: none;
+  }
+}

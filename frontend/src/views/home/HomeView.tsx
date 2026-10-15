@@ -2,29 +2,48 @@ import { Link } from "react-router-dom";
 
 function HomeView() {
   return (
-    <section className="page home-page">
-      <header className="home-intro">
-        <p className="page-eyebrow">Registro de entrenamiento</p>
-        <h1>WOD Explorer</h1>
-        <p>Explora WODs, ejercicios y registra tus resultados.</p>
-      </header>
+    <section className="home-page">
+      <div className="home-card">
+        {/* Logotipo */}
+        <div className="home-logo">
+          <span>WE</span>
+        </div>
 
-      <div className="home-primary-action">
-        <Link className="button-primary home-primary-link" to="/wods">
-          Explorar WODs
-        </Link>
+        {/* Encabezado */}
+        <header className="home-header">
+          <p className="home-eyebrow">TU ESPACIO DE ENTRENAMIENTO</p>
+
+          <h1>WOD Explorer</h1>
+
+          <p className="home-description">
+            Explora entrenamientos de CrossFit, descubre ejercicios y registra
+            tus resultados para superar tus marcas personales.
+          </p>
+        </header>
+
+        {/* Acción principal */}
+        <div className="home-form">
+          <Link className="home-submit" to="/wods">
+            Explorar WODs →
+          </Link>
+        </div>
+
+        {/* Separador */}
+        <div className="home-divider">
+          <span>EXPLORA MÁS</span>
+        </div>
+
+        {/* Accesos secundarios */}
+        <nav className="home-form" aria-label="Accesos principales">
+          <Link className="home-link" to="/exercises">
+            Catálogo de ejercicios →
+          </Link>
+
+          <Link className="home-link" to="/login">
+            Iniciar sesión →
+          </Link>
+        </nav>
       </div>
-
-      <nav className="home-routes" aria-label="Accesos principales">
-        <Link to="/exercises">
-          <span>Catálogo de ejercicios</span>
-          <span aria-hidden="true">→</span>
-        </Link>
-        <Link to="/login">
-          <span>Iniciar sesión para registrar resultados</span>
-          <span aria-hidden="true">→</span>
-        </Link>
-      </nav>
     </section>
   );
 }

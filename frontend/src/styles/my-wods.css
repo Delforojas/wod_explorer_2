@@ -1,0 +1,272 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   MY WODS — GLASSMORPHISM
+========================================== */
+
+/* NAVEGACIÓN PRINCIPAL */
+
+.my-wods-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  width: 100%;
+  gap: 12px;
+}
+
+/* ENLACES DE NAVEGACIÓN */
+
+.my-wods-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 1 1 140px;
+
+  min-height: 48px;
+
+  padding: 13px 20px;
+
+  box-sizing: border-box;
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(255, 255, 255, 0.12);
+
+  color: #ffffff;
+  text-decoration: none;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.my-wods-nav-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+/* ACCIONES DE CADA TARJETA */
+
+.my-wods-actions {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+.my-wods-actions .wod-card-action {
+  margin-top: 0;
+}
+
+/* BOTONES SECUNDARIOS */
+
+.my-wods-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  padding: 13px 20px;
+
+  box-sizing: border-box;
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: linear-gradient(180deg, #232526, #2d2e30);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    filter 0.25s ease,
+    transform 0.25s ease;
+}
+
+.my-wods-button:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+/* ELIMINAR */
+
+.my-wods-delete {
+  border-color: rgba(239, 68, 68, 0.25);
+
+  background: rgba(239, 68, 68, 0.08);
+
+  color: #fca5a5;
+}
+
+.my-wods-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* FORMULARIO DE EDICIÓN */
+
+.my-wods-edit-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 650px;
+
+  padding: 40px 35px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 28px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  gap: 20px;
+}
+
+/* ELEMENTOS DEL FORMULARIO */
+
+.my-wods-edit-form .form-field {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: 9px;
+}
+
+.my-wods-edit-form .form-field label {
+  font-size: 12px;
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* INPUTS Y SELECTORES */
+
+.my-wods-edit-form input,
+.my-wods-edit-form select {
+  width: 100%;
+  min-height: 48px;
+
+  padding: 13px 17px;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: #242424;
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.my-wods-edit-form input:focus-visible,
+.my-wods-edit-form select:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* EJERCICIOS EDITABLES */
+
+.my-wods-edit-item {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  gap: 16px;
+}
+
+/* ACCESIBILIDAD */
+
+.my-wods-nav-link:focus-visible,
+.my-wods-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+}
+
+/* TABLETS */
+
+@media (max-width: 768px) {
+  .my-wods-edit-form {
+    padding: 35px 30px;
+  }
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .my-wods-navigation {
+    padding: 0 24px;
+    box-sizing: border-box;
+  }
+
+  .my-wods-nav-link {
+    flex-basis: 100%;
+  }
+
+  .my-wods-actions {
+    gap: 12px;
+  }
+
+  .my-wods-edit-form {
+    padding: 32px 24px;
+    border-radius: 28px;
+  }
+
+  .my-wods-edit-item {
+    padding: 20px 16px;
+  }
+}
+
+/* MOVIMIENTO REDUCIDO */
+
+@media (prefers-reduced-motion: reduce) {
+  .my-wods-nav-link,
+  .my-wods-button {
+    transition: none;
+  }
+
+  .my-wods-nav-link:hover,
+  .my-wods-button:hover {
+    transform: none;
+  }
+}

@@ -10,7 +10,7 @@
 
 .site-navbar {
   border-bottom: 1px solid #262626;
-  background: #000000;
+  background: #e64906;
 }
 
 .navbar-header {
@@ -225,7 +225,7 @@
 }
 
 .auth-user {
-  color: #a1a1aa;
+  color: #f1f1f4;
   font-size: 13px;
 }
 
@@ -236,7 +236,7 @@
   padding: var(--space-2) var(--space-3);
 
   background: transparent;
-  color: #a1a1aa;
+  color: #eeeef2;
 
   font-size: 13px;
   text-decoration: none;

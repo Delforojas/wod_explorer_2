@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+
+import { useNavigate } from "react-router-dom";
 
 import { getExercises } from "../api/exercisesApi";
 import { createExerciseResult } from "../api/exerciseResultsApi";
@@ -6,24 +9,42 @@ import { createExerciseResult } from "../api/exerciseResultsApi";
 import type { ExerciseResponse } from "../types/Exercise";
 import type { ExerciseResultRequest } from "../api/apiTypes";
 
+import RegisterExerciseResultView from "../views/register-exercise-result/RegisterExerciseResultView";
+
 function RegisterExerciseResultPage() {
+  const navigate = useNavigate();
+
+  // TEMPORIZADOR DE REDIRECCIÓN
+
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ESTADO
+
   const [exercises, setExercises] = useState<ExerciseResponse[]>([]);
+
   const [selectedExerciseId, setSelectedExerciseId] = useState<
     number | undefined
   >(undefined);
 
   const [reps, setReps] = useState<number | undefined>(undefined);
+
   const [weightKg, setWeightKg] = useState<number | undefined>(undefined);
+
   const [distanceM, setDistanceM] = useState<number | undefined>(undefined);
+
   const [durationSeconds, setDurationSeconds] = useState<number | undefined>(
     undefined,
   );
+
   const [performedAt, setPerformedAt] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // CARGAR EJERCICIOS
 
   useEffect(() => {
     getExercises()
@@ -38,9 +59,23 @@ function RegisterExerciseResultPage() {
       });
   }, []);
 
+  // LIMPIAR TEMPORIZADOR AL SALIR DE LA PÁGINA
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current !== null) {
+        clearTimeout(redirectTimer.current);
+      }
+    };
+  }, []);
+
+  // EJERCICIO SELECCIONADO
+
   const selectedExercise = exercises.find(
     (exercise) => exercise.id === selectedExerciseId,
   );
+
+  // REINICIAR CAMPOS
 
   function resetResultFields() {
     setReps(undefined);
@@ -49,8 +84,11 @@ function RegisterExerciseResultPage() {
     setDurationSeconds(undefined);
   }
 
+  // CAMBIAR EJERCICIO
+
   function handleExerciseChange(value: string) {
     resetResultFields();
+
     setError(null);
     setSuccess(null);
 
@@ -62,11 +100,17 @@ function RegisterExerciseResultPage() {
     setSelectedExerciseId(Number(value));
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  // REGISTRAR RESULTADO
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    // Evitar envíos duplicados durante la petición o tras el éxito
+    if (submitting || success !== null) {
+      return;
+    }
+
     setError(null);
-    setSuccess(null);
 
     if (!selectedExercise) {
       setError("Selecciona un ejercicio");
@@ -82,6 +126,8 @@ function RegisterExerciseResultPage() {
       exerciseId: selectedExercise.id,
       performedAt,
     };
+
+    // VALIDAR SEGÚN EL TIPO DE MEDICIÓN
 
     switch (selectedExercise.measurementType) {
       case "WEIGHT":
@@ -130,6 +176,7 @@ function RegisterExerciseResultPage() {
         request.weightKg = weightKg;
         request.distanceM = distanceM;
         break;
+
       case "DISTANCE_TIME":
         if (distanceM === undefined || durationSeconds === undefined) {
           setError("Introduce la distancia y la duración");
@@ -141,16 +188,37 @@ function RegisterExerciseResultPage() {
         break;
     }
 
+    // GUARDAR RESULTADO EN EL BACKEND
+
     try {
       setSubmitting(true);
 
       await createExerciseResult(request);
 
-      setSuccess("Marca registrada correctamente");
+      // MOSTRAR CONFIRMACIÓN
+
+      setSuccess("✓ Marca registrada correctamente");
+
+      // LIMPIAR FORMULARIO
 
       setSelectedExerciseId(undefined);
       setPerformedAt("");
+
       resetResultFields();
+
+      // CANCELAR TEMPORIZADOR ANTERIOR SI EXISTE
+
+      if (redirectTimer.current !== null) {
+        clearTimeout(redirectTimer.current);
+      }
+
+      // REDIRIGIR DESPUÉS DE 3 SEGUNDOS
+
+      redirectTimer.current = setTimeout(() => {
+        navigate("/my-exercise-results", {
+          replace: true,
+        });
+      }, 3000);
     } catch {
       setError("No se pudo registrar la marca");
     } finally {
@@ -158,233 +226,28 @@ function RegisterExerciseResultPage() {
     }
   }
 
-  if (loading) {
-    return <p>Cargando ejercicios...</p>;
-  }
-
   return (
-    <section>
-      <h1>Registrar marca</h1>
-
-      <p>Registra un nuevo resultado para uno de tus ejercicios.</p>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="exercise">Ejercicio</label>
-
-          <select
-            id="exercise"
-            value={selectedExerciseId ?? ""}
-            onChange={(event) => handleExerciseChange(event.target.value)}
-          >
-            <option value="">Selecciona un ejercicio</option>
-
-            {exercises.map((exercise) => (
-              <option key={exercise.id} value={exercise.id}>
-                {exercise.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {selectedExercise && (
-          <>
-            <p>Tipo de medición: {selectedExercise.measurementType}</p>
-
-            {selectedExercise.measurementType === "WEIGHT" && (
-              <>
-                <div>
-                  <label htmlFor="reps">Repeticiones</label>
-                  <input
-                    id="reps"
-                    type="number"
-                    min="0"
-                    value={reps ?? ""}
-                    onChange={(event) =>
-                      setReps(
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="weightKg">Peso (kg)</label>
-                  <input
-                    id="weightKg"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={weightKg ?? ""}
-                    onChange={(event) =>
-                      setWeightKg(
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              </>
-            )}
-
-            {selectedExercise.measurementType === "REPS" && (
-              <div>
-                <label htmlFor="reps">Repeticiones</label>
-                <input
-                  id="reps"
-                  type="number"
-                  min="0"
-                  value={reps ?? ""}
-                  onChange={(event) =>
-                    setReps(
-                      event.target.value === ""
-                        ? undefined
-                        : Number(event.target.value),
-                    )
-                  }
-                />
-              </div>
-            )}
-
-            {selectedExercise.measurementType === "TIME" && (
-              <div>
-                <label htmlFor="durationSeconds">Duración (segundos)</label>
-                <input
-                  id="durationSeconds"
-                  type="number"
-                  min="0"
-                  value={durationSeconds ?? ""}
-                  onChange={(event) =>
-                    setDurationSeconds(
-                      event.target.value === ""
-                        ? undefined
-                        : Number(event.target.value),
-                    )
-                  }
-                />
-              </div>
-            )}
-
-            {selectedExercise.measurementType === "DISTANCE" && (
-              <div>
-                <label htmlFor="distanceM">Distancia (m)</label>
-                <input
-                  id="distanceM"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={distanceM ?? ""}
-                  onChange={(event) =>
-                    setDistanceM(
-                      event.target.value === ""
-                        ? undefined
-                        : Number(event.target.value),
-                    )
-                  }
-                />
-              </div>
-            )}
-            {selectedExercise.measurementType === "DISTANCE_TIME" && (
-              <>
-                <div>
-                  <label htmlFor="distanceM">Distancia (m)</label>
-                  <input
-                    id="distanceM"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={distanceM ?? ""}
-                    onChange={(event) =>
-                      setDistanceM(
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="durationSeconds">Duración (segundos)</label>
-                  <input
-                    id="durationSeconds"
-                    type="number"
-                    min="0"
-                    value={durationSeconds ?? ""}
-                    onChange={(event) =>
-                      setDurationSeconds(
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              </>
-            )}
-            {selectedExercise.measurementType === "WEIGHT_DISTANCE" && (
-              <>
-                <div>
-                  <label htmlFor="weightKg">Peso (kg)</label>
-                  <input
-                    id="weightKg"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={weightKg ?? ""}
-                    onChange={(event) =>
-                      setWeightKg(
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="distanceM">Distancia (m)</label>
-                  <input
-                    id="distanceM"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={distanceM ?? ""}
-                    onChange={(event) =>
-                      setDistanceM(
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              </>
-            )}
-
-            <div>
-              <label htmlFor="performedAt">Fecha y hora</label>
-              <input
-                id="performedAt"
-                type="datetime-local"
-                value={performedAt}
-                onChange={(event) => setPerformedAt(event.target.value)}
-              />
-            </div>
-          </>
-        )}
-
-        {error && <p>{error}</p>}
-        {success && <p>{success}</p>}
-
-        <button type="submit" disabled={!selectedExercise || submitting}>
-          {submitting ? "Registrando..." : "Registrar marca"}
-        </button>
-      </form>
-    </section>
+    <RegisterExerciseResultView
+      exercises={exercises}
+      selectedExerciseId={selectedExerciseId}
+      selectedExercise={selectedExercise}
+      reps={reps}
+      weightKg={weightKg}
+      distanceM={distanceM}
+      durationSeconds={durationSeconds}
+      performedAt={performedAt}
+      loading={loading}
+      submitting={submitting || success !== null}
+      error={error}
+      success={success}
+      onExerciseChange={handleExerciseChange}
+      onRepsChange={setReps}
+      onWeightChange={setWeightKg}
+      onDistanceChange={setDistanceM}
+      onDurationChange={setDurationSeconds}
+      onPerformedAtChange={setPerformedAt}
+      onSubmit={handleSubmit}
+    />
   );
 }
 

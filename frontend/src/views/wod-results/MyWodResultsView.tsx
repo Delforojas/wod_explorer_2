@@ -26,7 +26,7 @@ function formatTime(seconds: number): string {
 function renderResult(result: WodResultResponse) {
   if (result.type === "AMRAP") {
     return (
-      <p className="result-value">
+      <p className="my-wod-result-value">
         {result.amrapRounds ?? 0} rondas + {result.amrapExtraReps ?? 0} reps
       </p>
     );
@@ -34,7 +34,7 @@ function renderResult(result: WodResultResponse) {
 
   if (result.type === "EMOM") {
     return (
-      <p className="result-value">
+      <p className="my-wod-result-value">
         {result.completed ? "Completado" : "No completado"}
       </p>
     );
@@ -43,32 +43,36 @@ function renderResult(result: WodResultResponse) {
   if (result.type === "FOR_TIME") {
     if (result.completed && result.timeSeconds !== null) {
       return (
-        <p className="result-value">Tiempo: {formatTime(result.timeSeconds)}</p>
+        <p className="my-wod-result-value">
+          Tiempo: {formatTime(result.timeSeconds)}
+        </p>
       );
     }
 
     return (
-      <div className="result-progress">
-        <p className="result-value">No completado</p>
+      <div className="my-wod-result-progress">
+        <p className="my-wod-result-value">No completado</p>
 
         {result.progressRounds !== null && (
-          <p className="resource-meta">
+          <p className="my-wod-result-meta">
             Rondas completadas: {result.progressRounds}
           </p>
         )}
 
         {result.progressReps !== null && (
-          <p className="resource-meta">Progreso: {result.progressReps} reps</p>
+          <p className="my-wod-result-meta">
+            Progreso: {result.progressReps} reps
+          </p>
         )}
 
         {result.progressDistanceM !== null && (
-          <p className="resource-meta">
+          <p className="my-wod-result-meta">
             Progreso: {result.progressDistanceM} m
           </p>
         )}
 
         {result.progressDurationSeconds !== null && (
-          <p className="resource-meta">
+          <p className="my-wod-result-meta">
             Progreso: {result.progressDurationSeconds} segundos
           </p>
         )}
@@ -81,64 +85,90 @@ function renderResult(result: WodResultResponse) {
 
 function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
   return (
-    <section className="page">
-      <header className="page-header">
-        <p className="page-eyebrow">Mis entrenamientos</p>
+    <section className="wod-page my-wod-results-page">
+      <div className="wod-container">
+        {/* ENCABEZADO */}
 
-        <h1>Mis WODs</h1>
+        <header className="wod-header">
+          <p className="wod-eyebrow">MIS ENTRENAMIENTOS</p>
 
-        <p>
-          Consulta tus resultados y sigue tu progreso en cada entrenamiento.
-        </p>
-      </header>
+          <h1>Mis WODs</h1>
 
-      {/* Navegación secundaria */}
+          <p className="wod-description">
+            Consulta tus resultados y sigue tu progreso en cada entrenamiento.
+          </p>
+        </header>
 
-      <MyWodsNavigation />
+        {/* NAVEGACIÓN SECUNDARIA */}
 
-      {/* Registrar resultado */}
-
-      <nav className="marks-navigation" aria-label="Acciones de resultados">
-        <Link
-          to="/my-wod-results/new"
-          className="marks-nav-link marks-nav-action"
-        >
-          + Registrar resultado
-        </Link>
-      </nav>
-
-      {/* Listado de resultados */}
-
-      {loading ? (
-        <p className="ui-loading">Cargando resultados de WODs...</p>
-      ) : error ? (
-        <p className="ui-error" role="alert">
-          {error}
-        </p>
-      ) : results.length === 0 ? (
-        <p className="ui-empty">
-          Todavía no has registrado ningún resultado de WOD.
-        </p>
-      ) : (
-        <div className="resource-list glass-panel">
-          {results.map((result) => (
-            <article
-              className="resource-row resource-row-static"
-              key={result.id}
-            >
-              <header>
-                <h2>{result.wodName}</h2>
-
-                <span className="resource-meta">{result.type}</span>
-              </header>
-
-              <p className="resource-meta">{formatDate(result.performedAt)}</p>
-
-              {renderResult(result)}
-            </article>
-          ))}
+        <div className="my-wod-results-navigation">
+          <MyWodsNavigation />
         </div>
-      )}
+
+        {/* REGISTRAR RESULTADO */}
+
+        <nav
+          className="my-wod-results-actions"
+          aria-label="Acciones de resultados"
+        >
+          <Link to="/my-wod-results/new" className="my-wods-nav-link">
+            + Registrar resultado
+          </Link>
+        </nav>
+
+        {/* ESTADOS */}
+
+        {loading ? (
+          <p className="wod-empty" role="status">
+            Cargando resultados de WODs...
+          </p>
+        ) : error ? (
+          <p className="wod-error" role="alert">
+            {error}
+          </p>
+        ) : results.length === 0 ? (
+          <p className="wod-empty">
+            Todavía no has registrado ningún resultado de WOD.
+          </p>
+        ) : (
+          <>
+            {/* CONTADOR */}
+
+            <p className="wod-count">{results.length} resultados registrados</p>
+
+            {/* LISTADO */}
+
+            <div className="wod-grid">
+              {results.map((result) => (
+                <article
+                  className="wod-card my-wod-result-card"
+                  key={result.id}
+                >
+                  <h2>{result.wodName}</h2>
+
+                  {/* MODALIDAD */}
+
+                  <div className="wod-card-meta">
+                    <span>{result.type}</span>
+                  </div>
+
+                  {/* FECHA */}
+
+                  <p className="my-wod-result-date">
+                    {formatDate(result.performedAt)}
+                  </p>
+
+                  {/* RESULTADO */}
+
+                  <div className="my-wod-result-content">
+                    {renderResult(result)}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </section>
   );
 }

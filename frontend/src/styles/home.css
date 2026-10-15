@@ -1,0 +1,378 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   HOME — OPTIMIZED GLASSMORPHISM
+========================================== */
+
+/* ==========================================
+   CONTENEDOR PRINCIPAL
+========================================== */
+
+.home-page {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+  min-height: 0;
+
+  width: 100%;
+
+  margin: 0;
+  padding: 40px 20px;
+
+  box-sizing: border-box;
+  background: transparent;
+}
+
+/* ==========================================
+   TARJETA PRINCIPAL
+========================================== */
+
+.home-card {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 430px;
+
+  margin: 0;
+  padding: 40px 35px;
+
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ==========================================
+   LOGOTIPO
+========================================== */
+
+.home-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 58px;
+  height: 58px;
+
+  margin-bottom: 24px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.home-logo span {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+
+  letter-spacing: -1px;
+  color: #ffffff;
+}
+
+/* ==========================================
+   ENCABEZADO
+========================================== */
+
+.home-header {
+  width: 100%;
+  margin-bottom: 32px;
+
+  text-align: center;
+}
+
+.home-eyebrow {
+  margin: 0 0 10px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 3px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.home-header h1 {
+  margin: 0 0 12px;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 29px;
+  font-weight: 600;
+
+  letter-spacing: -1px;
+  line-height: 1.2;
+
+  color: #ffffff;
+}
+
+.home-description {
+  max-width: 300px;
+  margin: 0 auto;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ==========================================
+   CONTENEDOR DE ACCIONES
+========================================== */
+
+.home-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: 20px;
+}
+
+/* ==========================================
+   BOTONES — ESTILO WODS
+========================================== */
+
+.home-submit,
+.home-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  padding: 13px 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  text-align: center;
+  text-decoration: none;
+
+  cursor: pointer;
+}
+.home-submit {
+  margin-top: 8px;
+}
+/* ==========================================
+   SEPARADOR
+========================================== */
+
+.home-divider {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  gap: 15px;
+
+  margin: 28px 0;
+}
+
+.home-divider::before,
+.home-divider::after {
+  content: "";
+
+  flex: 1;
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.home-divider span {
+  font-size: 11px;
+  white-space: nowrap;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================
+   ENLACES SECUNDARIOS
+========================================== */
+
+.home-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  gap: 12px;
+  padding: 13px 20px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+
+  background: linear-gradient(180deg, #232526, #2d2e30);
+
+  color: #ffffff;
+  text-decoration: none;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+/* ==========================================
+   HOVER NARANJA — SOLO RATÓN
+========================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  .home-submit,
+  .home-link {
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .home-submit:hover,
+  .home-link:hover {
+    background: #ff6b00;
+    border-color: #ff6b00;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+      0 8px 25px rgba(255, 107, 0, 0.2),
+      0 0 15px rgba(255, 107, 0, 0.1);
+
+    color: #ffffff;
+  }
+}
+
+/* ==========================================
+   ACCESIBILIDAD — TECLADO
+========================================== */
+
+.home-submit:focus-visible,
+.home-link:focus-visible {
+  outline: 2px solid #ff6b00;
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 768px) {
+  .home-page {
+    padding: 16px 20px;
+  }
+
+  .home-card {
+    padding: 35px 30px;
+  }
+}
+
+/* ==========================================
+   MÓVILES — PANTALLA COMPLETA
+========================================== */
+
+@media (max-width: 480px) {
+  .home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    flex: 1;
+
+    width: 100%;
+    min-height: calc(100dvh - 60px);
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+  }
+
+  .home-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    flex: 1;
+
+    width: 100%;
+    max-width: none;
+
+    min-height: calc(100dvh - 150px);
+
+    margin: 0;
+    padding: 32px 24px;
+
+    box-sizing: border-box;
+
+    border: none;
+    border-radius: 0;
+
+    box-shadow: none;
+  }
+
+  .home-logo {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 24px;
+  }
+
+  .home-header {
+    margin-bottom: 32px;
+  }
+
+  .home-header h1 {
+    font-size: 28px;
+  }
+
+  .home-description {
+    font-size: 13px;
+  }
+
+  .home-form {
+    gap: 20px;
+  }
+}
+
+/* ==========================================
+   MOVIMIENTO REDUCIDO
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .home-submit,
+  .home-link {
+    transition: none;
+  }
+
+  .home-submit:hover,
+  .home-link:hover {
+    transform: none;
+  }
+}

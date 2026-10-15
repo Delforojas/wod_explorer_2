@@ -10,3 +10,17 @@
 @import "./styles/resources.css";
 @import "./styles/auth.css";
 @import "./styles/pages.css";
+@import "./styles/login.css";
+@import "./styles/home.css";
+@import "./styles/exercise.css";
+@import "./styles/wod.css";
+@import "./styles/my-wods.css";
+@import "./styles/my-wods-results.css";
+@import "./styles/WodDetail.css";
+@import "./styles/myExerciseResults.css";
+@import "./styles/exerciseResultsList.css";
+@import "./styles/exerciseResultCard.css";
+@import "./styles/registerExerciseResult.css";
+@import "./styles/exerciseResultForm.css";
+@import "./styles/exerciseResultFields.css";
+@import "./styles/exerciseSelector.css";

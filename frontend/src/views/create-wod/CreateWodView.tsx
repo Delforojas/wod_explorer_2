@@ -26,69 +26,126 @@ function CreateWodView({
   onSubmit,
 }: CreateWodViewProps) {
   if (loading) {
-    return <p className="ui-loading">Cargando ejercicios...</p>;
+    return (
+      <section className="wod-page">
+        <div className="wod-container">
+          <p className="wod-empty" role="status">
+            Cargando ejercicios...
+          </p>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <section className="page">
-      <header className="page-header">
-        <p className="page-eyebrow">WOD personal</p>
-        <h1>Crear WOD</h1>
-        <p>Crea un nuevo entrenamiento personal.</p>
-      </header>
+    <section className="wod-page">
+      <div className="wod-container">
+        {/* ENCABEZADO */}
 
-      {error && <p className="ui-error" role="alert">{error}</p>}
-      {success && <p className="ui-success">{success}</p>}
+        <header className="wod-header">
+          <p className="wod-eyebrow">WOD PERSONAL</p>
 
-      <form className="form-layout surface glass-panel" onSubmit={onSubmit}>
-        <div className="form-field">
-          <label htmlFor="name">Nombre</label>
+          <h1>Crear WOD</h1>
 
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(event) => onNameChange(event.target.value)}
-            required
-          />
-        </div>
+          <p className="wod-description">
+            Diseña un entrenamiento personal y configura sus ejercicios.
+          </p>
+        </header>
 
-        <div className="form-field">
-          <label htmlFor="type">Modalidad</label>
+        {/* MENSAJES */}
 
-          <select
-            id="type"
-            value={type}
-            onChange={(event) => onTypeChange(event.target.value as WodType)}
-          >
-            <option value="FOR_TIME">For Time</option>
-            <option value="AMRAP">AMRAP</option>
-            <option value="EMOM">EMOM</option>
-          </select>
-        </div>
+        {error && (
+          <p className="wod-error" role="alert">
+            {error}
+          </p>
+        )}
 
-        {type === "FOR_TIME" && (
-          <>
+        {success && (
+          <p className="wod-create-success" role="status">
+            {success}
+          </p>
+        )}
+
+        {/* FORMULARIO */}
+
+        <form className="wod-result-form wod-create-form" onSubmit={onSubmit}>
+          {/* NOMBRE */}
+
+          <div className="form-field">
+            <label htmlFor="name">Nombre</label>
+
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(event) => onNameChange(event.target.value)}
+              required
+            />
+          </div>
+
+          {/* MODALIDAD */}
+
+          <div className="form-field">
+            <label htmlFor="type">Modalidad</label>
+
+            <select
+              id="type"
+              value={type}
+              onChange={(event) => onTypeChange(event.target.value as WodType)}
+            >
+              <option value="FOR_TIME">For Time</option>
+              <option value="AMRAP">AMRAP</option>
+              <option value="EMOM">EMOM</option>
+            </select>
+          </div>
+
+          {/* CONFIGURACIÓN FOR TIME */}
+
+          {type === "FOR_TIME" && (
+            <>
+              <div className="form-field">
+                <label htmlFor="rounds">Rondas</label>
+
+                <input
+                  id="rounds"
+                  type="number"
+                  min="1"
+                  value={rounds ?? ""}
+                  onChange={(event) =>
+                    onRoundsChange(
+                      event.target.value === ""
+                        ? undefined
+                        : Number(event.target.value),
+                    )
+                  }
+                />
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="time-cap">Tiempo límite (segundos)</label>
+
+                <input
+                  id="time-cap"
+                  type="number"
+                  min="1"
+                  value={timeCapSeconds ?? ""}
+                  onChange={(event) =>
+                    onTimeCapChange(
+                      event.target.value === ""
+                        ? undefined
+                        : Number(event.target.value),
+                    )
+                  }
+                />
+              </div>
+            </>
+          )}
+
+          {/* CONFIGURACIÓN AMRAP / EMOM */}
+
+          {(type === "AMRAP" || type === "EMOM") && (
             <div className="form-field">
-              <label htmlFor="rounds">Rondas</label>
-
-              <input
-                id="rounds"
-                type="number"
-                min="1"
-                value={rounds ?? ""}
-                onChange={(event) =>
-                  onRoundsChange(
-                    event.target.value === ""
-                      ? undefined
-                      : Number(event.target.value),
-                  )
-                }
-              />
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="time-cap">Tiempo límite (segundos)</label>
+              <label htmlFor="time-cap">Duración (segundos)</label>
 
               <input
                 id="time-cap"
@@ -102,87 +159,66 @@ function CreateWodView({
                       : Number(event.target.value),
                   )
                 }
+                required
               />
             </div>
-          </>
-        )}
+          )}
 
-        {(type === "AMRAP" || type === "EMOM") && (
-          <div className="form-field">
-            <label htmlFor="time-cap">Duración (segundos)</label>
+          {/* SECCIÓN DE EJERCICIOS */}
 
-            <input
-              id="time-cap"
-              type="number"
-              min="1"
-              value={timeCapSeconds ?? ""}
-              onChange={(event) =>
-                onTimeCapChange(
-                  event.target.value === ""
-                    ? undefined
-                    : Number(event.target.value),
-                )
-              }
-              required
-            />
+          <div className="wod-create-section-header">
+            <h2>Ejercicios</h2>
+
+            <span className="wod-badge">
+              {items.length} {items.length === 1 ? "ejercicio" : "ejercicios"}
+            </span>
           </div>
-        )}
 
-        <h2>Ejercicios</h2>
+          {items.length === 0 && (
+            <p className="wod-empty">Todavía no has añadido ejercicios.</p>
+          )}
 
-        {items.length === 0 && <p className="ui-empty">Todavía no has añadido ejercicios.</p>}
+          {/* LISTADO DE EJERCICIOS */}
 
-        {items.map((item, index) => {
-          const exercise = getExercise(item.exerciseId);
+          {items.map((item, index) => {
+            const exercise = getExercise(item.exerciseId);
 
-          return (
-            <div className="repeatable-item" key={index}>
-              <h3>Ejercicio {index + 1}</h3>
+            return (
+              <div className="wod-create-item" key={index}>
+                <div className="wod-create-item-header">
+                  <h3>Ejercicio {index + 1}</h3>
 
-              <div className="form-field">
-                <label htmlFor={`exercise-${index}`}>Ejercicio</label>
-
-                <select
-                  id={`exercise-${index}`}
-                  value={item.exerciseId}
-                  onChange={(event) =>
-                    onExerciseChange(index, Number(event.target.value))
-                  }
-                >
-                  {exercises.map((availableExercise) => (
-                    <option
-                      key={availableExercise.id}
-                      value={availableExercise.id}
-                    >
-                      {availableExercise.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {exercise?.measurementType === "REPS" && (
-                <div className="form-field">
-                  <label htmlFor={`reps-${index}`}>Repeticiones</label>
-
-                  <input
-                    id={`reps-${index}`}
-                    type="number"
-                    min="1"
-                    value={item.reps ?? ""}
-                    onChange={(event) =>
-                      onRepsChange(
-                        index,
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
+                  <span className="wod-badge">
+                    {index + 1} / {items.length}
+                  </span>
                 </div>
-              )}
 
-              {exercise?.measurementType === "WEIGHT" && (
-                <>
+                {/* SELECCIÓN DEL EJERCICIO */}
+
+                <div className="form-field">
+                  <label htmlFor={`exercise-${index}`}>Ejercicio</label>
+
+                  <select
+                    id={`exercise-${index}`}
+                    value={item.exerciseId}
+                    onChange={(event) =>
+                      onExerciseChange(index, Number(event.target.value))
+                    }
+                  >
+                    {exercises.map((availableExercise) => (
+                      <option
+                        key={availableExercise.id}
+                        value={availableExercise.id}
+                      >
+                        {availableExercise.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* EJERCICIOS POR REPETICIONES */}
+
+                {exercise?.measurementType === "REPS" && (
                   <div className="form-field">
                     <label htmlFor={`reps-${index}`}>Repeticiones</label>
 
@@ -201,96 +237,56 @@ function CreateWodView({
                       }
                     />
                   </div>
+                )}
 
-                  <div className="form-field">
-                    <label htmlFor={`weight-${index}`}>Peso (kg)</label>
+                {/* EJERCICIOS CON PESO */}
 
-                    <input
-                      id={`weight-${index}`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.weightKg ?? ""}
-                      onChange={(event) =>
-                        onWeightChange(
-                          index,
-                          event.target.value === ""
-                            ? undefined
-                            : Number(event.target.value),
-                        )
-                      }
-                    />
-                  </div>
-                </>
-              )}
+                {exercise?.measurementType === "WEIGHT" && (
+                  <>
+                    <div className="form-field">
+                      <label htmlFor={`reps-${index}`}>Repeticiones</label>
 
-              {exercise?.measurementType === "DISTANCE" && (
-                <div className="form-field">
-                  <label htmlFor={`distance-${index}`}>Distancia (m)</label>
+                      <input
+                        id={`reps-${index}`}
+                        type="number"
+                        min="1"
+                        value={item.reps ?? ""}
+                        onChange={(event) =>
+                          onRepsChange(
+                            index,
+                            event.target.value === ""
+                              ? undefined
+                              : Number(event.target.value),
+                          )
+                        }
+                      />
+                    </div>
 
-                  <input
-                    id={`distance-${index}`}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={item.distanceM ?? ""}
-                    onChange={(event) =>
-                      onDistanceChange(
-                        index,
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              )}
+                    <div className="form-field">
+                      <label htmlFor={`weight-${index}`}>Peso (kg)</label>
 
-              {exercise?.measurementType === "TIME" && (
-                <div className="form-field">
-                  <label htmlFor={`duration-${index}`}>
-                    Duración (segundos)
-                  </label>
+                      <input
+                        id={`weight-${index}`}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.weightKg ?? ""}
+                        onChange={(event) =>
+                          onWeightChange(
+                            index,
+                            event.target.value === ""
+                              ? undefined
+                              : Number(event.target.value),
+                          )
+                        }
+                      />
+                    </div>
+                  </>
+                )}
 
-                  <input
-                    id={`duration-${index}`}
-                    type="number"
-                    min="1"
-                    value={item.durationSeconds ?? ""}
-                    onChange={(event) =>
-                      onDurationChange(
-                        index,
-                        event.target.value === ""
-                          ? undefined
-                          : Number(event.target.value),
-                      )
-                    }
-                  />
-                </div>
-              )}
+                {/* EJERCICIOS POR DISTANCIA */}
 
-              {exercise?.measurementType === "WEIGHT_DISTANCE" && (
-                <>
-                  <div className="form-field">
-                    <label htmlFor={`weight-${index}`}>Peso (kg)</label>
-
-                    <input
-                      id={`weight-${index}`}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={item.weightKg ?? ""}
-                      onChange={(event) =>
-                        onWeightChange(
-                          index,
-                          event.target.value === ""
-                            ? undefined
-                            : Number(event.target.value),
-                        )
-                      }
-                    />
-                  </div>
-
+                {exercise?.measurementType === "DISTANCE" && (
                   <div className="form-field">
                     <label htmlFor={`distance-${index}`}>Distancia (m)</label>
 
@@ -310,28 +306,115 @@ function CreateWodView({
                       }
                     />
                   </div>
-                </>
-              )}
+                )}
 
-              <button className="button-destructive" type="button" onClick={() => onRemoveExercise(index)}>
-                Eliminar ejercicio
-              </button>
-            </div>
-          );
-        })}
+                {/* EJERCICIOS POR TIEMPO */}
 
-        <div className="form-primary-actions">
-          <button className="button-secondary form-add-exercise" type="button" onClick={onAddExercise}>
+                {exercise?.measurementType === "TIME" && (
+                  <div className="form-field">
+                    <label htmlFor={`duration-${index}`}>
+                      Duración (segundos)
+                    </label>
+
+                    <input
+                      id={`duration-${index}`}
+                      type="number"
+                      min="1"
+                      value={item.durationSeconds ?? ""}
+                      onChange={(event) =>
+                        onDurationChange(
+                          index,
+                          event.target.value === ""
+                            ? undefined
+                            : Number(event.target.value),
+                        )
+                      }
+                    />
+                  </div>
+                )}
+
+                {/* EJERCICIOS CON PESO Y DISTANCIA */}
+
+                {exercise?.measurementType === "WEIGHT_DISTANCE" && (
+                  <>
+                    <div className="form-field">
+                      <label htmlFor={`weight-${index}`}>Peso (kg)</label>
+
+                      <input
+                        id={`weight-${index}`}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.weightKg ?? ""}
+                        onChange={(event) =>
+                          onWeightChange(
+                            index,
+                            event.target.value === ""
+                              ? undefined
+                              : Number(event.target.value),
+                          )
+                        }
+                      />
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor={`distance-${index}`}>Distancia (m)</label>
+
+                      <input
+                        id={`distance-${index}`}
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.distanceM ?? ""}
+                        onChange={(event) =>
+                          onDistanceChange(
+                            index,
+                            event.target.value === ""
+                              ? undefined
+                              : Number(event.target.value),
+                          )
+                        }
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* ELIMINAR EJERCICIO */}
+
+                <button
+                  className="wod-create-delete"
+                  type="button"
+                  onClick={() => onRemoveExercise(index)}
+                >
+                  Eliminar ejercicio
+                </button>
+              </div>
+            );
+          })}
+
+          {/* AÑADIR EJERCICIO */}
+
+          <button
+            className="wod-create-add"
+            type="button"
+            onClick={onAddExercise}
+          >
             + Añadir ejercicio
           </button>
 
-          <div className="form-submit-actions">
-            <button type="submit" disabled={items.length === 0}>
+          {/* CREAR WOD */}
+
+          <div className="wod-result-actions">
+            <button
+              className="wod-card-action"
+              type="submit"
+              disabled={items.length === 0}
+            >
               Crear WOD
             </button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </section>
   );
 }

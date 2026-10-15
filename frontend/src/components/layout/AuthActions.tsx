@@ -3,6 +3,7 @@ import TextRoll from "./TextRoll";
 
 interface AuthActionsProps {
   isAuthenticated: boolean;
+  username?: string | null;
   onLogout: () => void;
   onNavigate?: () => void;
   className?: string;
@@ -11,6 +12,7 @@ interface AuthActionsProps {
 
 function AuthActions({
   isAuthenticated,
+  username,
   onLogout,
   onNavigate,
   className,
@@ -22,12 +24,18 @@ function AuthActions({
     return (
       <div className={classes}>
         <NavLink
-          className={({ isActive }) => `nav-link${isActive ? " nav-link-active" : ""}`}
+          className={({ isActive }) =>
+            `nav-link${isActive ? " nav-link-active" : ""}`
+          }
           to="/login"
           onClick={onNavigate}
           aria-label={withTextRoll ? "Iniciar sesión" : undefined}
         >
-          {withTextRoll ? <TextRoll label="Iniciar sesión" /> : "Iniciar sesión"}
+          {withTextRoll ? (
+            <TextRoll label="Iniciar sesión" />
+          ) : (
+            "Iniciar sesión"
+          )}
         </NavLink>
       </div>
     );
@@ -35,15 +43,15 @@ function AuthActions({
 
   return (
     <div className={classes}>
-      <span className="auth-user">Usuario</span>
+      {username && <span className="auth-user">{username}</span>}
+
       <button
         type="button"
         className="auth-logout"
         onClick={onLogout}
-        aria-label={withTextRoll ? "Cerrar sesión" : undefined}
-      >
-        {withTextRoll ? <TextRoll label="Cerrar sesión" /> : "Cerrar sesión"}
-      </button>
+        aria-label="Cerrar sesión"
+        title="Cerrar sesión"
+      ></button>
     </div>
   );
 }
