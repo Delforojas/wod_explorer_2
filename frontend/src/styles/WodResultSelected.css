@@ -1,0 +1,233 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   WOD RESULT SELECTED
+========================================== */
+
+.wod-result-selected-card {
+  --selected-orange: #ff6b00;
+  --selected-orange-light: #ff9a3c;
+  --selected-border: rgba(255, 255, 255, 0.09);
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 24px;
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--selected-border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  overflow: hidden;
+}
+
+/* ==========================================
+   ACCENT
+========================================== */
+
+.wod-result-selected-card::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 28px;
+  right: 28px;
+
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 107, 0, 0.7),
+    transparent
+  );
+
+  pointer-events: none;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.wod-result-selected-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.wod-result-selected-heading {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 8px;
+}
+
+.wod-result-selected-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+
+  color: var(--selected-orange-light);
+}
+
+.wod-result-selected-heading h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -0.6px;
+
+  overflow-wrap: anywhere;
+
+  color: #efeded;
+}
+
+/* ==========================================
+   MODALITY BADGE
+========================================== */
+
+.wod-result-selected-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  min-height: 30px;
+  padding: 6px 12px;
+
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  border-radius: 8px;
+
+  background: rgba(255, 107, 0, 0.1);
+
+  color: var(--selected-orange-light);
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+/* ==========================================
+   INFORMATION GRID
+========================================== */
+
+.wod-result-selected-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+/* ==========================================
+   METADATA
+========================================== */
+
+.wod-result-selected-meta {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 8px;
+
+  padding: 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+
+  background: rgba(8, 12, 18, 0.35);
+}
+
+.wod-result-selected-label {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.wod-result-selected-value {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+
+  color: #efeded;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .wod-result-selected-card {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .wod-result-selected-heading h2 {
+    font-size: 22px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .wod-result-selected-card {
+    padding: 20px;
+    gap: 20px;
+
+    border-radius: 16px;
+  }
+
+  .wod-result-selected-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 14px;
+  }
+
+  .wod-result-selected-heading h2 {
+    font-size: 21px;
+  }
+
+  .wod-result-selected-info {
+    grid-template-columns: 1fr;
+  }
+
+  .wod-result-selected-meta {
+    padding: 14px;
+  }
+
+  .wod-result-selected-value {
+    font-size: 16px;
+  }
+}

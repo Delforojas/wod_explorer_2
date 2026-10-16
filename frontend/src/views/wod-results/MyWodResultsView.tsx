@@ -1,87 +1,10 @@
 import { Link } from "react-router-dom";
 
-import type { WodResultResponse } from "../../types/WodResult";
 import MyWodsNavigation from "../../components/layout/MyWodsNavigation";
 
-interface MyWodResultsViewProps {
-  results: WodResultResponse[];
-  loading: boolean;
-  error: string | null;
-}
+import type { MyWodResultsViewProps } from "./MyWodResultsView.Types";
 
-function formatDate(date: string): string {
-  return new Intl.DateTimeFormat("es-ES", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(date));
-}
-
-function formatTime(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
-
-  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-}
-
-function renderResult(result: WodResultResponse) {
-  if (result.type === "AMRAP") {
-    return (
-      <p className="my-wod-result-value">
-        {result.amrapRounds ?? 0} rondas + {result.amrapExtraReps ?? 0} reps
-      </p>
-    );
-  }
-
-  if (result.type === "EMOM") {
-    return (
-      <p className="my-wod-result-value">
-        {result.completed ? "Completado" : "No completado"}
-      </p>
-    );
-  }
-
-  if (result.type === "FOR_TIME") {
-    if (result.completed && result.timeSeconds !== null) {
-      return (
-        <p className="my-wod-result-value">
-          Tiempo: {formatTime(result.timeSeconds)}
-        </p>
-      );
-    }
-
-    return (
-      <div className="my-wod-result-progress">
-        <p className="my-wod-result-value">No completado</p>
-
-        {result.progressRounds !== null && (
-          <p className="my-wod-result-meta">
-            Rondas completadas: {result.progressRounds}
-          </p>
-        )}
-
-        {result.progressReps !== null && (
-          <p className="my-wod-result-meta">
-            Progreso: {result.progressReps} reps
-          </p>
-        )}
-
-        {result.progressDistanceM !== null && (
-          <p className="my-wod-result-meta">
-            Progreso: {result.progressDistanceM} m
-          </p>
-        )}
-
-        {result.progressDurationSeconds !== null && (
-          <p className="my-wod-result-meta">
-            Progreso: {result.progressDurationSeconds} segundos
-          </p>
-        )}
-      </div>
-    );
-  }
-
-  return null;
-}
+import WodResultsList from "./components/WodResultsList";
 
 function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
   return (
@@ -95,7 +18,8 @@ function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
           <h1>Mis WODs</h1>
 
           <p className="wod-description">
-            Consulta tus resultados y sigue tu progreso en cada entrenamiento.
+            Consulta tus resultados y sigue tu progreso en cada
+            entrenamientoaaa.
           </p>
         </header>
 
@@ -131,42 +55,7 @@ function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
             Todavía no has registrado ningún resultado de WOD.
           </p>
         ) : (
-          <>
-            {/* CONTADOR */}
-
-            <p className="wod-count">{results.length} resultados registrados</p>
-
-            {/* LISTADO */}
-
-            <div className="wod-grid">
-              {results.map((result) => (
-                <article
-                  className="wod-card my-wod-result-card"
-                  key={result.id}
-                >
-                  <h2>{result.wodName}</h2>
-
-                  {/* MODALIDAD */}
-
-                  <div className="wod-card-meta">
-                    <span>{result.type}</span>
-                  </div>
-
-                  {/* FECHA */}
-
-                  <p className="my-wod-result-date">
-                    {formatDate(result.performedAt)}
-                  </p>
-
-                  {/* RESULTADO */}
-
-                  <div className="my-wod-result-content">
-                    {renderResult(result)}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </>
+          <WodResultsList results={results} />
         )}
       </div>
     </section>

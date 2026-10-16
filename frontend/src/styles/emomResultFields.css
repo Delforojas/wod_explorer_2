@@ -1,0 +1,207 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EMOM RESULT FIELDS
+========================================== */
+
+.emom-result-fields {
+  --emom-orange: #ff6b00;
+  --emom-orange-light: #ff9a3c;
+  --emom-border: rgba(255, 255, 255, 0.09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 24px;
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--emom-border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.emom-result-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 8px;
+}
+
+.emom-result-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+
+  color: var(--emom-orange-light);
+}
+
+.emom-result-header h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+
+  color: #efeded;
+}
+
+.emom-result-header p {
+  max-width: 520px;
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ==========================================
+   FIELD
+========================================== */
+
+.emom-result-field {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 9px;
+}
+
+.emom-result-field label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================
+   SELECT
+========================================== */
+
+.emom-result-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+
+  padding: 12px 42px 12px 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  background-color: rgba(8, 12, 18, 0.75);
+
+  color: #f5f5f7;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  /* FLECHA PERSONALIZADA */
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.emom-result-field select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.emom-result-field select:focus {
+  border-color: var(--emom-orange);
+
+  background-color: rgba(12, 16, 24, 0.95);
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.emom-result-field select:focus-visible {
+  outline: 2px solid var(--emom-orange);
+  outline-offset: 2px;
+}
+
+/* OPCIONES */
+
+.emom-result-field select option {
+  background: #141820;
+  color: #f5f5f7;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .emom-result-fields {
+    padding: 24px;
+    gap: 20px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .emom-result-fields {
+    padding: 20px;
+    gap: 20px;
+
+    border-radius: 16px;
+  }
+
+  .emom-result-header h2 {
+    font-size: 20px;
+  }
+
+  .emom-result-field select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .emom-result-field select {
+    transition: none;
+  }
+}

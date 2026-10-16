@@ -1,0 +1,291 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   CREATE WOD — EXERCISES LIST
+========================================== */
+
+.wod-exercises-list {
+  --exercises-orange: #ff6b00;
+  --exercises-orange-light: #ff9a3c;
+  --exercises-border: rgba(255, 255, 255, 0.09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 24px;
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--exercises-border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.wod-exercises-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.wod-exercises-heading {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 8px;
+}
+
+.wod-exercises-eyebrow {
+  color: var(--exercises-orange-light);
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.wod-exercises-heading h2 {
+  margin: 0;
+
+  color: #efeded;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.wod-exercises-heading p {
+  max-width: 520px;
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.48);
+
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* ==========================================
+   COUNTER
+========================================== */
+
+.wod-exercises-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  min-height: 32px;
+  padding: 6px 12px;
+
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  border-radius: 10px;
+
+  background: rgba(255, 107, 0, 0.1);
+
+  color: var(--exercises-orange-light);
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.wod-exercises-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+  padding: 36px 24px;
+
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+
+  background: rgba(8, 12, 18, 0.3);
+
+  text-align: center;
+}
+
+.wod-exercises-empty-icon {
+  display: grid;
+  place-items: center;
+
+  width: 52px;
+  height: 52px;
+
+  border: 1px solid rgba(255, 107, 0, 0.25);
+  border-radius: 14px;
+
+  background: rgba(255, 107, 0, 0.1);
+
+  color: var(--exercises-orange);
+
+  font-size: 28px;
+  font-weight: 300;
+}
+
+.wod-exercises-empty p {
+  margin: 0;
+
+  color: #efeded;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wod-exercises-empty > span:last-child {
+  color: rgba(255, 255, 255, 0.45);
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   EXERCISES GRID
+========================================== */
+
+.wod-exercises-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 16px;
+}
+
+/* ==========================================
+   ADD EXERCISE BUTTON
+========================================== */
+
+.wod-exercises-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 50px;
+
+  gap: 10px;
+  padding: 12px 20px;
+
+  border: 1px dashed rgba(255, 107, 0, 0.45);
+  border-radius: 12px;
+
+  background: rgba(255, 107, 0, 0.06);
+
+  color: var(--exercises-orange-light);
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.wod-exercises-add:hover:not(:disabled) {
+  background: rgba(255, 107, 0, 0.13);
+  border-color: var(--exercises-orange);
+
+  transform: translateY(-1px);
+}
+
+.wod-exercises-add:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wod-exercises-add:focus-visible {
+  outline: 2px solid var(--exercises-orange);
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .wod-exercises-list {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .wod-exercises-header {
+    gap: 16px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .wod-exercises-list {
+    padding: 20px;
+    gap: 20px;
+
+    border-radius: 16px;
+  }
+
+  .wod-exercises-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 14px;
+  }
+
+  .wod-exercises-heading h2 {
+    font-size: 20px;
+  }
+
+  .wod-exercises-empty {
+    padding: 28px 18px;
+  }
+
+  .wod-exercises-add {
+    min-height: 48px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .wod-exercises-add {
+    transition: none;
+  }
+
+  .wod-exercises-add:hover:not(:disabled) {
+    transform: none;
+  }
+}

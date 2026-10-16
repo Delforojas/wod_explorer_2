@@ -24,3 +24,16 @@
 @import "./styles/exerciseResultForm.css";
 @import "./styles/exerciseResultFields.css";
 @import "./styles/exerciseSelector.css";
+@import "./styles/registerWodResult.css";
+@import "./styles/registerWodResult.css";
+@import "./styles/wodResultForm.css";
+@import "./styles/wodResultSelected.css";
+@import "./styles/amrapResultFields.css";
+@import "./styles/forTimeResultFields.css";
+@import "./styles/emomResultFields.css";
+
+@import "./styles/createWod.css";
+@import "./styles/createWodForm.css";
+@import "./styles/wodConfiguration.css";
+@import "./styles/wodExercisesList.css";
+@import "./styles/wodExerciseCard.css";

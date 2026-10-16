@@ -1,0 +1,259 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   CREATE WOD — CONFIGURATION
+========================================== */
+
+.wod-configuration {
+  --configuration-orange: #ff6b00;
+  --configuration-orange-light: #ff9a3c;
+  --configuration-border: rgba(255, 255, 255, 0.09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 24px;
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--configuration-border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.wod-configuration-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: 8px;
+}
+
+.wod-configuration-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+
+  color: var(--configuration-orange-light);
+}
+
+.wod-configuration-header h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+
+  color: #efeded;
+}
+
+.wod-configuration-description {
+  max-width: 520px;
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ==========================================
+   CONFIGURATION GRID
+========================================== */
+
+.wod-configuration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  width: 100%;
+  gap: 18px;
+}
+
+/* ==========================================
+   FIELDS
+========================================== */
+
+.wod-configuration-field {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 9px;
+}
+
+.wod-configuration-field label {
+  font-size: 12px;
+  font-weight: 500;
+
+  letter-spacing: 0.2px;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================
+   INPUTS AND SELECTS
+========================================== */
+
+.wod-configuration-field input,
+.wod-configuration-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+
+  padding: 12px 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  background-color: rgba(8, 12, 18, 0.75);
+
+  color: #f5f5f7;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.wod-configuration-field input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.wod-configuration-field input:hover,
+.wod-configuration-field select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.wod-configuration-field input:focus,
+.wod-configuration-field select:focus {
+  border-color: var(--configuration-orange);
+
+  background-color: rgba(12, 16, 24, 0.95);
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.wod-configuration-field input:focus-visible,
+.wod-configuration-field select:focus-visible {
+  outline: 2px solid var(--configuration-orange);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SELECT
+========================================== */
+
+.wod-configuration-field select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 42px;
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+}
+
+.wod-configuration-field select option {
+  background: #141820;
+  color: #f5f5f7;
+}
+
+/* ==========================================
+   NUMBER INPUT
+========================================== */
+
+.wod-configuration-field input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.wod-configuration-field input[type="number"]::-webkit-inner-spin-button,
+.wod-configuration-field input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .wod-configuration {
+    padding: 24px;
+    gap: 20px;
+  }
+
+  .wod-configuration-grid {
+    gap: 16px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .wod-configuration {
+    padding: 20px;
+    gap: 20px;
+
+    border-radius: 16px;
+  }
+
+  .wod-configuration-header h2 {
+    font-size: 20px;
+  }
+
+  .wod-configuration-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .wod-configuration-field input,
+  .wod-configuration-field select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .wod-configuration-field input,
+  .wod-configuration-field select {
+    transition: none;
+  }
+}

@@ -1,0 +1,272 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   REGISTER WOD RESULT — PAGE
+========================================== */
+
+/* REUTILIZAR ESTILOS DEL REGISTRO DE EJERCICIOS */
+
+@import "./registerExerciseResult.css";
+
+/* PÁGINA */
+
+.register-wod-result-page {
+  --register-orange: #ff6b00;
+  --register-orange-light: #ff9a3c;
+  --register-border: rgba(255, 255, 255, 0.09);
+
+  --register-background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 200, 210, 0.8)
+  );
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  min-height: 100%;
+
+  margin: 0;
+  padding: 24px 20px 110px;
+
+  box-sizing: border-box;
+  background: transparent;
+}
+
+/* CONTENEDOR */
+
+.register-wod-result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 800px;
+
+  margin: 0 auto;
+  gap: 28px;
+}
+
+/* ENCABEZADO */
+
+.register-wod-result-header {
+  width: 100%;
+  text-align: center;
+}
+
+.register-wod-result-header .wod-eyebrow {
+  margin: 0 0 10px;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.register-wod-result-header h1 {
+  margin: 0 0 12px;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 29px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -1px;
+
+  color: #efeded;
+}
+
+.register-wod-result-header .wod-description {
+  max-width: 420px;
+
+  margin: 0 auto;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* NAVEGACIÓN */
+
+.register-wod-result-navigation {
+  width: 100%;
+  min-width: 0;
+}
+
+/* CONTENIDO */
+
+.register-wod-result-content {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+  gap: 20px;
+}
+
+/* MENSAJES */
+
+.register-wod-result-status,
+.register-wod-result-error {
+  width: 100%;
+
+  margin: 0;
+  padding: 20px 24px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--register-border);
+  border-radius: 20px;
+
+  background: var(--register-background);
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.register-wod-result-error {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #fca5a5;
+}
+
+/* SIN WODS DISPONIBLES */
+
+.register-wod-result-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  padding: 32px 24px;
+  gap: 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--register-border);
+  border-radius: 20px;
+
+  background: var(--register-background);
+  text-align: center;
+}
+
+.register-wod-result-empty-icon {
+  display: grid;
+  place-items: center;
+
+  width: 52px;
+  height: 52px;
+
+  border: 1px solid rgba(255, 107, 0, 0.25);
+  border-radius: 14px;
+
+  background: rgba(255, 107, 0, 0.1);
+  color: var(--register-orange);
+
+  font-size: 28px;
+}
+
+.register-wod-result-empty h2 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+
+  color: #efeded;
+}
+
+.register-wod-result-empty p {
+  max-width: 420px;
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* BOTÓN CREAR WOD */
+
+.register-wod-result-create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 12px 22px;
+
+  border: 1px solid rgba(255, 107, 0, 0.4);
+  border-radius: 12px;
+
+  background: rgba(255, 107, 0, 0.12);
+
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+
+  color: var(--register-orange-light);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.register-wod-result-create:hover {
+  background: rgba(255, 107, 0, 0.2);
+  border-color: var(--register-orange);
+}
+
+.register-wod-result-create:focus-visible {
+  outline: 2px solid var(--register-orange);
+  outline-offset: 3px;
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .register-wod-result-page {
+    padding: 0 0 110px;
+  }
+
+  .register-wod-result-container {
+    gap: 20px;
+  }
+
+  .register-wod-result-header {
+    padding: 32px 24px 0;
+    box-sizing: border-box;
+  }
+
+  .register-wod-result-header h1 {
+    font-size: 28px;
+  }
+
+  .register-wod-result-status,
+  .register-wod-result-error {
+    width: calc(100% - 48px);
+    align-self: center;
+  }
+
+  .register-wod-result-empty {
+    padding: 28px 20px;
+  }
+
+  .register-wod-result-create {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-wod-result-create {
+    transition: none;
+  }
+}

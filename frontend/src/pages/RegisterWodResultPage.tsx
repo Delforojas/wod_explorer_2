@@ -9,7 +9,7 @@ import type { WodAggregateResponse } from "../types/Wod";
 import type { WodResultRequest } from "../types/WodResult";
 
 import RegisterWodResultView from "../views/wod-results/RegisterWodResultView";
-import type { WodResultFormValues } from "../views/wod-results/RegisterWodResultView";
+import type { WodResultFormValues } from "../views/wod-results/RegisterWodResultView.Types";
 
 function getLocalDateTime(): string {
   const now = new Date();

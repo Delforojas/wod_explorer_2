@@ -1,0 +1,332 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   CREATE WOD — EXERCISE CARD
+========================================== */
+
+.wod-exercise-card {
+  --exercise-orange: #ff6b00;
+  --exercise-orange-light: #ff9a3c;
+  --exercise-border: rgba(255, 255, 255, 0.09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 22px;
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--exercise-border);
+  border-radius: 16px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(8, 12, 18, 0.55)
+  );
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.wod-exercise-card:hover {
+  border-color: rgba(255, 107, 0, 0.24);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.wod-exercise-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.wod-exercise-card-heading {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 6px;
+}
+
+.wod-exercise-card-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: var(--exercise-orange-light);
+}
+
+.wod-exercise-card-heading h3 {
+  margin: 0;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+
+  color: #efeded;
+}
+
+.wod-exercise-card-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  min-height: 30px;
+  padding: 6px 12px;
+
+  border: 1px solid rgba(255, 107, 0, 0.25);
+  border-radius: 8px;
+
+  background: rgba(255, 107, 0, 0.08);
+
+  color: var(--exercise-orange-light);
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   FIELDS GRID
+========================================== */
+
+.wod-exercise-card-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  width: 100%;
+  gap: 16px;
+}
+
+.wod-exercise-card-field-full {
+  grid-column: 1 / -1;
+}
+
+/* ==========================================
+   FIELD
+========================================== */
+
+.wod-exercise-card-field {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 9px;
+}
+
+.wod-exercise-card-field label {
+  font-size: 12px;
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================
+   INPUTS / SELECTS
+========================================== */
+
+.wod-exercise-card-field input,
+.wod-exercise-card-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+
+  padding: 12px 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  background-color: rgba(8, 12, 18, 0.75);
+
+  color: #f5f5f7;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.wod-exercise-card-field input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.wod-exercise-card-field input:hover,
+.wod-exercise-card-field select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.wod-exercise-card-field input:focus,
+.wod-exercise-card-field select:focus {
+  border-color: var(--exercise-orange);
+  background-color: rgba(12, 16, 24, 0.95);
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.wod-exercise-card-field input:focus-visible,
+.wod-exercise-card-field select:focus-visible {
+  outline: 2px solid var(--exercise-orange);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SELECT
+========================================== */
+
+.wod-exercise-card-field select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 42px;
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+}
+
+.wod-exercise-card-field select option {
+  background: #141820;
+  color: #f5f5f7;
+}
+
+/* ==========================================
+   NUMBER INPUT
+========================================== */
+
+.wod-exercise-card-field input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.wod-exercise-card-field input[type="number"]::-webkit-inner-spin-button,
+.wod-exercise-card-field input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.wod-exercise-card-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  width: 100%;
+}
+
+.wod-exercise-card-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+  padding: 10px 18px;
+
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 10px;
+
+  background: rgba(248, 113, 113, 0.07);
+
+  color: #fca5a5;
+
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.wod-exercise-card-delete:hover {
+  background: rgba(248, 113, 113, 0.13);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.wod-exercise-card-delete:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .wod-exercise-card {
+    padding: 20px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .wod-exercise-card {
+    padding: 18px;
+    gap: 20px;
+
+    border-radius: 14px;
+  }
+
+  .wod-exercise-card-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .wod-exercise-card-heading h3 {
+    font-size: 17px;
+  }
+
+  .wod-exercise-card-field input,
+  .wod-exercise-card-field select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .wod-exercise-card-actions {
+    justify-content: stretch;
+  }
+
+  .wod-exercise-card-delete {
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .wod-exercise-card,
+  .wod-exercise-card-field input,
+  .wod-exercise-card-field select,
+  .wod-exercise-card-delete {
+    transition: none;
+  }
+}
