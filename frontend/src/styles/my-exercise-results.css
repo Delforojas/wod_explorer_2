@@ -4,9 +4,9 @@
 ========================================== */
 
 .exercise-results-page {
-  --results-orange: #ff6b00;
-  --results-orange-light: #ff9a3c;
-  --results-border: rgba(255, 255, 255, 0.09);
+  --results-orange: var(--color-orange-500);
+  --results-orange-light: var(--color-orange-300);
+  --results-border: var(--color-white-alpha-09);
 
   --results-background: linear-gradient(
     120deg,
@@ -21,7 +21,7 @@
   width: 100%;
   min-height: 100%;
 
-  padding: 24px 20px 110px;
+  padding: var(--space-6) var(--space-5) 110px;
   box-sizing: border-box;
 
   background: transparent;
@@ -29,59 +29,12 @@
 
 /* CONTENEDOR */
 
-.exercise-results-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  width: 100%;
-  max-width: 1200px;
-
-  margin: 0 auto;
-  gap: 28px;
-}
-
 /* ENCABEZADO */
 
 .exercise-results-header {
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
   text-align: center;
-}
-
-.exercise-results-eyebrow {
-  margin: 0 0 10px;
-
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.exercise-results-header h1 {
-  margin: 0 0 12px;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 29px;
-  font-weight: 600;
-
-  line-height: 1.2;
-  letter-spacing: -1px;
-
-  color: #ffffff;
-}
-
-.exercise-results-description {
-  max-width: 420px;
-
-  margin: 0 auto;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
 }
 
 /* NAVEGACIÓN */
@@ -93,7 +46,7 @@
   justify-content: center;
 
   width: 100%;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .exercise-results-nav-link {
@@ -102,7 +55,7 @@
   justify-content: center;
 
   min-height: 46px;
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-5);
 
   border: 1px solid var(--results-border);
   border-radius: 50px;
@@ -184,11 +137,11 @@
   }
 
   .exercise-results-container {
-    gap: 20px;
+    gap: var(--space-5);
   }
 
   .exercise-results-header {
-    padding: 32px 24px 0;
+    padding: var(--space-8) var(--space-6) 0;
     box-sizing: border-box;
   }
 
@@ -197,13 +150,13 @@
   }
 
   .exercise-results-navigation {
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     box-sizing: border-box;
   }
 
   .exercise-results-nav-link {
     flex: 1;
-    padding: 12px 14px;
+    padding: var(--space-3) 14px;
   }
 
   .exercise-results-empty,

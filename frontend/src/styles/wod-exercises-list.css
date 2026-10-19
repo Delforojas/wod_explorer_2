@@ -4,9 +4,9 @@
 ========================================== */
 
 .wod-exercises-list {
-  --exercises-orange: #ff6b00;
-  --exercises-orange-light: #ff9a3c;
-  --exercises-border: rgba(255, 255, 255, 0.09);
+  --exercises-orange: var(--color-orange-500);
+  --exercises-orange-light: var(--color-orange-300);
+  --exercises-border: var(--color-white-alpha-09);
 
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 24px;
+  gap: var(--space-6);
   padding: 28px;
 
   box-sizing: border-box;
@@ -41,7 +41,7 @@
   align-items: flex-start;
   justify-content: space-between;
 
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .wod-exercises-heading {
@@ -49,7 +49,7 @@
   flex-direction: column;
 
   min-width: 0;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .wod-exercises-eyebrow {
@@ -66,7 +66,7 @@
 
   color: #efeded;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.5px;
@@ -94,7 +94,7 @@
   flex-shrink: 0;
 
   min-height: 32px;
-  padding: 6px 12px;
+  padding: 6px var(--space-3);
 
   border: 1px solid rgba(255, 107, 0, 0.3);
   border-radius: 10px;
@@ -103,7 +103,7 @@
 
   color: var(--exercises-orange-light);
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 11px;
   font-weight: 600;
 }
@@ -118,8 +118,8 @@
   align-items: center;
   justify-content: center;
 
-  gap: 12px;
-  padding: 36px 24px;
+  gap: var(--space-3);
+  padding: 36px var(--space-6);
 
   border: 1px dashed rgba(255, 255, 255, 0.14);
   border-radius: 16px;
@@ -152,7 +152,7 @@
 
   color: #efeded;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 600;
 }
@@ -175,7 +175,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 /* ==========================================
@@ -191,7 +191,7 @@
   min-height: 50px;
 
   gap: 10px;
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-5);
 
   border: 1px dashed rgba(255, 107, 0, 0.45);
   border-radius: 12px;
@@ -200,7 +200,7 @@
 
   color: var(--exercises-orange-light);
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
 
@@ -235,12 +235,12 @@
 
 @media (max-width: 768px) {
   .wod-exercises-list {
-    padding: 24px;
-    gap: 20px;
+    padding: var(--space-6);
+    gap: var(--space-5);
   }
 
   .wod-exercises-header {
-    gap: 16px;
+    gap: var(--space-4);
   }
 }
 
@@ -250,8 +250,8 @@
 
 @media (max-width: 480px) {
   .wod-exercises-list {
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
 
     border-radius: 16px;
   }

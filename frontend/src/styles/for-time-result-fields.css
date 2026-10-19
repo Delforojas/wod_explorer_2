@@ -4,9 +4,9 @@
 ========================================== */
 
 .for-time-result-fields {
-  --for-time-orange: #ff6b00;
-  --for-time-orange-light: #ff9a3c;
-  --for-time-border: rgba(255, 255, 255, 0.09);
+  --for-time-orange: var(--color-orange-500);
+  --for-time-orange-light: var(--color-orange-300);
+  --for-time-border: var(--color-white-alpha-09);
 
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 24px;
+  gap: var(--space-6);
   padding: 28px;
 
   box-sizing: border-box;
@@ -41,7 +41,7 @@
   flex-direction: column;
   align-items: flex-start;
 
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .for-time-result-eyebrow {
@@ -52,27 +52,6 @@
   color: var(--for-time-orange-light);
 }
 
-.for-time-result-header h2 {
-  margin: 0;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-
-  color: #efeded;
-}
-
-.for-time-result-header p {
-  max-width: 520px;
-  margin: 0;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
-}
-
 /* ==========================================
    SECTION
 ========================================== */
@@ -81,7 +60,7 @@
   display: flex;
   flex-direction: column;
 
-  gap: 20px;
+  gap: var(--space-5);
   padding: 22px;
 
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -94,7 +73,7 @@
   display: flex;
   flex-direction: column;
 
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .for-time-result-section-label {
@@ -129,16 +108,6 @@
    FIELDS
 ========================================== */
 
-.for-time-result-field {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  min-width: 0;
-
-  gap: 9px;
-}
-
 .for-time-result-field label {
   font-size: 12px;
   font-weight: 500;
@@ -150,34 +119,6 @@
 /* ==========================================
    INPUTS Y SELECTS
 ========================================== */
-
-.for-time-result-field input,
-.for-time-result-field select {
-  width: 100%;
-  min-width: 0;
-  min-height: 50px;
-
-  padding: 12px 16px;
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-
-  background-color: rgba(8, 12, 18, 0.75);
-
-  color: #f5f5f7;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 15px;
-
-  outline: none;
-
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
 
 .for-time-result-field input::placeholder {
   color: rgba(255, 255, 255, 0.25);
@@ -207,20 +148,6 @@
    SELECT
 ========================================== */
 
-.for-time-result-field select {
-  appearance: none;
-  -webkit-appearance: none;
-
-  padding-right: 42px;
-  cursor: pointer;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 16px;
-}
-
 .for-time-result-field select option {
   background: #141820;
   color: #f5f5f7;
@@ -248,7 +175,7 @@
 .for-time-result-help {
   margin: 0;
 
-  padding: 12px 16px;
+  padding: var(--space-3) var(--space-4);
 
   border-left: 2px solid var(--for-time-orange);
   border-radius: 0 8px 8px 0;
@@ -267,8 +194,8 @@
 
 @media (max-width: 768px) {
   .for-time-result-fields {
-    padding: 24px;
-    gap: 20px;
+    padding: var(--space-6);
+    gap: var(--space-5);
   }
 }
 
@@ -278,8 +205,8 @@
 
 @media (max-width: 480px) {
   .for-time-result-fields {
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
 
     border-radius: 16px;
   }

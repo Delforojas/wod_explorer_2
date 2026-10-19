@@ -4,9 +4,9 @@
 ========================================== */
 
 .wod-result-selected-card {
-  --selected-orange: #ff6b00;
-  --selected-orange-light: #ff9a3c;
-  --selected-border: rgba(255, 255, 255, 0.09);
+  --selected-orange: var(--color-orange-500);
+  --selected-orange-light: var(--color-orange-300);
+  --selected-border: var(--color-white-alpha-09);
 
   position: relative;
 
@@ -16,7 +16,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 24px;
+  gap: var(--space-6);
   padding: 28px;
 
   box-sizing: border-box;
@@ -69,7 +69,7 @@
   align-items: flex-start;
   justify-content: space-between;
 
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .wod-result-selected-heading {
@@ -77,7 +77,7 @@
   flex-direction: column;
 
   min-width: 0;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .wod-result-selected-eyebrow {
@@ -93,7 +93,7 @@
 .wod-result-selected-heading h2 {
   margin: 0;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 24px;
   font-weight: 600;
 
@@ -117,7 +117,7 @@
   flex-shrink: 0;
 
   min-height: 30px;
-  padding: 6px 12px;
+  padding: 6px var(--space-3);
 
   border: 1px solid rgba(255, 107, 0, 0.3);
   border-radius: 8px;
@@ -126,7 +126,7 @@
 
   color: var(--selected-orange-light);
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 10px;
   font-weight: 700;
 
@@ -141,7 +141,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 /* ==========================================
@@ -153,9 +153,9 @@
   flex-direction: column;
 
   min-width: 0;
-  gap: 8px;
+  gap: var(--space-2);
 
-  padding: 16px;
+  padding: var(--space-4);
 
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
@@ -174,7 +174,7 @@
 }
 
 .wod-result-selected-value {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 600;
 
@@ -187,8 +187,8 @@
 
 @media (max-width: 768px) {
   .wod-result-selected-card {
-    padding: 24px;
-    gap: 20px;
+    padding: var(--space-6);
+    gap: var(--space-5);
   }
 
   .wod-result-selected-heading h2 {
@@ -202,8 +202,8 @@
 
 @media (max-width: 480px) {
   .wod-result-selected-card {
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
 
     border-radius: 16px;
   }

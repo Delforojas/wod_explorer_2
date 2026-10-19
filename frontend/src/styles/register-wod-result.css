@@ -3,49 +3,19 @@
    REGISTER WOD RESULT — PAGE
 ========================================== */
 
-/* REUTILIZAR ESTILOS DEL REGISTRO DE EJERCICIOS */
-
-@import "./registerExerciseResult.css";
-
 /* PÁGINA */
 
 .register-wod-result-page {
-  --register-orange: #ff6b00;
-  --register-orange-light: #ff9a3c;
-  --register-border: rgba(255, 255, 255, 0.09);
-
-  --register-background: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0.07),
-    rgba(13, 200, 210, 0.8)
-  );
-
-  display: flex;
-  flex-direction: column;
+  /* También lleva .wod-page: conservar precedencia sobre su responsive. */
   align-items: center;
-
-  width: 100%;
-  min-height: 100%;
-
-  margin: 0;
-  padding: 24px 20px 110px;
-
-  box-sizing: border-box;
-  background: transparent;
+  padding: var(--space-6) var(--space-5) 110px;
 }
 
 /* CONTENEDOR */
 
 .register-wod-result-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  width: 100%;
+  /* Prevalece sobre el max-width móvil de .wod-container. */
   max-width: 800px;
-
-  margin: 0 auto;
-  gap: 28px;
 }
 
 /* ENCABEZADO */
@@ -53,41 +23,6 @@
 .register-wod-result-header {
   width: 100%;
   text-align: center;
-}
-
-.register-wod-result-header .wod-eyebrow {
-  margin: 0 0 10px;
-
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.register-wod-result-header h1 {
-  margin: 0 0 12px;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 29px;
-  font-weight: 600;
-
-  line-height: 1.2;
-  letter-spacing: -1px;
-
-  color: #efeded;
-}
-
-.register-wod-result-header .wod-description {
-  max-width: 420px;
-
-  margin: 0 auto;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
 }
 
 /* NAVEGACIÓN */
@@ -105,31 +40,10 @@
 
   width: 100%;
   min-width: 0;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 /* MENSAJES */
-
-.register-wod-result-status,
-.register-wod-result-error {
-  width: 100%;
-
-  margin: 0;
-  padding: 20px 24px;
-
-  box-sizing: border-box;
-
-  border: 1px solid var(--register-border);
-  border-radius: 20px;
-
-  background: var(--register-background);
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  text-align: center;
-  color: rgba(255, 255, 255, 0.7);
-}
 
 .register-wod-result-error {
   border-color: rgba(248, 113, 113, 0.3);
@@ -144,7 +58,7 @@
   align-items: center;
 
   width: 100%;
-  padding: 32px 24px;
+  padding: var(--space-8) var(--space-6);
   gap: 14px;
 
   box-sizing: border-box;
@@ -175,7 +89,7 @@
 .register-wod-result-empty h2 {
   margin: 0;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 600;
 
@@ -200,8 +114,8 @@
   justify-content: center;
 
   min-height: 44px;
-  margin-top: 8px;
-  padding: 12px 22px;
+  margin-top: var(--space-2);
+  padding: var(--space-3) 22px;
 
   border: 1px solid rgba(255, 107, 0, 0.4);
   border-radius: 12px;
@@ -237,11 +151,11 @@
   }
 
   .register-wod-result-container {
-    gap: 20px;
+    gap: var(--space-5);
   }
 
   .register-wod-result-header {
-    padding: 32px 24px 0;
+    padding: var(--space-8) var(--space-6) 0;
     box-sizing: border-box;
   }
 
@@ -256,7 +170,7 @@
   }
 
   .register-wod-result-empty {
-    padding: 28px 20px;
+    padding: 28px var(--space-5);
   }
 
   .register-wod-result-create {

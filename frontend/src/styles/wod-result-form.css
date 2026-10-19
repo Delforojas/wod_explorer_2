@@ -4,16 +4,16 @@
 ========================================== */
 
 .wod-register-form {
-  --wod-form-orange: #ff6b00;
-  --wod-form-orange-light: #ff9a3c;
-  --wod-form-border: rgba(255, 255, 255, 0.09);
+  --wod-form-orange: var(--color-orange-500);
+  --wod-form-orange-light: var(--color-orange-300);
+  --wod-form-border: var(--color-white-alpha-09);
 
   display: flex;
   flex-direction: column;
 
   width: 100%;
   min-width: 0;
-  gap: 24px;
+  gap: var(--space-6);
 }
 
 /* ==========================================
@@ -27,7 +27,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 24px;
+  gap: var(--space-6);
   padding: 28px;
 
   box-sizing: border-box;
@@ -54,7 +54,7 @@
   flex-direction: column;
   align-items: flex-start;
 
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .wod-register-form-eyebrow {
@@ -66,40 +66,9 @@
   color: var(--wod-form-orange-light);
 }
 
-.wod-register-form-header h2 {
-  margin: 0;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-
-  color: #efeded;
-}
-
-.wod-register-form-header p {
-  max-width: 520px;
-  margin: 0;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
-}
-
 /* ==========================================
    FIELDS
 ========================================== */
-
-.wod-register-form-field {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  min-width: 0;
-
-  gap: 9px;
-}
 
 .wod-register-form-field label {
   font-size: 12px;
@@ -112,33 +81,6 @@
 /* ==========================================
    INPUTS AND SELECTS
 ========================================== */
-
-.wod-register-form-field input,
-.wod-register-form-field select {
-  width: 100%;
-  min-width: 0;
-  min-height: 50px;
-
-  padding: 12px 16px;
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-
-  background-color: rgba(8, 12, 18, 0.75);
-
-  color: #f5f5f7;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 15px;
-
-  outline: none;
-
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
 
 .wod-register-form-field input:hover,
 .wod-register-form-field select:hover {
@@ -163,20 +105,6 @@
 /* ==========================================
    SELECT
 ========================================== */
-
-.wod-register-form-field select {
-  appearance: none;
-  -webkit-appearance: none;
-
-  padding-right: 42px;
-  cursor: pointer;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 16px;
-}
 
 .wod-register-form-field select option {
   background: #141820;
@@ -208,8 +136,8 @@
   flex-wrap: wrap;
 
   width: 100%;
-  gap: 12px;
-  padding-top: 8px;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
 }
 
 /* SUBMIT */
@@ -220,16 +148,16 @@
   justify-content: center;
 
   min-height: 48px;
-  padding: 12px 24px;
+  padding: var(--space-3) var(--space-6);
 
   border: 1px solid rgba(255, 107, 0, 0.45);
   border-radius: 12px;
 
-  background: linear-gradient(135deg, #ff9a3c, #ff6b00);
+  background: linear-gradient(135deg, var(--color-orange-300), var(--color-orange-500));
 
   color: #111318;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
 
@@ -253,7 +181,7 @@
 }
 
 .wod-register-form-submit:focus-visible {
-  outline: 2px solid #ff9a3c;
+  outline: 2px solid var(--color-orange-300);
   outline-offset: 3px;
 }
 
@@ -265,7 +193,7 @@
   justify-content: center;
 
   min-height: 48px;
-  padding: 12px 24px;
+  padding: var(--space-3) var(--space-6);
 
   box-sizing: border-box;
 
@@ -276,7 +204,7 @@
 
   color: rgba(255, 255, 255, 0.72);
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
   text-decoration: none;
@@ -302,8 +230,8 @@
 
 @media (max-width: 768px) {
   .wod-register-form-section {
-    padding: 24px;
-    gap: 20px;
+    padding: var(--space-6);
+    gap: var(--space-5);
   }
 }
 
@@ -313,12 +241,12 @@
 
 @media (max-width: 480px) {
   .wod-register-form {
-    gap: 20px;
+    gap: var(--space-5);
   }
 
   .wod-register-form-section {
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
     border-radius: 16px;
   }
 

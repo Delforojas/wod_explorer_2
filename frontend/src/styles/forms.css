@@ -115,22 +115,95 @@ textarea:focus-visible {
   gap: var(--space-1);
 }
 
-.auth-page {
-  max-width: 440px;
+/* Patrones compartidos de la interfaz actual. Selectores explícitos conservan la especificidad; variantes y responsive permanecen en cada componente. */
+
+.amrap-result-header h2,
+.emom-result-header h2,
+.for-time-result-header h2,
+.wod-register-form-header h2 {
+  margin: 0;
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+
+  color: #efeded;
 }
 
-.auth-separator {
+.amrap-result-header p,
+.emom-result-header p,
+.for-time-result-header p,
+.wod-configuration-description,
+.wod-register-form-header p {
+  max-width: 520px;
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.emom-result-field,
+.for-time-result-field,
+.wod-register-form-field {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--color-text-muted);
-  font-size: 14px;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 9px;
 }
 
-.auth-separator::before,
-.auth-separator::after {
-  height: 1px;
-  flex: 1;
-  background: var(--color-border);
-  content: "";
+.for-time-result-field input,
+.for-time-result-field select,
+.wod-configuration-field input,
+.wod-configuration-field select,
+.wod-exercise-card-field input,
+.wod-exercise-card-field select,
+.wod-register-form-field input,
+.wod-register-form-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+
+  padding: var(--space-3) var(--space-4);
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  background-color: rgba(8, 12, 18, 0.75);
+
+  color: #f5f5f7;
+
+  font-family: var(--font-display);
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.for-time-result-field select,
+.wod-configuration-field select,
+.wod-exercise-card-field select,
+.wod-register-form-field select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 42px;
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
 }

@@ -11,13 +11,13 @@
   min-width: 0;
 
   margin: 0;
-  padding: 32px;
+  padding: var(--space-8);
 
   box-sizing: border-box;
 
-  gap: 24px;
+  gap: var(--space-6);
 
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--color-white-alpha-09);
   border-radius: 24px;
 
   background: linear-gradient(
@@ -29,52 +29,6 @@
   box-shadow:
     0 10px 30px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-/* SELECTOR */
-
-.exercise-result-selector {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  gap: 12px;
-}
-
-.exercise-result-selector label {
-  font-size: 10px;
-  font-weight: 600;
-
-  letter-spacing: 2px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.exercise-result-selector select {
-  width: 100%;
-  min-height: 52px;
-
-  padding: 14px 20px;
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-
-  background: #222222;
-  color: #ffffff;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 14px;
-
-  outline: none;
-}
-
-.exercise-result-selector select:focus-visible {
-  border-color: #ff6b00;
-
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
 }
 
 /* TIPO DE MEDICIÓN */
@@ -89,7 +43,7 @@
 
   background: rgba(255, 107, 0, 0.08);
 
-  color: #ff9a3c;
+  color: var(--color-orange-300);
 
   font-size: 11px;
   font-weight: 600;
@@ -108,16 +62,16 @@
   width: 100%;
   min-height: 50px;
 
-  margin-top: 8px;
+  margin-top: var(--space-2);
   padding: 14px 22px;
 
-  border: 1px solid #ff6b00;
+  border: 1px solid var(--color-orange-500);
   border-radius: 50px;
 
-  background: #ff6b00;
+  background: var(--color-orange-500);
   color: #ffffff;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
 
@@ -130,7 +84,7 @@
 }
 
 .exercise-result-submit:focus-visible {
-  outline: 2px solid #ff9a3c;
+  outline: 2px solid var(--color-orange-300);
   outline-offset: 4px;
 }
 
@@ -153,23 +107,21 @@
   .exercise-result-form {
     width: calc(100% - 48px);
 
-    padding: 24px 20px;
-    gap: 20px;
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-5);
 
     border-radius: 20px;
-  }
-
-  .exercise-result-selector select {
-    font-size: 16px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .exercise-result-submit {
+  .exercise-result-submit,
+  .exercise-result-submit:not(:disabled) {
     transition: none;
   }
 
-  .exercise-result-submit:hover {
+  .exercise-result-submit:hover,
+  .exercise-result-submit:not(:disabled):hover {
     transform: none;
   }
 }

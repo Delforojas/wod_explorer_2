@@ -4,9 +4,9 @@
 ========================================== */
 
 .wod-configuration {
-  --configuration-orange: #ff6b00;
-  --configuration-orange-light: #ff9a3c;
-  --configuration-border: rgba(255, 255, 255, 0.09);
+  --configuration-orange: var(--color-orange-500);
+  --configuration-orange-light: var(--color-orange-300);
+  --configuration-border: var(--color-white-alpha-09);
 
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 24px;
+  gap: var(--space-6);
   padding: 28px;
 
   box-sizing: border-box;
@@ -41,7 +41,7 @@
   flex-direction: column;
   align-items: flex-start;
 
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .wod-configuration-eyebrow {
@@ -57,7 +57,7 @@
 .wod-configuration-header h2 {
   margin: 0;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 600;
 
@@ -65,16 +65,6 @@
   letter-spacing: -0.5px;
 
   color: #efeded;
-}
-
-.wod-configuration-description {
-  max-width: 520px;
-  margin: 0;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
 }
 
 /* ==========================================
@@ -114,34 +104,6 @@
    INPUTS AND SELECTS
 ========================================== */
 
-.wod-configuration-field input,
-.wod-configuration-field select {
-  width: 100%;
-  min-width: 0;
-  min-height: 50px;
-
-  padding: 12px 16px;
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-
-  background-color: rgba(8, 12, 18, 0.75);
-
-  color: #f5f5f7;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 15px;
-
-  outline: none;
-
-  transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
-
 .wod-configuration-field input::placeholder {
   color: rgba(255, 255, 255, 0.25);
 }
@@ -170,20 +132,6 @@
    SELECT
 ========================================== */
 
-.wod-configuration-field select {
-  appearance: none;
-  -webkit-appearance: none;
-
-  padding-right: 42px;
-  cursor: pointer;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 16px;
-}
-
 .wod-configuration-field select option {
   background: #141820;
   color: #f5f5f7;
@@ -210,12 +158,12 @@
 
 @media (max-width: 768px) {
   .wod-configuration {
-    padding: 24px;
-    gap: 20px;
+    padding: var(--space-6);
+    gap: var(--space-5);
   }
 
   .wod-configuration-grid {
-    gap: 16px;
+    gap: var(--space-4);
   }
 }
 
@@ -225,8 +173,8 @@
 
 @media (max-width: 480px) {
   .wod-configuration {
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
 
     border-radius: 16px;
   }

@@ -8,10 +8,10 @@
 ========================================== */
 
 .wod-detail-page {
-  --detail-orange: #ff6b00;
-  --detail-orange-light: #ff9a3c;
+  --detail-orange: var(--color-orange-500);
+  --detail-orange-light: var(--color-orange-300);
 
-  --detail-border: rgba(255, 255, 255, 0.09);
+  --detail-border: var(--color-white-alpha-09);
 
   --detail-card-background: linear-gradient(
     120deg,
@@ -29,7 +29,7 @@
   min-width: 0;
   min-height: 100%;
 
-  padding: 24px 20px 110px;
+  padding: var(--space-6) var(--space-5) 110px;
   margin: 0;
 
   box-sizing: border-box;
@@ -70,7 +70,7 @@
   min-height: 46px;
 
   margin: 0;
-  padding: 12px 20px;
+  padding: var(--space-3) var(--space-5);
 
   box-sizing: border-box;
 
@@ -106,7 +106,7 @@
 /* EYEBROW */
 
 .wod-detail-page .wod-detail-eyebrow {
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-3);
 
   font-size: 10px;
   font-weight: 700;
@@ -122,7 +122,7 @@
 .wod-detail-page .wod-detail-header h1 {
   margin: 0 0 14px;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(28px, 4vw, 42px);
   font-weight: 700;
 
@@ -225,7 +225,7 @@
 .wod-detail-page .wod-detail-panel > h2 {
   margin: 0 0 26px;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
 
@@ -249,7 +249,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 20px;
+  gap: var(--space-5);
 
   margin: 0;
   padding: 0;
@@ -270,7 +270,7 @@
   min-width: 0;
   min-height: 170px;
 
-  padding: 20px 22px;
+  padding: var(--space-5) 22px;
 
   box-sizing: border-box;
 
@@ -301,7 +301,7 @@
 
   margin: 0 0 14px;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
 
@@ -338,7 +338,7 @@
 
   width: 100%;
 
-  gap: 8px;
+  gap: var(--space-2);
   margin-top: auto;
 }
 
@@ -348,7 +348,7 @@
 
   max-width: 100%;
 
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
 
   box-sizing: border-box;
 
@@ -432,11 +432,11 @@
 
 @media (max-width: 768px) {
   .wod-detail-page .wod-detail-panel {
-    padding: 26px 24px;
+    padding: 26px var(--space-6);
   }
 
   .wod-detail-page .wod-detail-sequence {
-    gap: 16px;
+    gap: var(--space-4);
   }
 }
 
@@ -446,20 +446,20 @@
 
 @media (max-width: 480px) {
   .wod-detail-page {
-    padding: 24px 0 110px;
+    padding: var(--space-6) 0 110px;
   }
 
   .wod-detail-page .wod-detail-container {
     width: 100%;
-    gap: 24px;
+    gap: var(--space-6);
   }
 
   .wod-detail-page .wod-detail-back {
-    margin: 0 24px;
+    margin: 0 var(--space-6);
   }
 
   .wod-detail-page .wod-detail-header {
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     box-sizing: border-box;
   }
 
@@ -468,7 +468,7 @@
   }
 
   .wod-detail-page .wod-detail-meta {
-    gap: 8px;
+    gap: var(--space-2);
   }
 
   .wod-detail-page .wod-detail-panel {
@@ -481,19 +481,19 @@
   }
 
   .wod-detail-page .wod-detail-panel > h2 {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     font-size: 20px;
   }
 
   .wod-detail-page .wod-detail-sequence {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: var(--space-3);
   }
 
   .wod-detail-page .wod-detail-exercise {
     min-height: 0;
 
-    padding: 18px 20px;
+    padding: 18px var(--space-5);
 
     border-radius: 16px;
   }

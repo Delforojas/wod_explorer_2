@@ -8,10 +8,10 @@
 ========================================== */
 
 .exercise-page {
-  --exercise-orange: #ff6b00;
-  --exercise-orange-light: #ff9a3c;
+  --exercise-orange: var(--color-orange-500);
+  --exercise-orange-light: var(--color-orange-300);
 
-  --exercise-border: rgba(255, 255, 255, 0.09);
+  --exercise-border: var(--color-white-alpha-09);
 
   --exercise-card-background: linear-gradient(
     120deg,
@@ -29,7 +29,7 @@
   min-height: 100%;
 
   margin: 0;
-  padding: 24px 20px 110px;
+  padding: var(--space-6) var(--space-5) 110px;
 
   box-sizing: border-box;
 
@@ -39,94 +39,23 @@
    CONTENEDOR
 ========================================== */
 
-.exercise-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  width: 100%;
-  max-width: 1200px;
-
-  margin: 0 auto;
-  gap: 28px;
-}
-
 /* ==========================================
    ENCABEZADO
 ========================================== */
 
 .exercise-header {
   width: 100%;
-  margin-bottom: 32px;
+  margin-bottom: var(--space-8);
   text-align: center;
-}
-
-.exercise-eyebrow {
-  margin: 0 0 10px;
-
-  font-size: 10px;
-  font-weight: 600;
-
-  letter-spacing: 3px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.exercise-header h1 {
-  margin: 0 0 12px;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 29px;
-  font-weight: 600;
-
-  line-height: 1.2;
-  letter-spacing: -1px;
-
-  color: #ffffff;
-}
-
-.exercise-description {
-  max-width: 300px;
-
-  margin: 0 auto;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
 }
 
 /* ==========================================
    CONTADOR
 ========================================== */
 
-.exercise-count {
-  width: 100%;
-  margin: 0;
-
-  text-align: center;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
-}
-
 /* ==========================================
    GRID
 ========================================== */
-
-.exercise-grid {
-  display: grid;
-
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
-
-  align-items: stretch;
-
-  width: 100%;
-  gap: 20px;
-}
 
 .exercise-grid-guest {
   align-items: start;
@@ -173,7 +102,7 @@
   width: 100%;
   min-width: 0;
 
-  padding: 20px 22px;
+  padding: var(--space-5) 22px;
 
   box-sizing: border-box;
 }
@@ -181,34 +110,6 @@
 /* ==========================================
    TÍTULO
 ========================================== */
-
-.exercise-card h2 {
-  width: 100%;
-  max-width: 100%;
-
-  margin: 0 0 14px;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-
-  line-height: 1.3;
-  letter-spacing: -0.5px;
-
-  text-align: left;
-
-  color: #ffffff;
-
-  background-image: linear-gradient(
-    to right,
-    var(--wod-orange),
-    var(--wod-orange-light)
-  );
-
-  background-position: left bottom;
-  background-repeat: no-repeat;
-  background-size: 0% 2px;
-}
 
 /* ==========================================
    SUBRAYADO NARANJA
@@ -233,49 +134,9 @@
    METADATOS
 ========================================== */
 
-.exercise-card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-
-  width: 100%;
-
-  gap: 10px;
-  margin: 0 0 16px;
-}
-
 /* ==========================================
    ETIQUETAS
 ========================================== */
-
-.exercise-card-meta span,
-.exercise-card-tag {
-  display: inline-flex;
-  align-items: center;
-
-  max-width: 100%;
-
-  padding: 8px 12px;
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50px;
-
-  background: rgba(255, 255, 255, 0.07);
-
-  color: rgba(255, 255, 255, 0.7);
-
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.4;
-
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-
-  overflow-wrap: anywhere;
-}
 
 /* ==========================================
    DESCRIPCIÓN OPCIONAL
@@ -283,7 +144,7 @@
 
 .exercise-card-description {
   width: 100%;
-  margin: 0 0 20px;
+  margin: 0 0 var(--space-5);
 
   font-size: 13px;
   line-height: 1.7;
@@ -294,16 +155,6 @@
 /* ==========================================
    ACCIONES
 ========================================== */
-
-.exercise-card-actions {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-
-  gap: 12px;
-  margin-top: auto;
-}
 
 /* ==========================================
    BOTÓN REGISTRAR RESULTADO
@@ -368,11 +219,11 @@
   min-height: 0;
   height: auto;
 
-  padding: 20px 22px;
+  padding: var(--space-5) 22px;
 }
 
 .exercise-card-guest h2 {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .exercise-card-guest .exercise-card-meta {
@@ -388,11 +239,11 @@
 }
 
 .exercise-card:not(.exercise-card-guest) .exercise-card-content {
-  padding: 20px 22px;
+  padding: var(--space-5) 22px;
 }
 
 .exercise-card:not(.exercise-card-guest) .exercise-card-meta {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
 }
 
 /* ==========================================
@@ -466,16 +317,6 @@
    SEPARADOR
 ========================================== */
 
-.exercise-divider {
-  display: flex;
-  align-items: center;
-
-  width: 100%;
-  gap: 15px;
-
-  margin: 28px 0;
-}
-
 .exercise-divider::before,
 .exercise-divider::after {
   content: "";
@@ -500,7 +341,7 @@
 .exercise-detail {
   width: 100%;
 
-  padding: 40px 35px;
+  padding: var(--space-10) 35px;
 
   box-sizing: border-box;
 
@@ -514,16 +355,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-.exercise-detail h3 {
-  margin: 0 0 24px;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-
-  color: #ffffff;
-}
-
 /* ==========================================
    DATOS DEL EJERCICIO
 ========================================== */
@@ -533,7 +364,7 @@
 
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
 
-  gap: 20px;
+  gap: var(--space-5);
   margin: 0;
 }
 
@@ -542,7 +373,7 @@
   flex-direction: column;
 
   min-width: 0;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .exercise-detail-data dt {
@@ -575,7 +406,7 @@
   width: 100%;
 
   margin: 0;
-  padding: 24px;
+  padding: var(--space-6);
 
   box-sizing: border-box;
 
@@ -602,121 +433,11 @@
 
 @media (max-width: 768px) {
   .exercise-page {
-    padding: 16px 20px 110px;
+    padding: var(--space-4) var(--space-5) 110px;
   }
 
   .exercise-detail {
     padding: 35px 30px;
-  }
-}
-
-/* ==========================================
-   MÓVILES
-========================================== */
-
-@media (max-width: 480px) {
-  .exercise-page {
-    align-items: stretch;
-
-    padding: 0 0 110px;
-  }
-
-  .exercise-container {
-    max-width: none;
-    gap: 20px;
-  }
-
-  .exercise-header {
-    margin-bottom: 0;
-
-    padding: 32px 24px 0;
-
-    box-sizing: border-box;
-  }
-
-  .exercise-header h1 {
-    font-size: 28px;
-  }
-
-  .exercise-count {
-    padding: 0 24px;
-    box-sizing: border-box;
-  }
-
-  .exercise-grid {
-    grid-template-columns: 1fr;
-
-    gap: 16px;
-
-    padding: 0 24px;
-
-    box-sizing: border-box;
-  }
-
-  .exercise-card h2 {
-    font-size: 19px;
-  }
-
-  /* VISITANTES */
-
-  .exercise-card-guest {
-    min-height: 0;
-  }
-
-  .exercise-card-guest .exercise-card-content {
-    padding: 18px 20px;
-  }
-
-  .exercise-card-guest h2 {
-    margin-bottom: 10px;
-  }
-
-  /* USUARIOS AUTENTICADOS */
-
-  .exercise-card:not(.exercise-card-guest) {
-    min-height: 170px;
-  }
-
-  .exercise-card:not(.exercise-card-guest) .exercise-card-content {
-    padding: 18px 20px;
-  }
-
-  .exercise-card:not(.exercise-card-guest) .exercise-card-meta {
-    margin-bottom: 14px;
-  }
-
-  .exercise-card-action {
-    min-height: 46px;
-  }
-
-  /* DETALLE */
-
-  .exercise-detail {
-    width: auto;
-
-    margin: 0 24px;
-    padding: 32px 24px;
-  }
-}
-
-/* ==========================================
-   MOVIMIENTO REDUCIDO
-========================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  .exercise-card,
-  .exercise-card-title,
-  .exercise-card-action,
-  .exercise-card-arrow {
-    transition: none;
-  }
-
-  .exercise-card:hover {
-    transform: none;
-  }
-
-  .exercise-card-action:hover .exercise-card-arrow {
-    transform: none;
   }
 }
 /* ==========================================
@@ -725,16 +446,6 @@
 ========================================== */
 
 /* CONTENEDOR */
-
-.exercise-search {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  max-width: 420px;
-
-  gap: 12px;
-}
 
 /* ETIQUETA */
 
@@ -770,7 +481,7 @@
 
   color: #ffffff;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 500;
 
@@ -823,53 +534,105 @@
   cursor: pointer;
 }
 
-/* TABLETS */
-
-@media (max-width: 768px) {
-  .exercise-search {
-    max-width: 420px;
-  }
-}
-
 /* MÓVILES */
 
 @media (max-width: 480px) {
+  .exercise-page {
+    align-items: stretch;
+
+    padding: 0 0 110px;
+  }
+
+  .exercise-container {
+    max-width: none;
+    gap: var(--space-5);
+  }
+
+  .exercise-header {
+    margin-bottom: 0;
+
+    padding: var(--space-8) var(--space-6) 0;
+
+    box-sizing: border-box;
+  }
+
+  .exercise-header h1 {
+    font-size: 28px;
+  }
+
+  .exercise-count {
+    padding: 0 var(--space-6);
+    box-sizing: border-box;
+  }
+
+  .exercise-grid {
+    grid-template-columns: 1fr;
+
+    gap: var(--space-4);
+
+    padding: 0 var(--space-6);
+
+    box-sizing: border-box;
+  }
+
+  .exercise-card h2 {
+    font-size: 19px;
+  }
+
+  /* VISITANTES */
+
+  .exercise-card-guest {
+    min-height: 0;
+  }
+
+  .exercise-card-guest .exercise-card-content {
+    padding: 18px var(--space-5);
+  }
+
+  .exercise-card-guest h2 {
+    margin-bottom: 10px;
+  }
+
+  /* USUARIOS AUTENTICADOS */
+
+  .exercise-card:not(.exercise-card-guest) {
+    min-height: 170px;
+  }
+
+  .exercise-card:not(.exercise-card-guest) .exercise-card-content {
+    padding: 18px var(--space-5);
+  }
+
+  .exercise-card:not(.exercise-card-guest) .exercise-card-meta {
+    margin-bottom: 14px;
+  }
+
+  .exercise-card-action {
+    min-height: 46px;
+  }
+
+  /* DETALLE */
+
+  .exercise-detail {
+    width: auto;
+
+    margin: 0 var(--space-6);
+    padding: var(--space-8) var(--space-6);
+  }
   .exercise-search {
     max-width: none;
 
-    padding: 0 24px;
+    padding: 0 var(--space-6);
 
     box-sizing: border-box;
   }
 
   .exercise-search input {
     min-height: 50px;
-    padding: 14px 20px;
+    padding: 14px var(--space-5);
 
     font-size: 16px;
     border-radius: 20px;
-  }
-}
-
-/* ==========================================
-   ACCESIBILIDAD — MOVIMIENTO REDUCIDO
-========================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  .exercise-search input,
-  .exercise-card,
-  .exercise-card-title,
-  .exercise-card-action,
-  .exercise-card-arrow {
-    transition: none;
-  }
-
-  .exercise-card:hover {
-    transform: none;
-  }
-
-  .exercise-card-action:hover .exercise-card-arrow {
-    transform: none;
   }
 }
 
@@ -890,7 +653,7 @@
 
   .exercise-card:active,
   .exercise-card:focus-within {
-    border-color: #ff6b00;
+    border-color: var(--color-orange-500);
 
     box-shadow:
       0 12px 30px rgba(255, 107, 0, 0.12),
@@ -907,17 +670,27 @@
   /* Botón pulsado */
 
   .exercise-card-action:active {
-    background: #ff6b00;
-    border-color: #ff6b00;
+    background: var(--color-orange-500);
+    border-color: var(--color-orange-500);
   }
 }
 
-/* ==========================================
-   MOVIMIENTO REDUCIDO — INTERACCIÓN TÁCTIL
-========================================== */
+/* Movimiento reducido: conservar prioridad después de hover y touch. */
 
 @media (prefers-reduced-motion: reduce) {
-  .exercise-card {
+  .exercise-search input,
+  .exercise-card,
+  .exercise-card-title,
+  .exercise-card-action,
+  .exercise-card-arrow {
     transition: none;
+  }
+
+  .exercise-card:hover {
+    transform: none;
+  }
+
+  .exercise-card-action:hover .exercise-card-arrow {
+    transform: none;
   }
 }

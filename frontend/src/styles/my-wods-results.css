@@ -17,7 +17,7 @@
   justify-content: center;
 
   width: 100%;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 /* ==========================================
@@ -26,7 +26,7 @@
 
 .my-wod-result-card {
   justify-content: flex-start;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 /* ==========================================
@@ -57,7 +57,7 @@
   width: 100%;
 
   margin-top: auto;
-  padding: 20px 16px;
+  padding: var(--space-5) var(--space-4);
 
   box-sizing: border-box;
 
@@ -74,7 +74,7 @@
 .my-wod-result-value {
   margin: 0;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 18px;
   font-weight: 600;
   line-height: 1.4;
@@ -133,7 +133,7 @@
 @media (max-width: 480px) {
   .my-wod-results-navigation,
   .my-wod-results-actions {
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     box-sizing: border-box;
   }
 
@@ -142,7 +142,7 @@
   }
 
   .my-wod-result-card {
-    gap: 16px;
+    gap: var(--space-4);
   }
 
   .my-wod-result-date {
@@ -150,7 +150,7 @@
   }
 
   .my-wod-result-content {
-    padding: 20px 16px;
+    padding: var(--space-5) var(--space-4);
   }
 
   .my-wod-result-value {

@@ -346,7 +346,7 @@
 
   max-height: calc(100dvh - 112px);
 
-  padding: 8px;
+  padding: var(--space-2);
 
   /* Fondo completamente sólido */
 
@@ -384,11 +384,11 @@
 
   justify-content: flex-start;
 
-  gap: 12px;
+  gap: var(--space-3);
 
   min-height: 44px;
 
-  padding: 10px 12px;
+  padding: 10px var(--space-3);
 
   background: transparent;
 
@@ -426,7 +426,7 @@
 .mobile-more-close {
   width: 100%;
 
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 /* ==========================================================
@@ -462,13 +462,18 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mobile-navigation .nav-link,
+  .mobile-navigation .mobile-nav-list .nav-link,
+  .mobile-navigation .mobile-auth-actions .nav-link,
   .mobile-navigation .mobile-more-button,
   .mobile-navigation .nav-icon {
     transition: none;
   }
 
   .mobile-navigation .nav-link:hover,
+  .mobile-navigation .mobile-nav-list .nav-link:hover,
+  .mobile-navigation .mobile-auth-actions .nav-link:hover,
   .mobile-navigation .mobile-more-button:hover,
+  .mobile-navigation .mobile-more-button:hover:not(:disabled),
   .mobile-navigation .nav-link:active,
   .mobile-navigation .mobile-more-button:active,
   .mobile-navigation .nav-link:hover .nav-icon,

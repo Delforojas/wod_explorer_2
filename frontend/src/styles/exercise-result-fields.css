@@ -9,7 +9,7 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
 
   width: 100%;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 /* CAMPO */
@@ -21,7 +21,7 @@
   min-width: 0;
   width: 100%;
 
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 /* ETIQUETA */
@@ -43,7 +43,7 @@
   min-height: 52px;
 
   margin: 0;
-  padding: 14px 20px;
+  padding: 14px var(--space-5);
 
   box-sizing: border-box;
 
@@ -54,7 +54,7 @@
 
   color: #ffffff;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 500;
 
@@ -64,7 +64,7 @@
 }
 
 .exercise-result-field input:focus-visible {
-  border-color: #ff6b00;
+  border-color: var(--color-orange-500);
 
   box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
 }

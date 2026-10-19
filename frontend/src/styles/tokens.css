@@ -1,4 +1,9 @@
 :root {
+  /* Valores de la interfaz actual; conservar separados del primary índigo. */
+  --color-orange-500: #ff6b00;
+  --color-orange-300: #ff9a3c;
+  --color-white-alpha-09: rgba(255, 255, 255, 0.09);
+  --font-display: "Space Grotesk", sans-serif;
   --color-primary-300: #91aeff;
   --color-primary-400: #5e84fc;
   --color-primary-500: #3758f9;

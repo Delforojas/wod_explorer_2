@@ -21,13 +21,13 @@
   justify-content: center;
 
   min-height: 44px;
-  padding: 10px 16px;
+  padding: 10px var(--space-4);
 
   border: 1px solid #262626;
   border-radius: 6px;
 
   background: #000000;
-  color: #ff6b00;
+  color: var(--color-orange-500);
 
   font-size: 13px;
   font-weight: 500;
@@ -56,9 +56,9 @@
 
 @media (hover: hover) and (pointer: fine) {
   .marks-nav-link:hover:not(:disabled) {
-    border-color: #ff6b00;
+    border-color: var(--color-orange-500);
     background: rgb(255 107 0 / 12%);
-    color: #ff6b00;
+    color: var(--color-orange-500);
 
     box-shadow: none;
     text-decoration: none;
@@ -71,9 +71,9 @@
 
 @media (hover: none) and (pointer: coarse) {
   .marks-nav-link:active:not(:disabled) {
-    border-color: #ff6b00;
+    border-color: var(--color-orange-500);
     background: rgb(255 107 0 / 12%);
-    color: #ff6b00;
+    color: var(--color-orange-500);
 
     box-shadow: none;
     text-decoration: none;
@@ -94,7 +94,7 @@
    ========================================== */
 
 .marks-nav-link:focus-visible {
-  outline: 2px solid #ff6b00;
+  outline: 2px solid var(--color-orange-500);
   outline-offset: 3px;
 }
 
@@ -104,12 +104,12 @@
 
 @media (max-width: 600px) {
   .marks-navigation {
-    gap: 8px;
+    gap: var(--space-2);
   }
 
   .marks-nav-link {
     flex: 1 1 auto;
-    padding: 10px 8px;
+    padding: 10px var(--space-2);
     font-size: 12px;
   }
 

@@ -1,0 +1,52 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   REGISTER EXERCISE RESULT — PAGE
+========================================== */
+
+/* CONTENEDOR */
+
+/* ENCABEZADO */
+
+.register-result-header {
+  width: 100%;
+  text-align: center;
+}
+
+/* MENSAJES */
+
+.register-result-error {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #fca5a5;
+}
+
+.register-result-success {
+  border-color: rgba(74, 222, 128, 0.3);
+  color: #86efac;
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .register-result-page {
+    padding: 0 0 110px;
+  }
+
+  .register-result-container {
+    gap: var(--space-5);
+  }
+
+  .register-result-header {
+    padding: var(--space-8) var(--space-6) 0;
+    box-sizing: border-box;
+  }
+
+  .register-result-header h1 {
+    font-size: 28px;
+  }
+
+  .register-result-loading,
+  .register-result-error,
+  .register-result-success {
+    width: calc(100% - 48px);
+  }
+}

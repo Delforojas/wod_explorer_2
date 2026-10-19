@@ -123,14 +123,14 @@
 .resource-list.glass-panel .resource-row:hover h3,
 .resource-list.glass-panel .resource-row:focus-within h2,
 .resource-list.glass-panel .resource-row:focus-within h3 {
-  color: #ff6b00;
+  color: var(--color-orange-500);
 }
 
 /* FLECHA NARANJA */
 
 .resource-list.glass-panel .resource-row:hover .exercise-row-action,
 .resource-list.glass-panel .resource-row:focus-within .exercise-row-action {
-  color: #ff6b00;
+  color: var(--color-orange-500);
 }
 
 /* ÚLTIMA FILA SIN SEPARADOR */

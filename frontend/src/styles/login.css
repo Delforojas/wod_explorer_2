@@ -18,7 +18,7 @@
   width: 100%;
   min-height: 100%;
 
-  padding: 24px 20px 100px;
+  padding: var(--space-6) var(--space-5) 100px;
 
   box-sizing: border-box;
 
@@ -41,11 +41,11 @@
   width: 100%;
   max-width: 430px;
 
-  padding: 40px 35px;
+  padding: var(--space-10) 35px;
 
   box-sizing: border-box;
 
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--color-white-alpha-09);
   border-radius: 28px;
 
   background: linear-gradient(
@@ -74,7 +74,7 @@
   width: 58px;
   height: 58px;
 
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 
   border-radius: 50%;
 
@@ -82,16 +82,6 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
 
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.login-logo span {
-  font-family: "Space Grotesk", sans-serif;
-
-  font-size: 20px;
-  font-weight: 700;
-
-  letter-spacing: -1px;
-  color: #ffffff;
 }
 
 /* ==========================================
@@ -102,44 +92,7 @@
   width: 100%;
   text-align: center;
 
-  margin-bottom: 32px;
-}
-
-.login-eyebrow {
-  margin: 0 0 10px;
-
-  font-size: 10px;
-  font-weight: 600;
-
-  letter-spacing: 3px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.login-header h1 {
-  margin: 0 0 12px;
-
-  font-family: "Space Grotesk", sans-serif;
-
-  font-size: 29px;
-  font-weight: 600;
-
-  letter-spacing: -1px;
-  line-height: 1.2;
-
-  color: #ffffff;
-}
-
-.login-description {
-  max-width: 300px;
-
-  margin: 0 auto;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
+  margin-bottom: var(--space-8);
 }
 
 /* ==========================================
@@ -151,7 +104,7 @@
   flex-direction: column;
 
   width: 100%;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .login-field {
@@ -204,7 +157,7 @@
 }
 
 .login-field input:hover {
-  background: rgba(255, 255, 255, 0.09);
+  background: var(--color-white-alpha-09);
 }
 
 .login-field input:focus {
@@ -232,9 +185,9 @@
   width: 100%;
   min-height: 48px;
 
-  margin-top: 8px;
+  margin-top: var(--space-2);
 
-  padding: 13px 20px;
+  padding: 13px var(--space-5);
 
   border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -277,16 +230,6 @@
    SEPARADOR
 ========================================== */
 
-.login-divider {
-  display: flex;
-  align-items: center;
-
-  width: 100%;
-  gap: 15px;
-
-  margin: 28px 0;
-}
-
 .login-divider::before,
 .login-divider::after {
   content: "";
@@ -315,9 +258,9 @@
 
   width: 100%;
   min-height: 48px;
-  gap: 12px;
+  gap: var(--space-3);
 
-  padding: 13px 20px;
+  padding: 13px var(--space-5);
 
   border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -389,7 +332,7 @@
   width: 100%;
 
   margin: 0;
-  padding: 12px 16px;
+  padding: var(--space-3) var(--space-4);
 
   box-sizing: border-box;
 
@@ -421,7 +364,7 @@
 
 @media (max-width: 768px) {
   .login-page {
-    padding: 16px 20px 110px;
+    padding: var(--space-4) var(--space-5) 110px;
   }
 
   .login-card {
@@ -435,11 +378,11 @@
 
 @media (max-width: 480px) {
   .login-page {
-    padding: 8px 16px 110px;
+    padding: var(--space-2) var(--space-4) 110px;
   }
 
   .login-card {
-    padding: 32px 24px;
+    padding: var(--space-8) var(--space-6);
     border-radius: 22px;
   }
 
@@ -447,7 +390,7 @@
     width: 52px;
     height: 52px;
 
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
   }
 
   .login-header {

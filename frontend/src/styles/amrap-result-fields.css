@@ -4,9 +4,9 @@
 ========================================== */
 
 .amrap-result-fields {
-  --amrap-orange: #ff6b00;
-  --amrap-orange-light: #ff9a3c;
-  --amrap-border: rgba(255, 255, 255, 0.09);
+  --amrap-orange: var(--color-orange-500);
+  --amrap-orange-light: var(--color-orange-300);
+  --amrap-border: var(--color-white-alpha-09);
 
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 24px;
+  gap: var(--space-6);
   padding: 28px;
 
   box-sizing: border-box;
@@ -41,7 +41,7 @@
   flex-direction: column;
   align-items: flex-start;
 
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .amrap-result-eyebrow {
@@ -52,27 +52,6 @@
   color: var(--amrap-orange-light);
 }
 
-.amrap-result-header h2 {
-  margin: 0;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-
-  color: #efeded;
-}
-
-.amrap-result-header p {
-  max-width: 520px;
-  margin: 0;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
-}
-
 /* ==========================================
    GRID
 ========================================== */
@@ -81,7 +60,7 @@
   display: grid;
 
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 /* ==========================================
@@ -109,7 +88,7 @@
   min-width: 0;
   min-height: 50px;
 
-  padding: 12px 16px;
+  padding: var(--space-3) var(--space-4);
   box-sizing: border-box;
 
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -119,7 +98,7 @@
 
   color: #f5f5f7;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 15px;
 
   outline: none;
@@ -172,8 +151,8 @@
 
 @media (max-width: 768px) {
   .amrap-result-fields {
-    padding: 24px;
-    gap: 20px;
+    padding: var(--space-6);
+    gap: var(--space-5);
   }
 }
 
@@ -183,8 +162,8 @@
 
 @media (max-width: 480px) {
   .amrap-result-fields {
-    padding: 20px;
-    gap: 20px;
+    padding: var(--space-5);
+    gap: var(--space-5);
 
     border-radius: 16px;
   }

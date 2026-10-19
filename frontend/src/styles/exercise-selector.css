@@ -4,9 +4,9 @@
 ========================================== */
 
 .exercise-selector {
-  --selector-orange: #ff6b00;
-  --selector-orange-light: #ff9a3c;
-  --selector-border: rgba(255, 255, 255, 0.09);
+  --selector-orange: var(--color-orange-500);
+  --selector-orange-light: var(--color-orange-300);
+  --selector-border: var(--color-white-alpha-09);
 
   --selector-background: linear-gradient(
     120deg,
@@ -22,7 +22,7 @@
   width: 100%;
   min-width: 0;
 
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 /* ==========================================
@@ -30,7 +30,7 @@
 ========================================== */
 
 .exercise-selector-label {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 10px;
   font-weight: 600;
 
@@ -90,7 +90,7 @@
   min-height: 52px;
 
   margin: 0;
-  padding: 14px 48px 14px 20px;
+  padding: 14px var(--space-12) 14px var(--space-5);
 
   box-sizing: border-box;
 
@@ -101,7 +101,7 @@
 
   color: #ffffff;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 14px;
   font-weight: 500;
 
@@ -172,7 +172,7 @@
   max-height: 280px;
 
   margin: 0;
-  padding: 8px;
+  padding: var(--space-2);
 
   box-sizing: border-box;
 
@@ -270,7 +270,7 @@
 
   color: #ffffff;
 
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
 
@@ -298,7 +298,7 @@
 ========================================== */
 
 .exercise-selector-empty {
-  padding: 20px 14px;
+  padding: var(--space-5) 14px;
 
   text-align: center;
 
@@ -334,7 +334,7 @@
 
   .exercise-selector-option {
     min-height: 52px;
-    padding: 12px;
+    padding: var(--space-3);
   }
 
   .exercise-selector-option-name {

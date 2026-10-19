@@ -11,7 +11,7 @@
   align-items: stretch;
 
   width: 100%;
-  gap: 20px;
+  gap: var(--space-5);
 
   margin: 0;
   padding: 0;
@@ -27,7 +27,7 @@
 
 @media (max-width: 768px) {
   .exercise-results-list {
-    gap: 16px;
+    gap: var(--space-4);
   }
 }
 
@@ -37,7 +37,7 @@
   .exercise-results-list {
     grid-template-columns: 1fr;
 
-    gap: 16px;
-    padding: 0 24px;
+    gap: var(--space-4);
+    padding: 0 var(--space-6);
   }
 }

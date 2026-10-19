@@ -20,8 +20,10 @@
 
   width: 100%;
 
+  max-width: 760px;
+
   margin: 0;
-  padding: 40px 20px;
+  padding: var(--space-10) var(--space-5);
 
   box-sizing: border-box;
   background: transparent;
@@ -43,7 +45,7 @@
   max-width: 430px;
 
   margin: 0;
-  padding: 40px 35px;
+  padding: var(--space-10) 35px;
 
   box-sizing: border-box;
   overflow: hidden;
@@ -61,7 +63,7 @@
   width: 58px;
   height: 58px;
 
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 
   box-sizing: border-box;
 
@@ -73,59 +75,15 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-.home-logo span {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-
-  letter-spacing: -1px;
-  color: #ffffff;
-}
-
 /* ==========================================
    ENCABEZADO
 ========================================== */
 
 .home-header {
   width: 100%;
-  margin-bottom: 32px;
+  margin-bottom: var(--space-8);
 
   text-align: center;
-}
-
-.home-eyebrow {
-  margin: 0 0 10px;
-
-  font-size: 10px;
-  font-weight: 600;
-
-  letter-spacing: 3px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.home-header h1 {
-  margin: 0 0 12px;
-
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 29px;
-  font-weight: 600;
-
-  letter-spacing: -1px;
-  line-height: 1.2;
-
-  color: #ffffff;
-}
-
-.home-description {
-  max-width: 300px;
-  margin: 0 auto;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.48);
 }
 
 /* ==========================================
@@ -137,7 +95,7 @@
   flex-direction: column;
 
   width: 100%;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 /* ==========================================
@@ -174,21 +132,11 @@
   cursor: pointer;
 }
 .home-submit {
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 /* ==========================================
    SEPARADOR
 ========================================== */
-
-.home-divider {
-  display: flex;
-  align-items: center;
-
-  width: 100%;
-  gap: 15px;
-
-  margin: 28px 0;
-}
 
 .home-divider::before,
 .home-divider::after {
@@ -212,31 +160,14 @@
 ========================================== */
 
 .home-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
-  width: 100%;
-  min-height: 48px;
-
-  gap: 12px;
-  padding: 13px 20px;
-
-  box-sizing: border-box;
+  gap: var(--space-3);
+  padding: 13px var(--space-5);
 
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50px;
 
   background: linear-gradient(180deg, #232526, #2d2e30);
-
-  color: #ffffff;
-  text-decoration: none;
-
-  font-family: inherit;
-  font-size: 13px;
   font-weight: 500;
-
-  cursor: pointer;
 }
 
 /* ==========================================
@@ -255,8 +186,8 @@
 
   .home-submit:hover,
   .home-link:hover {
-    background: #ff6b00;
-    border-color: #ff6b00;
+    background: var(--color-orange-500);
+    border-color: var(--color-orange-500);
 
     transform: translateY(-3px);
 
@@ -274,7 +205,7 @@
 
 .home-submit:focus-visible,
 .home-link:focus-visible {
-  outline: 2px solid #ff6b00;
+  outline: 2px solid var(--color-orange-500);
   outline-offset: 4px;
 }
 
@@ -284,7 +215,7 @@
 
 @media (max-width: 768px) {
   .home-page {
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
   }
 
   .home-card {
@@ -328,7 +259,7 @@
     min-height: calc(100dvh - 150px);
 
     margin: 0;
-    padding: 32px 24px;
+    padding: var(--space-8) var(--space-6);
 
     box-sizing: border-box;
 
@@ -341,11 +272,11 @@
   .home-logo {
     width: 58px;
     height: 58px;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
   }
 
   .home-header {
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
   }
 
   .home-header h1 {
@@ -357,7 +288,7 @@
   }
 
   .home-form {
-    gap: 20px;
+    gap: var(--space-5);
   }
 }
 
