@@ -13,6 +13,12 @@ Debe existir trazabilidad coherente entre:
 El guardrail se considera superado únicamente si:
 
 - la rama activa corresponde a la GitHub Issue #$1;
+- la política de base, el SHA remoto inicial y el rango completo de commits
+  están documentados;
+- la política `standard-main` identifica `main` como base y destino futuros, o
+  existe una excepción de dependencia aprobada y completa;
+- la rama de Issue parte de la base aprobada y no contiene commits ajenos en
+  el rango validado;
 - existe una única carpeta SDD correspondiente a la Issue;
 - la carpeta SDD tiene un número y slug válidos;
 - `spec.md` existe y contiene contenido válido;
@@ -26,6 +32,8 @@ El guardrail se considera superado únicamente si:
 - el hash del commit está disponible;
 - no quedan cambios pertenecientes a la Issue sin commit;
 - no quedan cambios pertenecientes a la Issue pendientes en staging;
+- ningún cambio local preexistente, incluido `opencode.json`, ha sido movido,
+  modificado o incluido en staging;
 - la GitHub Issue ha sido documentada correctamente;
 - la documentación de GitHub refleja el resultado real del workflow;
 - la GitHub Issue permanece abierta;
@@ -36,6 +44,9 @@ El guardrail se considera superado únicamente si:
 Activa este guardrail si:
 
 - la rama activa no corresponde a la Issue;
+- la base, la política o el rango completo de commits no pueden verificarse;
+- existen commits ajenos o archivos fuera del manifiesto en el rango de la
+  Issue;
 - falta el SDD;
 - existen varias carpetas SDD para la misma Issue;
 - la carpeta SDD tiene un nombre o slug inválido;
@@ -49,6 +60,8 @@ Activa este guardrail si:
 - el hash del commit no está disponible;
 - quedan cambios pertenecientes a la Issue sin commit;
 - quedan cambios pertenecientes a la Issue pendientes en staging;
+- se ha modificado, movido o incluido en staging `opencode.json` u otro cambio
+  local preexistente protegido;
 - la GitHub Issue no ha sido documentada correctamente;
 - la GitHub Issue ha sido cerrada;
 - se ha realizado push;

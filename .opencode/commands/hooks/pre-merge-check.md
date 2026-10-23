@@ -26,13 +26,19 @@ This hook does not create, modify, or merge a Pull Request.
   diverged.
 - The `destination branch` is the PR target branch containing the integrated
   result.
-- For this workflow, the destination branch must equal the validated base
-  branch.
-- The exact base SHA used for the local range review must be recorded.
+- For the standard policy, `base_branch=main`, `base_ref=origin/main`,
+  `base_remote_ref=refs/heads/main`, `pr_target=main`, and
+  `pr_target_ref=refs/heads/main`. A dependency policy is valid only when all
+  corresponding fields match the explicit approved exception record.
+- The immutable historical `base_sha`, initial remote SHAs, and latest observed
+  remote SHAs for both base and destination must be recorded separately.
 - The exact PR head SHA expected at merge time must be recorded.
 
-The PR base branch, destination branch, and validated base branch must agree.
-Their names must not be substituted silently.
+For `standard-main`, the PR base, destination, and validated base are all
+`main`. For `approved-dependency`, the PR base and destination must equal
+`pr_target`, while the Issue branch base must equal `base_branch`; any
+relationship between them must match the approved exception. Their names and
+references must not be substituted silently.
 
 ## Required Inputs and Evidence
 
@@ -42,8 +48,11 @@ The workflow must provide:
 - A normal-path `PASS` from:
   `.opencode/commands/guardarails/finish-preflight.md`.
 - The validated Issue branch and exact published `HEAD` SHA.
-- The validated base branch, destination branch, and exact base SHA used for
-  the local range review.
+- The validated `base_branch`, `base_ref`, `base_remote_ref`, immutable
+  `base_sha`, `pr_target`, and `pr_target_ref`.
+- `base_remote_sha_initial`, `base_remote_sha_latest`,
+  `pr_target_sha_initial`, and `pr_target_sha_latest` for both exact
+  references.
 - The PR number or URL.
 - The PR head branch and exact current head SHA.
 - The PR base branch and exact base reference.
@@ -54,6 +63,8 @@ The workflow must provide:
 - Evidence that no merge conflicts exist.
 - Explicit user evidence approving manual validation.
 - The classification of unrelated local changes.
+- The protected local paths, including `opencode.json`, and evidence that they
+  remain untouched and outside staging.
 
 ## Required Read-Only Checks
 
@@ -61,9 +72,13 @@ Verify all of the following before returning `PASS`:
 
 - The PR head branch is the validated Issue branch.
 - The PR head SHA equals the validated published `HEAD` SHA.
-- The PR base branch equals the validated destination branch.
-- The PR base reference is the validated base reference used for the range
-  comparison.
+- The PR base branch equals the recorded `pr_target` and its reference equals
+  `pr_target_ref`.
+- The standard fields are exactly `main`, `origin/main`, and
+  `refs/heads/main`, or every dependency field matches the explicit approved
+  exception.
+- The local range uses immutable `base_sha`; the current remote observations
+  are recorded separately and are not substituted into that historical field.
 - Every commit in the complete PR range is present in the validated local
   range or is a documented integration-only commit that is not yet merged.
 - Every PR commit is justified by the Issue, SDD, plan, or tasks.
@@ -75,6 +90,14 @@ Verify all of the following before returning `PASS`:
   required checks exist.
 - Explicit manual approval is attributable to the user and remains valid for
   this merge.
+- Fresh authoritative `git ls-remote origin <base_remote_ref>` and
+  `git ls-remote origin <pr_target_ref>` checks resolve both exact references.
+  Their observed SHAs are recorded as `base_remote_sha_latest` and
+  `pr_target_sha_latest` against the initial observations. If either reference
+  disappeared or advanced, the complete range and patch were re-evaluated
+  against the new SHA without rebasing.
+- `opencode.json` and other pre-existing protected paths are unchanged and
+  absent from the PR scope.
 
 The hook must perform a final read-only PR head recheck immediately before
 returning `PASS`. Record that SHA as `expectedHeadSha`. If it differs from the
@@ -98,6 +121,8 @@ Permitted local read-only checks include:
 - `git rev-parse`
 - `git merge-base`
 - `git branch -vv`
+- `git ls-remote origin <base_remote_ref>`
+- `git ls-remote origin <pr_target_ref>`
 
 Permitted remote read-only checks include GitHub MCP reads for the Issue, PR,
 PR commits, PR files, required checks, branch references, conflict state, and
@@ -125,12 +150,16 @@ Return `BLOCK` and stop before merge if any condition below applies:
 - The PR is missing or cannot be read safely.
 - The PR head branch is wrong or its SHA differs from the validated published
   `HEAD`.
-- The PR base branch or base reference differs from the validated destination
-  and base evidence.
-- The exact base SHA is missing, stale, or was silently substituted.
+- The PR base branch or reference differs from the recorded `pr_target` or
+  `pr_target_ref`, or the base fields do not match the approved policy.
+- The standard PR does not target `main`, or a dependency exception is missing,
+  unapproved, or points to a different destination.
+- The immutable `base_sha`, initial remote SHA, or latest observed remote SHA is
+  missing, stale, contradictory, or silently substituted.
 - The complete PR commit list or file/status diff is missing or incomplete.
 - Any PR commit or file is unrelated, unjustified, or outside the validated
   Issue scope.
+- A protected local path is present in the PR or was modified to prepare it.
 - The PR has merge conflicts.
 - Required repository checks failed, are pending, or cannot be determined.
 - Explicit manual approval is absent, ambiguous, or no longer attributable to
@@ -140,6 +169,9 @@ Return `BLOCK` and stop before merge if any condition below applies:
   unchanged expected head.
 - Any required evidence is missing, stale, contradictory, or unavailable.
 - Continuing would require modifying unrelated work or rewriting history.
+- The destination advanced and safe integration against the new SHA cannot be
+  demonstrated without rebasing or rewriting history.
+- The base or destination remote reference disappeared or cannot be verified.
 
 Report the observed state and stop. Do not attempt an automatic repair.
 

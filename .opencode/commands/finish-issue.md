@@ -26,10 +26,20 @@ Do not reconstruct conflicting copies of these values.
 
 - Issue identity, repository, state, SDD, completed tasks, blockers, and explicit user approval evidence.
 - Active Issue branch and its local and published HEAD.
-- Historical base branch, its determining evidence, exact remote reference, and exact baseline SHA.
-- Destination branch, exact remote reference, and exact SHA. In this workflow destination equals validated base.
+- One non-hybrid base policy (`standard-main` or `approved-dependency`), its
+  determining evidence, `base_branch`, `base_ref`, `base_remote_ref`, and
+  immutable historical `base_sha`.
+- `base_remote_sha_initial`, `base_remote_sha_latest`, and every authoritative
+  base observation, kept separate from the historical creation SHA.
+- `pr_target`, `pr_target_ref`, `pr_target_sha_initial`,
+  `pr_target_sha_latest`, and every authoritative destination observation.
+  Standard workflow values are `main`
+  and `refs/heads/main`; an exception must use only the approved dependency
+  values.
 - Accepted commit hash, message, branch, complete range, provenance (`handoff-commit` or `finish-commit`), and complete Issue file/status manifest.
 - Committed, staged, unstaged, untracked, deleted, and unrelated work classifications.
+- Protected local paths, including `opencode.json`, and their unchanged
+  pre/post state.
 - Remote, upstream, published branch, Pull Request, complete PR commits, complete PR file/status patch, checks, expected head SHA, merge strategy, and merge-result evidence.
 - Destination remote reference and SHA, local synchronization state, finalization documentation result, and post-close verification result.
 
@@ -57,16 +67,31 @@ determined safely, or continuing would require changing branches, discarding
 work, stashing automatically, rewriting history, or touching unrelated work.
 Do not commit, push, document, or close after this stop.
 
-Determine the historical base branch from the branch ancestry using history,
-merge-base, reflog, or local and remote references as necessary. Do not assume
-`main`. Stop if the base cannot be determined safely.
+Use the base policy recorded by `/issue`; do not infer a different base from the
+current branch or silently substitute a historical work branch.
 
-Before resolving the accepted commit and before the preflight, capture the
-validated base branch's exact remote reference and SHA. Record the destination
-branch as that same validated branch, its exact remote reference, and the same
-baseline SHA. If any reference is missing or conflicts, stop without silently
-substituting a moving branch.
-Pass this exact baseline to `finish-preflight` and every later PR validation.
+Verify the canonical policy without substituting fields. For
+`standard-main`, require `base_branch=main`, `base_ref=origin/main`,
+`base_remote_ref=refs/heads/main`, `pr_target=main`, and
+`pr_target_ref=refs/heads/main`. For `approved-dependency`, use the exact
+approved dependency values recorded by `/issue`.
+
+Before resolving the accepted commit and before the preflight, run
+`git ls-remote origin <base_remote_ref>` and
+`git ls-remote origin <pr_target_ref>` using the recorded exact references.
+Record the observed base and destination SHAs as `base_remote_sha_latest` and
+`pr_target_sha_latest`, separately from immutable `base_sha`, and compare each
+with its corresponding initial observation. If either reference disappears,
+changes without a complete safe re-evaluation, or cannot be verified, return
+`BLOCK`. Recompute the complete Issue range and patch against a changed base
+SHA when required, and re-evaluate the PR target against its changed SHA. Never
+rebase automatically, overwrite `base_sha`, or silently substitute a branch.
+
+Pass `base_branch`, `base_ref`, `base_remote_ref`, immutable `base_sha`,
+`base_remote_sha_initial`, `base_remote_sha_latest`, `pr_target`,
+`pr_target_ref`, `pr_target_sha_initial`, `pr_target_sha_latest`, the policy,
+and the destination evidence unchanged to `finish-preflight` and every later PR
+validation.
 
 Classify the complete Issue scope before staging or committing:
 
@@ -154,22 +179,27 @@ exclusively to unrelated work.
 ## Pull Request Integration
 
 The Pull Request is mandatory before normal Issue closure. Its `base` is the
-validated destination and its `head` is the published Issue branch. Never
-assume `main` and never merge directly with local `git merge`.
+validated destination and its `head` is the published Issue branch. For the
+standard policy, the PR base must be `main`. Never merge directly with local
+`git merge`.
 
 Before creating or reusing the PR, verify that the destination exists remotely,
-the Issue branch is published, the accepted commit is remote, and the current
-destination reference still equals the captured baseline. Also verify that the
-Issue head branch and destination branch are different. If the destination is
-missing, the branches are equal, or the reference changed, stop. Do not
-silently replace the baseline: re-evaluate the complete local and PR scope,
-update the evidence, and rerun `finish-preflight` before continuing when the
-destination reference changed.
+the Issue branch is published, the accepted commit is remote, and both
+`base_remote_ref` and `pr_target_ref` still resolve. Record their latest SHAs
+as `base_remote_sha_latest` and `pr_target_sha_latest`, then compare them with
+the corresponding initial observations.
+If either reference advanced, re-evaluate the complete local and PR scope
+against the new SHA without rebasing; stop when safety cannot be demonstrated.
+Also verify that the Issue head branch and `pr_target` are different. If a
+reference is missing, the branches are equal, or a reference changed without a
+safe re-evaluation, stop.
 
-Search first for an open PR whose head, base, and Issue match. Reuse it when
-found; otherwise create it with GitHub MCP using the recorded head and
-destination. Do not create a duplicate. A new PR title must describe the
-change and include `#$1` when appropriate.
+Search first for any open PR for the Issue and published head. Reuse it only
+when its base matches the approved destination and exact policy. If an existing
+PR has a different base, stop without retargeting it and without creating a
+duplicate. If no matching PR exists, create it with GitHub MCP using the
+recorded head and `pr_target`. A new PR title must describe the change and
+include `#$1` when appropriate.
 
 Before merge, verify the complete PR commit list, complete file/status diff and
 patch, Issue ownership of every commit and file, absence of unrelated committed
@@ -195,8 +225,8 @@ If the provider has no distinct merge SHA, use the destination tip, merged PR
 state, reachability, and complete resulting diff. A timestamp or generic merged
 metadata alone is insufficient.
 
-After the remote merge is verified, synchronize the local destination with its
-remote using only a safe fast-forward update, conceptually
+After the remote merge is verified, synchronize the local approved destination
+with its remote using only a safe fast-forward update, conceptually
 `git switch <destination>` followed by
 `git pull --ff-only <remote> <destination>`. Do not perform a local merge. If
 unrelated local work prevents switching or synchronizing safely, stop; do not

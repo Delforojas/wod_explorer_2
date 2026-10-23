@@ -36,6 +36,15 @@ Obtén:
 
 - las ramas locales relacionadas con la GitHub Issue #$1.
 
+- la política canónica, cuando ya exista, junto con `base_ref`,
+  `base_remote_ref`, `base_sha`, `pr_target` y `pr_target_ref`;
+
+- para una Issue aún sin política canónica, la referencia candidata
+  `origin/main` y su SHA actual;
+
+- la lista explícita de archivos locales preexistentes que deben permanecer
+  fuera del staging, incluido `opencode.json` cuando esté modificado.
+
 Utiliza, cuando correspondan:
 
 - `git branch --show-current`;
@@ -46,7 +55,12 @@ Utiliza, cuando correspondan:
 
 - `git diff --cached`;
 
-- `git branch`.
+- `git branch`;
+
+- `git ls-remote origin <base_remote_ref>` y, cuando corresponda,
+  `git ls-remote origin <pr_target_ref>`;
+
+- `git rev-parse <base_ref>`.
 
 ## Resultado
 
@@ -59,6 +73,15 @@ Devuelve información suficiente para que el workflow pueda determinar:
 - si existen cambios en staging;
 
 - si ya existe una rama relacionada con la Issue #$1;
+
+- cuál es el `base_ref` y el `base_remote_ref` exactos, su
+  `base_remote_sha_latest` observado, y el `base_sha` histórico cuando la
+  política ya esté seleccionada;
+
+- cuál es el `pr_target` y el `pr_target_ref` exactos y su
+  `pr_target_sha_latest` observado;
+
+- qué cambios locales preexistentes deben preservarse sin moverlos;
 
 - si existe algún estado Git que deba tenerse en cuenta antes de preparar la rama.
 

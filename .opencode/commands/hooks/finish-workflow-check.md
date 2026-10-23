@@ -44,6 +44,8 @@ Recibe del workflow, cuando estén disponibles:
 
 - rama destino;
 
+- política de base, SHA inicial y última revalidación remota;
+
 - remoto utilizado;
 
 - hash del commit final de la Issue;
@@ -86,6 +88,9 @@ Comprueba que:
 
 - pertenece al historial correspondiente a la Issue;
 
+- el rango completo desde la base registrada contiene únicamente commits y
+  archivos justificados por la Issue;
+
 - no quedan cambios pertenecientes a la Issue pendientes de commit.
 
 Los cambios locales ajenos a la Issue no deben provocar `FAIL` únicamente
@@ -103,6 +108,9 @@ Comprueba mediante GitHub MCP que:
 - su rama `head` corresponde a la rama de trabajo;
 
 - su rama `base` corresponde a la rama destino esperada;
+
+- su rama `base` es `main` para el flujo estándar, o coincide con la excepción
+  de dependencia aprobada;
 
 - contiene los cambios correspondientes a la Issue;
 
@@ -164,6 +172,9 @@ siempre que:
 
 - no impidan verificar el estado final del workflow.
 
+- `opencode.json` y otros cambios preexistentes protegidos permanecen intactos
+  y fuera del staging, commits y PR.
+
 Si aparecen cambios inesperados cuya relación con la Issue no puede
 
 determinarse de forma segura:
@@ -218,11 +229,17 @@ Devuelve `PASS` únicamente si:
 
 - la rama activa es la rama destino;
 
+- la rama destino es `main` para el flujo estándar, o coincide con la excepción
+  de dependencia aprobada;
+
 - la validación manual está registrada como aprobada;
 
 - la finalización está documentada;
 
 - la GitHub Issue está cerrada;
+
+- `opencode.json` y otros cambios preexistentes protegidos permanecen intactos
+  y fuera del staging, commits y PR;
 
 - no existen bloqueos pendientes.
 

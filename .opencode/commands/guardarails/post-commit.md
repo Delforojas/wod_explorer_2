@@ -20,6 +20,12 @@ El guardrail se considera superado únicamente si:
 
 - la rama activa corresponde a la GitHub Issue #$1;
 
+- la base validada, la política de base y el rango completo de commits siguen
+  siendo los esperados;
+
+- cada commit y archivo del rango posterior a la base está justificado por la
+  Issue;
+
 - todo el trabajo perteneciente a la Issue está incluido en el commit;
 
 - no quedan cambios pertenecientes a la Issue pendientes en el working tree;
@@ -47,6 +53,11 @@ Activa este guardrail si:
 - quedan cambios pertenecientes a la Issue en staging;
 
 - quedan archivos nuevos, modificados o eliminados pertenecientes a la Issue pendientes de incluir;
+
+- quedan commits o archivos ajenos dentro del rango validado;
+
+- `opencode.json` u otro cambio local preexistente protegido ha sido modificado,
+  movido o incluido en staging;
 
 - existen cambios pendientes cuya relación con la Issue no puede determinarse de forma segura;
 
