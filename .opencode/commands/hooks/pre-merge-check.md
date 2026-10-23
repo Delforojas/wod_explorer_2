@@ -54,6 +54,7 @@ The workflow must provide:
   `pr_target_sha_initial`, and `pr_target_sha_latest` for both exact
   references.
 - The PR number or URL.
+- The complete current PR body.
 - The PR head branch and exact current head SHA.
 - The PR base branch and exact base reference.
 - The complete PR commit list.
@@ -74,6 +75,12 @@ Verify all of the following before returning `PASS`:
 - The PR head SHA equals the validated published `HEAD` SHA.
 - The PR base branch equals the recorded `pr_target` and its reference equals
   `pr_target_ref`.
+- The PR body contains a non-closing reference to the expected Issue, such as
+  `Refs #$1`.
+- The PR body contains no GitHub auto-close keyword paired with `#$1`,
+  `<owner>/<repo>#$1`, or the equivalent repository Issue URL: `close`,
+  `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves`, or
+  `resolved`.
 - The standard fields are exactly `main`, `origin/main`, and
   `refs/heads/main`, or every dependency field matches the explicit approved
   exception.
@@ -152,6 +159,8 @@ Return `BLOCK` and stop before merge if any condition below applies:
   `HEAD`.
 - The PR base branch or reference differs from the recorded `pr_target` or
   `pr_target_ref`, or the base fields do not match the approved policy.
+- The PR body lacks a non-closing reference to the expected Issue or contains
+  an auto-close keyword paired with that Issue.
 - The standard PR does not target `main`, or a dependency exception is missing,
   unapproved, or points to a different destination.
 - The immutable `base_sha`, initial remote SHA, or latest observed remote SHA is

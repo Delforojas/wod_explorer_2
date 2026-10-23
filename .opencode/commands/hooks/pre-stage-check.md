@@ -18,6 +18,11 @@ Ejecuta este hook después de que todas las verificaciones aplicables hayan fina
 
 - crear el commit de la Issue.
 
+La sincronización final de `spec.md`, `plan.md` y `tasks.md` debe estar
+completada antes de ejecutar este hook. Este hook es una frontera de revisión
+de solo lectura: no debe permitir que avance un SDD que todavía requiera
+registrar el estado de tasks ya terminadas.
+
 ## Comprobaciones
 
 Obtén:
@@ -63,6 +68,20 @@ Devuelve información suficiente para que el workflow pueda determinar:
 
 - si algún archivo preexistente protegido aparece en staging o sería movido por
   la preparación del commit.
+
+Comprueba también que:
+
+- el workflow ha contrastado el estado actual de `tasks.md` con la
+  implementación y las verificaciones antes de preparar el staging;
+- toda task cuyo trabajo real está terminado ya aparece marcada como
+  completada;
+- no existe una actualización del SDD conocida o pendiente que deba hacerse
+  después de esta revisión;
+- `spec.md`, `plan.md` y `tasks.md` forman parte del conjunto revisado cuando
+  pertenecen al alcance de la Issue.
+
+Si alguna comprobación falla, devuelve `FAIL` y no ejecutes `git add`. El
+workflow debe sincronizar el SDD y repetir la revisión antes de continuar.
 
 El hook no determina por sí mismo si un cambio pertenece funcionalmente a la Issue.
 

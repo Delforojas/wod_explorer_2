@@ -266,6 +266,15 @@ refactorings, or functionality.
 Mark a task complete only after its required work
 has been implemented and verified.
 
+Before leaving this phase, perform a final SDD synchronization:
+
+- reread `tasks.md` and compare it with the implementation and verifications
+  that actually completed;
+- mark every task that can now be considered complete in `tasks.md`;
+- if the real state does not allow a task to be completed, leave it pending and
+  activate the applicable blocking flow;
+- do not postpone this update until after change review, staging, or commit.
+
 Continue when all tasks are completed and no blockers remain.
 
 ## 7. Run Verification Checks
@@ -329,6 +338,17 @@ Never weaken tests or expand Issue scope to force success.
 Continue only after all applicable verification checks pass.
 
 ## 9. Review Changes
+
+Before starting change review, pass the final SDD synchronization boundary
+defined in Phase 6. At this point:
+
+- every task that the real state allows to be completed is marked in
+  `tasks.md`;
+- `spec.md`, `plan.md`, and `tasks.md` are frozen for this commit;
+- any later change to those files requires stopping, repeating the review, and
+  preparing one commit that includes the updated state;
+- do not continue to staging or commit if the task state cannot be safely
+  reconciled with the implementation.
 
 Load and follow:
 

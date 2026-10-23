@@ -208,6 +208,15 @@ duplicate. If no matching PR exists, create it with GitHub MCP using the
 recorded head and `pr_target`. A new PR title must describe the change and
 include `#$1` when appropriate.
 
+The generated PR body must use a non-closing Issue reference, such as
+`Refs #$1`. It must not contain GitHub auto-close keywords paired with Issue
+references, including `close`, `closes`, `closed`, `fix`, `fixes`, `fixed`,
+`resolve`, `resolves`, or `resolved` followed by `#$1`, `<owner>/<repo>#$1`,
+or the equivalent repository Issue URL. Do not use `Closes #$1`, `Fixes #$1`,
+or `Resolves #$1`.
+If an existing PR body violates this rule or does not provide a non-closing
+reference, return `BLOCK` rather than silently modifying it.
+
 Before merge, verify the complete PR commit list, complete file/status diff and
 patch, Issue ownership of every commit and file, absence of unrelated committed
 work, required checks, no conflicts, correct head/base references, and explicit
