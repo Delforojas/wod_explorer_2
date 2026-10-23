@@ -22,6 +22,9 @@ El guardrail se considera superado únicamente si:
 
 - se han considerado los cambios locales preexistentes;
 
+- se ha registrado explícitamente `opencode.json` y cualquier otro cambio
+  preexistente que deba permanecer intacto;
+
 - no existen cambios accidentales que vayan a incluirse en el commit;
 
 - no se van a incluir cambios ajenos al alcance de la Issue;
@@ -44,6 +47,9 @@ Activa este guardrail si:
 
 - preparar el commit requeriría incluir cambios locales preexistentes que no pertenecen a la Issue;
 
+- `opencode.json` u otro cambio preexistente aparecería en staging sin una
+  autorización explícita de alcance y una resolución previa del conflicto;
+
 - no puede justificarse alguno de los cambios que sería necesario incluir;
 
 - separar los cambios podría afectar trabajo ajeno o preexistente.
@@ -65,6 +71,11 @@ Los cambios ajenos a la Issue:
 - no deben moverse mediante `stash` automáticamente;
 
 - no deben sobrescribirse.
+
+Los cambios preexistentes protegidos deben conservar exactamente su estado
+antes y después de la revisión. Una autorización futura para modificar uno de
+ellos no permite sobrescribirlo automáticamente ni resolver el conflicto sin
+una decisión explícita previa.
 
 No prepares el commit mientras exista una condición de bloqueo.
 

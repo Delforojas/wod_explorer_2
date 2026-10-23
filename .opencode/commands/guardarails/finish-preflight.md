@@ -34,15 +34,20 @@ The workflow must provide:
   `/finish-issue $1` command is not approval evidence by itself.
 - The current branch, local `HEAD`, and the result of
   `.opencode/commands/hooks/branch-check.md`.
-- The validated base branch, its determining evidence, and the exact remote
-  base SHA used as the range baseline.
-- The destination branch and its exact remote reference and SHA. For this
-  workflow it must equal the validated base branch, and that equality must be
-  recorded explicitly.
+- One non-hybrid base policy (`standard-main` or `approved-dependency`), its
+  determining evidence, `base_branch`, `base_ref`, and exact `base_remote_ref`.
+- The immutable historical `base_sha` used to create the Issue branch,
+  `base_remote_sha_initial`, and `base_remote_sha_latest`.
+- The `pr_target`, exact `pr_target_ref`, `pr_target_sha_initial`, and
+  `pr_target_sha_latest`. `standard-main` must use `main`,
+  `origin/main`, and `refs/heads/main`; a dependency must use only its
+  explicitly approved values.
 - The accepted Issue commit hash, message, source, and branch.
 - The current working-tree and staging state.
 - The classification of unrelated committed and uncommitted changes.
 - The complete commit range and patch review relative to the validated base.
+- The protected local paths, including `opencode.json` when pre-existing, and
+  evidence that they remain untouched and outside staging.
 
 ## Handoff Evidence Recovery
 
@@ -153,15 +158,27 @@ Issue closure, stash, rebase, force operation, discard, or history rewrite.
 
 ## Base Reference Stability
 
-The exact base SHA captured by preflight is the only range baseline accepted
-for the current evidence. Before PR validation, compare it with the current
-remote destination reference.
+The exact historical `base_sha` captured by preflight is the only range
+baseline accepted for the current evidence. Before PR creation and PR
+validation, compare both `base_remote_ref` and `pr_target_ref` with their
+current authoritative remote observations.
 
-If the base or destination reference changed, return `BLOCK` for the current
-evidence. The workflow must re-evaluate the complete local commit range and
-patch against the new exact base SHA, record the new baseline, and rerun the
-preflight or its equivalent read-only validation before continuing. Never
-silently substitute a moving branch reference.
+For `standard-main`, require `base_branch=main`, `base_ref=origin/main`,
+`base_remote_ref=refs/heads/main`, `pr_target=main`, and
+`pr_target_ref=refs/heads/main`. For `approved-dependency`, require explicit
+approval and use the exact recorded dependency values without substitution.
+
+Before PR creation and validation, run `git ls-remote origin <base_remote_ref>`
+and `git ls-remote origin <pr_target_ref>`. Record the observed SHAs as
+`base_remote_sha_latest` and `pr_target_sha_latest` on every validation and
+keep them separate from immutable `base_sha`. If either reference disappears,
+cannot be verified,
+or changes without a complete safe re-evaluation, return `BLOCK` for the
+current evidence. Re-evaluate the complete local range, patch, ancestry, and
+conflict state against a changed base observation, and the complete PR scope
+against a changed destination observation. Continue only when the evidence
+demonstrates safe integration. Never silently substitute a moving branch and
+never rebase automatically.
 
 ## PASS Conditions: Normal Open-Issue Path
 
@@ -176,14 +193,23 @@ Return `PASS` only when every condition below is supported by evidence:
 - The accepted commit is non-empty, on the active Issue branch, and its hash
   and message are known.
 - The active branch is the Issue branch and is not `main`.
+- The base policy is explicit and, for the standard path, the base and
+  destination are both `main`.
 - The validated base branch is unambiguous.
 - The exact validated base remote SHA used for the range comparison is known.
-- The destination branch is explicitly recorded and equals the validated base.
+- The `pr_target` is explicitly recorded and the destination branch equals it;
+  for `standard-main`, it is also the validated `main` base. For a dependency,
+  any relationship between `base_branch` and `pr_target` matches the approved
+  exception record.
 - The exact destination remote reference and SHA are known.
 - The complete local commit range and patch are Issue-related and justified.
 - No Issue-related changes remain outside the accepted commit range.
 - Staged, unstaged, untracked, and deleted changes are classified safely.
 - Unrelated local changes remain outside Issue commits and are preserved.
+- The complete range was validated before handoff and contains no unrelated
+  commit or file.
+- `opencode.json` and other pre-existing protected paths are unchanged and
+  outside staging.
 - Any already-published branch matches the validated local `HEAD` exactly and
   has no unexplained divergence.
 - Explicit user-provided manual approval is present and attributable to the
@@ -240,12 +266,17 @@ applies:
 - The active branch is `main`, does not correspond to the Issue, or cannot be
   identified safely.
 - The base or destination branch cannot be determined, or they conflict.
+- The standard policy does not target `main`, or an approved dependency
+  exception is missing or incomplete.
 - The accepted commit is missing, empty, on the wrong branch, or has an
   unknown or conflicting hash.
 - The complete local commit range contains unrelated or unjustified work.
 - Issue changes remain outside the accepted commit range.
 - Staged, unstaged, untracked, or deleted changes cannot be classified or
   separated safely.
+- The complete range was not validated or contains unrelated commits/files.
+- `opencode.json` or another protected pre-existing path was modified, moved,
+  staged, or overwritten.
 - An already-published branch differs from the validated local `HEAD` or has
   unexplained commits.
 - Any required evidence is missing, stale, contradictory, or unavailable.

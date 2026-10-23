@@ -29,9 +29,11 @@ handled by the read-only audit path in `finish-preflight.md`.
 - `destination branch`: the branch targeted by the PR and containing the
   integrated result.
 
-For this workflow, the destination branch must equal the validated base
-branch. Record both names and verify the equality rather than relying on
-implicit naming.
+For the standard policy, `base_branch=main`, `base_ref=origin/main`,
+`base_remote_ref=refs/heads/main`, `pr_target=main`, and
+`pr_target_ref=refs/heads/main`. A dependency destination is valid only when
+all corresponding fields match the explicit approved exception. Record the
+immutable creation SHA separately from every remote SHA observed later.
 
 ## Required Inputs and Evidence
 
@@ -41,8 +43,11 @@ The workflow must provide:
 - The successful normal-path `PASS` result from
   `.opencode/commands/guardarails/finish-preflight.md`.
 - The validated Issue branch and published `HEAD` SHA.
-- The validated base branch, destination branch, and their recorded remote
-  references.
+- The validated `base_branch`, `base_ref`, `base_remote_ref`, immutable
+  `base_sha`, `pr_target`, and `pr_target_ref`.
+- `base_remote_sha_initial`, `base_remote_sha_latest`,
+  `pr_target_sha_initial`, and `pr_target_sha_latest` for both exact
+  references, plus the divergence review when either advanced.
 - The accepted commit hash, provenance mode, complete local commit range, and
   validated Issue file/status manifest.
 - The successful result of:
@@ -61,6 +66,8 @@ The workflow must provide:
 - The finalization documentation update result and recorded final evidence.
 - Explicit user evidence approving manual validation.
 - The classification of unrelated local changes before and after integration.
+- The protected local paths, including `opencode.json`, and evidence that they
+  remain unchanged and outside the PR.
 
 ## Complete PR Scope Check
 
@@ -69,9 +76,12 @@ Issue commit:
 
 - The PR head branch must be the validated Issue branch.
 - The PR head SHA must equal the validated published `HEAD` SHA.
-- The PR base branch must equal the validated destination branch.
-- The PR base reference must be the expected destination reference used for
-  the range comparison.
+- The PR base branch and reference must equal `pr_target` and `pr_target_ref`.
+- The standard fields must be exactly `main`, `origin/main`, and
+  `refs/heads/main`, or every dependency field must match the explicit
+  approved exception.
+- The range comparison must use immutable `base_sha`; observed remote SHAs
+  must remain separate from that creation baseline.
 - Every commit in the PR range must be present in the validated local range
   or be the documented integration result.
 - Every commit must be justified by the Issue, SDD, plan, or tasks.
@@ -156,6 +166,8 @@ Permitted local read-only checks include:
 - `git rev-parse`
 - `git merge-base`
 - `git branch -vv`
+- `git ls-remote origin <base_remote_ref>`
+- `git ls-remote origin <pr_target_ref>`
 
 Permitted remote read-only checks include GitHub MCP reads for:
 
@@ -179,8 +191,9 @@ Return `PASS` only when every condition below is verified:
   accepted `HEAD`.
 - The PR exists and its head branch and SHA match the validated Issue branch
   and published `HEAD`.
-- The PR base branch equals the validated destination branch and therefore the
-  validated base branch.
+- The PR base branch and reference equal `pr_target` and `pr_target_ref`; for
+  `standard-main`, those also equal the validated `main` base. For a
+  dependency, the relationship to `base_branch` matches the approved record.
 - The complete PR commit range and file/status diff are Issue-related,
   justified, and free of unexplained divergence.
 - Required repository checks passed or none are required.
@@ -188,11 +201,15 @@ Return `PASS` only when every condition below is verified:
 - The destination remote contains the complete intended Issue diff.
 - The local destination branch is active and exactly synchronized with its
   remote reference without unsafe update operations.
+- The destination was freshly rechecked before validation and merge; any
+  advancement was re-evaluated without rebasing and proven safe.
 - Finalization documentation targets the correct Issue and contains only
   verified finalization evidence.
 - Manual validation approval is explicit user evidence.
 - Unrelated local changes remain identified, untouched, and outside Issue
   commits and PR scope.
+- `opencode.json` and other protected pre-existing paths remain unchanged and
+  outside the PR scope.
 - No blocker or unverified condition remains.
 
 `PASS` authorizes the next operation to be the normal Issue closure. This hook
@@ -208,6 +225,8 @@ applies:
 - The published branch or accepted `HEAD` cannot be verified.
 - The PR is missing, has the wrong head or base, or has unexplained
   divergence.
+- The standard PR does not target `main`, or a dependency exception is missing,
+  unapproved, or points to another destination.
 - The complete PR commit range or file/status diff cannot be verified, is
   broader than the validated Issue scope, or contains unrelated work.
 - Required repository checks failed, are pending, or cannot be determined.
@@ -222,6 +241,8 @@ applies:
   user.
 - Unrelated local changes were modified, staged, committed, or cannot be
   classified safely.
+- `opencode.json` or another protected pre-existing path was modified, moved,
+  staged, or overwritten.
 - Any required input is missing, stale, contradictory, or unavailable.
 
 Report the observed state and stop. Do not reopen, update, or close the Issue

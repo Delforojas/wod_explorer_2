@@ -84,16 +84,49 @@ This phase is mandatory before modifying any project file.
 1. Load and follow:
    `.opencode/commands/hooks/branch-check.md`
 2. Inspect the current Git state and existing branches.
-3. Determine the correct base branch:
-   - Use the latest valid development state containing
-     all dependencies required by the Issue.
-   - If prerequisite work is not merged into `main`,
-     use the branch containing those dependencies.
-   - Use `main` when it contains all required dependencies.
-4. Reuse an existing Issue branch or create a new one
-   from the verified base.
-5. Actually switch to the Issue branch.
-6. Load and apply:
+3. Select exactly one base policy before recording the canonical base:
+   - For an independent Issue, select `base_policy=standard-main`. Refresh
+     only the remote-tracking reference with `git fetch origin main`. This must
+     not modify the working tree, staging, or commit history. Run `git ls-remote
+     origin refs/heads/main` and verify that `git rev-parse origin/main` equals
+     the observed remote SHA. If either reference cannot be verified, stop.
+   - For an approved dependency, require that the Issue identifies a real
+     dependency and that the user explicitly approves it. Record the dependency
+     Issue, branch, exact remote base reference, intended PR destination and
+     exact destination remote reference. Refresh the approved base tracking
+     reference with `git fetch origin <base_branch>`, then run
+     `git ls-remote origin <base_remote_ref>` and verify
+     `git rev-parse <base_ref>` equals the observed base SHA. If the PR target
+     differs from the dependency base, also run
+     `git ls-remote origin <pr_target_ref>` and record its observed SHA. If the
+     target equals the base, record the same observed SHA as
+     `pr_target_sha_initial`. Missing or conflicting
+     approval, ancestry, included-commit, or destination evidence is a blocker.
+   - Never infer an exception from the current branch or from an unverified
+     local branch.
+4. Record one canonical, non-hybrid policy record:
+   - `standard-main`: `base_branch=main`, `base_ref=origin/main`,
+     `base_remote_ref=refs/heads/main`, `base_sha=<verified remote SHA>`,
+     `pr_target=main`, and `pr_target_ref=refs/heads/main`.
+   - `approved-dependency`: `base_branch` and `base_ref` are the approved
+     dependency branch and its exact remote-tracking reference,
+     `base_remote_ref` is its exact remote reference, `base_sha` is its
+     verified remote SHA, and `pr_target` and `pr_target_ref` are the approved
+     PR destination and exact remote reference.
+   - Record `base_remote_sha_initial` and `pr_target_sha_initial` separately
+     from `base_sha`. `base_sha` is the immutable historical SHA from which the
+     Issue branch is created; later remote observations must never overwrite it.
+   - Classify all staged, unstaged, untracked, and deleted work before any
+     branch operation. Existing local work, including `opencode.json`, remains
+     unrelated unless the Issue explicitly owns it.
+5. Reuse an existing Issue branch only when it is dedicated to this Issue and
+    `git merge-base --is-ancestor <base-sha> <issue-branch>` and its complete
+    range can be validated against the approved base. Otherwise, create the
+    branch from the exact approved `base_sha`, never from the active branch or
+    its working tree. Do not rebase or change an existing branch base.
+6. Actually switch to the Issue branch. Stop if doing so would overwrite,
+   move, stash, or otherwise alter any pre-existing local work.
+7. Load and apply:
    `.opencode/commands/guardarails/branch.md`
 
 Branch naming:

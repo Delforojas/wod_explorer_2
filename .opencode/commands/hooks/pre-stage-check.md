@@ -32,7 +32,10 @@ Obtén:
 
 - los cambios actualmente en staging;
 
-- los cambios todavía no incluidos en staging.
+- los cambios todavía no incluidos en staging;
+
+- la lista completa de cambios locales preexistentes y no relacionados,
+  incluyendo `opencode.json` cuando esté modificado.
 
 Utiliza, cuando correspondan:
 
@@ -56,11 +59,19 @@ Devuelve información suficiente para que el workflow pueda determinar:
 
 - si existen archivos nuevos o eliminados;
 
-- si existen cambios que requieren revisión antes de preparar el staging.
+- si existen cambios que requieren revisión antes de preparar el staging;
+
+- si algún archivo preexistente protegido aparece en staging o sería movido por
+  la preparación del commit.
 
 El hook no determina por sí mismo si un cambio pertenece funcionalmente a la Issue.
 
 Esa decisión debe realizarse utilizando la GitHub Issue, el SDD, las tasks y el contexto del workflow.
+
+`opencode.json` y cualquier otro cambio preexistente deben conservarse en el
+estado original y fuera del staging. Solo pueden pasar a ser archivos de la
+Issue si el alcance lo autoriza explícitamente y el conflicto local se ha
+resuelto antes de preparar el staging.
 
 ## Restricciones
 

@@ -24,6 +24,11 @@ Recibe del workflow:
 
 - los cambios previamente identificados como ajenos a la Issue, cuando existan.
 
+- la política de base y el SHA exacto validado (`main` para el flujo estándar);
+
+- la lista completa de commits y archivos que forman el rango candidato de la
+  Issue.
+
 El hook utiliza esta información únicamente para comparar el estado Git real con el estado esperado.
 
 ## Comprobaciones
@@ -42,7 +47,16 @@ Obtén y comprueba:
 
 - que el contenido de staging coincide con el conjunto esperado;
 
-- que ningún cambio previamente identificado como ajeno está incluido en staging.
+- que ningún cambio previamente identificado como ajeno está incluido en staging;
+
+- que `git merge-base --is-ancestor <base-sha> HEAD` es válido;
+
+- que cada commit de `<base-sha>..HEAD` está justificado por la Issue y que el
+  parche candidato de esos commits más staging coincide con el manifiesto
+  esperado;
+
+- que `opencode.json` y cualquier otro archivo local preexistente protegido no
+  aparece en staging.
 
 Utiliza, cuando correspondan:
 
@@ -52,7 +66,13 @@ Utiliza, cuando correspondan:
 
 - `git diff --cached`;
 
-- `git diff`.
+- `git diff`;
+
+- `git merge-base --is-ancestor <base-sha> HEAD`;
+
+- `git log <base-sha>..HEAD`;
+
+- `git diff --name-status <base-sha>...HEAD`.
 
 ## Resultado
 
@@ -70,6 +90,15 @@ El estado previo al commit es válido cuando:
 
 - no existen cambios previamente identificados como ajenos dentro de staging;
 
+- el rango completo de commits y el parche candidato son exclusivamente de la
+  Issue y coinciden con el manifiesto validado;
+
+- la base coincide con la política registrada y, para el flujo estándar, es el
+  SHA verificado de `origin/main`;
+
+- ningún archivo local preexistente protegido, incluido `opencode.json`, está
+  en staging;
+
 - el estado Git puede determinarse de forma segura.
 
 En este caso, el workflow puede continuar con `git commit`.
@@ -85,6 +114,14 @@ El estado previo al commit no es válido cuando:
 - existen cambios previamente identificados como ajenos dentro de staging;
 
 - el contenido preparado no coincide con el conjunto de cambios esperado;
+
+- existe un commit no justificado o un archivo fuera del manifiesto en el
+  rango candidato;
+
+- la base, el rango o el manifiesto no pueden verificarse de forma segura;
+
+- `opencode.json` u otro cambio local preexistente protegido aparece en
+  staging;
 
 - el estado Git no puede determinarse de forma segura.
 
