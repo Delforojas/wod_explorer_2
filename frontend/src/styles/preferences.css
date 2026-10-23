@@ -1,0 +1,42 @@
+/* Se carga después de las variantes locales para respetar las preferencias
+   del usuario sin aumentar la especificidad ni cambiar el diseño habitual. */
+
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .login-card,
+  .wod-register-form-section,
+  .wod-result-selected-card,
+  .amrap-result-fields,
+  .for-time-result-fields,
+  .emom-result-fields,
+  .wod-configuration,
+  .wod-exercises-list {
+    background: var(--color-glass-fallback);
+  }
+
+  .delfo-footer__marquee {
+    background: rgb(33, 88, 88);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .login-card,
+  .wod-register-form-section,
+  .wod-result-selected-card,
+  .amrap-result-fields,
+  .for-time-result-fields,
+  .emom-result-fields,
+  .wod-configuration,
+  .wod-exercises-list {
+    background: var(--color-glass-fallback);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .delfo-footer__marquee {
+    background: rgb(33, 88, 88);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

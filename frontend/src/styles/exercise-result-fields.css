@@ -1,0 +1,108 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EXERCISE RESULT — FIELDS
+========================================== */
+
+.exercise-result-fields {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+
+  width: 100%;
+  gap: var(--space-5);
+}
+
+/* CAMPO */
+
+.exercise-result-field {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  width: 100%;
+
+  gap: var(--space-3);
+}
+
+/* ETIQUETA */
+
+.exercise-result-field label {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* INPUT */
+
+.exercise-result-field input {
+  width: 100%;
+  min-height: 52px;
+
+  margin: 0;
+  padding: 14px var(--space-5);
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+
+  outline: none;
+
+  color-scheme: dark;
+}
+
+.exercise-result-field input:focus-visible {
+  border-color: var(--color-orange-500);
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+}
+
+.exercise-result-field input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* HOVER */
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-result-field input {
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .exercise-result-field input:hover:not(:focus) {
+    border-color: rgba(255, 107, 0, 0.5);
+  }
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .exercise-result-fields {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .exercise-result-field input {
+    min-height: 50px;
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-result-field input {
+    transition: none;
+  }
+}

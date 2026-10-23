@@ -1,0 +1,243 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   FOR TIME RESULT FIELDS
+========================================== */
+
+.for-time-result-fields {
+  --for-time-orange: var(--color-orange-500);
+  --for-time-orange-light: var(--color-orange-300);
+  --for-time-border: var(--color-white-alpha-09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: var(--space-6);
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--for-time-border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.for-time-result-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: var(--space-2);
+}
+
+.for-time-result-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+
+  color: var(--for-time-orange-light);
+}
+
+/* ==========================================
+   SECTION
+========================================== */
+
+.for-time-result-section {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-5);
+  padding: 22px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+
+  background: rgba(8, 12, 18, 0.32);
+}
+
+.for-time-result-section-header {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-2);
+}
+
+.for-time-result-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+
+  color: var(--for-time-orange-light);
+}
+
+.for-time-result-section-header p {
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ==========================================
+   GRID
+========================================== */
+
+.for-time-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+/* ==========================================
+   FIELDS
+========================================== */
+
+.for-time-result-field label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================
+   INPUTS Y SELECTS
+========================================== */
+
+.for-time-result-field input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.for-time-result-field input:hover,
+.for-time-result-field select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.for-time-result-field input:focus,
+.for-time-result-field select:focus {
+  border-color: var(--for-time-orange);
+
+  background-color: rgba(12, 16, 24, 0.95);
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.for-time-result-field input:focus-visible,
+.for-time-result-field select:focus-visible {
+  outline: 2px solid var(--for-time-orange);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SELECT
+========================================== */
+
+.for-time-result-field select option {
+  background: #141820;
+  color: #f5f5f7;
+}
+
+/* ==========================================
+   NUMBER INPUT
+========================================== */
+
+.for-time-result-field input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.for-time-result-field input[type="number"]::-webkit-inner-spin-button,
+.for-time-result-field input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ==========================================
+   HELP TEXT
+========================================== */
+
+.for-time-result-help {
+  margin: 0;
+
+  padding: var(--space-3) var(--space-4);
+
+  border-left: 2px solid var(--for-time-orange);
+  border-radius: 0 8px 8px 0;
+
+  background: rgba(255, 107, 0, 0.06);
+
+  font-size: 12px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .for-time-result-fields {
+    padding: var(--space-6);
+    gap: var(--space-5);
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .for-time-result-fields {
+    padding: var(--space-5);
+    gap: var(--space-5);
+
+    border-radius: 16px;
+  }
+
+  .for-time-result-header h2 {
+    font-size: 20px;
+  }
+
+  .for-time-result-section {
+    padding: 18px;
+  }
+
+  .for-time-result-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .for-time-result-field input,
+  .for-time-result-field select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .for-time-result-field input,
+  .for-time-result-field select {
+    transition: none;
+  }
+}

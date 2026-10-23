@@ -1,0 +1,159 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   MY WOD RESULTS — GLASSMORPHISM
+========================================== */
+
+/* ==========================================
+   NAVEGACIÓN
+========================================== */
+
+.my-wod-results-navigation {
+  width: 100%;
+}
+
+.my-wod-results-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  gap: var(--space-3);
+}
+
+/* ==========================================
+   TARJETA DE RESULTADO
+========================================== */
+
+.my-wod-result-card {
+  justify-content: flex-start;
+  gap: var(--space-5);
+}
+
+/* ==========================================
+   FECHA DEL ENTRENAMIENTO
+========================================== */
+
+.my-wod-result-date {
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 1.6;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ==========================================
+   CONTENEDOR DEL RESULTADO
+========================================== */
+
+.my-wod-result-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  margin-top: auto;
+  padding: var(--space-5) var(--space-4);
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ==========================================
+   VALOR PRINCIPAL
+========================================== */
+
+.my-wod-result-value {
+  margin: 0;
+
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+
+  text-align: center;
+
+  color: #ffffff;
+}
+
+/* ==========================================
+   PROGRESO DEL ENTRENAMIENTO
+========================================== */
+
+.my-wod-result-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  gap: 10px;
+}
+
+/* ==========================================
+   METADATOS DE PROGRESO
+========================================== */
+
+.my-wod-result-meta {
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 1.6;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 768px) {
+  .my-wod-result-card {
+    gap: 18px;
+  }
+
+  .my-wod-result-content {
+    padding: 18px 14px;
+  }
+}
+
+/* ==========================================
+   MÓVILES
+========================================== */
+
+@media (max-width: 480px) {
+  .my-wod-results-navigation,
+  .my-wod-results-actions {
+    padding: 0 var(--space-6);
+    box-sizing: border-box;
+  }
+
+  .my-wod-results-actions .my-wods-nav-link {
+    width: 100%;
+  }
+
+  .my-wod-result-card {
+    gap: var(--space-4);
+  }
+
+  .my-wod-result-date {
+    font-size: 12px;
+  }
+
+  .my-wod-result-content {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .my-wod-result-value {
+    font-size: 17px;
+  }
+}

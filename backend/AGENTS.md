@@ -1,539 +1,171 @@
 # AGENTS.md — Backend
 
-<backend_language>
+## 1. Scope
 
-<language_version>
+Applies to `backend/`.
 
-<backend_framework>
+Follow the root `AGENTS.md` for global rules, documentation, safety, and workflow.
 
-<framework_version>
+For database schema, migrations, or infrastructure changes, also consult `Docker/AGENTS.md`.
 
-<build_tool>
+## 2. Stack
 
-<build_command>
+- Java 21
+- Spring Boot 3.5.5
+- Maven Wrapper
+- Spring Data JPA / Hibernate
+- MySQL 8.4
+- JUnit 5 + Spring Boot Test
+- API base path: `/api`
 
-<persistence_framework>
+`PROJECT.md`, `pom.xml`, and the actual repository configuration determine installed versions and dependencies.
 
-<database_engine>
+Use the project's Maven Wrapper. Do not assume global Maven or unconfigured dependencies.
 
-<api_base_path>
+## 3. Architecture
 
-<test_framework>
+Follow the existing layered architecture:
 
-<database_mcp>
+Controller → Service → Repository → JPA/Hibernate → MySQL
 
-<repository_mcp>
+Responsibilities:
 
-## Ámbito
+- **Controller:** HTTP requests, input validation, response DTOs, status codes.
+- **Service:** business rules, use cases, orchestration, transactions.
+- **Repository:** persistence operations and database queries.
+- **Entity:** internal persistence representation.
+- **DTO:** explicit API request and response contracts.
+- **Mapper:** entity/DTO transformations when necessary.
 
-Este archivo aplica a todo el contenido dentro de `backend/`.
+Rules:
 
-Las reglas globales definidas en el `AGENTS.md` raíz siguen siendo obligatorias.
+- Keep business logic out of controllers and repositories.
+- Do not expose sensitive or internal entity fields through APIs.
+- Prefer explicit DTOs over exposing JPA entities directly.
+- Use constructor-based dependency injection.
+- Favor simple, readable Java code and standard Spring mechanisms.
+- Avoid unnecessary architectural layers or abstractions.
+- Do not introduce CQRS, hexagonal architecture, or other architectural patterns without authorization.
 
-Si existe conflicto entre este archivo y el `AGENTS.md` raíz, prevalecen las reglas globales salvo que una spec autorice explícitamente una excepción.
+## 4. Persistence and Domain Rules
 
-Las reglas relacionadas específicamente con persistencia y base de datos deben respetar también `database/AGENTS.md` cuando exista.
+- `DOMAIN.md` is the source of truth for functional
+  entities, ownership, WOD versioning, and result semantics.
+- `Docker/AGENTS.md` defines database and migration guardrails.
+- `PROJECT.md` defines the approved persistence stack.
+- Follow the active spec for implementation scope.
 
----
+- Enforce resource ownership in backend operations.
+- Allow users to create, correct, and delete only their own results.
+- Preserve the exact WOD version associated with each result.
+- Validate FOR_TIME, AMRAP, and EMOM results against DOMAIN.md.
+- Do not calculate ranked personal records for EMOM.
+- Never change historical WOD definitions when correcting results.
+- Do not use Hibernate schema generation as a replacement
+  for the approved migration strategy.
+- Inspect the existing schema before making persistence changes.
 
-## Tecnología y configuración
+## 5. REST API
 
-Configuración del backend de WOD Explorer 2.0. La configuración real del repositorio y `PROJECT.md` son la fuente de verdad para versiones y dependencias instaladas. Si difieren de lo indicado aquí, documentar la discrepancia antes de cambiar el stack.
+Use the existing `/api` conventions.
 
-- Lenguaje: `Java`
-- Versión del lenguaje: `21`
-- Framework: `Spring Boot`
-- Versión del framework: `3.5.5`
-- Gestor de dependencias / build: `Maven Wrapper`
-- Framework de persistencia: `Spring Data JPA / Hibernate`
-- Base de datos: `MySQL 8.4`
-- Framework de testing: `JUnit 5 + Spring Boot Test`
-- Ruta base de la API: `/api`
+- Apply appropriate HTTP methods and status codes.
+- Validate request data at application boundaries.
+- Keep response contracts explicit and consistent.
+- Use centralized exception handling when appropriate.
+- Never expose stack traces, credentials, or internal implementation details.
+- Do not swallow exceptions or report failed operations as successful.
+- Preserve backward compatibility unless changes are explicitly authorized.
 
-No asumir tecnologías que no hayan sido definidas por el proyecto.
+Do not invent endpoints, DTO fields, response structures, or business rules.
 
-No asumir dependencias que no estén presentes en `pom.xml`. Utilizar Maven Wrapper (`./mvnw` desde el directorio que lo contiene), sin asumir una instalación global de Maven.
+## 6. Validation and Security
 
----
+- Prefer existing Spring validation mechanisms.
+- Keep structural validation separate from business rules.
+- Never rely exclusively on frontend validation.
+- Enforce authentication, authorization, and resource ownership on the backend when applicable.
+- Never store plaintext passwords.
+- Never return password hashes or expose tokens and secrets.
+- Use appropriate password hashing when required.
+- Apply least-privilege access.
+- Never bypass security mechanisms to make tests pass.
 
-## Arquitectura
+Do not introduce authentication mechanisms, JWT, OAuth2, roles, or additional security infrastructure unless required by the approved scope.
 
-Respetar la arquitectura definida por el proyecto.
+## 7. Testing
 
-Arquitectura backend sencilla por capas:
+Use JUnit 5 and Spring Boot Test.
 
-```text
-HTTP Request
-     ↓
-Controller
-     ↓
-Service
-     ↓
-Repository
-     ↓
-Spring Data JPA / Hibernate
-     ↓
-MySQL 8.4
-```
+- Add tests proportional to the change.
+- Prioritize business rules, API contracts, validation, security, and persistence behavior.
+- Keep unit tests independent of external infrastructure where practical.
+- Use integration tests when interactions with Spring or MySQL matter.
+- Test observable behavior rather than implementation details.
+- Do not remove, disable, or weaken tests to hide failures.
 
-Los DTOs definen la entrada y salida de los controllers; la validación se aplica en la entrada y las reglas de negocio en los servicios. Utilizar mappers para Entity ↔ DTO cuando sea necesario. La seguridad controla el acceso y la autorización cuando la funcionalidad esté requerida.
+## 8. Build and Verification
 
-No introducir arquitectura hexagonal, Clean Architecture, ports/adapters, CQRS ni capas adicionales salvo que la spec activa lo requiera y se respeten los guardrails arquitectónicos.
+Use `./mvnw` from the directory containing the Maven Wrapper.
 
-Cada capa debe mantener responsabilidades claramente separadas.
+Before running commands:
 
-### Entrada / Controller
+- Inspect `pom.xml`, Maven Wrapper, and relevant configuration.
+- Verify available Maven goals, profiles, and environment requirements.
+- Do not invent commands or assume external services are available.
 
-Cuando la arquitectura utilice controllers o una capa equivalente:
+Before completion:
 
-- Recibir requests.
-- Validar datos de entrada.
-- Delegar la ejecución en la capa correspondiente.
-- Construir respuestas.
+1. Review changes and architecture compliance.
+2. Run applicable compilation, tests, and build checks.
+3. Verify affected API contracts and persistence behavior.
+4. Check for exposed credentials or sensitive information.
+5. Report failures, skipped checks, and unmet requirements.
+6. Follow the root agent's completion requirements.
 
-Evitar introducir lógica de negocio directamente en esta capa.
+Do not claim completion when mandatory checks fail.
 
-### Service / Application
+## 9. Skills
 
-Cuando exista una capa de servicios o aplicación:
+Backend skills are located under `.agents/skills/backend/`.
 
-- Implementar y coordinar casos de uso.
-- Aplicar reglas de negocio.
-- Coordinar acceso a persistencia.
-- Realizar transformaciones necesarias.
-- Gestionar transacciones cuando corresponda.
+Load only the relevant `SKILL.md` files:
 
-La lógica reutilizable debe permanecer fuera de las capas de transporte.
+| Skill                      | Use                                                   |
+| -------------------------- | ----------------------------------------------------- |
+| `java-springboot`          | Java, Spring Boot fundamentals, controllers, services |
+| `springboot-patterns`      | REST APIs, DTOs, transactions, architectural patterns |
+| `spring-data-jpa`          | Entities, relationships, repositories, queries        |
+| `spring-boot-security-jwt` | Authentication, authorization, JWT, security          |
 
-### Repository / Persistence
+Rules:
 
-Cuando exista una capa de repositorios o persistencia:
+- Verify skill availability before use.
+- Load only skills relevant to the current task.
+- Skills provide guidance, not new requirements.
+- Do not introduce technologies or dependencies solely because a skill recommends them.
 
-- Acceder a datos.
-- Ejecutar consultas.
-- Persistir y recuperar información.
+## 10. MCPs
 
-No introducir lógica de negocio en esta capa salvo que la arquitectura definida por el proyecto establezca explícitamente otro patrón.
+Use configured tools only when relevant:
 
-### Modelo de persistencia
+- `database`: inspect actual database structures and data.
+- `github`: inspect remote Issues, Pull Requests, and repository state.
+- `context7`: consult current Java, Spring Boot, and JPA documentation.
 
-Los modelos de persistencia representan los datos almacenados.
+Tool availability does not authorize unrelated, destructive, or out-of-scope operations.
 
-No utilizar directamente modelos internos de persistencia como contratos públicos de la API cuando pueda producir:
+## 11. Backend Guardrails
 
-- acoplamiento innecesario;
-- exposición de campos internos;
-- problemas de seguridad;
-- dificultad para evolucionar la API.
+Require authorization before:
 
-### DTO / Contracts
+- Replacing core backend technologies or architecture.
+- Introducing incompatible public API changes.
+- Removing endpoints or existing functionality.
+- Replacing authentication or authorization mechanisms.
+- Modifying sensitive security configuration.
+- Performing destructive database operations.
 
-Cuando el stack utilice DTOs o contratos equivalentes:
+Never expose credentials, disable security controls, suppress compilation errors, or bypass mandatory tests.
 
-- separar modelos de entrada y salida cuando aporte claridad;
-- mantener contratos explícitos;
-- evitar exponer información interna;
-- favorecer estructuras inmutables cuando el lenguaje y framework lo permitan.
-
----
-
-## Lenguaje
-
-Utilizar características compatibles con:
-
-```text
-Java 21
-```
-
-Priorizar:
-
-- código legible;
-- nombres descriptivos;
-- funciones y métodos pequeños;
-- responsabilidad única;
-- inmutabilidad cuando sea apropiada;
-- tipado claro cuando el lenguaje lo permita;
-- soluciones simples antes que abstracciones innecesarias.
-
-Evitar:
-
-- funciones o métodos excesivamente largos;
-- módulos o clases con múltiples responsabilidades;
-- duplicación innecesaria;
-- abstracciones prematuras;
-- metaprogramación o reflection salvo necesidad justificada;
-- complejidad accidental.
-
-Seguir las convenciones idiomáticas del lenguaje utilizado.
-
----
-
-## Framework
-
-Framework principal:
-
-```text
-Spring Boot 3.5.5
-```
-
-Seguir las convenciones oficiales y patrones establecidos por el framework.
-
-Preferir mecanismos estándar del framework frente a implementaciones personalizadas cuando resuelvan correctamente el problema.
-
-No añadir dependencias nuevas salvo que:
-
-1. sean necesarias para cumplir la spec activa;
-2. exista una justificación técnica clara;
-3. no exista ya una solución adecuada en el stack actual.
-
-No sustituir componentes fundamentales del stack sin autorización explícita.
-
-## Persistencia
-
-Tecnología de persistencia:
-
-```text
-Spring Data JPA / Hibernate
-```
-
-Base de datos:
-
-```text
-MySQL 8.4
-```
-
-El código debe respetar el esquema y las reglas de persistencia definidas por el proyecto.
-
-`DOMAIN.md` define las reglas funcionales y relaciones conceptuales del dominio. `database/AGENTS.md` define las reglas específicas de esquema, migraciones, integridad y operaciones sobre la base de datos.
-
-No utilizar generación automática de esquema de Hibernate como sustituto del mecanismo de migraciones definido por el proyecto.
-
-No asumir:
-
-- tablas;
-- columnas;
-- tipos;
-- índices;
-- constraints;
-- relaciones;
-- datos existentes.
-
-Cuando una tarea dependa del estado real de la base de datos, utilizar las herramientas de inspección disponibles.
-
-No modificar automáticamente el esquema desde el backend salvo que el proyecto defina explícitamente ese mecanismo.
-
-Todo cambio relacionado con esquema, migraciones o datos debe respetar `database/AGENTS.md` cuando exista.
-
----
-
-## API
-
-Ruta base:
-
-```text
-<api_base_path>
-```
-
-Mantener contratos y rutas consistentes.
-
-Cuando se utilice HTTP:
-
-- utilizar métodos HTTP apropiados;
-- utilizar códigos de estado coherentes;
-- validar correctamente los datos de entrada;
-- mantener una estructura consistente para errores;
-- evitar exponer detalles internos de implementación.
-
-No devolver respuestas exitosas cuando la operación haya fallado.
-
-No introducir cambios incompatibles en contratos públicos existentes sin autorización o sin que la spec lo requiera.
-
----
-
-## Validación
-
-Validar datos en los límites apropiados del sistema.
-
-Cuando el framework proporcione mecanismos declarativos de validación, preferirlos frente a validaciones repetitivas implementadas manualmente.
-
-Separar:
-
-```text
-Validación estructural / entrada
-              ↓
-      Reglas de negocio
-```
-
-Las reglas de negocio deben permanecer en la capa correspondiente y no dispersarse entre controllers, handlers o adaptadores.
-
-No confiar únicamente en validaciones realizadas por el cliente.
-
----
-
-## Gestión de errores
-
-Utilizar el mecanismo de gestión de errores recomendado por `Spring Boot`.
-
-Centralizar el tratamiento de errores cuando el framework lo permita.
-
-Evitar:
-
-- `try/catch` repetitivos;
-- ignorar excepciones silenciosamente;
-- devolver stack traces al cliente;
-- exponer información interna;
-- convertir todos los errores en una misma respuesta genérica.
-
-Los errores públicos deben mantener una estructura consistente cuando el proyecto exponga una API.
-
----
-
-## Seguridad
-
-Nunca:
-
-- almacenar contraseñas en texto plano;
-- devolver hashes de contraseñas;
-- registrar secretos;
-- incluir tokens o credenciales en logs;
-- versionar credenciales reales;
-- exponer stack traces o información sensible;
-- desactivar mecanismos de seguridad para facilitar una implementación.
-
-Para contraseñas utilizar algoritmos específicamente diseñados para password hashing cuando la funcionalidad exista.
-
-Aplicar el principio de mínimo privilegio.
-
-No introducir:
-
-- autenticación;
-- autorización;
-- roles;
-- tokens;
-- sesiones;
-- mecanismos equivalentes;
-
-salvo que estén definidos por la spec activa o por la arquitectura del proyecto.
-
----
-
-## Testing
-
-Toda funcionalidad nueva debe incluir tests proporcionales a su impacto.
-
-Framework de testing:
-
-```text
-JUnit 5 + Spring Boot Test
-```
-
-Priorizar, cuando correspondan:
-
-- tests unitarios;
-- tests de componentes o módulos;
-- tests de API;
-- tests de persistencia;
-- tests de integración;
-- tests end-to-end cuando aporten valor real.
-
-Los tests unitarios no deben depender innecesariamente de infraestructura externa.
-
-No eliminar, desactivar o debilitar tests existentes únicamente para conseguir que una implementación pase.
-
-Un test debe comprobar comportamiento relevante, no simplemente aumentar cobertura.
-
----
-
-## Comandos
-
-Herramienta principal:
-
-```text
-Maven Wrapper
-```
-
-Comandos del proyecto (pendientes de verificar y configurar):
-
-```text
-Install: pendiente de verificar en la configuración real
-Validate: pendiente de verificar en la configuración real
-Test: pendiente de verificar en la configuración real
-Build: pendiente de verificar en la configuración real
-Run: pendiente de verificar en la configuración real
-```
-
-Antes de completar esta lista, inspeccionar `pom.xml`, Maven Wrapper, módulos, perfiles, plugins y configuración de CI disponibles. Confirmar el directorio de ejecución y los requisitos de entorno. No inventar objetivos, opciones ni perfiles Maven. Si la configuración no está disponible, mantener los comandos pendientes y reportar la verificación no realizada.
-
-Utilizar los comandos definidos por el proyecto.
-
-No asumir que herramientas globales están instaladas cuando el proyecto proporciona wrappers o mecanismos reproducibles.
-
-Antes de considerar una tarea completada, ejecutar los comandos de validación aplicables.
-
----
-
-## Skills
-
-Las skills locales del backend se encuentran bajo `.agents/skills/backend/`, con rutas relativas a la raíz del repositorio, no a `backend/`. Leer el `SKILL.md` correspondiente antes de aplicarlo y utilizar únicamente las skills necesarias para la tarea activa.
-
-### `java-springboot`
-
-Ruta: `.agents/skills/backend/java-springboot/SKILL.md`.
-
-Utilizar para desarrollo general con Java y Spring Boot: configuración, controllers, services, inyección de dependencias, DTOs, validación, gestión de errores, logging y testing general del backend.
-
-### `springboot-patterns`
-
-Ruta: `.agents/skills/backend/springboot-patterns/SKILL.md`.
-
-Utilizar para estructura Controller → Service → Repository, APIs REST, DTOs y contratos, transacciones, paginación, manejo centralizado de errores y patrones de Spring Boot.
-
-No introducir caching, procesamiento asíncrono, mensajería, rate limiting u otros mecanismos descritos por la skill salvo que la spec activa los requiera.
-
-### `spring-data-jpa`
-
-Ruta: `.agents/skills/backend/spring-data-jpa/SKILL.md`.
-
-Utilizar para entidades JPA, relaciones, repositories, queries, estrategias de carga, transacciones, paginación, índices relacionados con consultas, problemas N+1 y comportamiento de cascadas.
-
-Respetar `DOMAIN.md` en las decisiones funcionales del modelo y `database/AGENTS.md` en los cambios físicos de esquema o migraciones. No exponer entidades JPA directamente como contratos públicos de la API.
-
-### `spring-boot-security-jwt`
-
-Ruta: `.agents/skills/backend/spring-boot-security-jwt/SKILL.md`.
-
-Utilizar únicamente cuando la tarea afecte a autenticación, autorización, Spring Security, JWT, filtros de seguridad, usuarios autenticados, protección de endpoints, ownership de recursos o tests de seguridad.
-
-La existencia de esta skill no obliga a usar JWT ni autoriza a introducir OAuth2, RBAC, ABAC, Redis, refresh tokens, blacklisting u otros mecanismos no requeridos por la spec activa.
-
----
-
-### Reglas de uso
-
-Las skills no son requisitos funcionales y no autorizan por sí mismas a añadir dependencias, cambiar arquitectura, modificar el modelo de dominio o el esquema, introducir infraestructura ni ampliar el alcance de la spec.
-
-Si varias skills son aplicables, utilizar únicamente las necesarias y resolver cualquier conflicto mediante la jerarquía de instrucciones definida en el `AGENTS.md` raíz. Si falta un archivo de skill, comunicarlo sin asumir su contenido.
-
-Las skills proporcionan patrones y conocimiento técnico especializado.
-
-No pueden contradecir:
-
-1. la spec activa;
-2. este `AGENTS.md`;
-3. el `AGENTS.md` raíz;
-4. los guardrails aplicables.
-
-Si una skill no es relevante para la tarea actual, no debe utilizarse innecesariamente.
-
----
-
-## MCP y herramientas externas
-
-Herramientas disponibles:
-
-```text
-Database MCP: database
-Repository MCP: github
-Documentation MCP: context7
-```
-
-Utilizar únicamente las herramientas configuradas y disponibles en el proyecto.
-
-### Base de datos
-
-Cuando exista `database`, puede utilizarse para:
-
-- inspeccionar tablas;
-- comprobar columnas;
-- revisar relaciones;
-- consultar índices;
-- validar datos existentes;
-- verificar resultados.
-
-Las operaciones destructivas deben respetar los guardrails de `database/AGENTS.md`.
-
-### Repositorio
-
-Cuando exista `github`, puede utilizarse para:
-
-- consultar Issues;
-- comprobar requisitos;
-- revisar Pull Requests;
-- consultar ramas;
-- comprobar estado remoto;
-- verificar que una implementación cubre el trabajo solicitado.
-
----
-
-### Documentación
-
-Cuando esté configurado y disponible, utilizar `context7` para consultar documentación de Java, Spring Boot, Spring Data JPA/Hibernate y otras bibliotecas realmente utilizadas por el proyecto, priorizando las versiones instaladas.
-
-La documentación consultada no autoriza a añadir dependencias, actualizar versiones, cambiar arquitectura ni ampliar el alcance de la spec.
-
-No realizar acciones destructivas o irreversibles mediante herramientas externas sin autorización cuando estén protegidas por los guardrails.
-
----
-
-## Specs
-
-La spec activa define el alcance de implementación.
-
-No implementar funcionalidad fuera de la spec aunque:
-
-- parezca necesaria;
-- exista una Issue relacionada;
-- pueda ser útil posteriormente;
-- facilite una implementación futura.
-
-Si se detecta una contradicción entre la spec y otra fuente de requisitos, detener la implementación y documentar el conflicto.
-
-No ampliar silenciosamente el alcance.
-
----
-
-## Guardrails
-
-El agente debe detenerse y solicitar autorización antes de:
-
-- introducir cambios incompatibles en contratos públicos existentes;
-- eliminar endpoints o funcionalidades existentes;
-- cambiar decisiones arquitectónicas fundamentales;
-- sustituir tecnologías principales del backend;
-- introducir o sustituir mecanismos de autenticación o autorización;
-- modificar configuración de seguridad sensible;
-- realizar operaciones que puedan provocar pérdida de datos;
-- realizar cambios destructivos o irreversibles;
-- realizar cambios fuera del alcance de la spec activa.
-
-El agente nunca debe:
-
-- introducir secretos o credenciales reales;
-- desactivar mecanismos de seguridad para resolver una tarea;
-- eliminar validaciones únicamente para evitar errores;
-- desactivar o eliminar tests únicamente para conseguir que el build pase;
-- ocultar errores de compilación, testing o ejecución;
-- declarar una tarea completada cuando las verificaciones obligatorias fallen.
-
-Los cambios relacionados con persistencia deben respetar además los guardrails definidos en `database/AGENTS.md`.
-
-Los guardrails globales definidos en el `AGENTS.md` raíz siguen teniendo prioridad.
-
----
-
-## Verificación final
-
-Antes de considerar una tarea backend completada:
-
-1. Revisar los cambios realizados.
-2. Comprobar que la implementación respeta la arquitectura definida.
-3. Ejecutar las validaciones aplicables.
-4. Ejecutar los tests relevantes.
-5. Ejecutar el build cuando corresponda.
-6. Comprobar que no existen secretos o credenciales versionados.
-7. Comprobar que no se ha ampliado el alcance de la tarea.
-8. Verificar el cumplimiento de la spec activa.
-9. Comprobar que no se han violado los guardrails.
-10. Reportar cualquier error o verificación que no haya podido completarse.
-
-Una tarea no debe considerarse completada si una verificación obligatoria falla.
+Follow the root `AGENTS.md` and applicable database instructions for additional guardrails.

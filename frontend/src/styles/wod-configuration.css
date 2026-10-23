@@ -1,0 +1,207 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   CREATE WOD — CONFIGURATION
+========================================== */
+
+.wod-configuration {
+  --configuration-orange: var(--color-orange-500);
+  --configuration-orange-light: var(--color-orange-300);
+  --configuration-border: var(--color-white-alpha-09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: var(--space-6);
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--configuration-border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.wod-configuration-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: var(--space-2);
+}
+
+.wod-configuration-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+
+  color: var(--configuration-orange-light);
+}
+
+.wod-configuration-header h2 {
+  margin: 0;
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+
+  color: #efeded;
+}
+
+/* ==========================================
+   CONFIGURATION GRID
+========================================== */
+
+.wod-configuration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  width: 100%;
+  gap: 18px;
+}
+
+/* ==========================================
+   FIELDS
+========================================== */
+
+.wod-configuration-field {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: 9px;
+}
+
+.wod-configuration-field label {
+  font-size: 12px;
+  font-weight: 500;
+
+  letter-spacing: 0.2px;
+
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ==========================================
+   INPUTS AND SELECTS
+========================================== */
+
+.wod-configuration-field input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.wod-configuration-field input:hover,
+.wod-configuration-field select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.wod-configuration-field input:focus,
+.wod-configuration-field select:focus {
+  border-color: var(--configuration-orange);
+
+  background-color: rgba(12, 16, 24, 0.95);
+
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.wod-configuration-field input:focus-visible,
+.wod-configuration-field select:focus-visible {
+  outline: 2px solid var(--configuration-orange);
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   SELECT
+========================================== */
+
+.wod-configuration-field select option {
+  background: #141820;
+  color: #f5f5f7;
+}
+
+/* ==========================================
+   NUMBER INPUT
+========================================== */
+
+.wod-configuration-field input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.wod-configuration-field input[type="number"]::-webkit-inner-spin-button,
+.wod-configuration-field input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .wod-configuration {
+    padding: var(--space-6);
+    gap: var(--space-5);
+  }
+
+  .wod-configuration-grid {
+    gap: var(--space-4);
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .wod-configuration {
+    padding: var(--space-5);
+    gap: var(--space-5);
+
+    border-radius: 16px;
+  }
+
+  .wod-configuration-header h2 {
+    font-size: 20px;
+  }
+
+  .wod-configuration-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .wod-configuration-field input,
+  .wod-configuration-field select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .wod-configuration-field input,
+  .wod-configuration-field select {
+    transition: none;
+  }
+}

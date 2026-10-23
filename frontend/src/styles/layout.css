@@ -1,0 +1,191 @@
+/* =========================================================
+   DELFO — APP LAYOUT BLACK & ORANGE
+========================================================= */
+
+/* =========================================================
+   ESTRUCTURA GENERAL
+========================================================= */
+
+#root,
+.app-layout {
+  min-height: 100svh;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+
+  background: #000000;
+}
+
+/* =========================================================
+   ACCESIBILIDAD
+========================================================= */
+
+.skip-link {
+  position: fixed;
+
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 30;
+
+  transform: translateY(-160%);
+
+  border-radius: var(--radius-sm);
+
+  padding: var(--space-2) var(--space-3);
+
+  background: var(--color-orange-500);
+  color: #000000;
+
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+.app-main {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  width: 100%;
+  max-width: 1280px;
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0 auto;
+
+  box-sizing: border-box;
+
+  /* Fondo oscuro detrás del Canvas */
+  background-color: #080808;
+}
+/* =========================================================
+   PULSAR GRID — ORANGE
+========================================================= */
+
+.pulsar-grid {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  z-index: 0;
+
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+
+  --pulsar-color: var(--color-orange-500);
+
+  pointer-events: none;
+
+  background: transparent;
+}
+
+/* Puntos generados mediante elementos HTML */
+
+.pulsar-grid .dot,
+.pulsar-grid .grid-dot {
+  background-color: var(--color-orange-500);
+}
+
+/* Puntos generados mediante SVG */
+
+.pulsar-grid svg circle {
+  fill: var(--color-orange-500);
+}
+
+/* =========================================================
+   CONTENIDO PRINCIPAL
+========================================================= */
+
+.app-main-content {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MÓVILES — HASTA 599px
+========================================================= */
+
+@media (max-width: 599px) {
+  .app-layout {
+    padding-left: 0;
+  }
+
+  .app-main {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+
+    padding: 0;
+  }
+
+  .app-main-content {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pulsar-grid {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* =========================================================
+   TABLETS — DESDE 600px
+========================================================= */
+
+@media (min-width: 600px) {
+  .app-main {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+/* =========================================================
+   ESCRITORIO — DESDE 900px
+========================================================= */
+
+@media (min-width: 900px) {
+  .app-layout {
+    padding-left: 248px;
+  }
+
+  .app-main {
+    padding: var(--space-8);
+  }
+}
+
+/* =========================================================
+   PANTALLAS GRANDES — DESDE 1200px
+========================================================= */
+
+@media (min-width: 1200px) {
+  .app-main {
+    padding-inline: var(--space-8);
+  }
+}

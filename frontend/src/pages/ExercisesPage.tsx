@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { getExercises } from "../api/exercisesApi";
-import type { Exercise } from "../types/Exercise";
+import type { ExerciseResponse } from "../types/Exercise";
+import { getExercises, getExerciseById } from "../api/exercisesApi";
+import ExercisesView from "../views/exercises/ExercisesView";
 
 function ExercisesPage() {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<ExerciseResponse[]>([]);
+  const [selectedExercise, setSelectedExercise] =
+    useState<ExerciseResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,22 +23,26 @@ function ExercisesPage() {
       });
   }, []);
 
-  if (loading) {
-    return <p>Cargando ejercicios...</p>;
-  }
+  async function handleSelectExercise(id: number) {
+    try {
+      setError(null);
 
-  if (error) {
-    return <p>{error}</p>;
+      const exercise = await getExerciseById(id);
+
+      setSelectedExercise(exercise);
+    } catch {
+      setError("No se pudo cargar el ejercicio");
+    }
   }
 
   return (
-    <section>
-      <h2>Ejercicios</h2>
-
-      {exercises.map((exercise) => (
-        <p key={exercise.id}>{exercise.name}</p>
-      ))}
-    </section>
+    <ExercisesView
+      exercises={exercises}
+      selectedExercise={selectedExercise}
+      loading={loading}
+      error={error}
+      onSelectExercise={handleSelectExercise}
+    />
   );
 }
 

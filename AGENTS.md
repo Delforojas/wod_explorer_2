@@ -1,344 +1,105 @@
-# AGENTS.md — wod-explorer
+# AGENTS.md — WOD Explorer 2
 
-## Proyecto
+## 1. Purpose
 
-Aplicación web Full Stack para explorar WODs y ejercicios de CrossFit, registrar resultados de usuarios y consultar evolución y marcas personales.
+WOD Explorer is a Full Stack application for exploring CrossFit exercises and WODs, recording results, and tracking user progress.
 
-El frontend está desarrollado con React + TypeScript.
+This file defines global rules and routes agents to task-specific context.
 
-La persistencia principal se realiza en MySQL 8.4 mediante Docker Compose.
+`PROJECT.md` and the actual repository configuration determine the stack, versions, tools, and available commands.
 
-El backend de WOD Explorer 2.0 utiliza Java 21, Spring Boot 3.5.5, Maven Wrapper y Spring Data JPA/Hibernate, con MySQL 8.4. Las reglas técnicas del backend se definen en `backend/AGENTS.md`; la configuración real del repositorio y `PROJECT.md` determinan las dependencias y comandos disponibles.
+## 2. Context Routing
 
-Los archivos JSON existentes pertenecen a la versión inicial del proyecto y no deben considerarse la fuente de verdad una vez que la funcionalidad sea migrada a la base de datos.
+Identify the task scope before loading additional documentation.
 
-`DOMAIN.md` define el dominio funcional de WOD Explorer 2.0. Debe consultarse antes de diseñar o modificar el modelo de datos. No debe modificarse salvo petición expresa.
+| Area | Instructions |
 
-## Stack
+|---|---|
+| Frontend, UI, UX | `frontend/AGENTS.md` |
+| Backend, APIs, authentication | `backend/AGENTS.md` |
+| Database, migrations, MySQL infrastructure | `Docker/AGENTS.md` |
 
-### Frontend
+- Read only the area instructions relevant to the task.
+- For cross-area tasks, read every applicable agent file.
+- If a referenced file is missing, do not invent its rules.
+- Verify actual project configuration before running commands.
 
-Para cualquier trabajo relacionado con frontend, consulta `frontend/AGENTS.md` si existe y revisa la configuración real del proyecto. Sus instrucciones son obligatorias dentro de su ámbito. Si el archivo no existe, no inventes sus reglas ni presupongas un stack a partir de esta guía raíz.
+## 3. Documentation
 
-### Backend
+Load documentation according to task relevance:
 
-Para cualquier trabajo relacionado con:
+- `docs/constitution.md`: global principles for project changes.
+- `specs/`: active spec when implementing features or executing tasks.
+- `PRODUCT.md`: product goals and constraints when relevant.
+- `DOMAIN.md`: domain rules; required for domain or persistence changes.
+- `DESIGN.md`: visual decisions for UI or UX changes.
+- `PROJECT.md`: technical configuration, versions, tools, and commands.
+- `.agents/skills/`: task-relevant skills only.
 
-- código del backend;
-- lógica de negocio;
-- APIs y servicios;
-- acceso y persistencia de datos;
-- configuración del backend;
-- dependencias y herramientas de build;
-- seguridad y autenticación;
-- tests del backend;
-- arquitectura del backend;
+Do not load unrelated specs, skills, or documentation.
 
-lee también:
-`backend/AGENTS.md`
-Sus reglas son obligatorias para cualquier cambio relacionado con backend.
-Las reglas detalladas de lenguaje, framework, herramientas y arquitectura se obtienen
-de `backend/AGENTS.md` y de la configuración real del proyecto. La mención del stack
-en la sección Proyecto es una referencia general; ante discrepancias, verifica esas fuentes antes de implementar.
+Do not modify `DOMAIN.md` without an explicit request. Respect the repository's rules for editing `specs/`.
 
-### Base de datos
+## 4. Implementation Rules
 
-- Sistema de gestión de base de datos: MySQL 8.4.
-- Herramientas de infraestructura y ejecución: Docker Compose.
-- Gestión de esquema y migraciones.
-- Persistencia e integridad de datos.
-- MCP disponible para inspección de la base de datos real: `database`.
+- Stay within the authorized scope and existing architecture.
+- Avoid unnecessary features, dependencies, abstractions, or infrastructure.
+- Do not change major versions or fundamental architectural decisions without authorization.
+- Separate presentation, business logic, persistence, and infrastructure responsibilities.
+- Validate data at appropriate application boundaries.
+- Avoid duplicate sources of truth.
+- Do not change schemas, models, or migrations outside the authorized scope.
+- Avoid unrelated refactoring.
 
-Para cualquier trabajo relacionado con base de datos o persistencia:
+## 5. Skills and Tools
 
-1. Lee también `Docker/AGENTS.md`.
-2. Sus reglas son obligatorias para cualquier cambio relacionado con base de datos o persistencia.
-3. Usa el MCP `database` cuando sea necesario conocer o verificar el estado real de la base de datos.
-4. No asumas que el estado de la base de datos coincide con entidades, scripts, migraciones o documentación: compruébalo cuando sea relevante.
+- Use only skills relevant to the task.
+- Skills provide technical guidance, not new requirements.
+- Use `context7` when up-to-date technical documentation is necessary.
+- Use the `database` MCP when live MySQL verification is needed.
+- Use local Git for local operations and the `github` MCP for relevant remote operations.
+- Never assume documented state matches actual state.
 
-La estrategia de migraciones y la arquitectura de persistencia deben obtenerse de `Docker/AGENTS.md` y de la configuración real del proyecto.
+## 6. Safety
 
-El motor es MySQL 8.4 y el entorno de ejecución es Docker Compose.
+Request authorization before destructive changes, modifying secrets, overwriting unclear existing work, or making fundamental changes outside the approved scope.
 
-No sustituyas MySQL 8.4 ni Docker Compose por otra tecnología sin autorización explícita.
+Never:
 
-## Ejecución de comandos
+- Commit real secrets or credentials.
+- Disable tests, validation, or security controls to hide failures.
+- Ignore known errors.
+- Perform Git or GitHub write operations unless explicitly authorized or permitted by the active workflow.
 
-Antes de ejecutar comandos, identifica el área afectada y consulta sus instrucciones específicas y la configuración real del proyecto:
+## 7. Verification and Reporting
 
-- Para frontend, lee `frontend/AGENTS.md`.
+After completing work:
 
-- Para backend, lee `backend/AGENTS.md`.
+1. Run applicable checks defined by the affected area instructions and actual project configuration.
+2. Do not invent commands or skip mandatory checks.
+3. Report changed files and executed checks.
+4. Disclose failures, skipped checks, and unmet requirements.
+5. Do not claim implementation is complete when mandatory checks fail.
 
-- Para base de datos o persistencia, lee `Docker/AGENTS.md`.
+## 8. Instruction Conflicts
 
-Los comandos, herramientas, gestores de paquetes, sistemas de build y procedimientos de ejecución deben obtenerse del `AGENTS.md` específico del área y de la configuración real del proyecto.
+Follow higher-priority environment instructions first, then applicable project rules.
 
-Usa únicamente comandos soportados realmente por el proyecto.
+Within project documentation:
 
-No asumas herramientas, gestores de paquetes, sistemas de build ni comandos que no estén definidos o presentes en el proyecto.
+- The constitution defines global principles.
+- The active spec defines scope and requirements.
+- `PRODUCT.md` and `DOMAIN.md` define product and domain decisions.
+- Area-specific agents define technical conventions.
+- `DESIGN.md` defines applicable visual decisions.
+- Skills provide specialized guidance.
 
-## Estructura
+No technical instruction or skill may override requirements or expand the approved scope.
 
-Mantén una separación clara de responsabilidades entre las distintas áreas del proyecto.
-Organiza el código según la arquitectura, convenciones y estructura definidas por el proyecto.
-Cuando corresponda, separa adecuadamente:
+If a conflict cannot be resolved, report it before making the affected change.
 
-- interfaz y presentación;
-- lógica de aplicación y negocio;
-- datos y modelos;
-- tipos y contratos;
-- validación;
-- utilidades compartidas;
-- acceso a datos y persistencia;
-- configuración e infraestructura;
-- tests.
-
-Evita colocar lógica compleja en capas cuya responsabilidad principal sea la presentación.
-Mantén desacopladas las distintas áreas del sistema y evita dependencias innecesarias entre ellas.
-Respeta la arquitectura existente antes de introducir nuevas capas, abstracciones o patrones.
-No introduzcas capas adicionales únicamente por seguir un patrón arquitectónico si no aportan una responsabilidad real al proyecto.
-
-Para reglas específicas de estructura y arquitectura:
-
-- Para frontend, consulta `frontend/AGENTS.md`.
-- Para backend, consulta `backend/AGENTS.md`.
-- Para base de datos o persistencia, consulta `Docker/AGENTS.md`.
-  Las reglas específicas definidas en estos archivos son obligatorias dentro de su área correspondiente.
-
-## Datos y persistencia
-
-Respeta la estrategia de persistencia y las fuentes de datos definidas por el proyecto.
-El motor y la infraestructura definidos para el proyecto son MySQL 8.4 y Docker Compose. Para estrategia de esquema, migraciones, ORM y procedimientos concretos, sigue `Docker/AGENTS.md` y la configuración real del proyecto.
-No modifiques el esquema, modelo de datos, migraciones o estructura de persistencia sin que el alcance de la tarea o la spec activa lo autorice.
-Evita mantener múltiples fuentes de verdad para los mismos datos.
-Cuando una fuente de datos sea sustituida o migrada, utiliza la fuente definida como principal por la arquitectura del proyecto y elimina dependencias obsoletas cuando el alcance de la tarea lo permita.
-Valida los datos en las fronteras correspondientes de la aplicación.
-Mantén separadas, cuando corresponda, la lógica de negocio y la lógica de acceso a datos.
-Para cualquier trabajo relacionado con base de datos o persistencia, consulta:
-`Docker/AGENTS.md`
-
-Sus reglas son obligatorias para cualquier cambio relacionado con datos y persistencia.
-La tecnología, herramientas, estrategia de migraciones, modelo de datos y procedimientos específicos deben obtenerse de `Docker/AGENTS.md` y de la configuración real del proyecto.
-
-## Skills
-
-Las skills proporcionan conocimiento especializado, buenas prácticas y criterios técnicos para ayudar al agente durante el desarrollo.
-
-Las skills no sustituyen ni pueden contradecir las decisiones definidas por:
-
-1. la constitución del proyecto;
-2. la spec activa;
-3. las reglas del `AGENTS.md` raíz;
-4. las reglas del `AGENTS.md` específico del área.
-
-No es obligatorio utilizar todas las skills disponibles en cada tarea.
-
-Antes de utilizar una skill:
-
-- identifica el área y el alcance real de la tarea;
-- consulta el `AGENTS.md` específico del área correspondiente;
-- identifica las skills definidas como relevantes para esa tecnología o tipo de trabajo;
-- utiliza únicamente las skills que aporten conocimiento necesario para la tarea.
-
-Las skills específicas de tecnologías, lenguajes, frameworks, herramientas o disciplinas deben declararse en el `AGENTS.md` del área correspondiente.
-
-Por ejemplo:
-
-- las skills relacionadas con frontend deben definirse en `frontend/AGENTS.md`;
-- las skills relacionadas con backend deben definirse en `backend/AGENTS.md`;
-- las skills relacionadas con base de datos y persistencia deben definirse en `Docker/AGENTS.md`.
-
-Una skill no autoriza por sí sola a:
-
-- introducir nuevas dependencias;
-- cambiar versiones;
-- modificar la arquitectura;
-- introducir patrones o abstracciones innecesarias;
-- ampliar el alcance de una tarea;
-- modificar decisiones establecidas por la spec.
-
-Utiliza las skills como conocimiento especializado, no como fuente de requisitos.
-
-## Reglas generales
-
-- Lee `docs/constitution.md` antes de realizar cambios en el proyecto.
-- Lee la spec activa dentro de `specs/` antes de implementar una funcionalidad.
-- La spec activa es la fuente de verdad funcional para el trabajo definido en ella.
-- No implementes funcionalidades fuera del alcance de la spec activa.
-- No modifiques archivos dentro de `specs/` salvo petición explícita o cuando el workflow definido por el proyecto lo requiera.
-- No añadas dependencias sin una necesidad técnica clara y relacionada con la tarea.
-- No introduzcas nuevas capas, servicios, sistemas de autenticación, infraestructura o integraciones externas fuera del alcance de la spec activa.
-- No modifiques modelos, esquemas o estructuras de persistencia fuera del alcance de la spec activa.
-- No realices refactors amplios que no sean necesarios para completar la tarea actual.
-- No introduzcas patrones arquitectónicos, patrones de diseño o abstracciones sin una necesidad concreta.
-- No cambies versiones principales de lenguajes, frameworks, dependencias o herramientas sin autorización explícita.
-- No realices commits, push, merge, creación de PR o cierre de Issues automáticamente salvo que el workflow correspondiente o una instrucción explícita lo autorice.
-
-Las verificaciones concretas deben obtenerse de la configuración real del proyecto y del `AGENTS.md` específico de cada área.
-
-## Al terminar cualquier tarea
-
-Ejecuta únicamente las verificaciones aplicables a las áreas del proyecto modificadas.
-Las verificaciones concretas deben obtenerse de la configuración real del proyecto y del `AGENTS.md` específico de cada área.
-
-### Si se modifica frontend
-
-Consulta:
-`frontend/AGENTS.md`
-Ejecuta las verificaciones de tests, lint, tipado, build y otras comprobaciones definidas allí que sean aplicables a la tarea.
-
-### Si se modifica backend
-
-Consulta:
-`backend/AGENTS.md`
-Ejecuta las verificaciones de tests, compilación, build, ejecución y otras comprobaciones definidas allí que sean aplicables a la tarea.
-
-### Si se modifica base de datos o persistencia
-
-Consulta:
-`Docker/AGENTS.md`
-Ejecuta las verificaciones de esquema, migraciones, integridad, persistencia y otras comprobaciones definidas allí que sean aplicables a la tarea.
-
-### Reglas generales de verificación
-
-- No inventes comandos de verificación que no existan en el proyecto.
-- No omitas una verificación obligatoria definida para el área modificada.
-- Si una verificación falla, no declares la tarea como completada.
-- Informa claramente de cualquier verificación que no haya podido ejecutarse y del motivo.
-
-### Siempre
-
-- Indica claramente qué archivos has creado, modificado o eliminado.
-
-- Indica qué verificaciones has ejecutado y su resultado.
-
-- Si algún requisito de la spec no se ha podido cumplir, indícalo explícitamente.
-
-- No marques una tarea como terminada si las verificaciones aplicables fallan.
-
-## Documentación obligatoria
-
-Antes de modificar código:
-
-1. Lee `docs/constitution.md` para respetar los principios no negociables.
-
-2. Lee la spec activa dentro de `specs/`.
-
-3. Lee `PRODUCT.md` para entender el propósito y las restricciones del producto.
-
-4. Lee `DOMAIN.md` antes de realizar tareas que afecten al dominio o a la base de datos.
-
-5. Lee este `AGENTS.md`.
-
-6. Lee los `AGENTS.md` específicos del área afectada.
-
-7. Lee `DESIGN.md` cuando la tarea afecte a interfaz, UX o diseño visual.
-
-8. Lee las skills locales relevantes dentro de `.agents/skills/`.
-
-No es necesario leer skills que no tengan relación con la tarea actual.
-Si alguno de estos archivos no existe, no asumas su contenido ni inventes reglas en su nombre.
-
-## Documentación técnica externa
-
-El proyecto dispone del MCP `context7` para consultar documentación técnica actualizada.
-
-Usa `context7` cuando una tarea requiera consultar documentación actual de una librería, framework, SDK, API o herramienta.
-
-Prioriza la documentación correspondiente a la tecnología y versión realmente configuradas en el proyecto.
-
-La documentación obtenida mediante `context7` no sustituye ni puede contradecir las decisiones definidas por la constitución, la spec activa, `PRODUCT.md`, `DOMAIN.md`, `PROJECT.md` o los `AGENTS.md` aplicables.
-
-No introduzcas una dependencia, tecnología o cambio arquitectónico únicamente porque aparezca recomendado en la documentación consultada.
-
-## Prioridad de instrucciones
-
-Cuando varias fuentes de instrucciones sean aplicables, utiliza el siguiente orden de prioridad:
-
-1. `docs/constitution.md`
-
-2. spec activa
-
-3. `PRODUCT.md`
-
-4. `DOMAIN.md` para las decisiones funcionales y de datos
-
-5. `AGENTS.md` específico del área afectada
-
-6. `DESIGN.md`, cuando aplique
-
-7. skills relevantes
-
-La constitución define los principios no negociables del proyecto.
-
-La spec activa define el comportamiento, alcance y requisitos funcionales del trabajo que debe realizarse.
-
-`PRODUCT.md` define el propósito, contexto y restricciones generales del producto.
-
-El `AGENTS.md` raíz define las reglas generales de trabajo y comportamiento del agente.
-
-Los `AGENTS.md` específicos definen las reglas técnicas y convenciones aplicables a cada área del proyecto.
-
-`DESIGN.md` define las decisiones de diseño e identidad visual cuando la tarea afecte a interfaz, UX o experiencia visual.
-
-Las skills aportan conocimiento técnico y buenas prácticas, pero no pueden modificar ni ampliar por sí mismas el alcance de una tarea ni contradecir instrucciones de mayor prioridad.
-
-Si existe una contradicción entre instrucciones de distinto nivel, prevalece la de mayor prioridad.
-
-Si el conflicto no puede resolverse aplicando esta jerarquía o existe una ambigüedad que impide continuar de forma segura, no improvises: detén la implementación e indica claramente el conflicto.
-
-## Guardrails
-
-Estas reglas se aplican a cualquier trabajo realizado en el proyecto.
-
-El agente debe detenerse y solicitar autorización antes de:
-
-- realizar cambios destructivos o irreversibles;
-
-- eliminar archivos o recursos relevantes del proyecto;
-
-- modificar secretos, credenciales o configuración sensible;
-
-- cambiar decisiones arquitectónicas fundamentales;
-
-- realizar cambios fuera del alcance de la tarea activa;
-
-- sobrescribir trabajo existente cuya finalidad no esté clara.
-
-El agente nunca debe:
-
-- introducir secretos o credenciales reales en Git;
-
-- desactivar tests, validaciones o mecanismos de seguridad para hacer pasar una tarea;
-
-- ignorar errores conocidos y declarar una tarea como completada;
-
-- realizar cambios no relacionados con la tarea actual.
-
-Los `AGENTS.md` especializados pueden añadir guardrails adicionales para su ámbito.
-
-## Configuración del proyecto
-
-`PROJECT.md` es la fuente de verdad de la configuración técnica del proyecto.
-
-Los `AGENTS.md` especializados deben consultar `PROJECT.md` para conocer las tecnologías, versiones, herramientas, comandos, MCPs y fuentes de verdad configuradas.
-
-Los placeholders que aún existan en documentos del proyecto no son valores configurados. No asumir sus valores: consultar `PROJECT.md`, los agentes específicos y la configuración real antes de tomar decisiones.
-
-## Git y GitHub
-
-- Git es el sistema de control de versiones del proyecto.
-- GitHub es la plataforma remota para repositorio, Issues, Pull Requests y workflows.
-- MCP disponible para interactuar con GitHub: `github`.
-
-Cuando una tarea requiera información del estado remoto de GitHub:
-
-- Usa el MCP `github` para consultar el repositorio, Issues, Pull Requests, Actions y demás recursos necesarios.
-- No asumas que el estado local coincide con el estado remoto; compruébalo cuando sea relevante.
-- Utiliza Git local para operaciones sobre el working tree, staging, commits y ramas locales.
-- Utiliza el MCP `github` para operaciones que requieran interactuar con recursos remotos de GitHub.
-
-El acceso al MCP `github` no autoriza por sí mismo operaciones de escritura.
-
-La creación o modificación de Issues, Pull Requests, merge, push, cierre de Issues u otras operaciones remotas solo puede realizarse cuando el workflow correspondiente o una instrucción explícita lo autorice.
+## 9. Language
+
+- Write agent instructions and technical identifiers in English.
+- Preserve the language of existing project documentation.
+- Communicate with the user in Spanish unless requested otherwise.

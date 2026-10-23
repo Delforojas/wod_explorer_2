@@ -1,0 +1,43 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EXERCISE RESULTS — LIST
+========================================== */
+
+.exercise-results-list {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+
+  align-items: stretch;
+
+  width: 100%;
+  gap: var(--space-5);
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* TABLETS */
+
+@media (max-width: 768px) {
+  .exercise-results-list {
+    gap: var(--space-4);
+  }
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .exercise-results-list {
+    grid-template-columns: 1fr;
+
+    gap: var(--space-4);
+    padding: 0 var(--space-6);
+  }
+}

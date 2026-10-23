@@ -1,0 +1,209 @@
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--color-input-background);
+  color: var(--color-text);
+}
+
+textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  border-color: var(--color-input-focus-border);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--color-button-primary-focus-ring);
+}
+
+.form-layout,
+.form-section,
+.repeatable-item {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.form-primary-actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.form-add-exercise {
+  justify-self: start;
+}
+
+.form-submit-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-submit-actions > button {
+  width: 100%;
+}
+
+.form-layout {
+  max-width: 760px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-surface);
+}
+
+.form-section,
+.repeatable-item {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+}
+
+.form-section h2,
+.repeatable-item h3 {
+  margin: 0;
+}
+
+.form-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.form-field label {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ui-error,
+.ui-success,
+.ui-empty,
+.ui-loading {
+  margin: 0;
+}
+
+.ui-loading {
+  min-height: 96px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  box-shadow: var(--shadow-surface);
+}
+
+.result-value {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.result-progress {
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* Patrones compartidos de la interfaz actual. Selectores explícitos conservan la especificidad; variantes y responsive permanecen en cada componente. */
+
+.amrap-result-header h2,
+.emom-result-header h2,
+.for-time-result-header h2,
+.wod-register-form-header h2 {
+  margin: 0;
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+
+  color: #efeded;
+}
+
+.amrap-result-header p,
+.emom-result-header p,
+.for-time-result-header p,
+.wod-configuration-description,
+.wod-register-form-header p {
+  max-width: 520px;
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.emom-result-field,
+.for-time-result-field,
+.wod-register-form-field {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 9px;
+}
+
+.for-time-result-field input,
+.for-time-result-field select,
+.wod-configuration-field input,
+.wod-configuration-field select,
+.wod-exercise-card-field input,
+.wod-exercise-card-field select,
+.wod-register-form-field input,
+.wod-register-form-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+
+  padding: var(--space-3) var(--space-4);
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+
+  background-color: rgba(8, 12, 18, 0.75);
+
+  color: #f5f5f7;
+
+  font-family: var(--font-display);
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.for-time-result-field select,
+.wod-configuration-field select,
+.wod-exercise-card-field select,
+.wod-register-form-field select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 42px;
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+}

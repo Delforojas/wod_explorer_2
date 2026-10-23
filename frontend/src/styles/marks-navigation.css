@@ -1,0 +1,130 @@
+/* ==========================================
+   HALASKA — ENLACES DE NAVEGACIÓN
+   ========================================== */
+
+.marks-navigation {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin-bottom: 28px;
+}
+
+/* Todos los enlaces con el mismo estilo */
+
+.marks-nav-link,
+.marks-nav-link-active,
+.marks-nav-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  padding: 10px var(--space-4);
+
+  border: 1px solid #262626;
+  border-radius: 6px;
+
+  background: #000000;
+  color: var(--color-orange-500);
+
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+
+  box-shadow: none;
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+/* Eliminar efectos decorativos */
+
+.marks-nav-link::before,
+.marks-nav-link::after {
+  content: none;
+}
+
+/* ==========================================
+   ESCRITORIO — HOVER
+   ========================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  .marks-nav-link:hover:not(:disabled) {
+    border-color: var(--color-orange-500);
+    background: rgb(255 107 0 / 12%);
+    color: var(--color-orange-500);
+
+    box-shadow: none;
+    text-decoration: none;
+  }
+}
+
+/* ==========================================
+   MÓVIL — EFECTO AL PULSAR
+   ========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .marks-nav-link:active:not(:disabled) {
+    border-color: var(--color-orange-500);
+    background: rgb(255 107 0 / 12%);
+    color: var(--color-orange-500);
+
+    box-shadow: none;
+    text-decoration: none;
+  }
+}
+
+/* ==========================================
+   REGISTRAR MARCA
+   ========================================== */
+
+.marks-nav-action {
+  margin-left: auto;
+  font-weight: 600;
+}
+
+/* ==========================================
+   FOCO ACCESIBLE
+   ========================================== */
+
+.marks-nav-link:focus-visible {
+  outline: 2px solid var(--color-orange-500);
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 600px) {
+  .marks-navigation {
+    gap: var(--space-2);
+  }
+
+  .marks-nav-link {
+    flex: 1 1 auto;
+    padding: 10px var(--space-2);
+    font-size: 12px;
+  }
+
+  .marks-nav-action {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+}
+
+/* ==========================================
+   ACCESIBILIDAD — MOVIMIENTO REDUCIDO
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .marks-nav-link {
+    transition: none;
+  }
+}

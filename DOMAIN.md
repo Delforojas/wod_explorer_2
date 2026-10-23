@@ -1,407 +1,366 @@
-# WOD Explorer 2.0 — Modelo de dominio
 
-## 1. Propósito del producto
+# DOMAIN.md — WOD Explorer 2.0
 
-WOD Explorer es una aplicación para consultar entrenamientos de CrossFit, crear WOD personalizados y registrar resultados personales.
+## 1. Purpose and Scope
 
-El núcleo del producto debe permitir dos formas de uso:
+This document is the **single source of truth for the functional domain** of WOD Explorer 2.0.
 
-- Sin autenticación: explorar el catálogo público de ejercicios y los WOD genéricos proporcionados por la aplicación.
-- Con autenticación: además de consultar el contenido público, crear WOD propios, registrar resultados y consultar el historial y las mejores marcas personales.
+It defines business entities, relationships, permissions, behavior, and invariants. It does not define implementation technologies, API contracts, database schemas, or UI architecture.
 
-Este documento define el dominio funcional. No prescribe una tecnología, una base de datos ni una interfaz concreta.
+- `PRODUCT.md`: product vision, users, capabilities, and exclusions.
+- `PROJECT.md`: architecture, technology, and infrastructure.
+- `DOMAIN.md`: functional business rules and invariants.
+- `specs/`: approved implementation requirements.
 
-## 2. Límites del dominio actual
+Do not infer missing business decisions. Resolve conflicts with approved specifications before changing domain behavior.
 
-El dominio actual incluye:
+## 2. Domain Boundaries
 
-- usuarios;
-- catálogo de ejercicios;
-- WOD genéricos;
-- WOD creados por usuarios;
-- composición ordenada de un WOD;
-- resultados personales de WOD;
-- historial personal;
-- mejores marcas personales.
+The current domain covers:
 
-Quedan fuera de esta primera versión del dominio:
+- System-managed exercise catalog.
+- Public, system-managed generic WODs.
+- Private, user-owned personal WODs.
+- Ordered WOD exercise prescriptions.
+- Versioned WOD definitions.
+- Private workout attempts and results.
+- Personal workout history and personal records.
+- User identity and resource ownership.
 
-- comunidades o boxes;
-- ligas y clasificaciones;
-- seguimiento entre usuarios;
-- comentarios, reacciones o valoraciones;
-- publicación y descubrimiento de WOD creados por otros usuarios;
-- edición del catálogo por usuarios;
-- resultados públicos;
-- planes de entrenamiento o programación de sesiones.
+Social features, competitions, gym management, user-generated exercise catalogs, shared personal WODs, public results, and training schedules are outside the current scope.
 
-Estas capacidades podrán añadirse más adelante como módulos separados sin alterar las reglas fundamentales definidas aquí.
+## 3. Actors and Access
 
-## 3. Actores
+### Visitor
 
-### Visitante
+An unauthenticated visitor may:
 
-Persona que utiliza la aplicación sin iniciar sesión.
+- Browse, search, and filter catalog exercises.
+- Browse, search, and filter generic WODs.
+- View generic WOD details and ordered exercises.
 
-Puede:
+Visitors cannot create WODs, record results, or access private resources.
 
-- consultar, buscar y filtrar ejercicios del catálogo;
-- consultar, buscar y filtrar WOD genéricos;
-- ver el detalle y la composición de un WOD genérico.
+### Registered User
 
-No puede:
+An authenticated user may additionally:
 
-- crear WOD;
-- registrar resultados;
-- acceder a historial o mejores marcas;
-- consultar datos privados de ningún usuario.
+- Create and manage their own personal WODs.
+- Record multiple attempts for generic or owned personal WODs.
+- View, correct, and delete their own results.
+- Access their own workout history and personal records.
 
-### Usuario registrado
+Every private operation must validate ownership using the authenticated identity, not merely a resource identifier.
 
-Persona autenticada y propietaria de sus datos personales.
+## 4. Core Entities
 
-Puede realizar todas las acciones de un visitante y, además:
+### 4.1 User
 
-- crear tantos WOD personales como quiera;
-- modificar y eliminar únicamente sus propios WOD;
-- registrar resultados para WOD genéricos o propios;
-- consultar su historial personal;
-- consultar sus mejores marcas.
+A user represents a registered account and owns:
 
-## 4. Contextos funcionales
+- Personal WODs.
+- Workout results.
+- Derived personal history and records.
 
-### 4.1. Identidad y acceso
+Only the minimum identity data necessary for account management is required.
 
-Se ocupa del registro, autenticación e identificación del usuario propietario de cada recurso privado.
+Authentication credentials and session mechanisms are technical concerns, not part of the sporting domain model.
 
-La información personal solicitada debe limitarse a la estrictamente necesaria para registrar e identificar la cuenta. Los datos de perfil ampliados no forman parte del dominio actual.
+### 4.2 Exercise
 
-### 4.2. Catálogo de ejercicios
+An exercise is a system-managed catalog entry.
 
-Contiene los ejercicios disponibles para consultar y para componer WOD.
+Conceptual attributes:
 
-Los ejercicios pertenecen a un catálogo común gestionado por el sistema. Los usuarios no pueden crear ejercicios libres al construir un WOD.
+- Identifier.
+- Name.
+- Category.
+- Measurement type.
 
-### 4.3. Catálogo de WOD genéricos
+Categories may include weightlifting, gymnastics, strongman, cardio, and other.
 
-Contiene entrenamientos públicos definidos por el sistema.
+Measurement types may include weight, repetitions, time, distance, weight-distance, and other.
 
-Los WOD genéricos pueden consultarse sin iniciar sesión, pero ningún usuario puede crearlos, modificarlos ni eliminarlos.
+Rules:
 
-### 4.4. WOD personales
+- Exercises must exist in the catalog before being referenced by a WOD.
+- Users cannot create or modify catalog exercises.
+- Exercise names must identify catalog entries unambiguously.
+- Removing an exercise from a WOD does not delete its catalog entry.
 
-Permite a cada usuario crear y gestionar sus propios entrenamientos utilizando exclusivamente ejercicios existentes en el catálogo.
+### 4.3 WOD
 
-Los WOD personales son privados. En esta versión no se comparten ni aparecen en búsquedas de otros usuarios.
+A WOD is an ordered workout definition composed of one or more catalog exercises.
 
-### 4.5. Seguimiento de resultados
+Two origins are supported:
 
-Permite registrar la ejecución de un WOD y consultar la evolución personal mediante historial y mejores marcas.
+| Origin | Owner | Visibility | Management |
 
-Cada resultado pertenece exclusivamente al usuario que lo registró y es privado.
+|---|---|---|---|
 
-## 5. Entidades y conceptos principales
+| Generic | System | Public | System only |
+| Personal | Registered user | Private | Owner only |
 
-### 5.1. Usuario
+Conceptual attributes include:
 
-Representa una cuenta registrada.
+- Identifier and name.
+- Origin and optional user ownership.
+- Workout modality.
+- Applicable time limit and round count.
+- Creation date.
+- Ordered exercise prescriptions.
+- Version and lifecycle information.
 
-Responsabilidades de dominio:
+WOD names are **not unique**, including within one user's personal collection.
 
-- ser propietario de sus WOD personales;
-- ser propietario de sus resultados;
-- acceder únicamente a su información privada.
+Difficulty levels are not required by the current domain.
 
-La identidad técnica, las credenciales y los mecanismos de sesión pertenecen al sistema de autenticación, no al modelo deportivo.
+### 4.4 WOD Version
 
-### 5.2. Ejercicio
+A WOD version preserves a specific workout definition.
 
-Representa un movimiento o actividad que puede formar parte de un WOD.
+Rules:
 
-Atributos conceptuales mínimos:
+- Editing a personal WOD creates a new version.
+- Results reference the exact version performed.
+- Existing results are never reassigned to newer versions.
+- Historical versions used by results must remain available.
+- A personal WOD with existing results is archived rather than physically deleted.
+- Archived WODs do not accept new results.
+- Generic WODs remain system-managed.
 
-- identificador;
-- nombre;
-- categoría;
-- tipo de medición.
+The exact storage and migration mechanisms are implementation decisions.
 
-La categoría permite organizar y filtrar el catálogo, por ejemplo:
+### 4.5 WOD Exercise Item
 
-- halterofilia;
-- gimnasia;
-- strongman;
-- cardio;
-- otros.
+A WOD exercise item associates a catalog exercise with a specific position and prescription in a WOD version.
 
-El tipo de medición expresa cómo se describe o evalúa normalmente el ejercicio, por ejemplo:
+Its prescription may contain:
 
-- peso;
-- repeticiones;
-- tiempo;
-- distancia;
-- peso y distancia;
-- otro.
+- Repetitions.
+- Load.
+- Distance.
+- Duration.
 
-Reglas:
+Units:
 
-- el ejercicio debe pertenecer al catálogo para poder añadirse a un WOD;
-- su nombre debe permitir identificarlo sin ambigüedad dentro del catálogo;
-- un usuario no puede modificar el ejercicio desde la creación de un WOD.
+- Load: kilograms (`kg`).
+- Distance: meters (`m`).
+- Duration: seconds (`s`).
 
-### 5.3. WOD
+Rules:
 
-Representa un entrenamiento compuesto por uno o más ejercicios ordenados.
+- An available WOD must contain at least one exercise item.
+- Exercise order is significant and deterministic.
+- The same catalog exercise may occur multiple times at different positions.
+- Each item references an existing catalog exercise.
+- Items belong to their WOD definition and cannot exist independently.
 
-Existen dos clases según su origen:
+## 5. Workout Modalities
 
-- **Genérico:** creado y mantenido por el sistema, público e inmutable para los usuarios.
-- **Personal:** creado por un usuario, privado y gestionable únicamente por su propietario.
+The supported modalities are `FOR_TIME`, `AMRAP`, and `EMOM`.
 
-Atributos conceptuales mínimos:
+Result validation and comparison must respect the modality and the specific WOD version performed.
 
-- identificador;
-- nombre;
-- modalidad o tipo de WOD;
-- nivel, cuando proceda;
-- límite de tiempo, cuando proceda;
-- número de rondas, cuando proceda;
-- origen: genérico o personal;
-- propietario, obligatorio solo si es personal;
-- fecha de creación;
-- composición ordenada.
+### 5.1 FOR_TIME
 
-El nombre de un WOD no tiene que ser único. Distintos WOD pueden compartir el mismo nombre, incluso dentro de la colección de un usuario.
+The objective is to complete the prescribed work in the shortest possible time.
 
-### 5.4. Ejercicio de WOD
+**Completed attempt:**
 
-Representa la participación de un ejercicio concreto dentro de un WOD. No es un ejercicio nuevo: referencia uno que ya existe en el catálogo.
+- Records a positive completion time.
+- May participate in personal-record comparison.
 
-Atributos conceptuales mínimos:
+**Incomplete attempt:**
 
-- ejercicio referenciado;
-- posición;
-- prescripción aplicable, como repeticiones, distancia, carga o duración cuando corresponda.
+- Records that the workout was not completed.
+- Preserves the applicable time limit and work completed.
+- Progress may identify rounds, exercise position, and achieved quantity.
+- Does not compete with completed attempts for the fastest-time personal record.
 
-Reglas:
+For equivalent completed attempts, **the lowest time wins**.
 
-- un WOD debe contener al menos un ejercicio;
-- el orden forma parte de la definición del WOD y debe conservarse;
-- un mismo ejercicio puede aparecer más de una vez en un WOD si ocupa posiciones diferentes;
-- cada elemento debe referenciar un ejercicio existente en el catálogo;
-- eliminar un elemento de la composición no elimina el ejercicio del catálogo.
+### 5.2 AMRAP
 
-### 5.5. Resultado de WOD
+The objective is to complete as much prescribed work as possible within a fixed time.
 
-Representa una ejecución realizada por un usuario sobre un WOD genérico o uno de sus propios WOD.
+A result records:
 
-Atributos conceptuales mínimos:
+- Completed rounds.
+- Additional repetitions.
 
-- identificador;
-- usuario propietario;
-- WOD realizado;
-- fecha y hora de realización;
-- resultado según la modalidad del WOD;
-- estado de finalización, cuando sea necesario distinguir un WOD completado de uno no completado;
-- las notas no forman parte de la primera versión.
+Both values must be non-negative.
 
-El resultado puede adoptar distintas formas según el tipo de WOD, por ejemplo:
+For comparable attempts:
 
-- tiempo total en un WOD `FOR_TIME`;
-- rondas y repeticiones en un `AMRAP`;
+1. More complete rounds wins.
+2. If rounds are equal, more additional repetitions wins.
 
-- repeticiones o carga alcanzada en un `EMOM`, si la definición concreta del entrenamiento lo requiere.
+Comparison is only valid between equivalent WOD definitions and result rules.
 
-No debe forzarse una única cifra genérica que pierda el significado deportivo del resultado.
+### 5.3 EMOM
 
-Las modalidades iniciales admitidas son `FOR_TIME`, `AMRAP` y `EMOM`. No se admiten modalidades adicionales hasta que exista una decisión explícita que defina su resultado y comparación.
+EMOM stands for *Every Minute On the Minute*.
 
-- En `FOR_TIME`, un resultado completado contiene un tiempo positivo. Un resultado no completado puede conservar el progreso alcanzado mediante los campos de progreso definidos para la versión ejecutada. Solo los resultados completados y compatibles participan en la mejor marca.
-- En `AMRAP`, un resultado contiene rondas completas y repeticiones adicionales no negativas. La comparación se realiza primero por rondas y después por repeticiones adicionales.
-- En `EMOM`, un resultado conserva la ronda alcanzada y, cuando proceda, el elemento y la métrica de progreso alcanzados. Solo se comparan resultados compatibles de la misma versión y regla de progreso.
+Its result is binary:
 
-Los campos de resultado deben ser compatibles con la modalidad del WOD.
+- `COMPLETED`: the prescribed workout was completed.
+- `NOT_COMPLETED`: the prescribed workout was not completed.
 
-Reglas:
+Rules:
 
-- solo un usuario autenticado puede registrar un resultado;
-- el usuario solo puede registrar un resultado a su propio nombre;
-- se pueden registrar varios intentos para el mismo WOD;
-- registrar un nuevo intento no sustituye los anteriores;
-- el resultado debe ser compatible con la modalidad del WOD;
-- todos los resultados son personales y privados;
-- un usuario puede modificar o corregir únicamente sus propios resultados.
-- un usuario solo puede consultar, modificar y eliminar sus propios resultados.
-- eliminar un resultado no elimina ni modifica los demás intentos.
+- No partial progress, achieved minute, or repetition breakdown is recorded.
+- EMOM results do not generate ranked personal records.
+- Multiple EMOM attempts may be recorded.
+- Results remain associated with the exact WOD version performed.
+- Users may correct or delete their own EMOM results.
 
-### 5.6. Historial personal
+## 6. Workout Results
 
-Es una vista derivada de los resultados del usuario, no una entidad que deba mantenerse duplicada.
+A workout result represents one attempt by one registered user.
 
-Debe permitir consultar cronológicamente los intentos registrados y, como mínimo:
+Conceptual attributes:
 
-- identificar el WOD;
-- conocer la fecha del intento;
-- ver el resultado obtenido;
-- distinguir entre WOD genérico y personal.
+- Identifier.
+- Owner.
+- WOD and exact version performed.
+- Performance date and time.
+- Modality-specific result.
+- Completion status when applicable.
 
-Puede ofrecer búsqueda, filtrado y ordenación sin cambiar la propiedad ni la privacidad de los datos.
+Business rules:
 
-### 5.7. Mejor marca personal
+- Only authenticated users may record results.
+- Users may record attempts for generic WODs or their own active personal WODs.
+- Multiple attempts for the same WOD are permitted.
+- Recording an attempt never replaces previous attempts.
+- Users may view, modify, correct, and delete **only their own results**.
+- Correcting one attempt must not change other attempts.
+- Corrections must preserve ownership, WOD-version association, and modality compatibility.
+- Result changes must not retroactively modify the definition of the WOD performed.
+- Results are private and cannot be accessed by other users.
 
-Es un valor derivado de los resultados válidos de un usuario para un WOD determinado.
+Notes are outside the current result model.
 
-No constituye un resultado adicional ni debe introducir una segunda fuente de verdad. Si se crea o elimina un resultado, la mejor marca se deriva de nuevo a partir de los resultados existentes.
+## 7. History and Personal Records
 
-La comparación depende de la modalidad:
+### 7.1 Personal History
 
-- en `FOR_TIME`, normalmente gana el menor tiempo entre intentos completados equivalentes;
-- en `AMRAP`, gana la mayor cantidad de trabajo, comparando primero rondas completas y después repeticiones adicionales;
-- no se calculan mejores marcas para modalidades no admitidas explícitamente.
+Workout history is a **derived view** of a user's existing results, not an independently editable domain entity.
 
-Solo deben compararse resultados compatibles del mismo WOD. No se agregan resultados de WOD distintos aunque compartan nombre.
+It must support chronological access to:
 
-Si se crea, modifica o elimina un resultado, la mejor marca se deriva de nuevo a partir de los resultados existentes.
+- The WOD performed.
+- Performance date.
+- Recorded result.
+- Generic or personal WOD origin.
+- The relevant historical WOD definition.
 
-## 6. Agregados y propiedad
+Search, filters, and sorting must never expose another user's private results.
 
-### Agregado WOD
+### 7.2 Personal Records
 
-El WOD es la raíz del agregado formado por:
+A personal record is derived from valid, comparable results.
 
-- WOD;
-- composición ordenada de ejercicios.
+Rules:
 
-La composición se crea, modifica y valida a través del WOD. No debe quedar un elemento de composición sin su WOD.
+- Personal records are not independently created or edited.
+- Creating, modifying, or deleting a result must be reflected when records are recalculated.
+- Only comparable attempts may compete.
+- WODs with identical names are not automatically equivalent.
+- Historical version compatibility must be respected.
+- `FOR_TIME`: lowest valid completed time.
+- `AMRAP`: highest valid rounds and additional repetitions.
+- `EMOM`: no ranked personal records.
 
-### Agregado Resultado
+A personal record must always be traceable to an existing valid attempt.
 
-El resultado es una raíz independiente que referencia:
+## 8. Domain Aggregates
 
-- al usuario propietario;
-- al WOD realizado y a la versión concreta ejecutada.
+### WOD Aggregate
 
-El histórico de resultados debe conservar su significado aunque el WOD personal cambie posteriormente. Cada modificación de un WOD personal con resultados crea una nueva versión; los resultados existentes mantienen la referencia a la versión ejecutada y no se alteran retroactivamente. Un WOD personal con resultados se archiva en lugar de eliminarse físicamente y no admite nuevos resultados mientras esté archivado.
+The WOD is the aggregate root for its definition, versions, and ordered exercise composition.
 
-### Propiedad de los recursos
+Its consistency responsibilities include:
 
-| Recurso               | Propietario             | Visibilidad | Quién puede modificarlo                |
-| --------------------- | ----------------------- | ----------- | -------------------------------------- |
-| Ejercicio de catálogo | Sistema                 | Pública     | Sistema                                |
-| WOD genérico          | Sistema                 | Pública     | Sistema                                |
-| WOD personal          | Usuario creador         | Privada     | Su propietario                         |
-| Resultado             | Usuario que lo registra | Privada     | Su propietario |
-| Historial             | Derivado del usuario    | Privada     | No se edita directamente               |
-| Mejor marca           | Derivada del usuario    | Privada     | No se edita directamente               |
+- Valid ownership and origin.
+- Non-empty published composition.
+- Valid catalog references.
+- Deterministic ordering.
+- Version preservation.
+- Appropriate active or archived lifecycle.
 
-## 7. Reglas de negocio consolidadas
+### Result Aggregate
 
-1. Cualquier persona puede consultar ejercicios y WOD genéricos sin autenticarse.
-2. Los WOD genéricos los proporciona el sistema y los usuarios no pueden crearlos ni modificarlos.
-3. Un usuario autenticado puede crear tantos WOD personales como quiera.
-4. Los WOD personales solo pueden componerse con ejercicios existentes en el catálogo.
-5. El orden de los ejercicios de un WOD es significativo y debe conservarse.
-6. El nombre de un WOD no tiene que ser único.
-7. Cada WOD personal pertenece a un único usuario.
-8. Un usuario solo puede modificar o eliminar sus propios WOD.
-9. Un usuario puede registrar varios resultados para el mismo WOD.
-10. Cada resultado pertenece a un único usuario y nunca es público.
-11. Un resultado solo puede ser consultado, modificado o eliminado por su propietario.
-12. El usuario solo puede acceder a su historial y a sus mejores marcas.
-13. El historial y las mejores marcas se derivan de los resultados; no se editan ni almacenan como segunda fuente de verdad.
-14. Los datos personales del usuario se limitan a los necesarios para el registro y la identificación.
-15. El acceso a un recurso privado debe validarse por propiedad, no solo por conocer su identificador.
-16. La eliminación o modificación de un WOD no puede falsear el significado de resultados históricos ya registrados.
+A result is an independent aggregate associated with:
 
-## 8. Invariantes
+- One owning user.
+- One WOD.
+- The exact WOD version performed.
 
-Las siguientes condiciones deben cumplirse siempre:
+Its consistency responsibilities include:
 
-- un WOD personal tiene propietario y un WOD genérico no depende de un usuario propietario;
-- un WOD nunca existe con una composición vacía una vez publicado o disponible para registrar resultados;
-- todas las posiciones de la composición permiten reconstruir un orden determinista;
-- cada ejercicio referenciado existe en el catálogo;
-- cada resultado tiene un usuario, un WOD y una fecha de realización;
-- un resultado no puede modificarse después de registrarse;
-- la representación del resultado coincide con la modalidad del WOD;
-- ningún usuario puede leer o alterar recursos privados de otro usuario;
-- una mejor marca siempre puede justificarse mediante un resultado existente y válido.
+- Valid modality-specific values.
+- Ownership enforcement.
+- Historical version integrity.
+- Independent modification and deletion of individual attempts.
 
-## 9. Búsqueda y filtros
+History and personal records are derived projections, not separate mutable aggregates.
 
-La búsqueda y los filtros son capacidades de consulta, no entidades del dominio.
+## 9. Domain Invariants
 
-El catálogo de ejercicios debe poder consultarse al menos por:
+The following conditions must always hold:
 
-- texto o nombre;
-- categoría;
-- tipo de medición.
+1. A personal WOD belongs to exactly one user; a generic WOD is system-managed.
+2. Available WODs have at least one valid, ordered exercise item.
+3. Every referenced exercise belongs to the catalog.
+4. WOD names need not be unique.
+5. Every result has an owner, performance date, WOD, and exact version.
+6. A result conforms to its workout modality.
+7. Users may access or modify only their own private resources.
+8. Modifying a WOD never changes the meaning of recorded historical attempts.
+9. A WOD with historical results cannot be physically deleted in a way that invalidates them.
+10. An archived personal WOD cannot receive new results.
+11. Result corrections do not modify other attempts or historical WOD definitions.
+12. History and personal records derive from actual stored results.
+13. Personal records compare only compatible attempts.
+14. EMOM results contain completion status only and have no ranked personal record.
 
-Los WOD genéricos y la colección personal del usuario deben poder consultarse al menos por:
+## 10. Search and Filtering
 
-- texto o nombre;
-- modalidad;
-- nivel, cuando exista;
-- origen, cuando se muestren conjuntamente.
+Search and filtering are query capabilities, not independent domain entities.
 
-El historial personal debe poder consultarse al menos por:
+The exercise catalog supports filtering by name, category, and measurement type.
 
-- WOD;
-- intervalo de fechas;
-- modalidad u origen cuando resulte útil.
+Generic and personal WOD collections support relevant filtering by name, modality, and origin.
 
-Los filtros no deben permitir que aparezca información privada de otros usuarios.
+Personal history supports filtering by WOD and date range, with additional modality or origin filters where useful.
 
-## 10. Casos de uso esenciales
+Authorization must be applied before returning private resources.
 
-### Públicos
+## 11. Pending Domain Decisions
 
-- listar ejercicios;
-- buscar y filtrar ejercicios;
-- ver el detalle de un ejercicio;
-- listar WOD genéricos;
-- buscar y filtrar WOD genéricos;
-- ver el detalle ordenado de un WOD genérico.
+The versioning and historical handling of the **system-managed exercise catalog** remain undecided.
 
-### Privados
+Do not introduce exercise catalog versioning, deletion behavior, or historical compatibility policies without an approved specification.
 
-- crear un WOD personal;
-- listar los WOD personales propios;
-- ver un WOD personal propio;
-- modificar un WOD personal propio;
-- eliminar un WOD personal propio;
-- registrar un resultado en un WOD genérico;
-- registrar un resultado en un WOD personal propio;
-- consultar y eliminar un resultado propio;
-- consultar el historial propio;
-- consultar las mejores marcas propias.
+Other new domain behavior requires an explicit scope decision.
 
-## 11. Decisiones pendientes que no deben asumirse
+## 12. Domain Terminology
 
-Antes de implementar funcionalidades que dependan de ellas, habrá que decidir explícitamente:
+| Term | Meaning |
 
-- cómo se gestionan las versiones del catálogo de ejercicios;
+|---|---|
 
-La única decisión pendiente de esta sección es cómo se gestionan las versiones del catálogo de ejercicios. No debe resolverse por intuición durante la implementación.
+| Exercise | System-managed catalog movement or activity |
+| WOD | Ordered workout definition |
+| Generic WOD | Public, system-managed workout |
+| Personal WOD | Private workout owned by a registered user |
+| WOD Version | Historical snapshot of a specific workout definition |
+| WOD Exercise Item | Ordered exercise prescription within a WOD version |
+| Result | One user's recorded workout attempt |
+| History | Chronological projection of personal attempts |
+| Personal Record | Best comparable valid result derived from existing attempts |
+| Archived WOD | WOD retained for history but unavailable for new attempts |
 
-## 12. Evolución futura
-
-Una futura capa social podrá incorporar WOD compartidos, comunidades o boxes, ligas y clasificaciones. Para mantener el dominio limpio:
-
-- la privacidad actual seguirá siendo la opción base;
-- publicar un WOD será una acción explícita diferente de crearlo;
-- una liga referenciará resultados válidos, pero no se convertirá en propietaria de ellos;
-- la clasificación se derivará de reglas de competición específicas;
-- pertenecer a una comunidad no concederá acceso automático a todo el historial privado de sus miembros.
-
-Estas extensiones no forman parte del alcance actual de WOD Explorer 2.0.
-
-## 13. Glosario
-
-- **Ejercicio:** movimiento o actividad disponible en el catálogo.
-- **WOD:** entrenamiento del día, definido como una composición ordenada de ejercicios y reglas de ejecución.
-- **WOD genérico:** WOD público creado y mantenido por el sistema.
-- **WOD personal:** WOD privado creado por un usuario.
-- **Resultado:** registro de una ejecución concreta de un WOD por un usuario.
-- **Historial:** consulta cronológica de los resultados personales.
-- **Mejor marca:** mejor resultado derivado para un usuario y un WOD según una regla de comparación válida.
-- **Propietario:** usuario con autorización para consultar y gestionar un recurso privado.
+Domain decisions take precedence over implementation convenience. When existing code, schemas, or specifications disagree with these rules, report the conflict before making changes.

@@ -1,0 +1,632 @@
+/* =========================================================
+   DELFO — HALASKA BLACK & ORANGE TABLE
+   ========================================================= */
+
+/* CONTENEDOR */
+
+.resource-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  width: 100%;
+  overflow: hidden;
+
+  border: 1px solid #242424;
+  border-radius: 10px;
+
+  background: #000000;
+  box-shadow: none;
+
+  transition: border-color 250ms ease;
+}
+
+.resource-list:hover {
+  border-color: #383838;
+}
+
+/* FILAS */
+
+.resource-row {
+  display: grid;
+  gap: var(--space-1);
+
+  margin: 0;
+  padding: var(--space-3) 14px;
+
+  border: 0;
+  border-bottom: 1px solid #202020;
+  border-radius: 0;
+
+  background: transparent;
+  box-shadow: none;
+
+  transition: background-color 180ms ease;
+}
+
+.resource-row:last-child {
+  border-bottom: none;
+}
+
+/* HOVER NARANJA */
+
+.resource-row:hover,
+.resource-row:focus-within {
+  background: rgb(255 107 0 / 12%);
+}
+
+/* FILAS ESTÁTICAS */
+
+.resource-row-static:hover,
+.resource-row-static:focus-within {
+  background: transparent;
+}
+
+/* CONTENIDO */
+
+.resource-row > header,
+.resource-row > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.resource-row > header {
+  justify-content: space-between;
+}
+
+/* NOMBRE DEL EJERCICIO */
+
+.resource-row h2,
+.resource-row h3 {
+  margin: 0;
+
+  color: #e8e8e8;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+
+  letter-spacing: -0.01em;
+
+  transition: color 180ms ease;
+}
+
+/* NOMBRE NARANJA AL HACER HOVER */
+
+.resource-row:hover h2,
+.resource-row:hover h3,
+.resource-row:focus-within h2,
+.resource-row:focus-within h3 {
+  color: var(--color-orange-500);
+}
+
+/* DISTRIBUCIÓN */
+
+.editorial-row {
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--space-4);
+  row-gap: var(--space-1);
+
+  align-items: center;
+}
+
+.editorial-row > header {
+  grid-column: 1;
+  grid-row: 1;
+
+  display: block;
+}
+
+.editorial-row > .resource-meta {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.editorial-row > .exercise-row-action {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+/* METADATOS */
+
+.resource-meta {
+  color: #777777;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 16px;
+
+  letter-spacing: 0.02em;
+}
+
+.resource-row > .resource-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resource-meta span + span::before {
+  margin-right: 10px;
+
+  color: #555555;
+  content: "·";
+}
+
+/* ACCIONES */
+
+.resource-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+}
+
+.row-action {
+  display: inline-flex;
+
+  min-width: 36px;
+  min-height: 36px;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 10px;
+
+  border: 1px solid #262626;
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #888888;
+
+  font-size: 13px;
+  text-decoration: none;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+/* BOTÓN NARANJA AL HACER HOVER */
+
+.row-action:hover:not(:disabled) {
+  border-color: rgb(255 107 0 / 50%);
+  background: rgb(255 107 0 / 12%);
+
+  color: var(--color-orange-500);
+  text-decoration: none;
+}
+
+/* FOCO ACCESIBLE */
+
+.row-action:focus-visible {
+  outline: 2px solid var(--color-orange-500);
+  outline-offset: 3px;
+}
+
+/* FLECHA DEL EJERCICIO */
+
+.exercise-row-action {
+  align-self: center;
+  justify-self: end;
+
+  color: #777777;
+
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* FLECHA NARANJA */
+
+.exercise-row-action:hover:not(:disabled),
+.resource-row:hover .exercise-row-action,
+.resource-row:focus-within .exercise-row-action {
+  color: var(--color-orange-500);
+}
+
+/* CATÁLOGO */
+
+.page--catalog .resource-list {
+  border-top: 1px solid #242424;
+}
+
+.page--catalog .resource-row:first-child {
+  padding-top: var(--space-3);
+}
+
+/* RESPONSIVE */
+
+@media (min-width: 600px) {
+  .resource-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .resource-row.editorial-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .resource-row > header {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .resource-actions {
+    justify-content: flex-end;
+  }
+
+  .page--catalog {
+    max-width: 960px;
+  }
+}
+
+@media (max-width: 599px) {
+  .resource-list {
+    border-radius: 8px;
+  }
+
+  .resource-row {
+    padding: 11px var(--space-3);
+  }
+
+  .resource-row h2,
+  .resource-row h3 {
+    font-size: 13px;
+  }
+}
+
+/* ACCESIBILIDAD */
+
+@media (prefers-reduced-motion: reduce) {
+  .resource-list,
+  .resource-row,
+  .resource-row h2,
+  .resource-row h3,
+  .row-action {
+    transition: none;
+  }
+}
+
+/* Patrones compartidos de la interfaz actual. Selectores explícitos conservan la especificidad; variantes y responsive permanecen en cada componente. */
+
+.exercise-container,
+.exercise-results-container,
+.wod-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+  gap: 28px;
+}
+
+.exercise-eyebrow,
+.home-eyebrow,
+.login-eyebrow,
+.exercise-results-eyebrow,
+.register-result-eyebrow,
+.register-wod-result-header .wod-eyebrow,
+.wod-eyebrow {
+  margin: 0 0 10px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 3px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.exercise-header h1,
+.exercise-results-header h1,
+.wod-header h1 {
+  margin: 0 0 var(--space-3);
+
+  font-family: var(--font-display);
+  font-size: 29px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -1px;
+
+  color: #ffffff;
+}
+
+.exercise-description,
+.home-description,
+.login-description,
+.wod-description {
+  max-width: 300px;
+
+  margin: 0 auto;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.exercise-count,
+.wod-count {
+  width: 100%;
+  margin: 0;
+
+  text-align: center;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.exercise-grid,
+.wod-grid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+
+  align-items: stretch;
+
+  width: 100%;
+  gap: var(--space-5);
+}
+
+.exercise-card h2,
+.wod-card h2 {
+  width: 100%;
+  max-width: 100%;
+
+  margin: 0 0 14px;
+
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+
+  text-align: left;
+
+  color: #ffffff;
+
+  background-image: linear-gradient(
+    to right,
+    var(--wod-orange),
+    var(--wod-orange-light)
+  );
+
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+}
+
+.exercise-card-meta,
+.wod-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+
+  width: 100%;
+
+  gap: 10px;
+  margin: 0 0 var(--space-4);
+}
+
+.exercise-card-meta span,
+.exercise-card-tag,
+.wod-card-meta span {
+  display: inline-flex;
+  align-items: center;
+
+  max-width: 100%;
+
+  padding: var(--space-2) var(--space-3);
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  overflow-wrap: anywhere;
+}
+
+.exercise-card-actions,
+.wod-card-actions {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+.exercise-divider,
+.home-divider,
+.login-divider {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  gap: 15px;
+
+  margin: 28px 0;
+}
+
+.exercise-detail h3,
+.wod-detail h2 {
+  margin: 0 0 var(--space-6);
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+
+  color: #ffffff;
+}
+
+.exercise-search,
+.wod-search {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  max-width: 420px;
+
+  gap: var(--space-3);
+}
+
+.home-logo span,
+.login-logo span {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+
+  letter-spacing: -1px;
+  color: #ffffff;
+}
+
+.home-header h1,
+.login-header h1 {
+  margin: 0 0 var(--space-3);
+
+  font-family: var(--font-display);
+  font-size: 29px;
+  font-weight: 600;
+
+  letter-spacing: -1px;
+  line-height: 1.2;
+
+  color: #ffffff;
+}
+
+.exercise-results-description,
+.register-result-description,
+.register-wod-result-header .wod-description {
+  max-width: 420px;
+
+  margin: 0 auto;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.register-result-page,
+.register-wod-result-page {
+  --register-orange: var(--color-orange-500);
+  --register-orange-light: var(--color-orange-300);
+  --register-border: var(--color-white-alpha-09);
+
+  --register-background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 200, 210, 0.8)
+  );
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  min-height: 100%;
+
+  margin: 0;
+  padding: var(--space-6) var(--space-5) 110px;
+
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.register-result-container,
+.register-wod-result-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 800px;
+
+  margin: 0 auto;
+  gap: 28px;
+}
+
+.register-result-header h1,
+.register-wod-result-header h1 {
+  margin: 0 0 var(--space-3);
+
+  font-family: var(--font-display);
+  font-size: 29px;
+  font-weight: 600;
+
+  line-height: 1.2;
+  letter-spacing: -1px;
+
+  color: #efeded;
+}
+
+.register-result-loading,
+.register-result-error,
+.register-result-success,
+.register-wod-result-status,
+.register-wod-result-error {
+  width: 100%;
+
+  margin: 0;
+  padding: var(--space-5) var(--space-6);
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--register-border);
+  border-radius: 20px;
+
+  background: var(--register-background);
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.resource-row h2,
+.resource-row h3,
+.resource-row p,
+.detail-section h2,
+.detail-section p {
+  margin: 0;
+}
+
+.resource-meta,
+.resource-meta time,
+.resource-meta p {
+  color: var(--color-text-secondary);
+}
+
+.resource-meta,
+.resource-meta p {
+  font-size: 14px;
+  line-height: 20px;
+}

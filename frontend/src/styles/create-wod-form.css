@@ -1,0 +1,134 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   CREATE WOD — FORM
+========================================== */
+
+.create-wod-form {
+  --create-orange: var(--color-orange-500);
+  --create-orange-light: var(--color-orange-300);
+  --create-border: var(--color-white-alpha-09);
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: var(--space-6);
+}
+
+/* ==========================================
+   FORM ACTIONS
+========================================== */
+
+.create-wod-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  width: 100%;
+  padding-top: var(--space-3);
+  gap: var(--space-3);
+}
+
+/* ==========================================
+   SUBMIT BUTTON
+========================================== */
+
+.create-wod-form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 48px;
+  padding: var(--space-3) 28px;
+
+  border: 1px solid rgba(255, 107, 0, 0.45);
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, var(--color-orange-300), var(--color-orange-500));
+
+  color: #111318;
+
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 24px rgba(255, 107, 0, 0.12);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+.create-wod-form-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow: 0 12px 30px rgba(255, 107, 0, 0.24);
+}
+
+.create-wod-form-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.create-wod-form-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.create-wod-form-submit:focus-visible {
+  outline: 2px solid var(--create-orange-light);
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   RESPONSIVE — TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .create-wod-form {
+    gap: var(--space-5);
+  }
+
+  .create-wod-form-actions {
+    padding-top: var(--space-2);
+  }
+}
+
+/* ==========================================
+   RESPONSIVE — MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .create-wod-form {
+    gap: var(--space-5);
+  }
+
+  .create-wod-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-wod-form-submit {
+    width: 100%;
+    min-height: 50px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .create-wod-form-submit {
+    transition: none;
+  }
+
+  .create-wod-form-submit:hover:not(:disabled) {
+    transform: none;
+  }
+}

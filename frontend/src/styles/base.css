@@ -1,0 +1,75 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-bg);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100svh;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  min-height: 44px;
+}
+
+a {
+  color: var(--color-info);
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin-top: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+h1 {
+  margin-bottom: var(--space-6);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+h2 {
+  margin-bottom: var(--space-4);
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+}
+
+code,
+.counter,
+.metric,
+time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

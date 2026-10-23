@@ -1,119 +1,159 @@
-# PROJECT.md
+# PROJECT.md — WOD Explorer 2.0
 
-Configuración central del proyecto WOD Explorer 2.0. Este archivo registra las tecnologías y herramientas decididas y señala los detalles aún pendientes. No se deben asumir valores marcados como pendientes.
+## 1. Overview
 
----
+- Product: WOD Explorer 2.0
+- Type: Full Stack CrossFit web application
+- Features: exercise catalog, WOD exploration, personal WODs, results, and history
+- Primary language: Spanish
+- Domain rules: `DOMAIN.md`
 
-## Producto
+This document records confirmed technical decisions. Verify actual repository configuration before execution. Never assume pending or undefined values.
 
-- Nombre: WOD Explorer 2.0
-- Descripción: aplicación web para explorar ejercicios y WOD de CrossFit, crear WOD personales y registrar resultados e historial.
-- Idioma principal: español
-- Dominio funcional: `DOMAIN.md`
+## 2. Frontend
 
----
+| Property | Configuration |
 
-## Frontend
+|---|---|
+| Framework | React |
+| Language | TypeScript 5.x |
+| Build | Vite |
+| Package manager | npm |
+| Architecture | Feature-based |
+| Styling | CSS |
+| Validation | Zod |
+| State | React hooks and Context when needed |
+| Testing | Vitest |
+| UI language | Spanish |
+| API base | `/api` |
 
-- Framework: React
-- Lenguaje: TypeScript
-- Versión: Pendiente de definir según la configuración del proyecto.
-- Build tool: Pendiente de definir.
-- Arquitectura: Pendiente de definir según la estructura real del frontend.
-- Styling: Pendiente de definir.
-- Validación: Pendiente de definir.
-- Estado: Pendiente de definir.
-- Testing: Pendiente de definir.
-- Idioma de interfaz: español
-- Ruta base API: Pendiente de definir.
-- Fuente de diseño: `DESIGN.md`; detalles visuales pendientes de definir.
+- Instructions: `frontend/AGENTS.md`
+- Visual design: `DESIGN.md`
+- Command source: `frontend/package.json`
 
-### Comandos frontend
+### Commands frontend
 
-- Install: Pendiente de definir según el gestor de paquetes del proyecto.
-- Run: Pendiente de definir.
-- Lint: Pendiente de definir.
-- Test: Pendiente de definir.
-- Build: Pendiente de definir.
+Run from `frontend/`:
 
----
+- Install: `npm install`
+- Dev: `npm run dev`
+- Lint: `npm run lint`
+- Test: `npm run test`
+- Build: `npm run build`
 
-## Diseño
+## 3. Backend
 
-- Fuente de verdad: `DESIGN.md` para las decisiones de diseño; referencia visual concreta pendiente de definir.
-- MCP de diseño: No configurado.
-- Referencia visual: Pendiente de definir.
+| Property | Configuration |
 
----
+|---|---|
 
-## Backend
+| Language | Java 21 |
+| Framework | Spring Boot 3.5.5 |
+| Build | Maven Wrapper |
+| Architecture | Controller → Service → Repository |
+| Persistence | Spring Data JPA / Hibernate |
+| Database | MySQL 8.4 |
+| Testing | JUnit 5 + Spring Boot Test |
+| API base | `/api` |
 
-- Lenguaje: Java
-- Versión: 21
-- Framework: Spring Boot
-- Versión del framework: 3.5.5
-- Build tool: Maven Wrapper.
-- Arquitectura: capas sencillas `Controller → Service → Repository → Spring Data JPA/Hibernate → MySQL`; DTOs para los contratos de la API y validación en la entrada. Mantener esta arquitectura simple y no añadir capas o patrones sin necesidad de la spec activa.
-- Persistencia: Spring Data JPA / Hibernate.
-- Base de datos: MySQL 8.4.
-- Testing: JUnit 5 + Spring Boot Test.
-- Ruta base API: `/api`.
+- Instructions: `backend/AGENTS.md`
+- DTOs define API contracts.
+- Input validation occurs at application boundaries.
+- Business logic belongs in services.
 
-### Comandos backend
+### Commands backend
 
-- Install: Pendiente de definir.
-- Preparación local: crear `../.env` desde `.env.example` y completar sus variables requeridas; `application.properties` importa ese archivo opcionalmente cuando Maven se ejecuta desde `backend/`.
-- Run: `./mvnw spring-boot:run` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
-- Validate: `./mvnw -q -DskipTests validate` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
-- Test: `./mvnw -q test` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
-- Build: `./mvnw -q package` desde `backend/`, con `../.env` configurado o las variables de entorno exportadas.
+Run from `backend/`:
 
-Maven no carga automáticamente el archivo `.env` por sí mismo. La aplicación importa `../.env` para las ejecuciones locales desde `backend/`; las variables exportadas explícitamente y las variables inyectadas por Docker Compose tienen prioridad. `JWT_SECRET`, `MYSQL_USER`, `MYSQL_PASSWORD`, `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` deben estar definidos antes de ejecutar tests o la aplicación.
+- Run: `./mvnw spring-boot:run`
+- Validate: `./mvnw -q -DskipTests validate`
+- Test: `./mvnw -q test`
+- Build: `./mvnw -q package`
+- Install/setup command: not yet defined
 
----
+### Environment
 
-## Database
+Create `../.env` from `.env.example` and configure the required variables.
 
-- Motor: MySQL
-- Versión: 8.4
-- Nombre: `wod_explorer_2`.
-- Servicio Docker Compose: `mysql`.
-- Imagen: `mysql:8.4`.
-- Puerto local: `${MYSQL_PORT:-3309}`.
-- Puerto interno: `3306`.
-- Volumen: `mysql_data`.
-- Scripts de inicialización: `Docker/mysql/init/NNN_*.sql`.
-- Sistema de migraciones: scripts SQL versionados y numerados, ejecutados en orden por Docker Compose al inicializar un volumen vacío.
-- Fuente de verdad del esquema: `Docker/mysql/init/001_baseline.sql` y los scripts numerados posteriores.
-- Evolución: los scripts aplicados no se editan; una evolución de un volumen existente requiere un script posterior y una ejecución de migración explícita. No se introduce un gestor de migraciones en esta Issue.
+For local runs, `application.properties` optionally imports `../.env`.
 
----
+Maven does not automatically load `.env` files.
 
-## Herramientas
+Explicitly exported environment variables and Docker Compose-injected variables take precedence.
 
-## MCPs
+Required variables:
 
-- `database`: acceso e inspección del estado real de MySQL.
-- `github`: acceso al repositorio remoto, Issues, Pull Requests, Actions y otros recursos de GitHub.
-- `context7`: consulta de documentación técnica actualizada de librerías, frameworks, SDKs, APIs y herramientas.
+- `JWT_SECRET`
+- `MYSQL_USER`
+- `MYSQL_PASSWORD`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
 
----
+These variables must be configured before running the application or tests.
 
-## Fuentes de verdad
+## 4. Database
 
-- Dominio y reglas de negocio: `DOMAIN.md`
-- Producto y alcance: `PRODUCT.md`
-- Configuración técnica: `PROJECT.md`
-- Diseño visual: `DESIGN.md`
-- Reglas globales de trabajo: `AGENTS.md`
-- Reglas frontend: `frontend/AGENTS.md`
-- Reglas backend: `backend/AGENTS.md`
-- Reglas de base de datos: `Docker/AGENTS.md`
-- Especificaciones: `specs/`
-- Esquema de base de datos: `Docker/mysql/init/001_baseline.sql` y los scripts numerados posteriores.
+| Property | Configuration |
 
----
+|---|---|
+| Engine | MySQL 8.4 |
+| Database | `wod_explorer_2` |
+| Docker service | `mysql` |
+| Image | `mysql:8.4` |
+| Host port | `${MYSQL_PORT:-3309}` |
+| Container port | `3306` |
+| Volume | `mysql_data` |
+| Initialization | `Docker/mysql/init/NNN_*.sql` |
 
-## Inicialización
+### Schema and Migrations
 
-Los valores marcados como pendientes deben concretarse cuando la implementación correspondiente lo requiera, consultando la especificación activa y la configuración real del proyecto. No se deben inventar comandos, versiones, puertos, nombres de servicio ni decisiones técnicas.
+- Schema source: `Docker/mysql/init/001_baseline.sql` and subsequent numbered SQL scripts.
+- Scripts execute in order when Docker Compose initializes an empty volume.
+- Applied scripts must not be modified.
+- Existing volumes require an explicit migration procedure.
+- No additional migration framework is currently approved.
+
+Database instructions: `Docker/AGENTS.md`.
+
+## 5. Design
+
+- Visual source of truth: `DESIGN.md`
+- Design MCP: not configured according to current documented configuration
+- Concrete visual reference: pending
+
+Do not assume the `21st` MCP is available without verification.
+
+## 6. MCPs
+
+| MCP | Purpose |
+
+|---|---|
+| `database` | Live MySQL inspection |
+| `github` | Remote repository, Issues, PRs, Actions |
+| `context7` | Current technical documentation |
+
+Verify tool availability before use.
+
+## 7. Sources of Truth
+
+| Responsibility | Source |
+
+|---|---|
+| Product | `PRODUCT.md` |
+| Domain | `DOMAIN.md` |
+| Technical configuration | `PROJECT.md` and actual repository files |
+| Visual design | `DESIGN.md` |
+| Global agent rules | `AGENTS.md` |
+| Frontend instructions | `frontend/AGENTS.md` |
+| Backend instructions | `backend/AGENTS.md` |
+| Database instructions | `Docker/AGENTS.md` |
+| Feature requirements | Active spec under `specs/` |
+| Database schema | Versioned SQL scripts under `Docker/mysql/init/` |
+
+## 8. Pending Decisions
+
+- Backend installation/setup command
+- Concrete visual reference
+- Design MCP configuration
+
+Resolve pending decisions only when required by an approved task. Never invent missing configuration.

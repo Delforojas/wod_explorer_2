@@ -1,0 +1,747 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EXERCISES — OPTIMIZED GLASSMORPHISM
+========================================== */
+
+/* ==========================================
+   PÁGINA Y VARIABLES
+========================================== */
+
+.exercise-page {
+  --exercise-orange: var(--color-orange-500);
+  --exercise-orange-light: var(--color-orange-300);
+
+  --exercise-border: var(--color-white-alpha-09);
+
+  --exercise-card-background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  min-height: 100%;
+
+  margin: 0;
+  padding: var(--space-6) var(--space-5) 110px;
+
+  box-sizing: border-box;
+
+  background: transparent;
+}
+/* ==========================================
+   CONTENEDOR
+========================================== */
+
+/* ==========================================
+   ENCABEZADO
+========================================== */
+
+.exercise-header {
+  width: 100%;
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+/* ==========================================
+   CONTADOR
+========================================== */
+
+/* ==========================================
+   GRID
+========================================== */
+
+.exercise-grid-guest {
+  align-items: start;
+}
+
+/* ==========================================
+   TARJETAS
+========================================== */
+
+.exercise-card {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+  overflow: hidden;
+
+  border: 1px solid var(--exercise-border);
+  border-radius: 20px;
+
+  background: var(--exercise-card-background);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================
+   CONTENIDO
+========================================== */
+
+.exercise-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  flex: 1;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: var(--space-5) 22px;
+
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   TÍTULO
+========================================== */
+
+/* ==========================================
+   SUBRAYADO NARANJA
+========================================== */
+
+.exercise-card-title {
+  display: block;
+  width: 100%;
+
+  background-image: linear-gradient(
+    to right,
+    var(--exercise-orange),
+    var(--exercise-orange-light)
+  );
+
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+}
+
+/* ==========================================
+   METADATOS
+========================================== */
+
+/* ==========================================
+   ETIQUETAS
+========================================== */
+
+/* ==========================================
+   DESCRIPCIÓN OPCIONAL
+========================================== */
+
+.exercise-card-description {
+  width: 100%;
+  margin: 0 0 var(--space-5);
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ==========================================
+   ACCIONES
+========================================== */
+
+/* ==========================================
+   BOTÓN REGISTRAR RESULTADO
+========================================== */
+
+.exercise-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  min-height: 48px;
+
+  margin: 0;
+  padding: 13px 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.exercise-card-register {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================
+   FLECHA
+========================================== */
+
+.exercise-card-arrow {
+  display: inline-block;
+
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ==========================================
+   VISITANTES — TARJETAS COMPACTAS
+========================================== */
+
+.exercise-card-guest {
+  min-height: 0;
+  height: auto;
+}
+
+.exercise-card-guest .exercise-card-content {
+  flex: initial;
+
+  min-height: 0;
+  height: auto;
+
+  padding: var(--space-5) 22px;
+}
+
+.exercise-card-guest h2 {
+  margin-bottom: var(--space-3);
+}
+
+.exercise-card-guest .exercise-card-meta {
+  margin: 0;
+}
+
+/* ==========================================
+   USUARIOS AUTENTICADOS
+========================================== */
+
+.exercise-card:not(.exercise-card-guest) {
+  min-height: 170px;
+}
+
+.exercise-card:not(.exercise-card-guest) .exercise-card-content {
+  padding: var(--space-5) 22px;
+}
+
+.exercise-card:not(.exercise-card-guest) .exercise-card-meta {
+  margin-bottom: var(--space-4);
+}
+
+/* ==========================================
+   HOVER NARANJA — SOLO RATÓN
+========================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-card {
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .exercise-card:hover {
+    transform: translateY(-3px);
+
+    border-color: var(--exercise-orange);
+
+    box-shadow:
+      0 12px 30px rgba(255, 107, 0, 0.12),
+      0 0 15px rgba(255, 107, 0, 0.08);
+  }
+
+  .exercise-card-title {
+    transition: background-size 0.3s ease;
+  }
+
+  .exercise-card:hover .exercise-card-title {
+    background-size: 100% 2px;
+  }
+
+  .exercise-card-action {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .exercise-card-action:hover {
+    background: var(--exercise-orange);
+    border-color: var(--exercise-orange);
+  }
+
+  .exercise-card-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .exercise-card-action:hover .exercise-card-arrow {
+    transform: translateX(4px);
+  }
+}
+
+/* ==========================================
+   ACCESIBILIDAD — TECLADO
+========================================== */
+
+.exercise-card:focus-within {
+  border-color: var(--exercise-orange);
+}
+
+.exercise-card-action:focus-visible {
+  outline: 2px solid var(--exercise-orange);
+  outline-offset: 4px;
+}
+
+.exercise-card:focus-within .exercise-card-title {
+  background-size: 100% 2px;
+}
+
+/* ==========================================
+   SEPARADOR
+========================================== */
+
+.exercise-divider::before,
+.exercise-divider::after {
+  content: "";
+
+  flex: 1;
+  height: 1px;
+
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.exercise-divider span {
+  font-size: 11px;
+  white-space: nowrap;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================
+   DETALLE DEL EJERCICIO
+========================================== */
+
+.exercise-detail {
+  width: 100%;
+
+  padding: var(--space-10) 35px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--exercise-border);
+  border-radius: 28px;
+
+  background: var(--exercise-card-background);
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================
+   DATOS DEL EJERCICIO
+========================================== */
+
+.exercise-detail-data {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.exercise-detail-data div {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  gap: var(--space-2);
+}
+
+.exercise-detail-data dt {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.exercise-detail-data dd {
+  margin: 0;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: #ffffff;
+
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   ESTADOS DE CARGA Y ERROR
+========================================== */
+
+.exercise-empty,
+.exercise-error {
+  width: 100%;
+
+  margin: 0;
+  padding: var(--space-6);
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--exercise-border);
+  border-radius: 28px;
+
+  background: var(--exercise-card-background);
+
+  text-align: center;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.exercise-error {
+  color: #fca5a5;
+}
+
+/* ==========================================
+   TABLETS
+========================================== */
+
+@media (max-width: 768px) {
+  .exercise-page {
+    padding: var(--space-4) var(--space-5) 110px;
+  }
+
+  .exercise-detail {
+    padding: 35px 30px;
+  }
+}
+/* ==========================================
+   WOD EXPLORER 2.0
+   BUSCADOR — OPTIMIZED GLASSMORPHISM
+========================================== */
+
+/* CONTENEDOR */
+
+/* ETIQUETA */
+
+.exercise-search label {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: rgb(251, 251, 251);
+}
+
+/* CAMPO DE BÚSQUEDA */
+
+.exercise-search input {
+  width: 100%;
+  min-height: 52px;
+
+  margin: 0;
+  padding: 14px 22px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--exercise-border);
+  border-radius: 20px;
+
+  background: var(--exercise-card-background);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+
+  outline: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* PLACEHOLDER */
+
+.exercise-search input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+/* FOCO — NARANJA */
+
+.exercise-search input:focus {
+  border-color: var(--exercise-orange);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    0 0 0 3px rgba(255, 107, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* HOVER — SOLO RATÓN */
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-search input {
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .exercise-search input:hover:not(:focus) {
+    border-color: var(--exercise-orange);
+
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.25),
+      0 0 15px rgba(255, 107, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* BOTÓN NATIVO PARA BORRAR LA BÚSQUEDA */
+
+.exercise-search input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* BOTÓN PARA RESTABLECER LOS FILTROS */
+
+.exercise-clear-filters {
+  align-self: flex-end;
+
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.exercise-clear-filters:focus-visible {
+  outline: 2px solid var(--exercise-orange);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-clear-filters {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .exercise-clear-filters:hover {
+    border-color: var(--exercise-orange);
+    background: rgba(255, 107, 0, 0.12);
+    color: #ffffff;
+  }
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .exercise-page {
+    align-items: stretch;
+
+    padding: 0 0 110px;
+  }
+
+  .exercise-container {
+    max-width: none;
+    gap: var(--space-5);
+  }
+
+  .exercise-header {
+    margin-bottom: 0;
+
+    padding: var(--space-8) var(--space-6) 0;
+
+    box-sizing: border-box;
+  }
+
+  .exercise-header h1 {
+    font-size: 28px;
+  }
+
+  .exercise-count {
+    padding: 0 var(--space-6);
+    box-sizing: border-box;
+  }
+
+  .exercise-grid {
+    grid-template-columns: 1fr;
+
+    gap: var(--space-4);
+
+    padding: 0 var(--space-6);
+
+    box-sizing: border-box;
+  }
+
+  .exercise-card h2 {
+    font-size: 19px;
+  }
+
+  /* VISITANTES */
+
+  .exercise-card-guest {
+    min-height: 0;
+  }
+
+  .exercise-card-guest .exercise-card-content {
+    padding: 18px var(--space-5);
+  }
+
+  .exercise-card-guest h2 {
+    margin-bottom: 10px;
+  }
+
+  /* USUARIOS AUTENTICADOS */
+
+  .exercise-card:not(.exercise-card-guest) {
+    min-height: 170px;
+  }
+
+  .exercise-card:not(.exercise-card-guest) .exercise-card-content {
+    padding: 18px var(--space-5);
+  }
+
+  .exercise-card:not(.exercise-card-guest) .exercise-card-meta {
+    margin-bottom: 14px;
+  }
+
+  .exercise-card-action {
+    min-height: 46px;
+  }
+
+  /* DETALLE */
+
+  .exercise-detail {
+    width: auto;
+
+    margin: 0 var(--space-6);
+    padding: var(--space-8) var(--space-6);
+  }
+  .exercise-search {
+    max-width: none;
+
+    padding: 0 var(--space-6);
+
+    box-sizing: border-box;
+  }
+
+  .exercise-search input {
+    min-height: 50px;
+    padding: 14px var(--space-5);
+
+    font-size: 16px;
+    border-radius: 20px;
+  }
+
+  .exercise-clear-filters {
+    align-self: stretch;
+    width: 100%;
+  }
+}
+
+/* ==========================================
+   INTERACCIÓN TÁCTIL — MÓVILES
+========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .exercise-card {
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  /* Tarjeta pulsada */
+
+  .exercise-card:active,
+  .exercise-card:focus-within {
+    border-color: var(--color-orange-500);
+
+    box-shadow:
+      0 12px 30px rgba(255, 107, 0, 0.12),
+      0 0 15px rgba(255, 107, 0, 0.08);
+  }
+
+  /* Subrayado naranja del título */
+
+  .exercise-card:active .exercise-card-title,
+  .exercise-card:focus-within .exercise-card-title {
+    background-size: 100% 2px;
+  }
+
+  /* Botón pulsado */
+
+  .exercise-card-action:active {
+    background: var(--color-orange-500);
+    border-color: var(--color-orange-500);
+  }
+}
+
+/* Movimiento reducido: conservar prioridad después de hover y touch. */
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-search input,
+  .exercise-card,
+  .exercise-card-title,
+  .exercise-card-action,
+  .exercise-card-arrow,
+  .exercise-clear-filters {
+    transition: none;
+  }
+
+  .exercise-card:hover {
+    transform: none;
+  }
+
+  .exercise-card-action:hover .exercise-card-arrow {
+    transform: none;
+  }
+}

@@ -1,497 +1,236 @@
-
-# /issue-create
-
-Crea una nueva GitHub Issue en el repositorio actual a partir de la descripción
-del usuario. El texto recibido después del command está disponible como
-
+---
+description: Propose and create a GitHub Issue with existing labels and explicit confirmation
 ---
 
-description: Propone y crea una GitHub Issue mediante GitHub CLI
+# Create GitHub Issue
 
----
+Create one new GitHub Issue from `$ARGUMENTS` in the current repository.
 
-`$ARGUMENTS`.
+This command only collects, classifies, confirms, creates, and verifies the
+Issue. It must not implement code, create or modify SDD files, create or change
+branches, commit, push, close or edit existing Issues, execute `/issue` or
+`/finish-issue`, or create labels. Use `gh` for the creation; do not use GitHub
+MCP or another write mechanism.
 
-## Responsabilidad
+Do not load `/issue`, `/finish-issue`, roadmap procedures, implementation
+specifications, hooks, loops, or guardrails unless a specific user-provided
+reference is necessary to understand the proposal. A path mentioned in text is
+not automatically loaded.
 
-Este command únicamente recopila la información, clasifica la Issue utilizando
-únicamente labels existentes en el repositorio, presenta una propuesta y crea la
-GitHub Issue después de una confirmación explícita del usuario.
+## Canonical Record
 
-No ejecutes `/issue` al terminar. La responsabilidad de este command termina
-cuando la Issue se ha creado correctamente.
+Maintain one record for the entire command:
 
-## Restricciones obligatorias
+```text
+proposal.repository    exact owner/name and repository URL
+proposal.title         confirmed Issue title
+proposal.body          confirmed Markdown body
+proposal.labels        confirmed existing label names
+proposal.source_arguments  exact user input used to build the proposal
 
-Durante este command:
+state.gh_available     verified before proposal preparation
+state.gh_authenticated verified before proposal preparation
+state.repository_verified  verified before proposal and again before creation
+state.confirmation     none, revise, cancelled, or create
+state.creation_attempted  false until gh issue create starts
+state.created_url      URL returned by gh, when unambiguous
+state.verification     pending, verified, failed, or uncertain
+```
 
-- no implementes código;
+The record is the only source of truth for the proposal. Any change to title,
+body, labels, or repository invalidates the previous confirmation.
 
-- no crees ni modifiques `spec.md`, `plan.md` o `tasks.md`;
+## 1. Preflight
 
-- no crees ni cambies de rama;
+Perform read-only checks before preparing or showing the proposal:
 
-- no hagas commits ni push;
+1. Require non-empty `$ARGUMENTS`. If it is missing or insufficient to identify
+   the requested work, ask for a description and stop until one is provided.
+2. Confirm that the current directory belongs to a valid Git repository. Use
+   read-only Git inspection such as `git rev-parse --show-toplevel`.
+3. Confirm that `gh` is available and authenticated with `gh auth status`.
+4. Resolve the GitHub repository unambiguously with `gh repo view`, and record
+   its exact `owner/name` and URL in `proposal.repository`.
+5. Obtain a complete structured snapshot of existing labels, including names
+   and descriptions. Use `gh label list --json name,description --limit <limit>`
+   with an explicit limit. Treat the result as complete only when it returns
+   fewer entries than the limit. If it reaches the limit, use supported
+   pagination or repeat with a larger explicit limit until exhaustion is
+   proven. If the CLI cannot prove that all labels were returned, stop. An
+   empty label set is valid.
 
-- no ejecutes `/issue` ni `/finish-issue`;
+If any preflight check fails, report the observed failure and stop. Do not use a
+different write mechanism or continue to proposal confirmation.
 
-- no cierres ni modifiques una Issue existente;
+## 2. Proposal
 
-- no uses el GitHub MCP para crear la Issue: la creación debe hacerse con `gh`;
+Set `proposal.source_arguments` to the exact user input. Derive only information
+clearly supported by that input and the verified repository context:
 
-- no inventes ni crees labels que no existan en el repositorio;
+- title;
+- objective;
+- context;
+- requirements;
+- observable acceptance criteria;
+- references explicitly supplied by the user or necessary to understand the request.
 
-- no continúes con la creación si el directorio actual no pertenece a un
-  repositorio Git válido;
+Do not invent functional decisions, requirements, technical constraints,
+references, acceptance criteria, or implementation plans. Acceptance criteria
+must describe observable results, not implementation tasks.
 
-- no continúes con la creación si `gh` no puede determinar de forma inequívoca
-  el repositorio GitHub de destino.
+Ask only for information that is essential or whose ambiguity could materially
+change the Issue scope. Do not ask for information that can be inferred safely.
 
-Puedes consultar de forma puntual:
+Build `proposal.body` from the collected information using this exact structure:
 
-- el repositorio Git actual;
+~~~markdown
+## Objective
 
-- el repositorio remoto asociado;
+<problem to solve or result to achieve>
 
-- las labels existentes;
+## Context
 
-- el estado y autenticación de `gh`;
+<information needed to understand the request>
 
-cuando sea necesario para validar el contexto.
+## Requirements
 
-Estas comprobaciones no deben ampliar el alcance del command ni convertirse en
-un análisis de implementación.
+- <required behavior, capability, or constraint>
 
-Antes de la confirmación explícita no ejecutes ninguna operación remota que cree,
-edite, cierre o elimine Issues.
+## Acceptance Criteria
 
-## 1. Recopilar la propuesta
+- [ ] <observable and verifiable result>
 
-Usa `$ARGUMENTS` como descripción inicial de la Issue.
+## References
 
-A partir de esa descripción, extrae o determina únicamente la información
-necesaria para definir correctamente el trabajo:
+- <user-provided reference, or omit this section when none exists>
+~~~
 
-- título;
+If a user-provided external reference must be read, load only that reference
+and only the relevant portion. Do not expand the command into project analysis.
 
-- objetivo;
+## 3. Classification
 
-- contexto;
+Classify `proposal.labels` using only the preflight label snapshot.
 
-- requisitos;
+- Select only labels that exist and are justified by the actual Issue scope.
+- Use a label's name and description, not the mere presence of its technology or area in the project.
+- Use multiple labels only when each represents a distinct real dimension of the work.
+- Do not invent, create, modify, substitute, or silently normalize labels.
+- Do not apply a label whose meaning is materially ambiguous.
 
-- criterios de aceptación;
+If no existing label represents a category, record that information for the
+proposal and continue without a substitute. No labels is valid.
 
-- referencias externas, si el usuario las ha proporcionado o son necesarias
-  para comprender la propuesta.
+## 4. Confirmation
 
-Infiere únicamente los campos que se desprendan claramente de `$ARGUMENTS` o del
-contexto disponible del repositorio.
+Before any Issue creation, show the complete canonical proposal:
 
-No inventes:
+- exact repository `owner/name` and URL;
+- exact title;
+- exact Markdown body;
+- exact labels, or `none`;
+- the requested source description when useful to explain the result.
 
-- decisiones funcionales;
+State clearly that the Issue has not been created. Use an interactive question
+with these distinct choices:
 
-- requisitos no solicitados;
+- `Create Issue`;
+- `Review proposal`;
+- `Cancel`.
 
-- comportamiento esperado no definido;
+Do not interpret comments, partial approval, silence, or ambiguous text as
+authorization. Only the explicit `Create Issue` choice authorizes the creation
+attempt for the complete displayed proposal.
 
-- restricciones técnicas;
+### Review
 
-- referencias externas;
+If the user selects `Review proposal`, ask only for requested changes. Preserve
+all unmodified fields, update the canonical record, show the complete proposal
+again, and reset `state.confirmation` to `none`. A changed proposal requires a
+new explicit `Create Issue` choice.
 
-- criterios de aceptación que introduzcan nuevo alcance.
+### Cancel
 
-Los criterios de aceptación deben representar resultados observables y
-verificables, no decisiones sobre cómo implementar la solución.
+If the user selects `Cancel`, set `state.confirmation` to `cancelled`, report
+that no Issue was created, and end the command without any write operation.
 
-Si falta información imprescindible para definir la Issue o existe una
-ambigüedad que pueda cambiar significativamente su alcance, pregunta únicamente
-por esa información antes de preparar la propuesta.
+## 5. Creation
 
-No solicites información adicional cuando pueda inferirse de forma segura sin
-alterar el alcance solicitado.
+Proceed only when the user explicitly selected `Create Issue` for the current
+canonical proposal.
 
-Si `$ARGUMENTS` está vacío o no contiene información suficiente para identificar
-el trabajo solicitado, pide al usuario una descripción antes de continuar. No
-intentes crear una Issue vacía o basada únicamente en suposiciones.
+Before the write, perform read-only revalidation:
 
-Si puede inferirse un título claro, utilízalo directamente en la propuesta.
+1. Re-run `gh repo view` and compare its exact `owner/name` and URL with
+   `proposal.repository`.
+2. Confirm that title, body, labels, and `source_arguments` still equal the
+   confirmed record.
+3. Re-read the complete structured label snapshot using the same limit or
+   pagination strategy and confirm that every confirmed label still exists. If
+   the repository or label snapshot changed, invalidate the confirmation,
+   update the proposal, show it again, and require a new explicit confirmation.
 
-Si existen varias interpretaciones razonables del título o del alcance, presenta
-la interpretación propuesta y solicita al usuario que la confirme o corrija
-antes de continuar.
+Set `state.creation_attempted` to `true` immediately before starting the only
+allowed creation attempt. Never reset it or retry creation after any result.
 
-## 2. Preparar el contenido
+Invoke `gh issue create` exactly once with an argument list, not a concatenated
+shell string:
 
-Construye el cuerpo de la Issue utilizando únicamente la información recopilada
-en el paso anterior.
+- pass the confirmed title as one quoted argument to `--title`;
+- write the confirmed body to a securely created temporary body file and pass
+  that path to `--body-file`;
+- pass one separately quoted `--label` argument for each confirmed label; never
+  concatenate labels into one string, shell fragment, or unescaped interpolation;
+- omit `--label` when the confirmed label set is empty;
+- do not pass assignees, projects, milestones, or other unconfirmed metadata.
 
-Usa esta estructura Markdown:
+Do not use `eval`, `sh -c`, unquoted interpolation, command substitution on
+user content, or a second creation mechanism. Remove the temporary body file
+after the attempt and retain `proposal.body` in the canonical record.
 
-```markdown
+If `gh` is unavailable, authentication fails, revalidation fails, or the
+creation command returns an ordinary error, report the error and stop. Do not
+claim success and do not retry.
 
-## Objetivo
+## 6. Verification And Result
 
-<qué problema se quiere resolver o qué resultado se busca>
+Capture only the URL returned by `gh issue create`; do not construct or guess a
+number, URL, or identifier. If the output does not identify one Issue safely,
+set `state.verification` to `uncertain` and perform only read-only checks that
+can resolve the result without creating or editing anything. Never create a
+second Issue to resolve uncertainty.
 
-## Contexto
+When a safe URL is available, run `gh issue view` for that Issue and verify:
 
-<información necesaria para comprender la necesidad>
+- repository and Issue identity;
+- Issue number and URL;
+- exact title;
+- body exactly equal to `proposal.body` after normalizing CRLF and CR to LF on
+  both values; any other difference is a verification failure;
+- final label set exactly matching `proposal.labels`.
 
-## Requisitos
+If verification fails or any field differs, report the observed discrepancy and
+do not edit the Issue automatically. A created but unverified or mismatched
+Issue must not be reported as successfully completed.
 
-- <comportamiento, capacidad o restricción requerida>
+Set `state.verification` to `verified` only after all required fields match.
+Then show only:
 
-## Criterios de aceptación
-
-- [ ] <resultado observable y verificable>
-
-## Referencias
-
-- <URL o referencia proporcionada>
-
-## 3. Clasificar la Issue
-
-Antes de mostrar la propuesta, determina las labels aplicables según el alcance
-real de la Issue.
-
-Consulta las labels disponibles en el repositorio mediante:
-
-`gh label list`
-
-Las labels existentes en el repositorio son la única fuente de verdad para la
-
-clasificación.
-
-No presupongas que el proyecto utiliza un conjunto concreto de labels ni que
-
-existen categorías como `frontend`, `backend`, `database`, `bug`, `feature`,
-
-`documentation` u otras.
-
-Analiza el nombre y, cuando esté disponible, la descripción de cada label para
-determinar cuáles representan correctamente el trabajo descrito en la Issue.
-Una Issue puede tener varias labels cuando su alcance afecte realmente a varias
-categorías existentes en el repositorio.
-
-### Reglas de clasificación
-
-- utiliza únicamente labels que existan actualmente en el repositorio;
-
-- selecciona únicamente labels justificadas por el alcance real de la Issue;
-
-- interpreta las labels según su nombre y descripción disponibles;
-
-- no añadas una label simplemente porque una tecnología, área o concepto exista
-  en el proyecto;
-
-- no inventes labels;
-
-- no crees labels nuevas;
-
-- no modifiques labels existentes;
-
-- no sustituyas una label inexistente por otra diferente únicamente para
-  clasificar la Issue;
-
-- evita labels redundantes o que describan indirectamente el mismo alcance;
-
-- utiliza varias labels únicamente cuando cada una represente una dimensión
-  real del trabajo;
-
-- no añadas una label cuando su relación con la Issue sea dudosa;
-
-- las labels propuestas forman parte de la confirmación explícita del usuario.
-
-### Labels no disponibles
-
-Si una categoría parece adecuada para la Issue pero no existe una label
-equivalente en el repositorio, no la crees ni selecciones otra label como
-sustitución automática.
-
-Indica en la propuesta que no existe una label adecuada para esa categoría.
-
-Si ninguna label existente representa correctamente la Issue, continúa con la
-propuesta sin labels.
-
-La ausencia de una label adecuada no debe impedir la creación de la Issue.
-
-### Ambigüedad
-
-Si una label existente puede interpretarse de varias formas y su aplicación no
-puede determinarse de forma segura mediante su nombre, descripción y alcance de
-la Issue, no la apliques automáticamente.
-
-Indica la ambigüedad al usuario como parte de la propuesta para que pueda
-decidir durante la confirmación.
-
-## 4. Mostrar y confirmar
-
-Antes de ejecutar cualquier operación que cree la Issue, muestra al usuario la
-propuesta completa que se enviaría a GitHub.
-La propuesta debe incluir:
-
-- título exacto;
-
-- cuerpo Markdown exacto;
-
-- labels que se aplicarán;
-
-- repositorio de destino.
-
-Si el repositorio de destino no puede determinarse de forma inequívoca, no
-continúes con la confirmación y solicita la información necesaria.
-Indica claramente que la Issue todavía no ha sido creada.
-
-### Confirmation gate
-
-Después de mostrar la propuesta completa, solicita una confirmación explícita
-mediante una pregunta interactiva con estas opciones o equivalentes:
-
-- `Crear Issue`;
-
-- `Revisar propuesta`;
-
-- `Cancelar`.
-
-No ejecutes `gh issue create` hasta que el usuario seleccione explícitamente
-`Crear Issue`.
-
-No interpretes como confirmación:
-
-- comentarios sobre la propuesta;
-
-- respuestas ambiguas;
-
-- aprobación parcial;
-
-- ausencia de respuesta;
-
-- expresiones que no correspondan claramente a la acción de crear la Issue.
-
-### Revisar propuesta
-
-Si el usuario selecciona `Revisar propuesta`, solicita únicamente los cambios
-que quiera realizar.
-
-Actualiza la propuesta manteniendo sin cambios las partes que el usuario no haya
-pedido modificar.
-
-Después de cualquier modificación, vuelve a mostrar la propuesta completa:
-
-- título;
-
-- cuerpo Markdown;
-
-- labels;
-
-- repositorio de destino.
-
-Toda propuesta modificada invalida cualquier confirmación anterior y requiere
-una nueva confirmación explícita antes de crear la Issue.
-
-### Cancelar
-
-Si el usuario selecciona `Cancelar`, termina el command sin ejecutar
-`gh issue create`.
-
-Indica claramente que no se ha creado ninguna Issue.
-No ejecutes ninguna acción posterior del workflow.
-
-## 5. Crear la Issue
-
-Solo después de que el usuario haya superado el `Confirmation gate`
-seleccionando explícitamente `Crear Issue`, procede con la creación.
-
-### 5.1 Verificar GitHub CLI
-
-Comprueba que `gh` está disponible y que existe una sesión autenticada válida.
-Si `gh` no está disponible o la autenticación falla:
-
-- informa del error;
-
-- no intentes crear la Issue mediante otro mecanismo;
-
-- no utilices GitHub MCP como alternativa;
-
-- no afirmes que la Issue fue creada;
-
-- detén el command.
-
-### 5.2 Verificar el repositorio destino
-
-Determina el repositorio actual mediante `gh repo view` si no se había
-determinado previamente.
-
-El repositorio debe coincidir con el repositorio mostrado al usuario durante el
-
-`Confirmation gate`.
-
-Si el repositorio no puede determinarse de forma inequívoca o ha cambiado desde
-la confirmación:
-
-- no ejecutes `gh issue create`;
-
-- informa al usuario;
-
-- vuelve al paso de confirmación si es necesario confirmar un repositorio
-  diferente.
-
-### 5.3 Crear la Issue
-
-Ejecuta `gh issue create` utilizando exactamente la propuesta confirmada por el
-usuario:
-
-- el título confirmado;
-
-- el cuerpo Markdown confirmado;
-
-- únicamente las labels confirmadas.
-
-Utiliza:
-
-- `--title` para el título;
-
-- `--body` para el cuerpo;
-
-- `--label` para cada label confirmada.
-
-Ejemplo conceptual:
-
-`gh issue create --title "..." --body "..." --label "..." --label "..."`
-
-Si la propuesta confirmada no contiene labels, crea la Issue sin argumentos
-`--label`.
-
-No:
-
-- modifiques el título confirmado;
-
-- modifiques el cuerpo confirmado;
-
-- añadas labels diferentes;
-
-- añadas assignees;
-
-- añadas proyectos;
-
-- añadas milestones;
-
-- añadas otros metadatos no incluidos explícitamente en la propuesta confirmada.
-
-La creación debe corresponder exactamente con lo que el usuario autorizó.
-
-### 5.4 Capturar el resultado
-
-Conserva la URL devuelta por `gh issue create`.
-No deduzcas ni construyas manualmente:
-
-- el número de Issue;
-
-- la URL;
-
-- ningún otro identificador de la Issue.
-
-Utiliza únicamente información devuelta o verificada mediante GitHub CLI.
-
-### 5.5 Verificar la Issue creada
-
-Después de una creación correcta, utiliza `gh issue view` sobre la Issue recién
-creada para verificar:
-
-- número;
-
-- título;
-
+- Issue number;
+- title;
+- labels, or `none`;
 - URL;
+- confirmation that the Issue was created and verified.
 
-- labels finales.
+If creation failed or remains uncertain, report the error or uncertainty and do
+not show a successful-creation summary. End the command in every case. Do not
+execute `/issue`, `/finish-issue`, or any later workflow.
 
-La verificación debe confirmar que la Issue creada corresponde con la propuesta
-autorizada.
+## Failure And Safety Policy
 
-Si se detecta una discrepancia, informa al usuario de la diferencia.
-
-No modifiques automáticamente la Issue para corregirla, ya que este command no
-debe editar Issues existentes sin una nueva autorización explícita.
-
-### Errores de creación
-
-Si `gh issue create` devuelve un error:
-
-- muestra el error recibido;
-
-- no inventes número, URL ni estado;
-
-- no afirmes que la Issue fue creada;
-
-- no reintentes utilizando otro mecanismo de creación;
-
-- no ejecutes `/issue`;
-
-- no ejecutes `/finish-issue`;
-
-- no continúes con ningún workflow posterior.
-
-Si el resultado de `gh issue create` es ambiguo y no permite determinar con
-seguridad si la Issue fue creada, verifica el estado mediante GitHub CLI antes
-de informar del resultado.
-
-No crees una segunda Issue mientras exista incertidumbre sobre el resultado de
-la primera operación.
-
-## 6. Salida final
-
-Cuando la Issue haya sido creada y verificada correctamente, muestra únicamente
-un resumen final de la operación.
-
-El resumen debe utilizar los datos obtenidos o verificados mediante GitHub CLI e
-incluir:
-
-- número de Issue;
-
-- título;
-
-- labels aplicadas;
-
-- URL.
-
-Si la Issue no tiene labels, indícalo explícitamente como `ninguna`.
-
-No inventes, reconstruyas ni deduzcas información que no haya sido devuelta o
-verificada mediante GitHub CLI.
-
-Indica claramente que la Issue fue creada correctamente.
-
-No muestres nuevamente el cuerpo completo de la Issue salvo que el usuario lo
-solicite.
-
-No continúes automáticamente con ninguna otra fase del workflow.
-
-En particular:
-
-- no ejecutes `/issue`;
-
-- no crees una rama;
-
-- no generes `spec.md`, `plan.md` o `tasks.md`;
-
-- no implementes código;
-
-- no hagas commits ni push.
-
-La responsabilidad de `/issue-create` termina después de informar de la creación
-correcta de la Issue.
-El usuario decidirá cuándo iniciar el siguiente paso del workflow.
-
-## Separación de responsabilidades
-
-- `/issue-create` → propone, clasifica, confirma y crea una GitHub Issue;
-
-- `/issue` → analiza una Issue existente e inicia el workflow SDD;
-
-- `/finish-issue` → verifica, documenta, publica y finaliza una Issue
-
-  implementada.
-  
+- One creation attempt maximum.
+- No GitHub MCP or alternate write mechanism.
+- No edits, closures, labels, projects, milestones, assignees, branches, commits, push, or SDD changes.
+- Preserve unrelated local work and perform only the read-only Git checks required by preflight.
+- Never invent or infer unverified GitHub data.
+- Never continue after failed preflight, failed confirmation, failed revalidation, failed creation, or failed verification.

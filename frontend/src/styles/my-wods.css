@@ -1,0 +1,160 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   MY WODS — GLASSMORPHISM
+========================================== */
+
+/* NAVEGACIÓN PRINCIPAL */
+
+.my-wods-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  width: 100%;
+  gap: var(--space-3);
+}
+
+/* ENLACES DE NAVEGACIÓN */
+
+.my-wods-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 1 1 140px;
+
+  min-height: 48px;
+
+  padding: 13px var(--space-5);
+
+  box-sizing: border-box;
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(255, 255, 255, 0.12);
+
+  color: #ffffff;
+  text-decoration: none;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.my-wods-nav-link:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+/* ACCIONES DE CADA TARJETA */
+
+.my-wods-actions {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  gap: var(--space-3);
+
+  margin-top: var(--space-6);
+}
+
+.my-wods-actions .wod-card-action {
+  margin-top: 0;
+}
+
+/* BOTONES SECUNDARIOS */
+
+.my-wods-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  padding: 13px var(--space-5);
+
+  box-sizing: border-box;
+
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: linear-gradient(180deg, #232526, #2d2e30);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    filter 0.25s ease,
+    transform 0.25s ease;
+}
+
+.my-wods-button:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+/* ELIMINAR */
+
+.my-wods-delete {
+  border-color: rgba(239, 68, 68, 0.25);
+
+  background: rgba(239, 68, 68, 0.08);
+
+  color: #fca5a5;
+}
+
+.my-wods-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* ACCESIBILIDAD */
+
+.my-wods-nav-link:focus-visible,
+.my-wods-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+}
+
+/* TABLETS */
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .my-wods-navigation {
+    padding: 0 var(--space-6);
+    box-sizing: border-box;
+  }
+
+  .my-wods-nav-link {
+    flex-basis: 100%;
+  }
+
+  .my-wods-actions {
+    gap: var(--space-3);
+  }
+}
+
+/* MOVIMIENTO REDUCIDO */
+
+@media (prefers-reduced-motion: reduce) {
+  .my-wods-nav-link,
+  .my-wods-button {
+    transition: none;
+  }
+
+  .my-wods-nav-link:hover,
+  .my-wods-button:hover {
+    transform: none;
+  }
+}

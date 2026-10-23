@@ -5,5 +5,6 @@ public enum MeasurementType {
     REPS,
     TIME,
     DISTANCE,
-    WEIGHT_DISTANCE
+    WEIGHT_DISTANCE,
+    DISTANCE_TIME
 }

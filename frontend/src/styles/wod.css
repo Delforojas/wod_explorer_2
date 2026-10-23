@@ -1,0 +1,567 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   WOD CATALOG — EXERCISE CARD STYLE
+========================================== */
+
+/* PÁGINA */
+
+.wod-page {
+  --wod-orange: var(--color-orange-500);
+  --wod-orange-light: var(--color-orange-300);
+
+  --wod-border: var(--color-white-alpha-09);
+
+  --wod-card-background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  min-height: 100%;
+
+  margin: 0;
+  padding: var(--space-6) var(--space-5) 110px;
+
+  box-sizing: border-box;
+
+  background: transparent;
+}
+
+/* CONTENEDOR */
+
+/* ENCABEZADO */
+
+.wod-header {
+  width: 100%;
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+/* CONTADOR */
+
+/* GRID */
+
+/* TARJETA */
+
+.wod-card {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 0px;
+
+  margin: 0;
+  padding: var(--space-5) 22px;
+
+  box-sizing: border-box;
+  overflow: hidden;
+
+  border: 1px solid var(--wod-border);
+  border-radius: 20px;
+
+  background: var(--wod-card-background);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* TÍTULO CON SUBRAYADO ANIMADO */
+
+/* METADATOS */
+
+/* ETIQUETAS */
+
+/* ACCIONES */
+
+/* BOTONES */
+
+.wod-card-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 48px;
+
+  margin: 0;
+  padding: 13px 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.15);
+
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  text-align: center;
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+/* BOTÓN REGISTRAR */
+
+.wod-card-register {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* HOVER NARANJA — RATÓN */
+
+@media (hover: hover) and (pointer: fine) {
+  .wod-card {
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .wod-card:hover {
+    transform: translateY(-3px);
+
+    border-color: var(--wod-orange);
+
+    box-shadow:
+      0 12px 30px rgba(255, 107, 0, 0.12),
+      0 0 15px rgba(255, 107, 0, 0.08);
+  }
+
+  .wod-card h2 {
+    transition: background-size 0.3s ease;
+  }
+
+  .wod-card:hover h2 {
+    background-size: 100% 2px;
+  }
+
+  .wod-card-action {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .wod-card-action:hover {
+    background: var(--wod-orange);
+    border-color: var(--wod-orange);
+  }
+}
+
+/* ACCESIBILIDAD */
+
+.wod-card:focus-within {
+  border-color: var(--wod-orange);
+}
+
+.wod-card:focus-within h2 {
+  background-size: 100% 2px;
+}
+
+.wod-card-action:focus-visible {
+  outline: 2px solid var(--wod-orange);
+  outline-offset: 4px;
+}
+
+/* BOTÓN VOLVER */
+
+.wod-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  align-self: flex-start;
+
+  min-height: 48px;
+  padding: 13px var(--space-5);
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+/* DETALLE DEL WOD */
+
+.wod-detail {
+  width: 100%;
+  padding: var(--space-10) 35px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--wod-border);
+  border-radius: 28px;
+
+  background: var(--wod-card-background);
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* INSIGNIAS DEL DETALLE */
+
+.wod-header-meta,
+.wod-sequence-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  gap: 10px;
+
+  margin-top: var(--space-3);
+}
+
+.wod-badge,
+.wod-sequence-meta span {
+  padding: var(--space-2) var(--space-3);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: rgba(255, 255, 255, 0.6);
+
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* COMPOSICIÓN */
+
+.wod-sequence {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-4);
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.wod-sequence-item {
+  padding: var(--space-5);
+
+  border: 1px solid var(--wod-border);
+  border-radius: 18px;
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wod-sequence-item h3 {
+  margin: 0 0 var(--space-3);
+
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+
+  color: #ffffff;
+}
+
+/* ESTADOS DE CARGA Y ERROR */
+
+.wod-empty,
+.wod-error {
+  width: 100%;
+
+  margin: 0;
+  padding: var(--space-6);
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--wod-border);
+  border-radius: 28px;
+
+  background: var(--wod-card-background);
+
+  text-align: center;
+
+  font-size: 13px;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.wod-error {
+  color: #fca5a5;
+}
+
+/* TABLETS */
+
+@media (max-width: 768px) {
+  .wod-page {
+    padding: var(--space-4) var(--space-5) 110px;
+  }
+
+  .wod-detail {
+    padding: 35px 30px;
+  }
+}
+/* ==========================================
+   WOD EXPLORER 2.0
+   BUSCADOR DE WODS — GLASSMORPHISM
+========================================== */
+
+/* CONTENEDOR */
+
+/* ETIQUETA */
+
+.wod-search label {
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  color: rgb(255, 255, 255);
+}
+
+/* CAMPO DE BÚSQUEDA */
+
+.wod-search input {
+  width: 100%;
+  min-height: 52px;
+
+  margin: 0;
+  padding: 14px 22px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--wod-border);
+  border-radius: 20px;
+
+  background: var(--wod-card-background);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+
+  outline: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* PLACEHOLDER */
+
+.wod-search input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+/* FOCO NARANJA */
+
+.wod-search input:focus {
+  border-color: var(--wod-orange);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    0 0 0 3px rgba(255, 107, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* HOVER — SOLO ESCRITORIO */
+
+@media (hover: hover) and (pointer: fine) {
+  .wod-search input {
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .wod-search input:hover:not(:focus) {
+    border-color: var(--wod-orange);
+
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.25),
+      0 0 15px rgba(255, 107, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* BOTÓN PARA BORRAR BÚSQUEDA */
+
+.wod-search input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .wod-page {
+    align-items: stretch;
+    padding: 0 0 110px;
+  }
+
+  .wod-container {
+    max-width: none;
+    gap: var(--space-5);
+  }
+
+  .wod-header {
+    margin-bottom: 0;
+    padding: var(--space-8) var(--space-6) 0;
+
+    box-sizing: border-box;
+  }
+
+  .wod-header h1 {
+    font-size: 28px;
+  }
+
+  .wod-count {
+    padding: 0 var(--space-6);
+    box-sizing: border-box;
+  }
+
+  .wod-grid {
+    grid-template-columns: 1fr;
+
+    gap: var(--space-4);
+    padding: 0 var(--space-6);
+
+    box-sizing: border-box;
+  }
+
+  .wod-card {
+    min-height: 170px;
+    padding: 18px var(--space-5);
+  }
+
+  .wod-card h2 {
+    font-size: 19px;
+  }
+
+  .wod-card-meta {
+    margin-bottom: 14px;
+  }
+
+  .wod-card-action {
+    min-height: 46px;
+  }
+
+  .wod-back {
+    margin: var(--space-5) var(--space-6) 0;
+  }
+
+  .wod-detail {
+    width: auto;
+
+    margin: 0 var(--space-6);
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .wod-detail h2 {
+    font-size: 20px;
+  }
+
+  .wod-sequence {
+    gap: var(--space-3);
+  }
+
+  .wod-sequence-item {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .wod-sequence-item h3 {
+    font-size: 16px;
+  }
+  .wod-search {
+    max-width: none;
+
+    padding: 0 var(--space-6);
+
+    box-sizing: border-box;
+  }
+
+  .wod-search input {
+    min-height: 50px;
+    padding: 14px var(--space-5);
+
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   INTERACCIÓN TÁCTIL — MÓVILES
+========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  .wod-card {
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  /* Borde y resplandor naranja */
+
+  .wod-card:active,
+  .wod-card:focus-within {
+    border-color: var(--color-orange-500);
+
+    box-shadow:
+      0 12px 30px rgba(255, 107, 0, 0.12),
+      0 0 15px rgba(255, 107, 0, 0.08);
+  }
+
+  /* Subrayado naranja del título */
+
+  .wod-card:active h2,
+  .wod-card:focus-within h2 {
+    background-size: 100% 2px;
+  }
+
+  /* Botón naranja al pulsarlo */
+
+  .wod-card-action:active {
+    background: var(--color-orange-500);
+    border-color: var(--color-orange-500);
+  }
+}
+
+/* Movimiento reducido: conservar prioridad después de hover y touch. */
+
+@media (prefers-reduced-motion: reduce) {
+  .wod-search input,
+  .wod-card,
+  .wod-card h2,
+  .wod-card-action {
+    transition: none;
+  }
+
+  .wod-card:hover {
+    transform: none;
+  }
+}

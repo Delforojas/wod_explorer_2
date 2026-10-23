@@ -141,26 +141,4 @@ public class WodResult {
     protected WodResult() {
     }
 
-    public void update(
-            LocalDateTime performedAt,
-            Boolean completed,
-            Integer timeSeconds,
-            Integer progressRounds,
-            WodVersionItem progressItem,
-            Integer progressReps,
-            BigDecimal progressDistanceM,
-            Integer progressDurationSeconds,
-            Integer amrapRounds,
-            Integer amrapExtraReps) {
-        this.performedAt = performedAt;
-        this.completed = completed;
-        this.timeSeconds = timeSeconds;
-        this.progressRounds = progressRounds;
-        this.progressItem = progressItem;
-        this.progressReps = progressReps;
-        this.progressDistanceM = progressDistanceM;
-        this.progressDurationSeconds = progressDurationSeconds;
-        this.amrapRounds = amrapRounds;
-        this.amrapExtraReps = amrapExtraReps;
-    }
 }

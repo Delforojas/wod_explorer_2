@@ -1,0 +1,37 @@
+.placeholder-page {
+  max-width: 72ch;
+}
+
+.page {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.page-header {
+  display: grid;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-5);
+}
+
+.page-header h1,
+.page-header h2,
+.page-header p {
+  margin: 0;
+}
+
+.page-header p {
+  color: var(--color-text-secondary);
+}
+
+.page-eyebrow {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.page-eyebrow {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

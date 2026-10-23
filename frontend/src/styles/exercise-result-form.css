@@ -1,0 +1,127 @@
+/* ==========================================
+   WOD EXPLORER 2.0
+   EXERCISE RESULT — FORM
+========================================== */
+
+.exercise-result-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  margin: 0;
+  padding: var(--space-8);
+
+  box-sizing: border-box;
+
+  gap: var(--space-6);
+
+  border: 1px solid var(--color-white-alpha-09);
+  border-radius: 24px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(18, 18, 18, 0.8)
+  );
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* TIPO DE MEDICIÓN */
+
+.exercise-result-measurement {
+  margin: 0;
+
+  padding: 10px 14px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 0, 0.18);
+
+  background: rgba(255, 107, 0, 0.08);
+
+  color: var(--color-orange-300);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* BOTÓN */
+
+.exercise-result-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 50px;
+
+  margin-top: var(--space-2);
+  padding: 14px 22px;
+
+  border: 1px solid var(--color-orange-500);
+  border-radius: 50px;
+
+  background: var(--color-orange-500);
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.exercise-result-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.exercise-result-submit:focus-visible {
+  outline: 2px solid var(--color-orange-300);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .exercise-result-submit:not(:disabled) {
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .exercise-result-submit:not(:disabled):hover {
+    background: #ff8533;
+    transform: translateY(-2px);
+  }
+}
+
+/* MÓVILES */
+
+@media (max-width: 480px) {
+  .exercise-result-form {
+    width: calc(100% - 48px);
+
+    padding: var(--space-6) var(--space-5);
+    gap: var(--space-5);
+
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-result-submit,
+  .exercise-result-submit:not(:disabled) {
+    transition: none;
+  }
+
+  .exercise-result-submit:hover,
+  .exercise-result-submit:not(:disabled):hover {
+    transform: none;
+  }
+}

@@ -1,7 +1,7 @@
 package com.wodexplorer2.backend.service;
 
 import com.wodexplorer2.backend.dto.WodResultRequest;
-import com.wodexplorer2.backend.dto.WodResultUpdateRequest;
+
 import com.wodexplorer2.backend.entity.User;
 import com.wodexplorer2.backend.entity.WodOrigin;
 import com.wodexplorer2.backend.entity.WodResult;
@@ -111,37 +111,6 @@ public class WodResultService {
   }
 
   @Transactional
-  public WodResult update(Long id, WodResultUpdateRequest request) {
-    WodResult result = requireOwned(id);
-    WodVersion version = result.getWodVersion();
-    WodVersionItem progressItem = resolveProgressItem(request.progressItemId(), version);
-    validateResult(
-        version.getType(),
-        request.completed(),
-        request.timeSeconds(),
-        request.progressRounds(),
-        progressItem,
-        request.progressReps(),
-        request.progressDistanceM(),
-        request.progressDurationSeconds(),
-        request.amrapRounds(),
-        request.amrapExtraReps());
-
-    result.update(
-        request.performedAt(),
-        request.completed(),
-        request.timeSeconds(),
-        request.progressRounds(),
-        progressItem,
-        request.progressReps(),
-        request.progressDistanceM(),
-        request.progressDurationSeconds(),
-        request.amrapRounds(),
-        request.amrapExtraReps());
-    return wodResultRepository.save(result);
-  }
-
-  @Transactional
   public void deleteById(Long id) {
     wodResultRepository.delete(requireOwned(id));
   }
@@ -198,6 +167,7 @@ public class WodResultService {
           progressDurationSeconds,
           amrapRounds,
           amrapExtraReps);
+
       case AMRAP -> validateAmrap(
           timeSeconds,
           progressRounds,
@@ -207,7 +177,9 @@ public class WodResultService {
           progressDurationSeconds,
           amrapRounds,
           amrapExtraReps);
+
       case EMOM -> validateEmom(
+          completed,
           timeSeconds,
           progressRounds,
           progressItem,
@@ -273,6 +245,7 @@ public class WodResultService {
   }
 
   private void validateEmom(
+      Boolean completed,
       Integer timeSeconds,
       Integer progressRounds,
       WodVersionItem progressItem,
@@ -281,15 +254,21 @@ public class WodResultService {
       Integer progressDurationSeconds,
       Integer amrapRounds,
       Integer amrapExtraReps) {
-    if (progressRounds == null) {
-      throw invalid("EMOM requiere rondas de progreso");
+
+    if (completed == null) {
+      throw invalid("completed es obligatorio para EMOM");
     }
-    if (timeSeconds != null || amrapRounds != null || amrapExtraReps != null) {
-      throw invalid("EMOM no admite tiempo ni campos AMRAP");
-    }
-    int metricCount = countNonNull(progressReps, progressDistanceM, progressDurationSeconds);
-    if (metricCount > 1) {
-      throw invalid("EMOM admite como máximo una métrica de progreso");
+
+    if (timeSeconds != null
+        || progressRounds != null
+        || progressItem != null
+        || progressReps != null
+        || progressDistanceM != null
+        || progressDurationSeconds != null
+        || amrapRounds != null
+        || amrapExtraReps != null) {
+
+      throw invalid("EMOM solo admite el estado completado/no completado");
     }
   }
 
@@ -336,7 +315,7 @@ public class WodResultService {
     return version.getWod().getDeletedAt() == null
         && (version.getWod().getOrigin() == WodOrigin.GENERIC
             || version.getWod().getOwner() != null
-            && version.getWod().getOwner().getId().equals(user.getId()));
+                && version.getWod().getOwner().getId().equals(user.getId()));
   }
 
   private boolean isValidForBest(WodResult result) {
