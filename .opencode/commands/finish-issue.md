@@ -1,875 +1,286 @@
 ---
-description: Finaliza, publica y cierra una GitHub Issue previamente implementada
+description: Finalize, publish, integrate, document, and close an implemented GitHub Issue
 ---
 
-# Finaliza la GitHub Issue #$1 del repositorio actual
+# Finish GitHub Issue #$1
+
+Run this command only after the implementation for Issue #$1 is complete, a
+dedicated Issue branch exists, its tasks are complete, and the user has
+explicitly approved manual validation.
+The explicit `/finish-issue $1` invocation authorizes the remote operations in
+this workflow, but it is not evidence of manual-validation approval.
+
+This command does not implement work, regenerate or modify the SDD, repeat the
+full project analysis, create branches, or repeat tests, build, or lint unless
+needed to investigate a detected problem.
+
+It may create only a necessary Issue commit, stage only Issue files, publish
+the Issue branch, create or reuse and merge the Pull Request, document verified
+finalization facts, and close the Issue. Never include, modify, stash, discard,
+overwrite, or otherwise move unrelated local work.
+
+## Canonical Evidence Record
+
+Maintain one in-session record and update it as each phase produces evidence.
+Do not reconstruct conflicting copies of these values.
+
+- Issue identity, repository, state, SDD, completed tasks, blockers, and explicit user approval evidence.
+- Active Issue branch and its local and published HEAD.
+- Historical base branch, its determining evidence, exact remote reference, and exact baseline SHA.
+- Destination branch, exact remote reference, and exact SHA. In this workflow destination equals validated base.
+- Accepted commit hash, message, branch, complete range, provenance (`handoff-commit` or `finish-commit`), and complete Issue file/status manifest.
+- Committed, staged, unstaged, untracked, deleted, and unrelated work classifications.
+- Remote, upstream, published branch, Pull Request, complete PR commits, complete PR file/status patch, checks, expected head SHA, merge strategy, and merge-result evidence.
+- Destination remote reference and SHA, local synchronization state, finalization documentation result, and post-close verification result.
+
+## Entry And Issue State
+
+1. Read the GitHub Issue with GitHub MCP. Verify the repository and Issue
+   identity, implementation documentation, completed tasks, absence of pending
+   blockers, and explicit user evidence approving manual validation.
+2. Preserve the Issue state before this invocation. The normal mutation path is
+   allowed only when the Issue was open at that time.
+3. If implementation work is pending, stop. Do not implement it from this
+   command.
+
+Issue state never replaces the required Git, branch, commit, working-tree, and
+remote evidence.
+
+## Read-Only Branch And Scope Intake
+
+Load and apply `.opencode/commands/hooks/branch-check.md` before determining the
+base branch. Use its read-only result to identify the active branch, Git state,
+staged and local changes, and related Issue branches.
+
+Stop if the active branch does not correspond to Issue #$1, Git state cannot be
+determined safely, or continuing would require changing branches, discarding
+work, stashing automatically, rewriting history, or touching unrelated work.
+Do not commit, push, document, or close after this stop.
+
+Determine the historical base branch from the branch ancestry using history,
+merge-base, reflog, or local and remote references as necessary. Do not assume
+`main`. Stop if the base cannot be determined safely.
+
+Before resolving the accepted commit and before the preflight, capture the
+validated base branch's exact remote reference and SHA. Record the destination
+branch as that same validated branch, its exact remote reference, and the same
+baseline SHA. If any reference is missing or conflicts, stop without silently
+substituting a moving branch.
+Pass this exact baseline to `finish-preflight` and every later PR validation.
+
+Classify the complete Issue scope before staging or committing:
+
+- committed changes after the validated base;
+- staged, unstaged, untracked, and deleted changes;
+- every Issue file with status `A`, `M`, `D`, or `R`;
+- unrelated committed and uncommitted work.
+
+Use the Issue, SDD, plan, tasks, branch, and complete commit and patch ranges to
+justify ownership. Every Issue commit and file must be attributable to the
+Issue. Unrelated work may remain only when it is identified, separable, outside
+Issue commits and PR scope, and untouched by this workflow. Stop if ownership
+cannot be determined safely.
+
+## Already-Closed Issue
+
+If the Issue was already closed before this invocation, do not enter the normal
+publication, PR, documentation, merge, or closure path.
+
+After the read-only intake above, load
+`.opencode/commands/guardarails/finish-preflight.md` in closed-audit mode and
+provide the complete canonical evidence record.
+
+- `VERIFIED_NO_MUTATION`: report the verified final state and end the command.
+- `BLOCK`: report the missing, stale, contradictory, or unsafe evidence and end the command.
+
+This path must not reopen, update, publish, create or modify a PR, merge, close,
+switch branches, or perform any other mutation. `VERIFIED_NO_MUTATION` is not a
+normal-path success.
+
+## Resolve The Issue Commit
+
+Find a valid existing commit for the Issue before creating one. It must be on
+the active Issue branch, contain the Issue changes, be non-empty, and have a
+message that clearly identifies Issue #$1 or its purpose.
+
+- Reuse a complete `/issue` handoff commit as `handoff-commit`; never duplicate it.
+- If Issue changes remain uncommitted, an additional commit may be created as `finish-commit` only for unambiguously owned Issue changes.
+- If no valid commit exists and owned Issue changes are pending, create the necessary `finish-commit`.
+- If a valid commit already exists, verify that no Issue changes remain outside the accepted range before continuing.
+- Do not amend, rebase, rewrite existing history, or create a redundant commit.
+
+When a new commit is necessary, execute these existing procedures in order:
+
+1. Load `.opencode/commands/hooks/pre-stage-check.md` and require its pass result.
+2. Stage only the classified Issue files. Never use `git add .` or an equivalent broad command.
+3. Load `.opencode/commands/hooks/pre-commit.md` and require its pass result.
+4. Create the commit. Its message must describe the change, follow repository style when known, and include `(#$1)`.
+5. Load `.opencode/commands/hooks/post-commit.md` and require its pass result.
+
+Stop on any failed hook. Preserve the accepted hash, message, provenance,
+complete Issue range, and complete file/status manifest in the evidence record.
+
+## Finish Preflight
+
+After commit resolution and before any remote mutation, load
+`.opencode/commands/guardarails/finish-preflight.md`. Provide its required
+Issue, SDD, Git, branch, commit, range, patch, manual-approval, and unrelated-
+work evidence from the canonical record.
+
+- Normal open Issue: only `PASS` may continue to `pre-push-check`.
+- `BLOCK`: stop before every remote mutation and report the blocking evidence.
+- `VERIFIED_NO_MUTATION`: valid only for the already-closed path and terminal there.
+
+The exact validated base SHA is the only accepted range baseline. If the base
+or destination reference changes, stop the current evidence, re-evaluate the
+complete local range and patch against the new exact SHA, update the record, and
+rerun the preflight before continuing.
+
+## Publish The Issue Branch
+
+1. Load `.opencode/commands/hooks/pre-push-check.md` and require `PASS`.
+2. Preserve its remote, branch, upstream, and safe-push result in the evidence record.
+3. Only after `PASS`, publish the current branch. Configure upstream during the push only when no valid upstream exists; otherwise use a normal push.
+4. Verify that the push succeeded, the remote branch exists, and the accepted Issue commit is available remotely.
+
+Stop on failure. Never force push, force-with-lease, rebase, amend, rewrite
+history, or document or close the Issue after an unverifiable push.
+
+Recompute and preserve the final Issue file/status manifest from the complete
+validated range, using the equivalent of
+`git diff --name-status <base>...HEAD`. Do not include files belonging
+exclusively to unrelated work.
+
+## Pull Request Integration
+
+The Pull Request is mandatory before normal Issue closure. Its `base` is the
+validated destination and its `head` is the published Issue branch. Never
+assume `main` and never merge directly with local `git merge`.
+
+Before creating or reusing the PR, verify that the destination exists remotely,
+the Issue branch is published, the accepted commit is remote, and the current
+destination reference still equals the captured baseline. Also verify that the
+Issue head branch and destination branch are different. If the destination is
+missing, the branches are equal, or the reference changed, stop. Do not
+silently replace the baseline: re-evaluate the complete local and PR scope,
+update the evidence, and rerun `finish-preflight` before continuing when the
+destination reference changed.
 
-Este comando se ejecuta únicamente después de que:
-
-- la implementación de la Issue #$1 haya finalizado correctamente;
-
-- exista una rama específica correspondiente a la Issue;
-
-- las tasks de la Issue estén completadas;
-
-- el usuario haya realizado y aprobado la validación manual.
-
-Este comando NO implementa trabajo.
-
-No vuelvas a implementar la Issue.
-No vuelvas a generar ni modificar el SDD.
-No repitas el análisis completo del proyecto.
-No repitas tests, build o lint salvo que sea necesario para comprobar un problema detectado.
-No crees nuevas ramas.
-
-Este comando SÍ está autorizado para:
-
-- crear el commit final correspondiente a la Issue si todavía no existe;
-
-- añadir al staging únicamente archivos pertenecientes a la Issue;
-
-- publicar la rama;
-
-- documentar la finalización mediante GitHub MCP;
-
-- cerrar la Issue.
-
-La ejecución explícita de `/finish-issue $1` constituye autorización del usuario
-para realizar el commit y push necesarios para finalizar exclusivamente esa Issue.
-
-Nunca incluyas en el commit cambios locales ajenos a la Issue.
-
-La ejecucion explicita de este comando autoriza las operaciones remotas
-permitidas por este workflow, pero no demuestra por si misma que el usuario
-haya aprobado la validacion manual. Esa aprobacion debe existir como evidencia
-explicita y atribuible al usuario.
-
-## 1. Comprobar la Issue
-
-Obtén la GitHub Issue #$1 mediante el GitHub MCP.
-
-Comprueba que:
-
-- la implementación está documentada;
-- las tasks están completadas;
-- no existen bloqueos pendientes;
-- la validación manual ha sido indicada por el usuario como aprobada.
-
-El estado remoto de la Issue no sustituye las comprobaciones Git.
-
-Aunque la Issue #$1 aparezca ya como cerrada:
-
-- comprueba igualmente la rama;
-- comprueba los cambios;
-- comprueba el commit;
-- comprueba el working tree;
-- comprueba si la rama está publicada.
-
-Si existe trabajo de implementación pendiente:
-
-DETENTE.
-
-No implementes trabajo desde este comando.
-
-## 2. Comprobar la rama y el working tree
-
-Aplica las reglas definidas en `.opencode/commands/hooks/branch-check.md`
-
-para obtener el estado Git necesario de la rama actual.
-
-Utiliza el resultado del hook para comprobar que:
-
-- la rama actual corresponde a la Issue #$1;
-
-- el estado Git puede determinarse de forma segura;
-
-- los cambios locales existentes están identificados.
-
-Si la rama actual no corresponde a la Issue #$1 o el estado Git no puede
-
-determinarse de forma segura:
-
-**DETENTE.**
-
-No crees una nueva rama.
-
-No cambies automáticamente a otra rama.
-
-No hagas commit.
-
-No hagas push.
-
-No cierres la Issue.
-
-Conserva el resultado del hook para determinar la rama base en el siguiente paso.
-
-## 3. Determinar la rama base
-
-Identifica la rama base real desde la que se creó la rama actual.
-
-No uses `main` automáticamente si la rama fue creada desde otra rama válida
-
-de dependencia.
-
-Utiliza historial Git, merge-base, reflog o referencias locales/remotas
-
-cuando sea necesario para determinarla de forma segura.
-
-Si no puede determinarse con seguridad la rama base:
-
-DETENTE.
-
-No inventes una rama base.
-
-Conserva el nombre de la rama base para el resumen final.
-
-### 3.1 Capturar referencias remotas de base y destino
-
-Antes de resolver el commit final y antes de ejecutar el preflight, obtén
-mediante comprobaciones de solo lectura la referencia remota exacta y el SHA
-actual de la rama base validada.
-
-La rama destino del Pull Request será esa misma rama. Conserva explícitamente
-el nombre de la rama destino, su referencia remota y el mismo SHA de base.
-
-Si cualquiera de estas referencias no puede obtenerse o no coincide, DETENTE.
-No inventes una referencia ni sustituyas silenciosamente una nueva línea base.
-Pasa el SHA exacto capturado a `finish-preflight` y a toda validación posterior
-del Pull Request.
-
-## 4. Identificar los archivos pertenecientes a la Issue
-
-Esta sección es OBLIGATORIA.
-
-Inspecciona:
-
-- cambios ya committeados respecto a la rama base;
-
-- cambios staged;
-
-- cambios unstaged;
-
-- archivos nuevos sin seguimiento.
-
-Determina qué archivos pertenecen realmente a la Issue #$1 usando:
-
-- la Issue;
-
-- la spec activa;
-
-- el plan;
-
-- las tasks;
-
-- la rama actual.
-
-No asumas que todos los cambios del working tree pertenecen a la Issue.
-
-Clasifica los archivos como:
-
-- `A` — añadido;
-
-- `M` — modificado;
-
-- `D` — eliminado;
-
-- `R` — renombrado.
-
-Si existen cambios locales ajenos a la Issue, identifícalos y consérvalos intactos.
-
-Si no es posible determinar con seguridad qué cambios pertenecen a la Issue:
-
-DETENTE.
-
-Informa exactamente qué archivos generan la ambigüedad.
-
-Conserva la clasificación de archivos para los pasos posteriores y para el resumen final.
-
-### 4.1 Ruta de auditoria para una Issue ya cerrada
-
-Si la Issue ya estaba cerrada al obtenerla, no ejecutes la ruta normal de
-publicacion, integracion, documentacion o cierre.
-
-Despues de recopilar las comprobaciones de solo lectura de las secciones 1 a
-4, ejecuta `.opencode/commands/guardarails/finish-preflight.md` en modo de
-auditoria de Issue cerrada.
-
-- Si devuelve `VERIFIED_NO_MUTATION`, informa de que el estado final ha sido
-  verificado sin mutaciones y termina el comando.
-- Si devuelve `BLOCK`, informa de la evidencia que falta o entra en conflicto y
-  termina el comando.
-
-No reabras la Issue. No hagas push. No crees ni modifiques Pull Requests. No
-actualices la Issue. No cierres de nuevo la Issue. La ruta normal comienza
-unicamente cuando la Issue estaba abierta antes de esta ejecucion.
-
-## 5. Crear o localizar el commit final
-
-Busca primero si ya existe un commit válido correspondiente a la Issue #$1.
-
-Un commit se considera asociado a la Issue cuando:
-
-- pertenece a la rama actual;
-
-- contiene los cambios correspondientes a la Issue;
-
-- su mensaje referencia claramente la Issue #$1 o su propósito.
-
-En ambos caminos registra el origen del commit aceptado:
-
-- `handoff-commit` si el hash procede del commit creado y documentado por
-  `/issue`;
-- `finish-commit` si el hash procede de un commit creado por este comando.
-
-La procedencia debe conservarse aunque no se cree un commit nuevo.
-
-### Si ya existe un commit válido
-
-No crees otro commit innecesariamente.
-
-Comprueba que no queden cambios de la Issue pendientes de commit.
-
-### Si NO existe un commit válido
-
-Y existen cambios correspondientes a la Issue pendientes:
-
-1. aplica las reglas definidas en `.opencode/commands/hooks/pre-stage-check.md`;
-
-2. si `pre-stage-check` falla, DETENTE;
-
-3. añade al staging únicamente los archivos identificados como pertenecientes a la Issue;
-
-4. aplica las reglas definidas en `.opencode/commands/hooks/pre-commit.md`;
-
-5. si `pre-commit` falla, DETENTE;
-
-6. crea el commit final correspondiente a la Issue;
-
-7. aplica las reglas definidas en `.opencode/commands/hooks/post-commit.md`;
-
-8. si `post-commit` falla, DETENTE.
-
-No uses `git add .` ni equivalentes que puedan incluir cambios ajenos.
-
-El mensaje del commit debe:
-
-- describir brevemente el cambio realizado;
-
-- seguir el estilo de commits existente en el repositorio cuando pueda determinarse;
-
-- incluir obligatoriamente `(#$1)`.
-
-Después del commit conserva:
-
-- hash;
-
-- mensaje;
-
-- archivos contenidos.
-
-Conserva tambien el origen del commit aceptado como `handoff-commit` si fue
-creado por `/issue`, o como `finish-commit` si fue creado por este comando. Un
-commit de handoff valido se reutiliza y no se duplica.
-
-### Si ya existía un commit pero quedan cambios de la Issue pendientes
-
-Puedes crear un commit final adicional únicamente si esos cambios pertenecen
-
-inequívocamente a la Issue.
-
-Antes de crearlo aplica igualmente:
-
-- `.opencode/commands/hooks/pre-stage-check.md`;
-
-- `.opencode/commands/hooks/pre-commit.md`;
-
-- `.opencode/commands/hooks/post-commit.md`.
-
-No reescribas commits existentes.
-
-No hagas amend salvo petición explícita del usuario.
-
-No hagas rebase automáticamente.
-
-## 5.5 Ejecutar el preflight de finalizacion
-
-Despues de resolver el commit y antes de ejecutar `pre-push-check`, carga y
-aplica:
-
-`.opencode/commands/guardarails/finish-preflight.md`
-
-Proporciona el resultado de la recuperacion de evidencia desde la
-documentacion de la Issue, Git y el SDD, incluyendo:
-
-- Issue, repositorio y estado remoto;
-- rama activa, rama base validada y rama destino;
-- commit aceptado, origen, hash, mensaje y rango completo;
-- tareas, verificaciones y documentacion del handoff;
-- cambios committeados, staged, unstaged, untracked y deleted;
-- clasificacion de trabajo ajeno;
-- evidencia explicita de aprobacion manual del usuario.
-
-La rama base es la rama historica desde la que se creo la rama de la Issue.
-La rama destino es la rama objetivo del Pull Request. En este workflow ambas
-deben ser la misma rama y su igualdad debe verificarse explicitamente.
-
-Solo un resultado normal `PASS` permite continuar al pre-push. Un resultado
-`BLOCK` detiene el workflow antes de cualquier mutacion remota. El resultado
-`VERIFIED_NO_MUTATION` solo es valido para la ruta de Issue ya cerrada de la
-seccion 4.1 y no permite continuar.
-
-## 6. Verificar el estado previo al push
-
-Aplica las reglas definidas en `.opencode/commands/hooks/pre-push-check.md`.
-
-Si `pre-push-check` falla:
-
-DETENTE.
-
-No hagas push.
-
-No documentes la finalización.
-
-No cierres la Issue.
-
-Los cambios locales ajenos a la Issue no impiden continuar siempre que:
-
-- hayan sido identificados claramente;
-
-- no estén incluidos en los commits de la Issue;
-
-- no hayan sido modificados por este comando.
-
-Obtén la lista final de archivos pertenecientes a la Issue mediante una comparación equivalente a:
-
-`git diff --name-status <rama-base>...HEAD`
-
-No incluyas archivos que pertenezcan exclusivamente a trabajo ajeno a la Issue.
-
-Conserva esta lista para:
-
-1. documentarla posteriormente en la GitHub Issue;
-
-2. mostrarla en el resumen final.
-
-## 7. Publicar la rama
-
-Únicamente después de que `.opencode/commands/hooks/pre-push-check.md` haya devuelto `PASS`,
-publica la rama actual.
-
-Si la rama todavía no tiene upstream:
-
-- configura el upstream durante el push.
-
-Ejemplo conceptual:
-
-`git push -u <remote> <rama>`
-
-Si la rama ya tiene un upstream válido:
-
-- realiza un push normal.
-
-Después del push comprueba que:
-
-- el comando terminó correctamente;
-
-- la rama remota existe;
-
-- el commit correspondiente a la Issue está publicado en remoto.
-
-Si el push falla o no puede verificarse correctamente:
-
-**DETENTE.**
-
-No intentes realizar force push.
-No reescribas el historial.
-No documentes la finalización.
-No cierres la Issue.
-
-Conserva para los pasos posteriores:
-
-- rama remota publicada;
-
-- remoto utilizado;
-
-- commit publicado.
-
-## 8. Integrar la rama mediante Pull Request
-
-Después de publicar correctamente la rama, integra la Issue en su rama destino.
-
-Esta sección es OBLIGATORIA antes de cerrar la Issue.
-
-La rama destino será la rama base validada determinada previamente en el punto
-3 de este workflow. Conserva ambos nombres en la evidencia y verifica que son
-iguales antes de crear o reutilizar el Pull Request.
-
-No asumas automáticamente que la rama destino es `main`.
-
-### 8.1 Comprobar la rama destino
-
-Antes de crear el Pull Request:
-
-- comprueba que la rama base existe en remoto;
-
-- comprueba que la rama actual está publicada;
-
-- comprueba que el commit final de la Issue existe en remoto;
-
-- comprueba que la rama actual y la rama destino son diferentes.
-
-- vuelve a leer la referencia remota de la rama base y compara su SHA con la
-  línea base capturada antes del preflight.
-
-Si la rama base cambió, no sustituyas silenciosamente la línea base. Reevalúa
-el rango completo local y el parche contra el nuevo SHA exacto, actualiza la
-evidencia y vuelve a ejecutar la validación de preflight antes de continuar.
-
-Si la rama destino no puede determinarse o no existe en remoto:
-
-**DETENTE.**
-
-No inventes una rama destino.
-
-No crees el Pull Request.
-
-No hagas merge directamente mediante `git merge` local.
-
-La integración debe realizarse mediante Pull Request usando GitHub MCP.
-
-### 8.2 Crear o localizar el Pull Request
-
-Busca primero si ya existe un Pull Request abierto correspondiente a:
-
-- la rama actual como `head`;
-
-- la rama base como `base`;
-
-- la Issue #$1.
-
-Si ya existe:
-
-- reutilízalo;
-
-- no crees un Pull Request duplicado.
-
-Si no existe:
-
-- crea un Pull Request mediante GitHub MCP;
-
-- usa como `base` la rama base determinada previamente;
-
-- usa como `head` la rama actual;
-
-- referencia la Issue #$1.
-
-El título debe describir brevemente el cambio e incluir `#$1`
-
-cuando resulte apropiado.
-
-No cierres todavía la Issue.
-
-### 8.3 Comprobar que el Pull Request puede integrarse
-
-Comprueba mediante GitHub MCP que:
-
-- el Pull Request tiene como `head` la rama actual;
-
-- el Pull Request tiene como `base` la rama destino esperada;
-
-- la referencia base del Pull Request coincide con el SHA exacto validado;
-- la referencia `head` del Pull Request coincide con el `HEAD` publicado;
-- todos los commits del Pull Request están identificados;
-- todos los archivos y el parche completo del Pull Request están identificados;
-- cada commit, archivo y cambio puede justificarse mediante la Issue y el SDD;
-- no existen cambios committeados ajenos a la Issue;
-
-- no existen conflictos de merge;
-
-- las comprobaciones obligatorias del repositorio, si existen, permiten la integración.
-
-Si existen conflictos o alguna comprobación obligatoria bloquea la integración:
-
-**DETENTE.**
-
-No intentes resolver conflictos automáticamente desde `/finish-issue`.
-
-No fuerces la integración.
-
-No cierres la Issue.
-
-Informa de la condición que está bloqueando el merge.
-
-### 8.4 Ejecutar el pre-merge check
-
-Inmediatamente antes del merge, carga y aplica:
-
-`.opencode/commands/hooks/pre-merge-check.md`
-
-El hook debe devolver `PASS` únicamente cuando haya registrado el `head` SHA
-exacto esperado y haya verificado de nuevo que no cambió. Debe conservarse el
-`expectedHeadSha` para la operación de merge.
-
-Si el GitHub MCP admite un expected-head-SHA condicional, pásale ese valor al
-merge. Si no admite una condición atómica, realiza la comprobación final
-definida por el hook, no declares una garantía atómica y detente si se detecta
-cualquier cambio antes del merge.
-
-Si el SHA de base cambió desde el preflight, reevalúa primero el rango completo
-contra el nuevo SHA exacto. No continúes hasta que el pre-merge check valide la
-nueva evidencia.
-
-Solo `PASS` permite ejecutar el merge.
-
-### 8.5 Hacer merge del Pull Request
-
-Si el Pull Request puede integrarse y no existen bloqueos:
-
-- realiza el merge mediante GitHub MCP;
-
-- respeta la estrategia de merge permitida o configurada en el repositorio;
-
-- no uses force push;
-
-- no reescribas el historial.
-
-Después del merge comprueba que:
-
-- el Pull Request aparece como `merged`;
-
-- la rama destino contiene los cambios de la Issue;
-
-- el resultado del merge está disponible en remoto.
-
-Si el merge falla o no puede verificarse:
-
-**DETENTE.**
-
-No cierres la Issue.
-
-Conserva:
-
-- URL o número del Pull Request;
-
-- estado del Pull Request;
-
-- estrategia de merge utilizada;
-
-- hash resultante del merge.
-
-### 8.6 Sincronizar la rama destino local
-
-Después de confirmar el merge remoto:
-
-- cambia a la rama destino;
-
-- actualízala desde su rama remota mediante fast-forward cuando sea posible.
-
-Ejemplo conceptual:
-
-`git switch <rama-base>`
-
-`git pull --ff-only <remote> <rama-base>`
-
-No realices merges locales adicionales durante este paso.
-
-Si existen cambios locales ajenos que impidan cambiar de rama o actualizarla
-
-de forma segura:
-
-**DETENTE.**
-
-No elimines los cambios.
-
-No hagas stash automáticamente.
-
-No fuerces el cambio de rama.
-
-Después comprueba que:
-
-- la rama destino local contiene los cambios de la Issue;
-
-- la rama destino local está sincronizada con su correspondiente rama remota.
-
-Conserva para el resumen final:
-
-- rama destino;
-
-- URL o número del Pull Request;
-
-- estado del Pull Request;
-
-- estrategia de merge utilizada;
-
-- hash resultante en la rama destino.
-
-## 9. Registrar la validación y finalización
-
-Actualiza la GitHub Issue #$1 mediante GitHub MCP indicando que la implementación
-ha sido completada y validada.
-
-Documenta únicamente información que haya sido comprobada durante el workflow.
-
-Esta es documentacion de finalizacion, no documentacion del handoff de
-desarrollo. No declares que la validacion manual sigue pendiente ni que
-`/finish-issue` sigue pendiente despues de que esta actualizacion se haya
-verificado.
-
-Incluye:
-
-- validación manual aprobada por el usuario;
-- verificaciones automáticas realizadas y su estado conocido;
-- rama de trabajo publicada;
-- rama base, SHA base y referencia remota usada para la validación;
-- rama destino;
-- commit final asociado a la Issue y rango completo validado;
-- lista completa de commits y archivos/status del Pull Request;
-- Pull Request utilizado para la integración;
-- estrategia y resultado verificable del merge;
-- referencia remota y SHA resultante de la rama destino;
-- sincronización local segura de la rama destino;
-- clasificación de cambios ajenos antes y después de la integración.
-
-Incluye obligatoriamente los siguientes datos:
-
-- nombre de la rama de trabajo;
-- rama base;
-- rama destino;
-- hash del commit;
-- mensaje del commit;
-- rango completo de commits de la Issue;
-- lista completa de commits del Pull Request;
-- lista completa de archivos y estados del Pull Request;
-- número o URL del Pull Request;
-- estado del Pull Request;
-- estrategia de merge utilizada;
-- evidencia del resultado del merge, incluyendo el SHA resultante o la
-  evidencia equivalente exigida por la estrategia utilizada;
-- referencia y SHA de la rama destino remota;
-- confirmación de sincronización de la rama destino local;
-- archivos cambiados por la Issue.
-
-### Archivos cambiados
-
-Incluye todos los archivos de la Issue identificados anteriormente,
-conservando su estado:
-
-- `A` — añadido;
-- `M` — modificado;
-- `D` — eliminado;
-- `R` — renombrado.
-
-Ejemplo conceptual:
-
-### Archivos cambiados por la Issue
-
-- `M path/to/modified-file`
-- `A path/to/new-file`
-- `D path/to/deleted-file`
-- `R path/to/renamed-file`
-
-No inventes:
-
-- pruebas manuales;
-- verificaciones automáticas;
-- resultados de CI;
-- commits;
-- archivos;
-- información del Pull Request;
-- resultados del merge.
-
-No vuelvas a documentar detalles técnicos innecesarios si ya están registrados
-en la Issue.
-
-Si la actualización de la GitHub Issue falla:
-
-**DETENTE.**
-
-No cierres la Issue.
-
-## 9.5 Ejecutar el pre-close check
-
-Despues de confirmar el merge, sincronizar la rama destino y actualizar la
-documentacion de finalizacion, carga y aplica:
-
-`.opencode/commands/hooks/pre-close-check.md`
-
-El hook debe recibir y verificar:
-
-- el resultado normal `PASS` del preflight;
-- el commit y rango completo validados;
-- la rama head y SHA publicados;
-- la rama base del Pull Request y la rama destino esperada;
-- todos los commits y archivos del Pull Request;
-- los checks obligatorios y el resultado de merge;
-- la referencia remota y la sincronizacion local de la rama destino;
-- la documentacion de finalizacion;
-- la aprobacion manual explicita del usuario;
-- la clasificacion de cambios ajenos.
-
-Solo `PASS` permite continuar al cierre normal de la Issue. `BLOCK` detiene
-el workflow y no autoriza ninguna reparacion automatica.
-
-## 10. Cerrar la Issue
-
-El cierre de la Issue debe ser siempre el último paso remoto del workflow.
-
-Cierra la GitHub Issue #$1 únicamente si:
-
-- todas las comprobaciones anteriores han finalizado correctamente;
-
-- la validación manual ha sido aprobada por el usuario;
-
-- la rama de trabajo ha sido publicada correctamente;
-
-- el Pull Request ha sido integrado correctamente en la rama destino;
-
-- la finalización ha sido documentada correctamente en la GitHub Issue;
-
-- no existen bloqueos pendientes.
-
-Si cualquiera de estas condiciones no se cumple:
-
-**DETENTE.**
-
-NO cierres la Issue.
-
-### Si la Issue ya estaba cerrada
-
-La ruta de Issue ya cerrada se resuelve exclusivamente en la seccion 4.1.
-Esta seccion no se ejecuta para una Issue que ya estaba cerrada. Nunca
-reabras, actualices, publiques, integres ni cierres de nuevo una Issue cerrada.
-
-## 11. Verificación final
-
-Aplica las reglas definidas en `.opencode/commands/hooks/finish-workflow-check.md`.
-
-Esta verificacion final solo se ejecuta despues del cierre normal. No se
-ejecuta en la ruta terminal `VERIFIED_NO_MUTATION` de una Issue que ya estaba
-cerrada, porque esa ruta no realiza una nueva clausura.
-
-El check debe verificar como mínimo que:
-
-- la rama base o destino fue identificada correctamente;
-
-- no quedan cambios pertenecientes a la Issue pendientes de commit;
-
-- el commit correspondiente a la Issue es válido;
-
-- la rama de trabajo fue publicada correctamente;
-
-- el commit está disponible en remoto;
-
-- el Pull Request fue integrado correctamente en la rama destino;
-
-- los cambios de la Issue existen en la rama destino remota;
-
-- la rama destino local está sincronizada con su correspondiente rama remota;
-
-- la validación manual está registrada;
-
-- la finalización está documentada en la GitHub Issue;
-
-- la Issue está cerrada;
-
-- no existen bloqueos pendientes.
-
-Si `finish-workflow-check` devuelve `FAIL`:
-
-**DETENTE.**
-
-No consideres el workflow finalizado.
-
-Informa exactamente de:
-
-- qué comprobación ha fallado;
-
-- la evidencia observada;
-
-- qué estado impide considerar finalizada la Issue.
-
-No intentes corregir automáticamente el problema desde este punto.
-
-Si existen cambios locales ajenos a la Issue:
-
-- indícalos claramente;
-
-- no los modifiques;
-
-- no los elimines;
-
-- no hagas stash automáticamente.
-
-El comando debe finalizar en la rama destino utilizada para integrar la Issue.
-
-Si no es posible permanecer en la rama destino de forma segura:
-
-**DETENTE.**
-
-No fuerces el cambio de rama.
-
-No modifiques cambios locales ajenos para conseguirlo.
-
-## 12. Resumen final
-
-Después de superar correctamente `.opencode/commands/hooks/finish-workflow-check.md`,
-muestra el resumen final del workflow.
-
-La salida final DEBE incluir obligatoriamente:
-
-- Issue;
-
-- rama de trabajo;
-
-- rama base;
-
-- rama destino;
-
-- hash y mensaje del commit final;
-
-- archivos cambiados por la Issue;
-
-- estado del working tree;
-
-- cambios locales ajenos, si existen;
-
-- estado del push;
-
-- Pull Request;
-
-- estado del merge;
-
-- estrategia de merge utilizada, si está disponible;
-
-- hash resultante en la rama destino, si está disponible;
-
-- validación manual;
-
-- estado final de la Issue;
-
-- rama actual al finalizar el workflow.
-
-### Archivos cambiados finales
-
-Muestra obligatoriamente todos los archivos pertenecientes a la Issue,
-conservando su estado:
-
-- `A` — añadido;
-
-- `M` — modificado;
-
-- `D` — eliminado;
-
-- `R` — renombrado.
-
-No incluyas archivos pertenecientes exclusivamente a cambios locales ajenos
-a la Issue.
-
-Si existen cambios locales ajenos a la Issue:
-
-- indícalos claramente;
-
-- informa de que permanecen sin modificar.
-
-No inventes información que no haya sido comprobada durante el workflow.
-No finalices el comando sin mostrar la lista de archivos cambiados por la Issue.
+Search first for an open PR whose head, base, and Issue match. Reuse it when
+found; otherwise create it with GitHub MCP using the recorded head and
+destination. Do not create a duplicate. A new PR title must describe the
+change and include `#$1` when appropriate.
+
+Before merge, verify the complete PR commit list, complete file/status diff and
+patch, Issue ownership of every commit and file, absence of unrelated committed
+work, required checks, no conflicts, correct head/base references, and explicit
+manual approval. These checks must be performed by loading
+`.opencode/commands/hooks/pre-merge-check.md` immediately before merge.
+
+Require `PASS`. Preserve its final `expectedHeadSha`. When the GitHub MCP
+supports conditional expected-head merging, pass that exact SHA to the merge.
+When it does not, perform the hook's final read-only recheck, do not claim an
+atomic SHA guarantee, and stop if the head changed.
+
+After `PASS`, merge through GitHub MCP using the permitted repository strategy.
+Never force-push or rewrite history. Verify that the PR is merged, the merge
+result is available remotely, the destination contains the complete intended
+Issue change, and the strategy-specific evidence is sufficient:
+
+- merge commit: verify the merge SHA exists on the destination and contains the validated PR diff;
+- squash: verify the squashed destination commit and resulting tree contain the validated PR diff;
+- rebase: verify the rebased destination range and resulting tree contain the validated PR diff.
+
+If the provider has no distinct merge SHA, use the destination tip, merged PR
+state, reachability, and complete resulting diff. A timestamp or generic merged
+metadata alone is insufficient.
+
+After the remote merge is verified, synchronize the local destination with its
+remote using only a safe fast-forward update, conceptually
+`git switch <destination>` followed by
+`git pull --ff-only <remote> <destination>`. Do not perform a local merge. If
+unrelated local work prevents switching or synchronizing safely, stop; do not
+stash, discard, overwrite, or force the operation.
+
+Verify and record that the active destination contains the Issue changes and is
+exactly synchronized with the destination remote.
+
+## Finalization Documentation
+
+After merge and destination synchronization, update the correct GitHub Issue
+with only verified finalization facts. This is finalization documentation, not
+the development handoff. Do not claim pending validation or pending
+`/finish-issue` after this update is verified.
+
+The record must include:
+
+- explicit user approval and known automatic verification results;
+- Issue branch, validated base branch and SHA, destination branch and remote SHA;
+- accepted commit, provenance, message, complete range, and full PR commit list;
+- complete PR file/status manifest, PR identity and status, merge strategy, and merge-result evidence;
+- published branch, destination synchronization, and pre/post classification of unrelated work;
+- working-tree and staging state;
+- every Issue file with its `A`, `M`, `D`, or `R` status.
+
+Document only facts observed during this workflow. If the Issue update fails,
+stop and do not close the Issue.
+
+## Pre-Close And Closure
+
+After the merge, synchronization, and finalization update, load
+`.opencode/commands/hooks/pre-close-check.md`. Provide the canonical evidence
+record, including the normal preflight `PASS`, published head, complete PR
+scope, required checks, strategy-specific merge result, destination remote and
+local synchronization, finalization documentation, manual approval, and
+unrelated-work classification.
+
+Only `PASS` authorizes the next operation. `BLOCK` stops the workflow and does
+not authorize automatic repair.
+
+The Issue must still be the open Issue observed at entry. Closure is the last
+remote mutation and is allowed only after all previous gates pass, the branch is
+published, the PR is integrated into the validated destination, finalization
+documentation is verified, and no blocker remains.
+
+Never run this section for an Issue that was already closed; that route ended in
+the closed-audit section.
+
+## Post-Close Verification
+
+After normal closure, and only after normal closure, load
+`.opencode/commands/hooks/finish-workflow-check.md`. It must verify publication,
+accepted commit, complete Issue scope, merged PR, destination remote and local
+synchronization, preserved unrelated work, manual approval, finalization
+documentation, and closed Issue state.
+
+- `PASS`: continue to the final summary.
+- `FAIL`: stop, report the failed check, expected state, observed state, and evidence. Do not repair automatically.
+
+Do not run this hook for the terminal closed-Issue audit path.
+
+The workflow must finish on the active destination branch. If it cannot remain
+there safely, stop and do not change unrelated local work to force that state.
+
+## Final Summary
+
+Only after `finish-workflow-check PASS`, show the preserved canonical evidence:
+
+- Issue, current branch, Issue branch, base branch, destination branch, and remote;
+- final commit hash and message, complete Issue range, and all Issue files/statuses;
+- working-tree state and unrelated local changes, explicitly marked unchanged;
+- push state, PR identity and state, merge state, strategy, and merge-result SHA when available;
+- manual-validation approval, final Issue state, and destination synchronization.
+
+Include every Issue file with status `A`, `M`, `D`, or `R`. Do not list files that
+belong exclusively to unrelated work. Do not invent commits, files, checks,
+CI results, PR data, merge results, or validation evidence.
+
+## Global Safety Rules
+
+- Keep all procedures read-only until their explicitly authorized mutation phase.
+- Load supporting procedures at the phase where they are needed; do not preload every hook or guardrail.
+- Stop immediately on missing, stale, contradictory, unsafe, or unverifiable evidence.
+- Preserve unrelated local work exactly as found.
+- Never automatically create or switch to a different Issue branch.
+- Never automatically stash, discard, overwrite, force-update, rebase, amend, or rewrite history.
+- Never close, document as complete, push, create or modify a PR, or merge after a failed relevant gate.
