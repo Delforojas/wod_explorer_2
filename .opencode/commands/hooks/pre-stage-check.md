@@ -2,90 +2,117 @@
 
 ## Propósito
 
-Inspeccionar el estado Git del repositorio antes de preparar el staging para la GitHub Issue #$1.
+Inspeccionar una única vez el estado Git y SDD del repositorio antes de
+preparar el staging para la GitHub Issue #$1.
 
-Este hook recopila información objetiva sobre los cambios existentes en el working tree y en staging.
+Este hook produce la observación en sesión `pre_stage_evidence`. No escribe
+esa evidencia en archivos, GitHub ni ningún almacenamiento persistente y no
+decide qué cambios pertenecen funcionalmente a la Issue.
 
 No modifica el estado del repositorio.
 
 ## Momento de ejecución
 
-Ejecuta este hook después de que todas las verificaciones aplicables hayan finalizado correctamente y antes de:
+Ejecuta este hook después de que todas las verificaciones aplicables hayan
+finalizado correctamente y antes de:
 
 - preparar el staging;
-
 - ejecutar `git add`;
-
 - crear el commit de la Issue.
 
-La sincronización final de `spec.md`, `plan.md` y `tasks.md` debe estar
-completada antes de ejecutar este hook. Este hook es una frontera de revisión
-de solo lectura: no debe permitir que avance un SDD que todavía requiera
-registrar el estado de tasks ya terminadas.
+La observación debe producirse en la frontera final de sincronización de
+`spec.md`, `plan.md` y `tasks.md`, antes de cualquier cambio de staging.
+
+## Observación `pre_stage_evidence`
+
+Genera exactamente una observación por ejecución y entrégala al workflow en
+memoria. Debe identificar:
+
+- `source`: este hook y cada comando o fuente SDD utilizada;
+- `phase`: frontera previa a staging;
+- `observed_at`: momento de la observación;
+- repositorio e Issue `#$1` a los que corresponde;
+- rama activa y `HEAD` observados;
+- estado completo del working tree, staging y cambios fuera de staging;
+- manifiesto completo de archivos con estados `A`, `M`, `D` o `R`;
+- paths protegidos y preexistentes, incluido `opencode.json` cuando esté
+  modificado;
+- estado observado de `spec.md`, `plan.md` y `tasks.md`, incluyendo existencia,
+  revisión o hash cuando esté disponible y estado bruto de sus tasks;
+- `status` de la recolección: completa, incompleta o contradictoria;
+- `invalidated_by`: condiciones que dejan de hacer válida la observación.
+
+La observación es válida únicamente mientras no ocurra ninguna de estas
+condiciones:
+
+- edición, creación, eliminación o renombrado de un archivo;
+- cambio del staging, incluido `git add`, `git reset` o equivalente;
+- cambio de rama, `HEAD` o historial Git;
+- modificación de `spec.md`, `plan.md`, `tasks.md` o de otra fuente SDD
+  observada;
+- cambio del alcance, decisión o contexto de la Issue que la observación debía
+  evaluar.
+
+El workflow y `change-review` deben consumir esta observación directamente.
+No deben reconstruirla ni repetir las mismas consultas mientras siga válida.
 
 ## Comprobaciones
 
-Obtén:
+Obtén una sola vez:
 
 - el estado actual del working tree;
-
-- los archivos modificados;
-
-- los archivos nuevos;
-
-- los archivos eliminados;
-
+- los archivos modificados, nuevos, eliminados y renombrados;
 - los cambios actualmente en staging;
-
 - los cambios todavía no incluidos en staging;
-
 - la lista completa de cambios locales preexistentes y no relacionados,
-  incluyendo `opencode.json` cuando esté modificado.
+  incluyendo `opencode.json` cuando esté modificado;
+- la existencia y el estado observado de `spec.md`, `plan.md` y `tasks.md`.
 
 Utiliza, cuando correspondan:
 
+- `git branch --show-current`;
+- `git rev-parse HEAD`;
 - `git status`;
-
 - `git diff`;
+- `git diff --cached`;
+- lecturas SDD necesarias para registrar su estado y revisión.
 
-- `git diff --cached`.
-
-Utiliza comprobaciones Git adicionales únicamente cuando sean necesarias para identificar correctamente el estado de los cambios.
+Utiliza comprobaciones adicionales únicamente para completar esta observación
+o resolver una contradicción. No las repitas para evaluar pertenencia a la
+Issue.
 
 ## Resultado
 
-Devuelve información suficiente para que el workflow pueda determinar:
+### PASS
 
-- qué archivos presentan cambios;
+Devuelve `PASS` únicamente cuando `pre_stage_evidence` está completa,
+coherente, corresponde al repositorio y Issue actuales, y contiene el estado
+Git, el manifiesto, los paths protegidos y el estado SDD requeridos.
 
-- qué cambios están fuera de staging;
+`PASS` significa que la observación puede ser consumida por
+`guardarails/change-review.md`; no significa que los cambios pertenezcan a la
+Issue ni autoriza `git add`.
 
-- qué cambios están actualmente en staging;
+### FAIL
 
-- si existen archivos nuevos o eliminados;
+Devuelve `FAIL` y no ejecutes `git add` cuando:
 
-- si existen cambios que requieren revisión antes de preparar el staging;
+- falta la observación o alguno de sus campos obligatorios;
+- una consulta Git o SDD no pudo completarse;
+- el estado Git o el SDD es incompleto o contradictorio;
+- no puede identificarse con seguridad el manifiesto `A/M/D/R`;
+- no puede identificarse un path protegido o el estado de `opencode.json`;
+- la observación ya fue invalidada antes de ser consumida.
 
-- si algún archivo preexistente protegido aparece en staging o sería movido por
-  la preparación del commit.
+El workflow debe obtener una nueva observación después de resolver el
+problema. No debe continuar usando una observación parcial o inválida.
 
-Comprueba también que:
+## Responsabilidad de decisión
 
-- el workflow ha contrastado el estado actual de `tasks.md` con la
-  implementación y las verificaciones antes de preparar el staging;
-- toda task cuyo trabajo real está terminado ya aparece marcada como
-  completada;
-- no existe una actualización del SDD conocida o pendiente que deba hacerse
-  después de esta revisión;
-- `spec.md`, `plan.md` y `tasks.md` forman parte del conjunto revisado cuando
-  pertenecen al alcance de la Issue.
-
-Si alguna comprobación falla, devuelve `FAIL` y no ejecutes `git add`. El
-workflow debe sincronizar el SDD y repetir la revisión antes de continuar.
-
-El hook no determina por sí mismo si un cambio pertenece funcionalmente a la Issue.
-
-Esa decisión debe realizarse utilizando la GitHub Issue, el SDD, las tasks y el contexto del workflow.
+La evaluación de pertenencia a la Issue, separabilidad de cambios ajenos,
+sincronización semántica del SDD y condiciones de bloqueo corresponde
+exclusivamente a `guardarails/change-review.md`, usando esta observación y el
+contexto de Issue/SDD ya reunido por el workflow.
 
 `opencode.json` y cualquier otro cambio preexistente deben conservarse en el
 estado original y fuera del staging. Solo pueden pasar a ser archivos de la
@@ -97,25 +124,16 @@ resuelto antes de preparar el staging.
 Este hook NO debe:
 
 - ejecutar `git add`;
-
 - modificar el staging;
-
 - crear commits;
-
 - hacer push;
-
 - hacer `stash`;
-
 - descartar cambios;
-
 - eliminar archivos;
-
 - sobrescribir cambios;
-
 - modificar archivos;
-
 - alterar el historial Git;
-
 - decidir automáticamente que un cambio pertenece a la Issue.
 
-Su responsabilidad termina después de inspeccionar y devolver el estado Git previo al staging.
+Su responsabilidad termina después de producir la única observación
+`pre_stage_evidence` del estado previo al staging.
