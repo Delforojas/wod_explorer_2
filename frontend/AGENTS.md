@@ -1,807 +1,196 @@
 # AGENTS.md — Frontend
 
-Este archivo aplica a todo el contenido dentro de `frontend/`.
+## 1. Scope
+
+Applies to `frontend/`.
+
+Follow the root `AGENTS.md` for global rules, documentation, safety, and workflow. For cross-area tasks, load the relevant area instructions.
+
+## 2. Stack
 
-Las reglas globales definidas en el `AGENTS.md` raíz siguen siendo obligatorias.
+- React + TypeScript 5.x
+- Vite + npm
+- CSS for styling
+- Zod for runtime validation
+- Vitest for testing
+- React native state management
+- API base path: `/api`
+- UI language: Spanish
 
-Toda tarea frontend debe respetar las fuentes de verdad y reglas definidas por el proyecto.
+Verify versions and dependencies against `PROJECT.md` and the actual configuration.
 
-Cuando una tarea requiera cambios en otras capas, deberán respetarse también los `AGENTS.md` correspondientes.
+Do not introduce alternative frameworks, styling systems, or state libraries without an approved architectural need.
 
-Si existe un conflicto entre reglas, aplicar la jerarquía definida por el proyecto.
+## 3. Architecture
 
----
+Use the existing feature-based architecture:
 
-## Tecnología y configuración
+- `src/app/`: application setup and composition
+- `src/features/`: domain-specific features
+- `src/components/`: shared UI components
+- `src/api/`: shared HTTP infrastructure
+- `src/schemas/`: shared Zod schemas
+- `src/types/`: shared TypeScript types
+- `src/hooks/`: shared hooks
+- `src/utils/`: shared pure utilities
+- `src/assets/`: static assets
 
-La configuración del frontend de WOD Explorer 2.0 es:
+Rules:
 
-- Framework: React
-- Lenguaje: TypeScript
-- Versión: TypeScript 5.x
-- Build tool: Vite
-- Sistema de estilos: CSS
-- Librería de validación: Zod
-- Gestión de estado: estado local de React (`useState`, `useReducer`, Context cuando sea necesario)
-- Framework de testing: Vitest
-- Ruta base de API: `/api`
-- Idioma principal de la interfaz: español
+- Keep feature-specific code inside its feature.
+- Extract shared code only when genuinely reused.
+- Separate presentation, state, business logic, and data access.
+- Prefer component composition over unnecessary abstractions.
+- Avoid unnecessary cross-feature dependencies.
+- Do not create empty directories or speculative architecture.
+- Keep components focused and state close to its consumers.
 
-No asumir tecnologías, librerías o herramientas que no hayan sido definidas.
+## 4. TypeScript and Validation
 
-Seguir las convenciones propias de React, TypeScript y Vite configuradas en el proyecto.
+- Preserve the project's type-safety settings.
+- Prefer explicit, inferred, and reusable types.
+- Never use unsafe casts or assertions to hide type errors.
+- Treat external data as untrusted.
+- Validate relevant API responses, forms, and external inputs with Zod.
+- Prefer `z.infer` over duplicated type definitions.
+- Frontend validation never replaces backend validation.
 
-No añadir ni sustituir tecnologías principales del frontend sin autorización cuando el cambio tenga impacto arquitectónico.
+## 5. API Integration
 
-No introducir una librería global de gestión de estado mientras el estado pueda resolverse adecuadamente mediante las capacidades nativas de React.
+Use the existing `/api` contracts.
 
-No introducir un framework o librería de estilos adicional sin una necesidad justificada y aprobación previa.
+- Handle loading, empty, success, and error states.
+- Validate external responses when appropriate.
+- Keep reusable HTTP logic outside visual components.
+- Avoid hardcoded URLs when configuration exists.
+- Never invent endpoints, payloads, parameters, or response contracts.
+- Never silently modify existing API contracts.
+- Enforce authorization and ownership on the backend.
 
----
+If a required API contract is missing, inspect the active spec and backend definitions. Report unresolved dependencies rather than inventing contracts.
 
-## Arquitectura
+## 6. UI and Styling
 
-Respetar la arquitectura frontend definida por el proyecto y su estructura existente.
+Read `DESIGN.md` before visual changes.
 
-Arquitectura:
+- Reuse existing design tokens, CSS variables, and components.
+- Follow the existing CSS architecture.
+- Maintain mobile-first responsive behavior.
+- Verify relevant mobile, tablet, and desktop layouts.
+- Avoid unnecessary styling frameworks, global tokens, or visual patterns.
+- Use the `21st` MCP when external design references are useful.
+- Adapt external proposals to the existing design system.
 
-```text
-Arquitectura por features (feature-based).
+Do not introduce fundamental visual-system changes without authorization.
 
-frontend/src/
-├── app/          # configuración y composición global de la aplicación
-├── features/     # funcionalidades organizadas por dominio o caso de uso
-├── components/   # componentes reutilizables entre múltiples features
-├── api/          # infraestructura y configuración común de acceso HTTP
-├── schemas/      # schemas Zod compartidos
-├── types/        # tipos TypeScript compartidos
-├── hooks/        # hooks reutilizables entre múltiples features
-├── utils/        # utilidades puras compartidas
-└── assets/       # recursos estáticos
-```
+## 7. Accessibility
 
-Organizar principalmente el código específico de negocio dentro de `features/`.
+- Use semantic HTML and native interactive elements.
+- Support keyboard navigation and visible focus.
+- Associate labels with form controls.
+- Maintain sufficient contrast and heading hierarchy.
+- Use buttons for actions and links for navigation.
+- Provide accessible feedback for loading, errors, and form validation.
+- Use ARIA only when native semantics are insufficient.
+- Never rely on color alone to communicate essential information.
 
-Las features deben corresponder a funcionalidades o áreas funcionales reales del producto.
+## 8. State and Performance
 
-Ejemplos de features de WOD Explorer 2.0:
+- Prefer `useState` for simple local state.
+- Use `useReducer` for complex local transitions.
+- Use Context only when shared state justifies it.
+- Avoid duplicated or unnecessarily elevated state.
+- Derive values instead of storing redundant state.
+- Keep server data distinct from UI state.
+- Avoid redundant requests and unnecessary renders.
+- Measure performance issues before introducing memoization, caching, or complex optimizations.
 
-- `auth`;
-- `exercises`;
-- `wods`;
-- `results`;
-- `history`;
-- `personal-records`.
+## 9. Testing
 
-Cada feature debe contener únicamente las partes que necesite.
+Use Vitest and the project's existing testing infrastructure.
 
-Por ejemplo:
+- Test observable user behavior, not implementation details.
+- Cover relevant interactions, validation, forms, navigation, API states, and accessibility.
+- Mock only necessary dependencies.
+- Update existing tests only when approved requirements change.
+- Never disable or weaken tests to hide failures.
 
-```text
-features/
-└── exercises/
-    ├── components/
-    ├── api/
-    ├── schemas/
-    ├── types/
-    └── hooks/
-```
+## 10. Commands and Verification
 
-No exigir la misma estructura interna a todas las features ni crear carpetas vacías para cumplir una estructura teórica.
+Run commands from the appropriate frontend directory.
 
-Mantener una separación clara de responsabilidades.
+- Install: `npm install`
+- Development: `npm run dev`
+- Lint: `npm run lint`
+- Test: `npm run test`
+- Build: `npm run build`
 
-Separar cuando corresponda:
+Verify scripts in `package.json` before execution.
 
-- presentación;
-- composición;
-- lógica de aplicación;
-- acceso a datos;
-- estado;
-- validación;
-- tipos;
-- schemas;
-- utilidades.
+Before completion:
 
-Mantener dentro de cada feature el código que pertenezca únicamente a esa funcionalidad.
+1. Review the changed files and affected contracts.
+2. Run applicable lint, tests, type checks, and build.
+3. Validate responsive behavior and accessibility for UI changes.
+4. Verify affected loading, empty, success, and error states.
+5. Report failures and skipped checks.
+6. Follow the root agent's completion requirements.
 
-Mover código a áreas compartidas únicamente cuando exista reutilización real entre múltiples features.
+## 11. Skills and MCPs
 
-Los componentes compartidos no deben contener reglas de negocio específicas de una feature.
+### Skill Selection and Context Loading
 
-Evitar dependencias innecesarias entre features.
+Available skills: `.agents/skills/frontend/`
 
-Cuando varias features necesiten una misma capacidad, extraer únicamente la parte realmente compartida.
+| Skill | Load when |
 
-No crear nuevas capas, carpetas o abstracciones sin una necesidad real.
+|---|---|
+ç
+| `vercel-react-best-practices` | React performance, rendering, optimization |
+| `vercel-composition-patterns` | Component composition, architecture, prop design |
+| `typescript-advanced-types` | Complex TypeScript types or inference |
+| `zod` | Schemas, runtime validation, data contracts |
+| `accessibility` | Accessibility, keyboard interaction, ARIA |
 
-No reorganizar la arquitectura existente como efecto secundario de una tarea no relacionada.
+Rules:
 
-No realizar refactors arquitectónicos fuera del alcance de la spec activa.
+- Inspect the task and affected code before selecting skills.
+- Load skills based on actual need, not technology alone.
+- Use no skill when project instructions are sufficient.
+- Prefer one skill when sufficient; combine only for distinct needs.
+- Verify skill availability before loading.
+- For narrowly scoped tasks, prefer selective reads of `SKILL.md` and relevant `rules/` or `references/` files.
+- Avoid invoking the skill tool when it unnecessarily embeds complete `AGENTS.md` guides.
+- Load complete guides only when comprehensive coverage is required.
+- Do not reload guidance already present in context.
+- Never sacrifice correctness, security, or accessibility to reduce tokens.
 
-## Componentes
+### MCPs
 
-Cuando el framework utilice componentes, estos deben mantener responsabilidades claras y acotadas.
+| MCP | Purpose |
 
-Los componentes visuales deben centrarse principalmente en:
+|---|---|
 
-- presentación;
+| `21st` | Design exploration and UI references |
+| `context7` | Current technical documentation |
+| `github` | Remote repository information |
+| `database` | Database inspection when relevant |
 
-- composición;
+- Use MCPs only when required by the task.
+- MCP access does not override project rules.
+- Frontend communication must remain API-based.
+- Never introduce direct database access from frontend code.
 
-- interacción;
+## 12. Frontend Guardrails
 
-- representación de estado.
+Require authorization before:
 
-Evitar componentes con:
+- Replacing React, CSS, or the existing state architecture.
+- Making fundamental changes to the design system.
+- Breaking public API contracts.
+- Removing existing functionality.
+- Performing destructive or cross-area changes outside the approved scope.
 
-- demasiadas responsabilidades;
+Never expose credentials in frontend code, bypass security checks, or suppress TypeScript, lint, test, or build failures.
 
-- lógica de negocio compleja;
-
-- acceso a datos mezclado innecesariamente con presentación;
-
-- estado innecesariamente elevado;
-
-- efectos secundarios difíciles de controlar;
-
-- dependencias innecesarias.
-
-Extraer lógica reutilizable cuando aporte claridad real.
-
-Preferir composición cuando resulte apropiado.
-
-No crear abstracciones únicamente para reducir líneas de código.
-
-No crear componentes genéricos prematuramente.
-
----
-
-## Lenguaje y tipado
-
-Utilizar:
-
-TypeScript 5.x
-
-Seguir las convenciones idiomáticas del lenguaje y framework configurados.
-
-Cuando exista tipado estático:
-
-- mantener el nivel de seguridad de tipos definido por el proyecto;
-
-- preferir tipos explícitos y reutilizables;
-
-- utilizar tipos derivados cuando eviten duplicación;
-
-- tratar datos externos como no confiables hasta validarlos;
-
-- evitar mecanismos que desactiven innecesariamente el sistema de tipos.
-
-No utilizar assertions, casts o mecanismos equivalentes únicamente para ocultar errores.
-
-Priorizar:
-
-- código legible;
-
-- nombres descriptivos;
-
-- responsabilidades claras;
-
-- estructuras simples;
-
-- tipos seguros;
-
-- inmutabilidad cuando sea apropiada.
-
----
-
-## Validación
-
-Sistema de validación:
-
-Zod
-
-Validar datos externos cuando corresponda.
-
-Esto puede incluir:
-
-- respuestas de API;
-- formularios;
-- parámetros;
-- almacenamiento local;
-- archivos;
-- datos importados;
-- configuración externa.
-
-Utilizar esquemas Zod como frontera de validación para datos no confiables.
-
-Cuando un tipo TypeScript represente exactamente los datos definidos por un esquema Zod, preferir derivarlo mediante `z.infer` en lugar de mantener manualmente ambas definiciones.
-
-Evitar mantener múltiples representaciones equivalentes de un mismo contrato cuando puedan derivarse de una única fuente.
-
-La validación frontend mejora la experiencia de usuario, pero no sustituye la validación realizada por el backend.
-
-Las reglas de negocio y restricciones de seguridad deben seguir siendo validadas y aplicadas por el backend.
-
-No eliminar ni debilitar validaciones únicamente para evitar errores durante la implementación.
-
----
-
-## API
-
-Ruta base:
-
-`/api`
-
-Toda integración HTTP deberá:
-
-- manejar errores;
-- gestionar estados de carga cuando corresponda;
-- gestionar estados vacíos cuando corresponda;
-- gestionar correctamente estados de éxito;
-- evitar URLs hardcodeadas cuando exista configuración;
-- mantener la lógica reutilizable de acceso a datos separada de componentes puramente visuales;
-- validar con Zod las respuestas externas cuando corresponda;
-- respetar los contratos existentes;
-- tratar adecuadamente respuestas inesperadas.
-
-Los componentes visuales no deben contener directamente lógica HTTP reutilizable.
-
-No asumir contratos API no definidos.
-
-No inventar endpoints, parámetros, payloads, códigos de respuesta ni estructuras de datos.
-
-No modificar silenciosamente contratos existentes para adaptar el frontend.
-
-Las reglas de autorización y propiedad definidas por el dominio deben ser aplicadas por el backend. El frontend puede reflejarlas en la interfaz, pero no constituye una frontera de seguridad.
-
-Si una funcionalidad necesita un endpoint o contrato inexistente:
-
-1. identificar la dependencia;
-2. comprobar la spec activa;
-3. consultar las fuentes de verdad disponibles;
-4. comprobar si el contrato está definido por el backend;
-5. detener la implementación si falta una decisión necesaria.
-
----
-
-## Diseño
-
-`DESIGN.md` es la fuente de verdad del lenguaje visual del proyecto.
-
-Debe consultarse antes de implementar o modificar cualquier interfaz visual.
-
-La spec define qué debe conseguir una pantalla o funcionalidad.
-
-`DESIGN.md` define cómo debe expresarse visualmente dentro del producto.
-
-Antes de realizar cambios visuales:
-
-1. comprobar la spec activa;
-
-2. leer `DESIGN.md`;
-
-3. identificar tokens, patrones y componentes existentes;
-
-4. consultar el MCP de diseño configurado cuando resulte relevante;
-
-5. reutilizar soluciones existentes cuando sean adecuadas;
-
-6. implementar respetando las decisiones visuales establecidas.
-
-No introducir decisiones visuales que contradigan `DESIGN.md` salvo que la spec autorice explícitamente una evolución del sistema visual.
-
-No introducir sin justificación:
-
-- nuevas familias tipográficas;
-
-- nuevos colores globales;
-
-- nuevos radios;
-
-- nuevas sombras;
-
-- nuevos patrones de componentes;
-
-- nuevos estilos de navegación;
-
-- nuevas convenciones visuales.
-
-Cuando exista un token o patrón equivalente, reutilizarlo.
-
-Si una necesidad visual no está contemplada en `DESIGN.md`, no crear silenciosamente una nueva convención global.
-
-Determinar si se trata de:
-
-- una necesidad local;
-
-- una variante de un patrón existente;
-
-- una evolución del sistema visual.
-
-Cuando una decisión suponga una evolución relevante del sistema visual, actualizar `DESIGN.md` únicamente cuando la spec o el alcance de la tarea lo permita.
-
----
-
-## Estilos
-
-Sistema principal:
-
-CSS
-
-Utilizar CSS como sistema principal de estilos del frontend.
-
-Seguir las convenciones y la organización de estilos definidas por el proyecto.
-
-Mantener una estrategia mobile-first para el diseño responsive.
-
-Evitar:
-
-- introducir sistemas de estilos alternativos sin necesidad;
-- incorporar Tailwind CSS, CSS-in-JS, Sass u otros sistemas sin una decisión explícita;
-- mezclar estrategias de estilos incompatibles;
-- duplicar grandes cantidades de estilos;
-- crear abstracciones visuales prematuras;
-- introducir valores arbitrarios cuando existan tokens equivalentes;
-- utilizar estilos inline para sustituir reglas que deberían formar parte del sistema de estilos.
-
-Reutilizar tokens, variables CSS, primitives y patrones visuales existentes cuando estén disponibles.
-
-Los valores visuales compartidos, como colores, espaciados, tipografía, radios o dimensiones recurrentes, deben reutilizar los tokens existentes antes de introducir nuevos valores.
-
-No modificar el sistema visual global como efecto secundario de implementar una funcionalidad concreta.
-
-## Responsive
-
-Aplicar la estrategia responsive definida en `DESIGN.md`.
-
-Cuando no exista una estrategia específica, priorizar un enfoque mobile-first.
-
-Comprobar los tamaños o breakpoints relevantes para la funcionalidad modificada.
-
-Cuando corresponda, validar:
-
-- móvil;
-
-- tablet;
-
-- escritorio.
-
-No asumir únicamente tamaños desktop durante la implementación.
-
-Evitar layouts rígidos cuando no sean necesarios.
-
----
-
-## Accesibilidad
-
-La accesibilidad forma parte de los requisitos obligatorios de calidad del frontend.
-
-Mantener cuando corresponda:
-
-- HTML semántico;
-
-- labels asociados a controles;
-
-- navegación mediante teclado;
-
-- focus visible;
-
-- contraste suficiente;
-
-- jerarquía correcta de encabezados;
-
-- botones reales para acciones;
-
-- links reales para navegación;
-
-- estados comprensibles para tecnologías de asistencia.
-
-Preferir elementos interactivos nativos frente a recreaciones innecesarias mediante elementos genéricos.
-
-Añadir ARIA únicamente cuando la semántica nativa no sea suficiente.
-
-No eliminar comportamiento accesible existente para simplificar una implementación.
-
-No depender únicamente del color para transmitir información relevante.
-
----
-
-## Formularios
-
-Los formularios deberán:
-
-- mostrar errores comprensibles;
-
-- mantener una jerarquía visual clara;
-
-- comunicar estados de carga;
-
-- evitar múltiples envíos accidentales;
-
-- gestionar correctamente estados de éxito y error;
-
-- preservar accesibilidad;
-
-- validar los datos cuando corresponda.
-
-No depender exclusivamente de la validación frontend para garantizar:
-
-- reglas de negocio;
-
-- integridad;
-
-- autorización;
-
-- seguridad.
-
----
-
-## Estado
-
-Sistema de gestión de estado:
-
-React (`useState`, `useReducer` y Context cuando corresponda)
-
-Mantener el estado lo más cerca posible del lugar donde se utiliza.
-
-Utilizar:
-
-- `useState` para estado local simple;
-- `useReducer` cuando un estado local tenga transiciones o lógica suficientemente complejas;
-- Context para estado compartido por una parte relevante del árbol de componentes cuando evite prop drilling significativo.
-
-Evitar:
-
-- elevar estado sin necesidad;
-- utilizar Context para problemas puramente locales;
-- utilizar estado global para problemas locales;
-- duplicar el mismo estado en múltiples fuentes;
-- almacenar como estado valores que puedan derivarse de otro estado existente;
-- introducir nuevas librerías de estado sin justificación.
-
-Distinguir entre estado de interfaz, estado de aplicación y datos procedentes del backend. No copiar innecesariamente datos remotos a múltiples estados locales.
-
-No introducir o sustituir una solución global de estado salvo que:
-
-1. la spec lo requiera;
-2. exista una necesidad arquitectónica clara;
-3. las herramientas existentes no resuelvan adecuadamente el problema;
-4. el cambio respete los Guardrails.
-
-## Rendimiento
-
-Evitar optimizaciones prematuras.
-
-Priorizar:
-
-- renders simples;
-
-- componentes con responsabilidades claras;
-
-- estructuras de datos adecuadas;
-
-- carga eficiente de recursos;
-
-- evitar trabajo innecesario;
-
-- evitar peticiones redundantes.
-
-No introducir memoización, caching u optimizaciones complejas sin una razón concreta.
-
-Cuando exista un problema de rendimiento real, medir antes de optimizar cuando sea posible.
-
----
-
-## Testing
-
-Framework de testing:
-
-Vitest
-
-Añadir tests proporcionales al impacto de la funcionalidad cuando la infraestructura del proyecto lo permita.
-
-Priorizar tests sobre comportamiento relevante:
-
-- interacción del usuario;
-- validación;
-- estados de carga, vacío, éxito y error;
-- navegación;
-- formularios;
-- integración con respuestas API;
-- tratamiento de respuestas inesperadas;
-- comportamiento accesible relevante;
-- reglas de presentación derivadas del dominio cuando corresponda.
-
-Evitar tests excesivamente acoplados a detalles internos de implementación.
-
-Preferir comprobar el comportamiento observable del componente desde la perspectiva del usuario frente a comprobar su estructura interna.
-
-No depender de nombres de funciones internas, estado interno o detalles de implementación cuando no formen parte del comportamiento observable.
-
-Mockear únicamente las dependencias necesarias para aislar el comportamiento que se está verificando.
-
-No eliminar, desactivar, omitir o debilitar tests únicamente para conseguir que una implementación pase.
-
-Cuando un test existente falle como consecuencia de un cambio intencionado de comportamiento, actualizarlo únicamente si la spec confirma el nuevo comportamiento esperado.
-
-Los tests deben verificar comportamiento relevante, no simplemente aumentar cobertura.
-
-## Comandos
-
-Herramienta principal:
-
-Vite
-
-Package manager:
-
-npm
-
-Comandos definidos para el proyecto:
-
-Install: npm install
-Run: npm run dev
-Lint: npm run lint
-Test: npm run test
-Build: npm run build
-
-Utilizar los comandos definidos por el proyecto.
-
-No asumir un package manager o herramienta concreta si no está configurada.
-
-Utilizar mecanismos reproducibles proporcionados por el proyecto antes que instalaciones globales.
-
-Ejecutar las verificaciones aplicables antes de considerar una tarea completada.
-
----
-
-## Skills
-
-Utilizar las skills relevantes disponibles en `.agents/skills/frontend/`.
-
-Skills frontend disponibles:
-
-- `vercel-react-best-practices`;
-- `vercel-composition-patterns`;
-- `typescript-advanced-types`;
-- `zod`;
-- `accessibility`.
-
-Utilizar cada skill únicamente cuando sea relevante para la tarea actual.
-
-Las skills proporcionan conocimiento, patrones y criterios especializados, pero no constituyen fuentes de verdad del producto.
-
-No pueden contradecir:
-
-1. la spec activa;
-2. este `frontend/AGENTS.md`;
-3. el `AGENTS.md` raíz;
-4. `DESIGN.md` cuando corresponda;
-5. los Guardrails aplicables;
-6. las decisiones de dominio vigentes.
-
-No utilizar skills irrelevantes para la tarea actual.
-
-No introducir tecnologías, dependencias o decisiones arquitectónicas únicamente porque una skill las recomiende.
-
-## MCP y herramientas externas
-
-MCPs configurados para el frontend:
-
-```text
-Design MCP: 21st
-Repository MCP: github
-Documentation MCP: context7
-Database MCP: database
-```
-
-No asumir que un MCP está disponible si no ha sido configurado explícitamente.
-
-### MCP de diseño
-
-`21st` es el MCP de diseño configurado para WOD Explorer.
-
-Utilizarlo cuando resulte relevante para:
-
-- consultar referencias visuales;
-- explorar layouts;
-- analizar componentes;
-- estudiar patrones de interfaz;
-- obtener propuestas visuales;
-- apoyar decisiones de composición e interacción.
-
-Las propuestas obtenidas mediante `21st` deben adaptarse a:
-
-1. la spec activa;
-2. `DESIGN.md`;
-3. el sistema visual existente;
-4. la arquitectura frontend;
-5. los requisitos de accesibilidad;
-6. los Guardrails.
-
-`21st` puede proponer, explorar y servir de apoyo para definir soluciones visuales.
-
-No sustituye a `DESIGN.md` como fuente de verdad visual.
-
-No aplicar automáticamente una propuesta obtenida mediante `21st` si contradice decisiones ya establecidas.
-
-### MCP de repositorio
-
-`github` es el MCP de repositorio configurado para el proyecto.
-
-Puede utilizarse para:
-
-- consultar Issues;
-- revisar requisitos;
-- consultar Pull Requests;
-- revisar ramas;
-- comprobar el estado remoto;
-- verificar trabajo relacionado con una tarea.
-
-No realizar acciones destructivas o irreversibles sin autorización cuando estén protegidas por los Guardrails.
-
-### MCP de documentación
-
-`context7` puede utilizarse para consultar documentación técnica actualizada de librerías y frameworks cuando resulte necesario para implementar o verificar una tarea.
-
-La documentación obtenida mediante `context7` no sustituye las decisiones arquitectónicas establecidas por el proyecto.
-
-### MCP de base de datos
-
-`database` proporciona acceso a la base de datos del proyecto dentro del ámbito para el que haya sido configurado.
-
-Puede utilizarse cuando una tarea frontend requiera verificar estructuras, datos o contratos relacionados con la integración con el backend.
-
-No utilizar el acceso a base de datos para introducir dependencias directas entre frontend y persistencia.
-
-El frontend debe continuar comunicándose con el backend mediante los contratos API definidos por el proyecto.
-
-### Reglas generales
-
-Los MCPs y herramientas externas no sustituyen:
-
-- la spec activa;
-- `DESIGN.md`;
-- los `AGENTS.md`;
-- los Guardrails;
-- las fuentes de verdad definidas por el proyecto.
-
----
-
-## Backend
-
-No modificar backend desde una tarea exclusivamente frontend salvo que la spec lo requiera explícitamente.
-
-Si una funcionalidad frontend necesita un contrato backend inexistente:
-
-1. identificar la dependencia;
-
-2. comprobar la spec activa;
-
-3. consultar las fuentes de verdad disponibles;
-
-4. no inventar el contrato;
-
-5. detener la implementación cuando falte una decisión necesaria.
-
-Cuando una tarea requiera modificar backend, respetar también `backend/AGENTS.md`.
-
----
-
-## Specs
-
-La spec activa define el alcance de la implementación.
-
-Puede definir, entre otros aspectos:
-
-- qué pantalla construir;
-
-- qué comportamiento implementar;
-
-- qué API consumir;
-
-- qué estados gestionar;
-
-- qué requisitos visuales cumplir;
-
-- qué está fuera de alcance.
-
-No añadir funcionalidades simplemente porque parezcan convenientes.
-
-No ampliar silenciosamente el alcance.
-
-No implementar trabajo futuro no solicitado únicamente para facilitar posibles evoluciones posteriores.
-
-Si falta una decisión funcional necesaria, detener la implementación y solicitar aclaración.
-
----
-
-## Guardrails
-
-El agente debe detenerse y solicitar autorización antes de:
-
-- sustituir el framework principal del frontend;
-
-- sustituir el sistema principal de estilos;
-
-- introducir o sustituir una solución global de estado;
-
-- cambiar decisiones arquitectónicas fundamentales;
-
-- sustituir `DESIGN.md` como fuente de verdad visual;
-
-- modificar de forma fundamental el sistema visual global;
-
-- realizar cambios incompatibles en contratos públicos existentes;
-
-- eliminar funcionalidades existentes;
-
-- realizar cambios destructivos o difíciles de revertir;
-
-- modificar otras capas fuera del alcance de la tarea;
-
-- ampliar el alcance definido por la spec activa.
-
-El agente nunca debe:
-
-- inventar endpoints o contratos inexistentes;
-
-- introducir secretos o credenciales reales en código frontend;
-
-- desactivar mecanismos de seguridad para resolver una tarea;
-
-- eliminar validaciones únicamente para evitar errores;
-
-- eliminar o desactivar tests únicamente para conseguir que una implementación pase;
-
-- ocultar errores de tipado, lint, testing o build;
-
-- ignorar verificaciones fallidas;
-
-- tratar automáticamente una propuesta del MCP como requisito;
-
-- declarar una tarea completada cuando fallen verificaciones obligatorias.
-
-Los cambios relacionados con backend deben respetar también `backend/AGENTS.md`.
-
-Los cambios relacionados con persistencia deben respetar también `database/AGENTS.md`.
-
-Los Guardrails globales definidos en el `AGENTS.md` raíz tienen prioridad.
-
----
-
-## Verificación final
-
-Antes de considerar una tarea frontend completada:
-
-1. revisar los cambios realizados;
-
-2. comprobar que respetan la arquitectura definida;
-
-3. comprobar que respetan `DESIGN.md` cuando exista impacto visual;
-
-4. ejecutar la comprobación de tipos cuando corresponda;
-
-5. ejecutar lint cuando esté configurado;
-
-6. ejecutar los tests relevantes;
-
-7. ejecutar el build;
-
-8. comprobar responsive cuando exista impacto visual;
-
-9. comprobar accesibilidad básica cuando exista impacto en interfaz;
-
-10. comprobar los estados de carga, error, vacío y éxito afectados;
-
-11. verificar los contratos API utilizados;
-
-12. comprobar que no existen secretos o credenciales versionados;
-
-13. confirmar que no se ha ampliado el alcance de la spec;
-
-14. comprobar que no se han violado los Guardrails;
-
-15. reportar cualquier verificación que no haya podido completarse.
-
-Una tarea no debe considerarse completada si una verificación obligatoria falla.
+Follow the root `AGENTS.md` for all other guardrails.

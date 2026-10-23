@@ -1,321 +1,270 @@
-# DESIGN.md
+# DESIGN.md — WOD Explorer 2.0
 
-## Fuente de verdad visual
+## 1. Visual Direction
 
-`DESIGN.md` es la fuente de verdad del lenguaje visual de WOD Explorer.
+**Approved direction:** Mobile-First Performance Dashboard ("Pizarra de Rendimiento Mobile-First").
 
-Toda decisión visual compartida, incluidos tokens, patrones de componentes y reglas responsive, debe consolidarse en este archivo antes de aplicarse de forma generalizada. Este documento define cómo se presenta el producto; no define ni modifica el dominio, permisos, contratos API ni reglas de negocio.
+`DESIGN.md` defines shared visual decisions, tokens, components, and responsive behavior. It does not define business rules, permissions, or API contracts.
 
-La dirección visual aprobada es **Pizarra de Rendimiento Mobile-First**.
+- Identity: precise, restrained, athletic, personal performance tool.
+- Visual language: dark blue surfaces, indigo accents, numerical hierarchy.
+- Theme: dark only.
+- UI language: Spanish.
+- Avoid social, competitive, gamified, or ranking-oriented aesthetics.
 
----
+Shared visual changes must be documented here before widespread implementation.
 
-## Uso de 21st
+Use `21st` only as optional design support when available. Its proposals never override the active spec, this document, accessibility, or existing design decisions.
 
-`21st` es el MCP de diseño de apoyo configurado para WOD Explorer.
+## 2. Color Tokens
 
-Puede utilizarse para explorar referencias, layouts, jerarquía, componentes, spacing y alternativas visuales. Sus propuestas deben evaluarse frente a la spec activa, este documento, el sistema visual existente, la accesibilidad y las restricciones del producto.
+| Role                | Value       |
+| ------------------- | ----------- |
+| Base background     | `#030712`   |
+| Elevated background | `#111827`   |
+| Surface             | `#1E2634`   |
+| Elevated surface    | `#1F2937`   |
+| Interactive overlay | `#FFFFFF08` |
+| Border              | `#1F2937`   |
+| Primary text        | `#FFFFFFCC` |
+| Secondary text      | `#9CA3AF`   |
+| Muted text          | `#6B7280`   |
+| Primary             | `#3758F9`   |
+| Primary hover       | `#2237EE`   |
+| Information         | `#0EA5E9`   |
+| Success             | `#22C55E`   |
+| Warning             | `#EAB308`   |
+| Error               | `#EF4444`   |
 
-`21st` no sustituye a `DESIGN.md`, no crea requisitos funcionales y no debe aplicarse automáticamente.
+- Maintain contrast across dark surfaces.
+- Never communicate meaning through color alone.
+- Primary color does not inherently represent achievement or personal records.
+- Reuse existing CSS tokens instead of introducing equivalent local values.
 
----
+## 3. Typography
 
-## Jerarquía de decisiones
+**Font:** `"DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`
 
-Aplicar este orden cuando existan varias fuentes de decisión:
+Load DM Sans through its official Google Fonts stylesheet, preserving system fallbacks.
 
-1. Spec activa.
-2. `DESIGN.md`.
-3. Sistema visual existente.
-4. MCP de diseño `21st`.
-5. Skills de diseño.
+**Weights:** 400 body, 500 controls, 600 headings, 700 metrics.
 
-Las decisiones visuales no pueden modificar los requisitos funcionales, las reglas de privacidad, propiedad o historial definidos por el dominio.
+| Token       | Size / Line Height |
+| ----------- | ------------------ |
+| `text-xs`   | `12px / 16px`      |
+| `text-sm`   | `14px / 20px`      |
+| `text-base` | `16px / 24px`      |
+| `text-lg`   | `20px / 28px`      |
+| `text-xl`   | `24px / 32px`      |
+| `metric-lg` | `32px / 36px`      |
+| `metric-xl` | `40px / 44px`      |
 
----
+- Use tabular figures for numerical metrics, times, dates, rounds, and repetitions when supported.
+- Reserve uppercase text for short labels with subtle tracking.
+- Never use text smaller than `12px`.
 
-## Identidad visual
+## 4. Spacing and Surfaces
 
-- Nombre del producto: `WOD Explorer`.
-- Dirección: `Pizarra de Rendimiento Mobile-First`.
-- Carácter: herramienta personal de rendimiento, precisa, sobria y atlética.
-- Lenguaje: superficies dark azuladas, primary índigo y jerarquía guiada por cifras y estructura.
-- Debe evitar una estética de competición, red social, comunidad, gamificación o ranking.
-- Idioma de interfaz: español.
+**Base spacing unit:** `4px`
 
-### Tema
+Scale: `4`, `8`, `12`, `16`, `20`, `24`, `32`, `40`, `48`, `64` px.
 
-- Tema principal y único consolidado: oscuro.
-- El tema claro no forma parte de esta decisión y no debe introducirse como variante local.
-- El fondo oscuro debe conservar separación suficiente entre fondo base, superficies y superficies elevadas.
+- Minimum control padding: `12px`.
+- Card padding: `16px` mobile, `20px` desktop.
+- Section spacing: `24px` mobile, `32px` desktop.
 
----
+### Radius and Borders
 
-## Tokens
+| Token            | Value               |
+| ---------------- | ------------------- |
+| `radius-sm`      | `6px`               |
+| `radius-md`      | `10px`              |
+| `radius-lg`      | `14px`              |
+| `border-default` | `1px solid #394345` |
 
-Los valores siguientes son la base para variables CSS compartidas. No introducir valores equivalentes arbitrarios en pantallas o componentes concretos.
+Use small radii for badges and chips, medium for controls and cards, and large for panels and modals.
 
-### Colores y roles semánticos
+Avoid thick borders except for focus or error states.
 
-| Rol | Valor | Uso visual |
-| --- | --- | --- |
-| Fondo base | `#030712` | Fondo de la aplicación y sidebar |
-| Fondo elevado | `#111827` | Áreas persistentes, controles outline y navegación móvil |
-| Superficie | `#1E2634` | Cards, formularios y paneles |
-| Superficie elevada | `#1F2937` | Panel secundario y superficie interactiva |
-| Superficie interactiva | `#FFFFFF08` | Hover de cards y capas ligeras |
-| Borde | `#1F2937` | Separación de superficies y controles |
-| Texto principal | `#FFFFFFCC` | Títulos, cifras y contenido primario |
-| Texto secundario | `#9CA3AF` | Metadatos y labels |
-| Texto tenue | `#6B7280` | Ayuda y placeholders |
-| Primary | `#3758F9` | Acción primaria y navegación activa |
-| Primary hover | `#2237EE` | Hover de acción primaria |
-| Información | `#0EA5E9` | Información neutral y enlaces |
-| Éxito | `#22C55E` | Confirmación de interfaz |
-| Advertencia | `#EAB308` | Atención no destructiva |
-| Error | `#EF4444` | Error, validación y acción destructiva |
+### Shadows
 
-- El color nunca es el único medio para comunicar origen, modalidad, estado de finalización, error o éxito.
-- El acento principal no implica por sí mismo una mejora, marca personal o estado deportivo.
-- Mantener contraste suficiente entre texto y todas las superficies oscuras.
+| Token            | Value                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| `shadow-surface` | `0 1px 2px rgb(16 24 40 / 5%)`                                          |
+| `shadow-raised`  | `0 4px 8px -2px rgb(16 24 40 / 10%), 0 2px 4px -2px rgb(16 24 40 / 6%)` |
+| `shadow-modal`   | `0 32px 64px rgb(16 24 40 / 14%)`                                       |
 
-### Tipografía y escala
+Shadows communicate elevation, not status. Avoid decorative glow effects.
 
-- Familia: `"DM Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. DM Sans se carga con el stylesheet oficial de Google Fonts y conserva fallbacks del sistema.
-- Usar figuras tabulares para tiempos, fechas, rondas y repeticiones cuando el navegador las soporte.
-- Pesos: 400 para cuerpo, 500 para controles, 600 para títulos y 700 para métricas.
+## 5. Layout and Breakpoints
 
-| Token | Tamaño / interlineado | Uso |
-| --- | --- | --- |
-| `text-xs` | `12px / 16px` | Ayuda y metadatos |
-| `text-sm` | `14px / 20px` | Texto base compacto, controles y tablas |
-| `text-base` | `16px / 24px` | Lectura y labels principales |
-| `text-lg` | `20px / 28px` | Títulos de sección |
-| `text-xl` | `24px / 32px` | Títulos de pantalla |
-| `metric-lg` | `32px / 36px` | Métricas destacadas |
-| `metric-xl` | `40px / 44px` | Métrica principal de detalle |
+- Application canvas: `#111827`.
+- Sidebar and bottom navigation: `#030712`.
+- Main container max-width: `1280px`.
+- Gutters: `16px` mobile, `24px` tablet, `32px` desktop.
 
-- Reservar las mayúsculas sostenidas para etiquetas muy breves y acompañarlas de tracking ligero.
-- No usar tamaños inferiores a `12px`.
+| Breakpoint   | Width        | Grid       | Gap    |
+| ------------ | ------------ | ---------- | ------ |
+| Mobile       | `0–599px`    | 4 columns  | `16px` |
+| Tablet       | `600–899px`  | 8 columns  | `20px` |
+| Desktop      | `900–1199px` | 12 columns | `24px` |
+| Wide desktop | `1200px+`    | 12 columns | `24px` |
 
-### Spacing
+- Mobile uses a single-column content flow.
+- Desktop uses persistent navigation and optional contextual content.
+- Secondary context follows primary content on mobile.
+- Metric cards span available width on mobile and 2–4 grid columns on desktop.
+- Forms remain single-column below `600px`.
+- Breakpoints must not hide essential information.
 
-- Unidad base: `4px`.
-- Escala: `4px`, `8px`, `12px`, `16px`, `20px`, `24px`, `32px`, `40px`, `48px`, `64px`.
-- Padding interno mínimo de controles: `12px`.
-- Padding de card: `16px` en móvil y `20px` en escritorio.
-- Separación de bloques: `24px` en móvil y `32px` en escritorio.
-- Mantener el ritmo vertical con esta escala en todas las pantallas.
+## 6. Navigation and Responsive Behavior
 
-### Bordes y radios
+**Mobile-first:** prioritize vertical reading, touch controls, and one primary task per screen.
 
-| Token | Valor | Uso |
-| --- | --- | --- |
-| `radius-sm` | `6px` | Badges, chips e inputs compactos |
-| `radius-md` | `10px` | Botones, inputs, filas interactivas y cards |
-| `radius-lg` | `14px` | Paneles de página y modales |
-| `border-default` | `1px solid #394345` | Controles y separación de superficies |
+### Mobile
 
-- No usar bordes gruesos salvo para focus visible o error.
-- Evitar radios excesivamente grandes o formas decorativas.
+- Fixed bottom navigation with at most five destinations.
+- Always display navigation labels.
+- Active destination uses primary text, translucent background, and a bottom indicator.
+- Use cards or stacked rows for lists.
+- Move filters into accessible expandable panels when necessary.
 
-### Sombras
+### Desktop
 
-| Token | Valor | Uso |
-| --- | --- | --- |
-| `shadow-surface` | `0 1px 2px rgb(16 24 40 / 5%)` | Superficie estándar |
-| `shadow-raised` | `0 4px 8px -2px rgb(16 24 40 / 10%), 0 2px 4px -2px rgb(16 24 40 / 6%)` | Panel o card elevada |
-| `shadow-modal` | `0 32px 64px rgb(16 24 40 / 14%)` | Modal |
+- Persistent sidebar with icons and labels.
+- Tables may replace cards when comparison benefits.
+- Additional contextual information must not duplicate functionality.
 
-- Las sombras indican elevación, no estados semánticos.
-- No usar efectos glow decorativos como patrón general.
+### General
 
----
+- Keep numerical values visible without truncation.
+- Preserve keyboard access to secondary actions.
+- Place resource actions near their corresponding content.
+- Display private-resource status through consistent labels.
+- Adapt layouts without duplicating controls.
 
-## Layout y grid
+## 7. Buttons and Forms
 
-- Canvas principal: `#111827`; sidebar y navegación inferior: `#030712`; las surfaces se sitúan sobre el canvas en `#1E2634`.
-- Contenedor principal: ancho máximo de `1280px`.
-- Gutter exterior: `16px` en móvil, `24px` en tablet y `32px` en escritorio.
-- Escritorio: navegación persistente, contenido principal y columna contextual opcional cuando aporte información ya disponible.
-- Móvil: una columna; el contexto secundario se muestra después del contenido principal.
-- Las pantallas de detalle priorizan identidad, modalidad y composición; los metadatos disponibles quedan en segundo plano.
+### Buttons
 
-| Rango | Columnas | Gap |
-| --- | --- | --- |
-| Móvil | 4 | `16px` |
-| Tablet | 8 | `20px` |
-| Escritorio | 12 | `24px` |
+- Standard height: `44px`.
+- Minimum touch target: `44px × 44px`.
+- Primary: `#3758F9`, hover `#2237EE`, white text, weight 600.
+- Secondary: `#111827` background, `#1F2937` border, `#E5E7EB` text.
+- Tertiary: transparent, muted text; hover `#111827` and `#D1D5DB`.
+- Destructive: `#DC2626`, hover `#B91C1C`, white text.
 
-- Las cards de métrica ocupan el ancho disponible en móvil y de 2 a 4 columnas en escritorio según contenido.
-- Formularios y listas usan una columna en móvil. Dos columnas se permiten cuando los campos pertenecen al mismo bloque y siguen siendo legibles.
+Required states: default, hover, focus-visible, disabled, loading.
 
-### Breakpoints
+Focus ring: `3px #91AEFF`, `2px` offset. Primary controls additionally use `rgb(55 88 249 / 20%)` halo.
 
-| Nombre | Rango |
-| --- | --- |
-| Base | `0px–599px` |
-| Tablet | `600px–899px` |
-| Escritorio | `900px–1199px` |
-| Escritorio amplio | `1200px` en adelante |
+### Inputs
 
-Los breakpoints reorganizan densidad y estructura; no ocultan información esencial.
+- Minimum height: `44px`.
+- Background: `#FFFFFF0D`.
+- Border: `border-default`.
+- Focus: `#91AEFF` border and visible primary halo.
+- Persistent labels; placeholders provide supplementary guidance.
+- Help text: `text-xs`.
+- Errors require an icon, color, and explanatory text.
+- Group fields by purpose without inventing new domain fields.
 
----
+Display `FOR_TIME` results as time and `AMRAP` results as completed rounds plus additional repetitions.
 
-## Estrategia responsive y navegación
+## 8. Components
 
-El diseño es mobile-first: primero se resuelven lectura vertical, controles táctiles y una tarea principal por pantalla; escritorio añade densidad y contexto sin duplicar controles.
+### Cards
 
-### Navegación
+- Standard: surface background, default border, medium radius, surface shadow.
+- Interactive: subtle elevation, `#374151` border, `#FFFFFF08` hover overlay.
+- Metric: prominent value with explanatory text below.
+- WOD: name, modality, origin, and available composition summary.
+- Exercise composition: numbered sequence preserving order.
 
-- Los destinos disponibles se muestran con etiquetas visibles y jerarquía consistente.
-- En móvil, utilizar navegación inferior fija con un máximo de cinco destinos y etiquetas siempre visibles.
-- En escritorio, utilizar navegación lateral persistente con icono y etiqueta.
-- El destino activo usa texto primary y fondo primary translúcido; en móvil conserva además un indicador inferior primary.
-- Las acciones proporcionadas por la aplicación se agrupan en el contexto visual del recurso que representan.
-- Las áreas y estados privados proporcionados se distinguen mediante etiquetas y contexto visual consistentes.
+Avoid mandatory stock sports imagery or decorative charts.
 
-### Adaptación
+### Liquid Glass
 
-- En móvil, las listas se presentan como filas o cards de una columna; en escritorio pueden usar tabla cuando mejore la comparación.
-- Los filtros pasan de barra lateral o línea horizontal a panel desplegable accesible en pantallas estrechas.
-- Las acciones secundarias pueden agruparse en un menú contextual solo si siguen siendo alcanzables por teclado.
-- Los valores numéricos no se truncan; el contexto puede saltar de línea antes de comprimir una cifra.
-- Los formularios no usan dos columnas por debajo de `600px`.
+Use only for interior panels displaying an existing ambient background.
 
----
+- Dark-blue translucent tint.
+- Moderate `backdrop-filter`.
+- Subtle primary border, upper reflection, soft shadow.
+- No independent glass filters on internal rows.
+- Inputs use more opaque surfaces.
+- Provide opaque fallback and reduced-transparency alternatives.
 
-## Componentes y patrones
-
-### Botones
+### Lists and Tables
 
-- Altura estándar: `44px`; objetivo táctil mínimo: `44px × 44px`.
-- Primario: fondo `#3758F9`, hover `#2237EE`, texto blanco y peso 600.
-- Secundario: fondo `#111827`, borde `#1F2937` y texto `#E5E7EB`.
-- Terciario: sin fondo persistente, texto tenue; hover con fondo `#111827` y texto `#D1D5DB`.
-- Destructivo: fondo `#DC2626`, hover `#B91C1C`, borde de error y texto blanco; reservado para acciones destructivas ya definidas por el producto.
-- Estados visuales obligatorios: default, hover, focus-visible, disabled y loading.
-- Focus visible: anillo de `3px` en `#91AEFF`, separado `2px` del control. Controles primary usan además un halo `rgb(55 88 249 / 20%)`.
+- Mobile: stacked rows or cards, title before metadata.
+- Desktop: tables when comparison is clearer.
+- Table rows: minimum `48px`.
+- Basic information must remain accessible without horizontal scrolling.
+- Right-align numerical values and use tabular figures.
+- Prefer borders over row shadows.
+- Prioritize name, modality-specific result, date, and origin when available.
 
-### Inputs y formularios
+### Badges
 
-- Altura mínima: `44px`.
-- Fondo: `#FFFFFF0D`; borde: borde estándar; texto: texto principal.
-- Focus: borde `#91AEFF` y halo visible del primary.
-- Label persistente sobre cada control; el placeholder es solo ayuda contextual.
-- Texto de ayuda: `text-xs`.
-- Error: icono, color y mensaje textual; no depender únicamente del borde rojo.
-- Agrupar campos por finalidad visual, sin añadir campos no definidos por los contratos y el dominio.
-- La presentación de un resultado debe conservar su estructura específica: `FOR_TIME` muestra tiempo; `AMRAP` muestra rondas completas y repeticiones adicionales.
+- `text-xs`, `radius-sm`, horizontal padding `8px`.
+- Neutral: `#4B5563` background, `#E5E7EB` text.
+- May indicate modality, origin, category, measurement type, completion, or archive status.
+- Never serve as the only explanation of important information.
 
-### Cards y superficies
+## 9. Interface States
 
-- Card estándar: superficie, borde estándar, radio medio, sombra de superficie y padding definido por breakpoint.
-- Card interactiva: misma base, con elevación suave, borde `#374151` y capa `#FFFFFF08` en hover.
-- Resource rows, formularios y detalles reutilizan la jerarquía de superficies sin alterar su flujo o contenido.
-- Card de métrica: cifra como foco y contexto textual debajo; no requiere gráficos decorativos.
-- Card de WOD: nombre, modalidad, origen y composición resumida cuando esos datos estén disponibles.
-- La composición usa una secuencia numerada de ejercicios para preservar el orden visualmente.
-- No usar imágenes deportivas de stock como requisito de la identidad.
+- **Loading:** skeletons matching approximate final dimensions.
+- **Empty:** simple icon, title, explanation, and only existing valid actions.
+- **Error:** error-bordered panel, clear description, retry when supported.
+- **Success:** brief confirmation using text and success color.
 
-#### Variante Liquid Glass
+Never invent unavailable results, records, actions, or content for empty states.
 
-- Los paneles Liquid Glass se reservan para contenidos interiores que deban dejar percibir un fondo ambiental existente.
-- Usan tinte azul oscuro translúcido, `backdrop-filter` moderado, borde primary tenue, reflejo superior y sombra suave; no se aplican filtros separados a filas internas.
-- Los campos dentro de un panel glass usan una superficie más sólida para conservar contraste y foco visible.
-- Debe existir fallback opaco y una alternativa sin transparencia para preferencias del usuario.
+## 10. Metrics and Charts
 
-### Listas y tablas
+- Use prominent, tabular numerical figures with explicit labels.
+- Preserve `FOR_TIME` and `AMRAP` result structures.
+- Personal-record cards prioritize value, WOD identity, and context.
+- Charts are optional and must remain simple.
+- Never imply unsupported comparisons or conclusions.
+- Provide accessible textual equivalents.
 
-- En móvil, usar filas o cards de una columna: título primero y metadatos debajo.
-- En escritorio, usar tablas cuando comparen información de forma más eficaz; filas de al menos `48px`.
-- Toda tabla debe tener representación móvil estructurada y no depender del desplazamiento horizontal para contenido básico.
-- Alinear cifras a la derecha y usar figuras tabulares.
-- Usar borde como separador principal, no sombras entre filas.
-- Priorizar nombre, resultado representado según modalidad, fecha disponible y origen cuando se muestre información conjunta.
+## 11. Accessibility
 
-### Badges y estados de entidad
+- Maintain sufficient contrast and visible focus.
+- Support keyboard navigation and logical focus order.
+- Use semantic HTML and properly associated labels.
+- Prefer native controls; use ARIA only when necessary.
+- Keep touch targets at least `44px × 44px`.
+- Never rely exclusively on color.
+- Keep motion subtle and respect reduced-motion preferences.
+- Provide meaningful labels and summaries for charts.
 
-- Badge compacto: `text-xs`, radio pequeño y padding horizontal de `8px`; el neutral usa fondo `#4B5563` y texto `#E5E7EB`.
-- Puede representar visualmente modalidad, origen de WOD, categoría, tipo de medición, estado de finalización cuando corresponda y archivado cuando exista ese dato.
-- Un badge nunca es la única representación de un dato relevante.
+## 12. Cross-Screen Consistency
 
-### Estados de interfaz
+- Reuse colors, spacing, typography, radii, borders, and shadows.
+- Maintain consistent domain terminology in Spanish.
+- Represent origin, modality, completion, and archive status consistently.
+- Use identical result formats across details, lists, history, and records.
+- Maintain primary, secondary, then destructive action hierarchy.
+- Reuse existing components before introducing local variants.
+- Document new shared visual decisions before global adoption.
 
-- Loading: skeleton con dimensiones cercanas al contenido final; no sustituir toda la pantalla por un spinner.
-- Empty: icono simple, título, explicación breve y acción solo cuando ya exista funcionalmente en el contexto.
-- Error: panel con borde de error, descripción clara y reintento cuando la operación técnica lo permita.
-- Success: confirmación breve con color de éxito y texto; no usarlo como estado permanente ni como mensaje de logro.
-- Los estados vacíos no sugieren contenido, resultados, historial o marcas inexistentes.
+## 13. Visual Guardrails
 
----
+Require authorization before:
 
-## Métricas y estadísticas
+- Replacing the approved visual direction.
+- Introducing a global light theme.
+- Adopting an external design system.
+- Fundamentally changing product identity.
+- Applying external design proposals that contradict approved decisions.
 
-- Las métricas usan tipografía grande, cifras tabulares y etiqueta explícita.
-- Los resultados conservan la estructura de su modalidad:
-  - `FOR_TIME`: tiempo.
-  - `AMRAP`: rondas completas y repeticiones adicionales.
-- Cuando la aplicación proporcione una mejor marca, su card prioriza el valor, la identificación del WOD y su contexto textual.
-- Las cards de métrica muestran la identificación y el contexto proporcionados junto al valor para evitar ambigüedad visual.
-- Los gráficos son opcionales: deben ser simples, no prometer comparativas o interpretaciones no definidas y contar con alternativa textual.
+Never:
 
----
-
-## Accesibilidad visual
-
-- Mantener contraste suficiente para texto, controles y estados en todas las superficies.
-- Mantener focus visible y consistente en todos los elementos interactivos.
-- No depender solo del color para comunicar origen, modalidad, estado, error o éxito.
-- Mantener objetivos táctiles mínimos de `44px × 44px`.
-- Mantener labels asociados a controles y texto auxiliar legible.
-- Respetar navegación mediante teclado, jerarquía de encabezados y orden de foco coherente con el orden visual.
-- Preferir elementos semánticos nativos; ARIA solo cuando la semántica nativa no sea suficiente.
-- La animación debe ser discreta, no necesaria para comprender información y respetar preferencias de movimiento reducido.
-- Los gráficos deben disponer de etiquetas y resumen textual equivalente.
-
----
-
-## Reglas de consistencia entre pantallas
-
-- Usar los mismos roles de color, radios, bordes y sombras en todo el producto.
-- Usar de forma consistente la terminología de dominio: WOD, ejercicio, WOD genérico, WOD personal, resultado, historial y mejor marca.
-- Representar modalidad, origen y estado con el mismo patrón de badge y texto en todas las pantallas.
-- Usar el mismo formato de resultado en detalle, listados, historial y mejores marcas.
-- Mantener el mismo orden visual de acciones: primaria, secundaria y destructiva.
-- Expresar la privacidad con contexto y etiquetas, no mediante datos, secciones o funciones inventadas.
-- No crear iconos, colores, radios, sombras o patrones de card exclusivos de una pantalla si existe un patrón del sistema que responde a la misma necesidad.
-- Toda nueva decisión compartida debe añadirse primero a este documento como token o regla antes de aplicarse de forma general.
-
----
-
-## Guardrails visuales
-
-Solicitar autorización antes de:
-
-- sustituir completamente la dirección visual aprobada;
-- introducir un tema claro global;
-- incorporar un design system externo;
-- cambiar la identidad visual fundamental;
-- sustituir `DESIGN.md` como fuente de verdad visual;
-- aplicar una propuesta de 21st que contradiga decisiones consolidadas.
-
-Nunca:
-
-- tratar una propuesta del MCP como requisito automático;
-- introducir funcionalidades, estados de negocio, permisos o reglas de dominio a través de una decisión visual;
-- modificar el dominio para adaptarlo a la interfaz;
-- ignorar accesibilidad, responsive o foco visible;
-- ampliar el alcance de una spec por una recomendación visual;
-- introducir dependencias o sistemas de estilos alternativos como efecto de implementar este diseño.
-
----
-
-## Principios
-
-- Priorizar claridad, legibilidad y accesibilidad.
-- Reutilizar tokens y patrones antes de crear variantes locales.
-- Mantener coherencia entre móvil, tablet y escritorio.
-- Usar 21st como apoyo de exploración, no como sustituto de decisiones del proyecto.
-- Mantener el sistema visual separado de las reglas funcionales y de negocio.
+- Treat MCP proposals as mandatory requirements.
+- Introduce business features or permissions through visual decisions.
+- Modify domain rules to accommodate UI designs.
+- Ignore accessibility or responsive requirements.
+- Expand an active spec based on visual recommendations.
+- Introduce alternative styling systems without approval.

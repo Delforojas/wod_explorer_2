@@ -1,99 +1,98 @@
-# WOD Explorer 2.0
+# PRODUCT.md — WOD Explorer 2.0
 
 <!-- impeccable:product-schema 1 -->
 
-## Plataforma
+## 1. Overview
 
-Aplicación web para consultar entrenamientos de CrossFit, crear WOD personales y registrar resultados.
+WOD Explorer 2.0 is a CrossFit web application for discovering exercises and WODs, creating personal workouts, recording results, and tracking progress.
 
-## Usuarios
+**Product goal:** Enable users to find or create a WOD, record their performance, and review their workout history and personal bests.
 
-### Visitante
+**Positioning:** A personal workout exploration and tracking tool, not a social network, gym management platform, or competition system.
 
-Puede consultar, buscar y filtrar el catálogo público de ejercicios y los WOD genéricos proporcionados por la aplicación. No puede crear WOD, registrar resultados ni consultar información privada.
+## 2. Users
 
-### Usuario registrado
+### Visitors
 
-Además de las capacidades de un visitante, puede crear y gestionar sus propios WOD privados, registrar resultados de WOD genéricos o propios y consultar su historial y mejores marcas personales.
+- Browse, search, and filter public exercises and system-managed WODs.
+- Cannot create WODs, record results, or access private resources.
 
-Cada usuario solo puede acceder y gestionar sus propios recursos privados.
+### Registered Users
 
-## Propósito del producto
+In addition to visitor capabilities, they can:
 
-WOD Explorer ayuda a deportistas de CrossFit a descubrir ejercicios y entrenamientos, crear WOD personalizados con ejercicios del catálogo y registrar sus ejecuciones para conocer su evolución.
+- Create, edit, and delete personal WODs.
+- Use existing catalog exercises to build workouts.
+- Record multiple attempts for generic or personal WODs.
+- Review personal history and best performances.
+- Access and manage only their own private resources.
 
-El producto tiene éxito cuando una persona puede encontrar un WOD o crear uno propio, registrar su resultado y consultar de forma clara sus intentos y su mejor marca personal.
+## 3. Core Capabilities
 
-## Posicionamiento
+- Public exercise and generic WOD catalogs.
+- Search and filtering.
+- Private personal WOD management.
+- Personal workout result tracking.
+- Workout history and personal records derived from results.
 
-WOD Explorer es una herramienta personal de exploración y seguimiento de entrenamientos de CrossFit. Combina un catálogo público mantenido por el sistema con una zona privada para los WOD y resultados de cada usuario.
+These describe product capabilities, not necessarily implemented features. The active spec determines implementation scope.
 
-No es una red social, una plataforma de boxes ni un sistema de competición en esta versión.
+## 4. Product Constraints
 
-## Contexto operativo
+- Generic WODs are public and system-managed.
+- Personal WODs and results belong to one user and remain private.
+- Exercise order matters; exercises may repeat within a WOD.
+- History and personal records must derive from stored results.
+- Results must preserve WOD modality semantics.
+- Editing or deleting WODs must not invalidate historical results.
+- Private resource access must enforce ownership.
+- Unresolved domain decisions require explicit specification.
 
-El frontend se desarrolla con React y TypeScript. El backend se implementará con Java y Spring Boot cuando la especificación correspondiente lo solicite. La persistencia principal utiliza MySQL 8.4 y se ejecuta mediante Docker Compose.
+Refer to `DOMAIN.md` for detailed rules and invariants.
 
-Los detalles de arquitectura, configuración y ejecución se definen en los archivos `AGENTS.md` específicos de cada área y en la configuración real del proyecto. No se deben presentar como existentes componentes que todavía no estén implementados.
+## 5. Out of Scope
 
-## Capacidades y restricciones
+The current version excludes:
 
-### Capacidades actuales de dominio
+- Communities and gym management.
+- Leagues, rankings, and competitions.
+- User following or social interactions.
+- Comments, reactions, and ratings.
+- Publishing or discovering other users' WODs.
+- User-managed exercise catalogs.
+- Public workout results.
+- Training plans and session scheduling.
 
-- Consultar, buscar y filtrar ejercicios del catálogo público.
-- Consultar, buscar y filtrar WOD genéricos públicos.
-- Crear, modificar y eliminar WOD personales usando solo ejercicios existentes en el catálogo.
-- Registrar varios resultados personales para un mismo WOD.
-- Consultar el historial personal y las mejores marcas derivadas de los resultados.
+Do not introduce excluded capabilities without an approved scope change.
 
-### Restricciones
+## 6. Data and Implementation
 
-- Los WOD genéricos son públicos y los mantiene el sistema; los usuarios no pueden modificarlos.
-- Los WOD personales y los resultados son privados y pertenecen a un único usuario.
-- El orden de los ejercicios forma parte de la definición de un WOD y un ejercicio puede repetirse en posiciones distintas.
-- El historial y las mejores marcas se derivan de los resultados; no deben convertirse en una segunda fuente de verdad.
-- Los resultados deben conservar el significado de la modalidad del WOD; no se deben reducir a una única cifra genérica.
-- Modificar o eliminar un WOD no puede alterar silenciosamente el significado de resultados históricos.
-- Las decisiones aún pendientes en `DOMAIN.md` no deben resolverse por intuición durante la implementación.
+- `DOMAIN.md` defines functional domain rules.
+- `PROJECT.md` defines the technical stack and configuration.
+- MySQL 8.4 is the persistent source of truth after migration.
+- Legacy JSON files are not authoritative after the corresponding migration.
+- Active specs under `specs/` define implementation requirements.
+- Do not present planned features as already implemented.
 
-### Fuera de alcance en esta versión
+## 7. Language and Brand
 
-- Comunidades o boxes.
-- Ligas, clasificaciones o competiciones.
-- Seguimiento entre usuarios.
-- Comentarios, reacciones o valoraciones.
-- Publicación o descubrimiento de WOD creados por otros usuarios.
-- Edición del catálogo por usuarios.
-- Resultados públicos.
-- Planes de entrenamiento o programación de sesiones.
+- Official name: WOD Explorer 2.0.
+- UI and project documentation: Spanish unless explicitly specified otherwise.
+- Domain terminology: WOD, exercise, generic WOD, personal WOD, result, history, personal record.
+- No additional brand commitments are currently defined.
 
-## Compromisos de marca
+## 8. Product Principles
 
-- Nombre oficial: WOD Explorer 2.0.
-- Terminología de dominio: WOD, ejercicio, WOD genérico, WOD personal, resultado, historial y mejor marca.
-- La interfaz y la documentación del proyecto se redactan en español, salvo que una especificación establezca otra necesidad.
+- Prioritize simple workflows for exploring WODs, creating workouts, and recording results.
+- Preserve privacy, data ownership, and historical traceability.
+- Maintain a single authoritative source for domain data.
+- Avoid unnecessary infrastructure, dependencies, and out-of-scope functionality.
+- Distinguish planned functionality from implemented functionality.
 
-No hay otros compromisos de marca definidos todavía.
+## 9. Accessibility
 
-## Fuente de verdad y evidencia
+Use semantic HTML, keyboard navigation, visible focus, accessible labels, understandable errors, sufficient contrast, and readable interfaces.
 
-- `DOMAIN.md` define el dominio funcional, sus reglas e invariantes.
-- MySQL 8.4 será la fuente de verdad persistente de los datos una vez que cada funcionalidad se migre a la base de datos.
-- Los archivos JSON existentes pertenecen a la versión inicial y no deben usarse como fuente de verdad después de esa migración.
-- Los recursos privados se autorizan por propiedad del usuario, no solo por conocer su identificador.
-- Las especificaciones activas dentro de `specs/` definen el alcance de cada implementación concreta.
+Support the screen sizes defined by the project.
 
-## Principios del producto
-
-- Priorizar recorridos simples para explorar, crear WOD y registrar resultados.
-- Mantener la privacidad de los WOD personales y los resultados como comportamiento base.
-- Preservar una única fuente de verdad para los datos del dominio.
-- Conservar la trazabilidad histórica de los resultados.
-- No introducir funcionalidades sociales, infraestructura o dependencias fuera del alcance de la especificación activa.
-- No presentar como existente una funcionalidad que todavía no se haya implementado.
-
-## Accesibilidad e inclusión
-
-La interfaz debe usar HTML semántico cuando corresponda, permitir navegación mediante teclado, mantener el foco visible y proporcionar labels, mensajes de error, contraste y legibilidad adecuados. Debe funcionar correctamente en los tamaños de pantalla que el proyecto declare como soportados.
-
-No se ha definido todavía una versión ni nivel objetivo de WCAG.
+No specific WCAG version or conformance level has been established.

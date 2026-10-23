@@ -1,139 +1,165 @@
-# AGENTS.md — Base de datos
+# AGENTS.md — Database & Docker
 
-Estas instrucciones aplican al diseño, implementación y operación de la base de datos de WOD Explorer 2.0. Se basan en el dominio del producto y en las decisiones técnicas confirmadas; no presuponen que los archivos o datos de una base anterior sean válidos para la nueva.
+## 1. Scope
 
-## Fuentes de verdad
+Applies to database design, schema, migrations, MySQL persistence, and related Docker infrastructure.
 
-Antes de diseñar o modificar el modelo, consulta:
+Follow the root `AGENTS.md` for global rules, documentation, safety, and workflow.
 
-1. `DOMAIN.md` para las reglas e invariantes funcionales.
-2. La spec activa en `specs/` para el alcance concreto de la tarea.
-3. `PROJECT.md` para las decisiones de tecnología y configuración.
-4. La constitución y el `AGENTS.md` raíz para los principios y guardrails generales.
-5. El esquema, migraciones y configuración existentes, si ya existen en este proyecto.
+For backend changes, also consult `backend/AGENTS.md`.
 
-El esquema de una base antigua sirve como referencia para entender datos o decisiones previas. No reemplaza a `DOMAIN.md` ni define por sí solo el modelo de la base nueva.
+## 2. Stack and Configuration
 
-Si falta una fuente necesaria o existe una contradicción que afecta al modelo, indícalo y no inventes una regla de producto para resolverla.
+- Database: MySQL 8.4
+- Infrastructure: Docker Compose
+- Database name: `wod_explorer_2`
+- Administration: MySQL Workbench
+- Database inspection: `database` MCP
 
-## Tecnología confirmada
+`PROJECT.md` and the actual repository configuration define services, ports, volumes, credentials, and migration tooling.
 
-- Motor: MySQL 8.4.
-- Entorno previsto: Docker Compose.
-- Nombre de la base de datos: `wod_explorer_2`.
-- MySQL Workbench está disponible para el usuario como herramienta de inspección y administración.
-- Servicio, contenedor, puertos, volumen, rutas, versión exacta de la imagen y herramienta de migraciones: se decidirán para el proyecto nuevo y se registrarán en `PROJECT.md` cuando estén confirmados.
+Never reuse configuration from previous projects without verification.
 
-No reutilices automáticamente esos valores de una instalación o repositorio anterior. No añadas un ORM, gestor de migraciones ni otra dependencia hasta que el proyecto o una spec lo decida.
+Do not introduce migration tools, ORMs, or infrastructure dependencies without authorization.
 
-## Reglas de modelado del dominio
+## 3. Sources of Truth
 
-- Modela usuarios, catálogo de ejercicios, WOD, composición ordenada y resultados según `DOMAIN.md`.
-- Los ejercicios y WOD genéricos los administra el sistema. Un WOD personal pertenece a un único usuario y es privado.
-- Un WOD puede tener varios ejercicios ordenados; debe poder repetirse un mismo ejercicio en posiciones distintas. La posición debe permitir reconstruir el orden de forma determinista.
-- Un WOD disponible debe tener al menos un ejercicio.
-- No impongas unicidad al nombre del WOD.
-- Cada resultado pertenece al usuario que lo registra y al WOD realizado. Se permiten varios intentos para el mismo WOD y todos son privados.
-- Conserva la semántica de cada modalidad en los resultados. No reduzcas modalidades distintas a una cifra genérica.
-- El historial personal y las mejores marcas se derivan de los resultados; evita mantenerlos como una segunda fuente de verdad.
-- Un cambio o eliminación de un WOD no puede cambiar silenciosamente el significado histórico de sus resultados.
-- Protege las operaciones privadas por propiedad del usuario, no solo por conocer el identificador.
-- Mantén los datos personales en el mínimo necesario para identificar la cuenta.
+- `DOMAIN.md`: domain rules and invariants.
+- Active spec: approved task scope and requirements.
+- `PROJECT.md`: technical decisions and configuration.
+- Existing schema and migrations: implemented database structure.
+- Live database: actual deployed state.
 
-`DOMAIN.md` deja decisiones pendientes sobre las modalidades admitidas, campos de resultado, prescripciones, conservación de la definición del WOD, eliminación o archivo de WOD con resultados, versionado del catálogo y notas. No fijes estructuras que resuelvan estas decisiones por intuición. Identifica las alternativas y pide que se concreten en una spec o decisión de producto antes de cerrar el diseño afectado.
+Never assume these sources are synchronized.
 
-## Esquema propuesto
+Inspect relevant sources before schema changes. Report unresolved conflicts or domain decisions rather than inventing requirements.
 
-El diagrama compartido para la nueva base propone estas tablas y relaciones:
+Legacy databases and diagrams are references, not authoritative specifications.
 
-- `users`: identidad y credenciales de la cuenta.
-- `exercises`: catálogo de ejercicios.
-- `wods`: identidad del WOD, propietario opcional para WOD personales, origen y fechas de ciclo de vida.
-- `wod_versions`: versiones numeradas de la definición de un WOD, con modalidad, límites y rondas.
-- `wod_version_items`: ejercicios ordenados de una versión y sus prescripciones de repeticiones, carga, distancia o duración.
-- `wod_results`: intentos de un usuario sobre una versión concreta del WOD, con campos para finalización, tiempo, progreso y resultados AMRAP.
-- `exercise_results`: marcas personales de un usuario para un ejercicio.
+## 4. Domain and Schema
 
-Relaciones representadas: un usuario puede poseer varios WOD y registrar varios resultados; un WOD tiene versiones; una versión contiene elementos ordenados que referencian ejercicios; los resultados pueden referenciar la versión ejecutada y, cuando aplique, el elemento de progreso; las marcas de ejercicio pertenecen al usuario y al ejercicio.
+- Follow `DOMAIN.md` for domain entities, relationships, and invariants.
+- Follow the active spec for approved schema changes.
+- Use versioned SQL migrations as defined in `PROJECT.md`.
+- Preserve ownership, privacy, exercise ordering, WOD versioning,
+  modality-specific results, and historical integrity.
+- Treat diagrams and legacy schemas as references only.
+- Never infer missing domain requirements or database constraints.
+- Support owner-authorized result corrections and deletions
+- Follow `DOMAIN.md` for modality-specific result fields;
+  EMOM records completion status only.
 
-Este diagrama es el diseño de partida, no una especificación cerrada. Antes de fijar el esquema, comprueba que cada campo representa una regla aprobada de `DOMAIN.md` o una decisión de diseño acordada. En particular:
+## 5. Schema Design
 
-- `wod_versions` puede conservar la definición histórica que requiere el dominio; acuerda si se crea una nueva versión al cambiar un WOD y cómo se selecciona la versión al registrar un resultado.
-- Los campos `progress_*`, `amrap_*`, `completed` y `type` deben validarse frente a las modalidades y resultados permitidos. No los conviertas en la estructura definitiva de resultados hasta concretar las decisiones pendientes del dominio.
-- `exercise_results` no está definido como entidad en el `DOMAIN.md` compartido. Antes de incluirlo en el alcance del producto, debe existir una decisión o spec que lo respalde.
-- El diagrama no muestra restricciones, claves únicas, `ON DELETE`, nulabilidad ni índices completos. Deben diseñarse y documentarse; no deducir su comportamiento solo por las líneas de relación del dibujo.
+The initial proposed model includes:
 
-## Convenciones del esquema
+- `users`: account identity and credentials.
+- `exercises`: exercise catalog.
+- `wods`: WOD identity, ownership, and lifecycle.
+- `wod_versions`: versioned WOD definitions.
+- `wod_version_items`: ordered exercises and prescriptions.
+- `wod_results`: attempts linked to WOD versions.
+- `exercise_results`: user exercise results.
 
-- Usa nombres de tablas y columnas en inglés y `snake_case`, siguiendo el estilo de la plantilla recibida.
-- Toda tabla debe tener una clave primaria explícita.
-- Representa relaciones con claves foráneas y usa tablas de unión para relaciones muchos a muchos.
-- Evita datos redundantes. Conserva instantáneas solo si se aprueba esa estrategia para proteger la historia.
-- Define nulabilidad, unicidad, `CHECK` y otras restricciones según reglas confirmadas del dominio.
-- Define conscientemente `ON DELETE` y `ON UPDATE`, en especial para usuarios, WOD y resultados históricos.
-- Diseña índices a partir de consultas, filtros, orden y relaciones necesarios; justifica los índices importantes.
-- Sigue la skill local de MySQL, si está disponible, para detalles del motor. Comprueba sus recomendaciones frente a MySQL 8.4, la spec y el estado real antes de aplicarlas.
+This is a proposed model, not an automatically approved schema.
 
-## Fuente de verdad del esquema y cambios
+Validate tables, fields, relationships, and result semantics against `DOMAIN.md` and the active spec.
 
-Antes de implementar tablas, define dónde vive el esquema autoritativo y cómo se aplican los cambios. Registra esa decisión en `PROJECT.md`.
+In particular, confirm versioning, modality-specific fields, historical preservation, and the inclusion of `exercise_results` before implementing affected structures.
 
-- Los cambios de esquema deben ser reproducibles y versionados.
-- No dependas de modificaciones manuales no documentadas.
-- Usa el sistema de migraciones que el proyecto confirme. Si aún no está definido, no instales ni elijas uno por intuición.
-- Mantén la inicialización de una base vacía coherente con el esquema esperado.
-- Antes de cambiar una base existente, inspecciona su esquema y los datos afectados; separa el estado observado del modelo deseado.
-- No edites una migración aplicada si puede dejar entornos distintos; añade una migración posterior cuando corresponda.
+## 6. Schema Conventions
 
-## MySQL Workbench
+- Use English `snake_case` for tables and columns.
+- Define explicit primary keys.
+- Use foreign keys for relationships.
+- Support many-to-many relationships through junction tables when appropriate.
+- Define nullability, uniqueness, and constraints from approved domain rules.
+- Choose `ON DELETE` and `ON UPDATE` behavior deliberately.
+- Preserve historical data integrity.
+- Avoid unnecessary redundancy.
+- Design indexes around real queries and access patterns.
+- Verify MySQL 8.4 compatibility.
 
-Usa Workbench para inspección visual o consultas de solo lectura cuando la conexión esté disponible. No asumas que el agente tiene acceso directo a la sesión de Workbench.
+Do not infer missing constraints from diagrams.
 
-Si hace falta revisar una base a la que el agente no puede conectarse, solicita una exportación del esquema sin datos sensibles o las salidas de inspección necesarias. No pidas ni guardes contraseñas, secretos o volcados de datos personales innecesarios.
+## 7. Schema and Migrations
 
-## Seguridad y operación
+- Define the authoritative schema and migration strategy in `PROJECT.md`.
+- Keep schema changes reproducible and version-controlled.
+- Use only the approved migration mechanism.
+- Never rely on undocumented manual schema changes.
+- Never silently modify applied migrations.
+- Use subsequent migrations when existing environments must evolve.
+- Keep fresh database initialization consistent with the intended schema.
+- Inspect affected data before modifying an existing database.
+- Distinguish observed database state from desired schema.
 
-- Gestiona credenciales con variables de entorno o el mecanismo de secretos decidido para el proyecto.
-- Nunca guardes credenciales reales en archivos versionados. `.env` debe estar excluido de Git y `.env.example` debe usar valores ficticios.
-- La aplicación no debe conectarse como `root`; utiliza una cuenta con privilegios mínimos.
-- Evita mostrar o registrar datos privados innecesarios.
-- Antes de operaciones de mantenimiento, identifica el entorno y los datos afectados. Usa respaldo y plan de recuperación cuando la operación pueda causar pérdida de datos.
+Do not allow Hibernate schema generation to replace the approved migration strategy.
 
-## Guardrails destructivos
+## 8. Database Inspection
 
-Detente y pide autorización explícita antes de eliminar tablas o columnas, borrar datos en bloque, ejecutar `DROP DATABASE` o `TRUNCATE`, eliminar volúmenes, aplicar una migración destructiva o realizar una operación irreversible.
+Use the `database` MCP when available for tasks involving existing schema, relationships, constraints, migrations, or persistence state.
 
-Trata como destructiva cualquier operación con riesgo razonable de pérdida de datos o recuperación incierta. Las consultas de solo lectura y la inspección pueden realizarse libremente.
+Before relevant changes:
 
-## MCP de base de datos
+1. Inspect affected tables, columns, keys, and constraints.
+2. Compare the live schema with repository migrations.
+3. Identify potential data compatibility issues.
 
-El proyecto dispone del MCP `database` para acceder al estado real de MySQL.
+After schema changes, verify the resulting state.
 
-### Uso obligatorio
+Prefer read-only inspection.
 
-Cuando una tarea afecte al esquema, relaciones, restricciones, migraciones
-o persistencia existente:
+If the MCP is unavailable, report the limitation and use an approved alternative when possible. Never claim live verification without evidence.
 
-- Usa `database` para inspeccionar el estado actual antes de realizar cambios.
-- Verifica tablas, columnas, claves, relaciones y restricciones relevantes.
-- Contrasta el estado real con las migraciones y configuración del repositorio.
-- Después de un cambio de esquema, verifica el resultado mediante `database`.
+MySQL Workbench may support manual inspection but does not imply agent access to the user's session.
 
-### Seguridad
+## 9. Security and Data Protection
 
-- Prioriza operaciones de lectura para inspección y diagnóstico.
-- No elimines tablas, columnas o datos existentes sin que la tarea lo requiera explícitamente.
-- No uses el MCP para introducir cambios manuales que deban quedar representados mediante una migración.
-- Los cambios estructurales deben seguir la estrategia de migraciones definida por el proyecto
+- Never commit real credentials or secrets.
+- Keep `.env` excluded from Git.
+- Use placeholder values in `.env.example`.
+- Never connect the application as MySQL `root`.
+- Apply least-privilege database access.
+- Avoid exposing personal or sensitive data.
+- Confirm the target environment before write operations.
+- Establish backup and recovery procedures before risky changes.
 
-## Verificación
+Require explicit authorization before:
 
-Después de implementar cambios, realiza verificaciones proporcionales al alcance:
+- `DROP DATABASE`, `DROP TABLE`, or `TRUNCATE`.
+- Destructive schema migrations.
+- Bulk data deletion.
+- Removing persistent Docker volumes.
+- Any operation with reasonable risk of irreversible data loss.
 
-- confirmar que MySQL 8.4 está accesible en el entorno correspondiente;
-- inspeccionar las tablas modificadas y sus claves, relaciones, índices y restricciones;
-- ejecutar consultas funcionales relacionadas con la spec;
-- verificar integridad y compatibilidad de los datos existentes;
-- confirmar que scripts y migraciones están versionados y permiten reconstruir o evolucionar el esquema según el flujo elegido.
+Never use the database MCP for undocumented structural changes that should be represented by migrations.
 
-No inventes comandos ni afirmes que los cambios se aplicaron si solo se diseñaron. Informa qué verificaciones se ejecutaron y cuáles quedaron pendientes.
+## 10. Skills and Tools
+
+- Inspect the task before selecting skills or technical guidance.
+- Do not assume a dedicated MySQL skill is installed.
+- Load only relevant skills when available and necessary.
+- Prefer targeted documentation over complete guides.
+- Avoid unnecessary or repeated context reads.
+- Use `database` for relevant live MySQL inspection.
+- Use `context7` for version-specific documentation when needed.
+- Use `github` for relevant remote repository information.
+
+Skills and external tools do not override domain rules,
+approved requirements, or safety constraints.
+
+## 11. Verification
+
+After relevant changes:
+
+1. Verify MySQL connectivity when required.
+2. Inspect modified schema objects and constraints.
+3. Check relevant queries and data integrity.
+4. Verify migration reproducibility and version control.
+5. Confirm compatibility with existing data.
+6. Report executed checks, failures, and limitations.
+
+Never claim database changes were applied when they were only designed.
+
+Follow the root `AGENTS.md` for final reporting and completion requirements.
