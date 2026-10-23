@@ -2,6 +2,10 @@ import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 
 import type { ExercisesViewProps } from "../ExercisesView.Types";
+import {
+  filterExercises,
+  hasActiveExerciseFilters,
+} from "../exerciseFilters";
 
 type ExercisesListProps = Pick<ExercisesViewProps, "exercises">;
 
@@ -9,18 +13,12 @@ function ExercisesList({ exercises }: ExercisesListProps) {
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   const [search, setSearch] = useState("");
+  const hasActiveFilters = hasActiveExerciseFilters(search);
 
-  const filteredExercises = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    if (!query) {
-      return exercises;
-    }
-
-    return exercises.filter((exercise) =>
-      exercise.name.toLowerCase().includes(query),
-    );
-  }, [exercises, search]);
+  const filteredExercises = useMemo(
+    () => filterExercises(exercises, search),
+    [exercises, search],
+  );
 
   return (
     <>
@@ -50,12 +48,22 @@ function ExercisesList({ exercises }: ExercisesListProps) {
           onChange={(event) => setSearch(event.target.value)}
           autoComplete="off"
         />
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            className="exercise-clear-filters"
+            onClick={() => setSearch("")}
+          >
+            Limpiar filtros
+          </button>
+        )}
       </div>
 
       {/* CONTADOR */}
 
       <p className="exercise-count">
-        {search.trim()
+        {hasActiveFilters
           ? `${filteredExercises.length} de ${exercises.length} ejercicios`
           : `${exercises.length} ejercicios disponibles`}
       </p>
