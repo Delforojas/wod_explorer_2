@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 
 import type { WodsViewProps } from "../WodsView.Types";
 import type { WodAggregateResponse } from "../../../types/Wod";
+import { filterWods, hasActiveWodFilters } from "../wodFilters";
 
 type WodsListProps = Pick<WodsViewProps, "wods" | "onSelectWod">;
 
@@ -14,16 +15,9 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   const [search, setSearch] = useState("");
+  const hasActiveFilters = hasActiveWodFilters(search);
 
-  const filteredWods = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    if (!query) {
-      return wods;
-    }
-
-    return wods.filter((wod) => wod.name.toLowerCase().includes(query));
-  }, [wods, search]);
+  const filteredWods = useMemo(() => filterWods(wods, search), [wods, search]);
 
   return (
     <section className="wod-page">
@@ -52,12 +46,22 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             onChange={(event) => setSearch(event.target.value)}
             autoComplete="off"
           />
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="wod-clear-filters"
+              onClick={() => setSearch("")}
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
 
         {/* CONTADOR */}
 
         <p className="wod-count">
-          {search.trim()
+          {hasActiveFilters
             ? `${filteredWods.length} de ${wods.length} entrenamientos`
             : `${wods.length} entrenamientos disponibles`}
         </p>
