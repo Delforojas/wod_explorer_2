@@ -9,5 +9,5 @@
 - [x] Añadir estilos responsive y estados de foco visibles para la nueva
       acción sin modificar la estética global.
 - [x] Ejecutar tests, lint y build del frontend.
-- [ ] Revisar archivos modificados y preparar únicamente el commit relacionado
+- [x] Revisar archivos modificados y preparar únicamente el commit relacionado
       con la Issue #71.
