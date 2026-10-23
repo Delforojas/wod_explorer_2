@@ -9,5 +9,5 @@
 - [x] Añadir estilos para la acción con foco visible, objetivo táctil mínimo y
       comportamiento responsive sin modificar la estética global.
 - [x] Ejecutar tests, lint y build del frontend.
-- [ ] Revisar archivos modificados, completar las tareas verificadas y preparar
+- [x] Revisar archivos modificados, completar las tareas verificadas y preparar
       únicamente el commit relacionado con la Issue #76.
