@@ -51,25 +51,30 @@ The workflow must provide:
 
 ## Handoff Evidence Recovery
 
-No persisted handoff snapshot is required. Reconstruct one read-only evidence
-record from these sources:
+Prefer the static handoff summary documented by `/issue`. Verify its repository
+and Issue identity, approved scope and decisions, SDD references, accepted
+commit/range, file/status manifest, and historical verification sources before
+reusing it. The summary is historical evidence only; it never proves current
+Git, remote, PR, or Issue state.
 
-1. GitHub Issue documentation and relevant Issue comments must identify the
-   Issue branch, SDD path, completed tasks, verification results, commit hash,
-   commit message, changed files, and pending manual-validation checklist.
-2. Git must confirm the active branch, `HEAD`, commit hash and message, commit
-   ancestry, complete range from the validated base, current working tree,
-   staging state, and any published branch reference.
-3. The SDD must confirm `spec.md`, `plan.md`, and `tasks.md`, completed tasks,
-   acceptance-criteria coverage, and the verification results referenced by
-   the Issue documentation.
-4. The current user message or another explicit user statement must confirm
-   that manual validation was approved. Issue state, an agent summary, a
-   checklist, or the `/finish-issue` invocation cannot substitute for it.
+If the summary is absent or incomplete, reconstruct only the affected static
+facts read-only from these sources:
 
-The evidence is valid only when the repository, Issue, branch, SDD, accepted
-commit, and verification results agree. Missing, stale, contradictory, or
-ambiguous evidence returns `BLOCK`.
+1. GitHub Issue documentation and relevant Issue comments identify the Issue,
+   SDD path, completed tasks, verification results, commit hash, commit
+   message, changed files, and pending manual-validation checklist.
+2. Git confirms the accepted commit, ancestry, complete historical range, and
+   file/status manifest.
+3. The SDD confirms `spec.md`, `plan.md`, and `tasks.md`, completed tasks,
+   acceptance-criteria coverage, and referenced verification results.
+4. The current user message or another explicit user statement confirms that
+   manual validation was approved. Issue state, an agent summary, a checklist,
+   or the `/finish-issue` invocation cannot substitute for it.
+
+The evidence is valid only when the repository, Issue, SDD, accepted commit,
+and verification results agree. Missing, stale, contradictory, or ambiguous
+static evidence returns `BLOCK` when it cannot be reconciled. Mutable evidence
+must always be obtained again at the relevant finish boundary.
 
 ## Commit Provenance Modes
 

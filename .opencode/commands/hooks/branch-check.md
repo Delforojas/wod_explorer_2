@@ -8,6 +8,11 @@ Este hook únicamente recopila y devuelve información del repositorio.
 
 No decide qué rama debe utilizarse y no modifica el estado de Git.
 
+Devuelve una única observación `branch_evidence` con `observed_at`, fuente,
+estado y los campos Git recopilados. Todos los datos Git de esta observación
+son mutables y solo pueden reutilizarse mientras no haya ocurrido una mutación
+Git, remota o del working tree.
+
 ## Momento de ejecución
 
 Ejecuta este hook antes de:
@@ -84,6 +89,11 @@ Devuelve información suficiente para que el workflow pueda determinar:
 - qué cambios locales preexistentes deben preservarse sin moverlos;
 
 - si existe algún estado Git que deba tenerse en cuenta antes de preparar la rama.
+
+El workflow debe consumir esta observación directamente en la fase actual. Si
+el estado Git cambia después de este resultado, invalida la observación
+afectada y vuelve a ejecutar el hook en la siguiente frontera que lo requiera;
+no reconstruyas la misma evidencia inmediatamente después de recibirla.
 
 ## Restricciones
 
