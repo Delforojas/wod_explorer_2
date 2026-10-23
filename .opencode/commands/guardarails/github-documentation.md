@@ -30,6 +30,14 @@ El guardrail se considera superado únicamente si:
 
 - el nombre de la rama documentado corresponde a la rama de trabajo actual;
 
+- la documentación contiene únicamente el resumen estático mínimo de handoff:
+  identidad y alcance aprobado de la Issue, decisiones y dependencias,
+  referencias del SDD, verificaciones históricas, commit/rango aceptado y
+  manifiesto completo de archivos/status;
+
+- las fuentes del resumen estático son identificables y no se presenta como
+  evidencia actual ningún estado mutable de Git, remoto, PR o Issue;
+
 - la documentación indica que la implementación está completada;
 
 - la documentación indica que las verificaciones aplicables han finalizado correctamente;
@@ -61,6 +69,9 @@ Activa este guardrail si:
 - el mensaje documentado no corresponde al commit esperado;
 
 - el nombre de la rama documentado es incorrecto;
+
+- falta el resumen estático de handoff, sus fuentes no pueden verificarse, o se
+  ha presentado evidencia histórica como si fuera un estado actual;
 
 - la documentación declara la Issue como cerrada o finalizada definitivamente;
 

@@ -20,6 +20,11 @@ El guardrail se considera superado únicamente si:
 - la rama de Issue parte de la base aprobada y no de la rama activa previa;
 - el rango completo de commits y su manifiesto de archivos/status son
   exclusivamente de la Issue;
+- existe un resumen estático de evidencia con la identidad y alcance aprobado
+  de la Issue, decisiones y dependencias aprobadas, referencias del SDD,
+  verificaciones históricas, commit aceptado, rango y manifiesto de archivos;
+- el resumen estático identifica sus fuentes y no presenta como actuales las
+  observaciones mutables de Git, remotos, PR o estado de la Issue;
 - existe un SDD válido;
 - existe una única carpeta SDD correspondiente a la Issue;
 - todas las tasks están completadas;
@@ -30,6 +35,9 @@ El guardrail se considera superado únicamente si:
 - no quedan cambios pertenecientes a la Issue sin commit;
 - la GitHub Issue está documentada con la implementación realizada;
 - la documentación contiene el hash y el mensaje del commit;
+- la documentación contiene el resumen estático de evidencia verificable para
+  que `/finish-issue` pueda reutilizarlo sin convertirlo en una comprobación
+  actual de Git o GitHub;
 - la GitHub Issue permanece abierta;
 - las validaciones manuales pendientes están identificadas;
 - ninguna validación manual ha sido marcada automáticamente como aprobada;

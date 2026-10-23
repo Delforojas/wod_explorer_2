@@ -28,7 +28,7 @@ Identify the task scope before loading additional documentation.
 
 Load documentation according to task relevance:
 
-- `docs/constitution.md`: global principles for project changes.
+- `docs/consitucion.md`: global principles for project changes.
 - `specs/`: active spec when implementing features or executing tasks.
 - `PRODUCT.md`: product goals and constraints when relevant.
 - `DOMAIN.md`: domain rules; required for domain or persistence changes.

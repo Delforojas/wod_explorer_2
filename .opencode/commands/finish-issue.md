@@ -24,24 +24,24 @@ overwrite, or otherwise move unrelated local work.
 Maintain one in-session record and update it as each phase produces evidence.
 Do not reconstruct conflicting copies of these values.
 
-- Issue identity, repository, state, SDD, completed tasks, blockers, and explicit user approval evidence.
-- Active Issue branch and its local and published HEAD.
-- One non-hybrid base policy (`standard-main` or `approved-dependency`), its
-  determining evidence, `base_branch`, `base_ref`, `base_remote_ref`, and
-  immutable historical `base_sha`.
-- `base_remote_sha_initial`, `base_remote_sha_latest`, and every authoritative
-  base observation, kept separate from the historical creation SHA.
-- `pr_target`, `pr_target_ref`, `pr_target_sha_initial`,
-  `pr_target_sha_latest`, and every authoritative destination observation.
-  Standard workflow values are `main`
-  and `refs/heads/main`; an exception must use only the approved dependency
-  values.
-- Accepted commit hash, message, branch, complete range, provenance (`handoff-commit` or `finish-commit`), and complete Issue file/status manifest.
-- Committed, staged, unstaged, untracked, deleted, and unrelated work classifications.
-- Protected local paths, including `opencode.json`, and their unchanged
-  pre/post state.
-- Remote, upstream, published branch, Pull Request, complete PR commits, complete PR file/status patch, checks, expected head SHA, merge strategy, and merge-result evidence.
-- Destination remote reference and SHA, local synchronization state, finalization documentation result, and post-close verification result.
+- Static handoff evidence: Issue identity, repository, approved scope,
+  dependencies and decisions, SDD references, completed tasks, historical
+  verification results, and explicit user approval evidence.
+- Static commit evidence: accepted commit hash, message, provenance
+  (`handoff-commit` or `finish-commit`), complete range, and complete Issue
+  file/status manifest.
+- Static base policy: one non-hybrid policy (`standard-main` or
+  `approved-dependency`), its determining evidence, `base_branch`, `base_ref`,
+  `base_remote_ref`, immutable historical `base_sha`, and approved
+  `pr_target`/`pr_target_ref`.
+- Mutable observations: active branch and `HEAD`, working-tree and staging
+  state, base and destination remote SHAs, published branch, Issue state, PR
+  state, checks, merge strategy/result, destination synchronization, and
+  protected local paths including `opencode.json`.
+- Every reused static entry must retain its source and revision/hash when
+  available. Mutable entries must retain observation time, source, phase, and
+  status; they are never inherited as current merely because the handoff was
+  valid historically.
 
 ## Entry And Issue State
 
@@ -69,6 +69,13 @@ Do not commit, push, document, or close after this stop.
 
 Use the base policy recorded by `/issue`; do not infer a different base from the
 current branch or silently substitute a historical work branch.
+
+Read the static handoff summary only after checking repository and Issue
+identity, source references, accepted commit/range, and SDD consistency. If the
+summary is absent, incomplete, or contradictory, reconstruct the affected
+static facts from the Issue, SDD, and Git. If they cannot be reconciled, return
+`BLOCK`. This reuse never replaces fresh mutable Git, remote, PR, or Issue
+checks.
 
 Verify the canonical policy without substituting fields. For
 `standard-main`, require `base_branch=main`, `base_ref=origin/main`,

@@ -28,6 +28,26 @@ local commit, and handoff for manual validation.
 - Never automatically rebase, force-push, or rewrite Git history.
 - Never weaken verification or security controls to reduce token usage.
 
+### Canonical Evidence Record
+
+Maintain one compact `issue_evidence` record for the whole workflow. Record a
+field only after its source has been observed; leave missing values absent and
+never infer them. Separate the record into:
+
+- `static`: Issue identity and approved scope, dependencies and decisions,
+  applicable instruction/specification paths and revisions, SDD references,
+  historical verification results, and the accepted commit/range manifest;
+
+- `mutable`: observation time, active branch, `HEAD`, working-tree and staging
+  state, remote references and SHAs, published branch, Issue state, PR state,
+  checks, and merge state.
+
+Each observation must retain its source, phase, and status. Reuse an unchanged
+static entry across later phases. Invalidate only the affected static entries
+when scope, specifications, decisions, or applicable instructions change.
+Invalidate the affected mutable entries after any Git, remote, GitHub, PR, or
+working-tree mutation and re-observe them at the next security boundary.
+
 ### Blocking Policy
 
 If a mandatory guardrail fails, essential information is missing,
@@ -71,6 +91,11 @@ context necessary to understand and implement the Issue:
 Do not indiscriminately load unrelated files, skills,
 documentation, or MCP resources.
 
+Record the paths, revisions or hashes when available, applicability decisions,
+and source of every static context item actually used. Later phases consume
+this record instead of rereading unchanged static context merely to reconstruct
+what was already verified.
+
 Only after gathering the necessary context, load and apply:
 
 `.opencode/commands/guardarails/context.md`
@@ -83,7 +108,12 @@ This phase is mandatory before modifying any project file.
 
 1. Load and follow:
    `.opencode/commands/hooks/branch-check.md`
-2. Inspect the current Git state and existing branches.
+2. Consume the complete read-only result from `branch-check.md`, including its
+   observation time and mutable Git evidence. Do not repeat the same Git
+   inspection immediately. Stop if the result is incomplete or stale.
+   The base-selection fetch below invalidates only the remote-reference fields
+   of `branch_evidence`; retain unaffected branch, working-tree, and staging
+   observations only while they remain unchanged.
 3. Select exactly one base policy before recording the canonical base:
    - For an independent Issue, select `base_policy=standard-main`. Refresh
      only the remote-tracking reference with `git fetch origin main`. This must
@@ -357,6 +387,13 @@ Document only verified evidence:
 - Executed verification checks and their results.
 - Local commit hash, message, and branch.
 - Readiness for manual validation.
+
+Persist only the compact static handoff evidence needed by `/finish-issue`:
+Issue identity and approved scope, approved decisions and dependencies, SDD
+references, historical verification results, accepted commit/range, and the
+complete Issue file/status manifest. Do not present mutable Git, remote, PR, or
+Issue state as current handoff evidence; those values must be freshly observed
+by `/finish-issue`.
 
 Explicitly state that the Issue remains open and
 the branch has not been pushed by this command.
