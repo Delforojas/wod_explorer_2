@@ -174,6 +174,62 @@
   outline-offset: 4px;
 }
 
+.wod-scroll-top {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-raised);
+
+  color: var(--color-foreground-soft);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.wod-scroll-top:focus-visible,
+.wod-header h1:focus-visible {
+  outline: 2px solid var(--wod-orange);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .wod-scroll-top {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .wod-scroll-top:hover {
+    border-color: var(--wod-orange);
+    background: var(--color-accent);
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 899px) {
+  .wod-scroll-top {
+    right: var(--space-4);
+    bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
 /* BOTÓN VOLVER */
 
 .wod-back {
@@ -612,6 +668,10 @@
   }
 
   .wod-clear-filters {
+    transition: none;
+  }
+
+  .wod-scroll-top {
     transition: none;
   }
 
