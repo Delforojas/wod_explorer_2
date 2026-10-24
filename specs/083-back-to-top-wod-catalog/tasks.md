@@ -8,5 +8,5 @@
 - [x] Anadir estilos responsive para el boton, foco visible, separacion del
       dock movil y reduced motion sin cambiar otros controles del catalogo.
 - [x] Ejecutar tests, lint, build y `git diff --check` del frontend/proyecto.
-- [ ] Revisar el diff, sincronizar estas tareas con el estado real y preparar
+- [x] Revisar el diff, sincronizar estas tareas con el estado real y preparar
       un commit que incluya solo la Issue #83 y su SDD.
