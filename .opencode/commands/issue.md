@@ -400,23 +400,16 @@ Continue only when the Post-Commit Guard returns `PASS`.
 
 Update GitHub Issue #$1 using the configured `github` MCP.
 
-Document only verified evidence:
-
-- Implemented work and relevant technical decisions.
-- Affected components and files.
-- Executed verification checks and their results.
-- Local commit hash, message, and branch.
-- Readiness for manual validation.
+Document only verified implementation and technical decisions, affected files,
+executed verification results, the local commit hash/message/branch, and
+readiness for manual validation.
 
 Persist only the compact static handoff evidence needed by `/finish-issue`:
 Issue identity and approved scope, approved decisions and dependencies, SDD
 references, historical verification results, accepted commit/range, and the
-complete Issue file/status manifest. Do not present mutable Git, remote, PR, or
-Issue state as current handoff evidence; those values must be freshly observed
-by `/finish-issue`.
-
-Explicitly state that the Issue remains open and
-the branch has not been pushed by this command.
+complete Issue file/status manifest. Keep mutable Git, remote, PR, and Issue
+state separate; `/finish-issue` must observe those values freshly. State that
+the Issue remains open and that this command has not pushed the branch.
 
 Load and apply:
 
@@ -431,38 +424,26 @@ Load and apply:
 1. `.opencode/commands/hooks/final-workflow-check.md`
 2. `.opencode/commands/guardarails/final-workflow.md`
 
-Verify SDD completeness, acceptance-criteria coverage,
-completed tasks, successful required checks, local commit,
-GitHub documentation, and absence of uncommitted Issue changes.
-
-The Issue must remain open.
-No push must have occurred during this workflow.
+Use these results to verify SDD completeness, acceptance coverage, completed
+tasks, successful required checks, the Issue commit, GitHub documentation, and
+no uncommitted Issue changes. The Issue must remain open and no push may occur
+during this workflow.
 
 Continue only when the Final Workflow Guard returns `PASS`.
 
 ## 14. Prepare Manual Validation
 
-Derive manual checks from the Issue acceptance criteria,
-implemented behavior, affected components, and relevant risks.
+Derive task-specific manual checks from acceptance criteria, implemented
+behavior, affected components, and risks. Cover the applicable scope:
 
-Adapt validations to the actual scope:
-
-- Frontend: visual behavior, interaction, navigation,
-  responsive layouts, and accessibility when applicable.
-- Backend/API: affected endpoints, expected responses,
-  relevant status codes, and error scenarios.
-- Authentication: authentication states, permissions,
-  ownership, and role distinctions when applicable.
-- Persistence: relevant data operations and integrity.
-- Docker/Infrastructure: startup, healthchecks,
-  connectivity, persistence, and configuration.
-- Documentation/Design: relevant documentation,
-  technical decisions, and design review.
-- Integrations: external service interactions, API
-  connections, error handling, and integration behavior.
-- Configuration: relevant environment variables,
-  application settings, configuration loading,
-  and expected behavior.
+- Frontend: visual behavior, interactions, navigation, responsiveness, accessibility.
+- Backend/API: endpoints, responses, status codes, error cases.
+- Authentication: states, permissions, ownership, roles.
+- Persistence: data operations and integrity.
+- Docker/Infrastructure: startup, healthchecks, connectivity, persistence, configuration.
+- Documentation/Design: relevant documentation, decisions, review.
+- Integrations: external services, connections, errors, behavior.
+- Configuration: variables, loading, settings, expected behavior.
 
 Do not generate generic checklists.
 Do not duplicate completed automated checks unless
@@ -498,8 +479,8 @@ Load and apply:
 
 `.opencode/commands/guardarails/workflow-handoff.md`
 
-The development handoff is ready only when all previous
-mandatory checks and the Workflow Handoff Guard return `PASS`.
+The development handoff is ready only when all previous mandatory checks and
+the Workflow Handoff Guard return `PASS`.
 
 Provide a final summary containing:
 
@@ -513,15 +494,10 @@ Provide a final summary containing:
 - The complete pending manual-validation checklist.
 - Blockers or limitations, if any.
 
-**Expected final state:**
-
-- Implementation and verification completed.
-- Local commit created.
-- Issue documented and left open.
-- No push.
-- No merge.
-- No Issue closure.
-- Manual validation pending.
+Keep the listed static handoff evidence historical; report `git status` and
+GitHub Issue status as current observations. The resulting state is completed
+implementation and verification, a local commit, an open documented Issue, no
+push, merge, or closure, and pending manual validation.
 
 After the user approves manual validation,
 the next command is:
