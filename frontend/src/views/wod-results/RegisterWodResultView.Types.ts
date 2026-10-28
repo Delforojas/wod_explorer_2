@@ -2,7 +2,7 @@ import type { FormEventHandler } from "react";
 import type { WodAggregateResponse } from "../../types/Wod";
 
 export interface WodResultFormValues {
-  wodId: string;
+  wodVersionId: string;
   performedAt: string;
   completed: boolean;
   timeSeconds: string;

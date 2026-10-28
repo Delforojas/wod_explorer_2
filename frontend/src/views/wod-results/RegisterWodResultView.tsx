@@ -57,8 +57,8 @@ function RegisterWodResultView(props: RegisterWodResultViewProps) {
                   <h2>Empieza creando tu primer WOD</h2>
 
                   <p>
-                    Todavía no tienes WODs personales disponibles para registrar
-                    resultados.
+                    No hay WODs disponibles para registrar resultados en este
+                    momento.
                   </p>
 
                   <Link to="/create-wod" className="register-wod-result-create">

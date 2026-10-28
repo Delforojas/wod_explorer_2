@@ -52,6 +52,24 @@ export const API_ERROR_MESSAGES = {
 
 export function handleApiError(response: Response, message: string): void {
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Tu sesión ha expirado. Inicia sesión de nuevo.");
+    }
+
+    if (response.status === 403) {
+      throw new Error(
+        "No tienes permisos para acceder a este recurso o el WOD ya no está disponible.",
+      );
+    }
+
+    if (response.status === 404) {
+      throw new Error("El WOD o resultado solicitado no existe.");
+    }
+
+    if (response.status === 400 || response.status === 422) {
+      throw new Error("Los datos del resultado no son válidos.");
+    }
+
     throw new Error(message);
   }
 }

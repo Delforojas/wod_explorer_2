@@ -2,9 +2,12 @@ import type { MyWodResultsViewProps } from "../MyWodResultsView.Types";
 
 import WodResultCard from "./WodResultCard";
 
-type WodResultsListProps = Pick<MyWodResultsViewProps, "results">;
+type WodResultsListProps = Pick<
+  MyWodResultsViewProps,
+  "results" | "deletingId" | "onDelete"
+>;
 
-function WodResultsList({ results }: WodResultsListProps) {
+function WodResultsList({ results, deletingId, onDelete }: WodResultsListProps) {
   return (
     <>
       {/* CONTADOR */}
@@ -15,7 +18,12 @@ function WodResultsList({ results }: WodResultsListProps) {
 
       <div className="wod-grid">
         {results.map((result) => (
-          <WodResultCard key={result.id} result={result} />
+          <WodResultCard
+            key={result.id}
+            result={result}
+            deleting={deletingId === result.id}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </>

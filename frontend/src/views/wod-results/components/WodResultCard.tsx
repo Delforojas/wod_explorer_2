@@ -1,119 +1,60 @@
 import type { WodResultResponse } from "../../../types/WodResult";
+import {
+  formatWodOrigin,
+  formatWodResultDate,
+  formatWodType,
+  getWodResultLines,
+} from "../resultPresentation";
 
 interface WodResultCardProps {
   result: WodResultResponse;
+  deleting: boolean;
+  onDelete: (id: number) => void;
 }
 
-function WodResultCard({ result }: WodResultCardProps) {
-  // FORMATEAR FECHA
-
-  function formatDate(date: string): string {
-    return new Intl.DateTimeFormat("es-ES", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(date));
-  }
-
-  // FORMATEAR TIEMPO
-
-  function formatTime(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
-  }
-
-  // REPRESENTAR RESULTADO SEGÚN MODALIDAD
+function WodResultCard({ result, deleting, onDelete }: WodResultCardProps) {
+  const resultLines = getWodResultLines(result);
 
   function renderResult() {
-    // AMRAP
-
-    if (result.type === "AMRAP") {
-      return (
-        <p className="my-wod-result-value">
-          {result.amrapRounds ?? 0} rondas + {result.amrapExtraReps ?? 0} reps
-        </p>
-      );
-    }
-
-    // EMOM
-
-    if (result.type === "EMOM") {
-      return (
-        <p className="my-wod-result-value">
-          {result.completed ? "Completado" : "No completado"}
-        </p>
-      );
-    }
-
-    // FOR TIME
-
-    if (result.type === "FOR_TIME") {
-      // ENTRENAMIENTO COMPLETADO
-
-      if (result.completed && result.timeSeconds !== null) {
-        return (
-          <p className="my-wod-result-value">
-            Tiempo: {formatTime(result.timeSeconds)}
+    return (
+      <div className="my-wod-result-progress">
+        {resultLines.map((line, index) => (
+          <p
+            className={index === 0 ? "my-wod-result-value" : "my-wod-result-meta"}
+            key={`${line}-${index}`}
+          >
+            {line}
           </p>
-        );
-      }
-
-      // ENTRENAMIENTO NO COMPLETADO
-
-      return (
-        <div className="my-wod-result-progress">
-          <p className="my-wod-result-value">No completado</p>
-
-          {result.progressRounds !== null && (
-            <p className="my-wod-result-meta">
-              Rondas completadas: {result.progressRounds}
-            </p>
-          )}
-
-          {result.progressReps !== null && (
-            <p className="my-wod-result-meta">
-              Progreso: {result.progressReps} reps
-            </p>
-          )}
-
-          {result.progressDistanceM !== null && (
-            <p className="my-wod-result-meta">
-              Progreso: {result.progressDistanceM} m
-            </p>
-          )}
-
-          {result.progressDurationSeconds !== null && (
-            <p className="my-wod-result-meta">
-              Progreso: {result.progressDurationSeconds} segundos
-            </p>
-          )}
-        </div>
-      );
-    }
-
-    return null;
+        ))}
+      </div>
+    );
   }
 
   return (
     <article className="wod-card my-wod-result-card">
-      {/* NOMBRE DEL WOD */}
-
       <h2>{result.wodName}</h2>
 
-      {/* MODALIDAD */}
-
       <div className="wod-card-meta">
-        <span>{result.type}</span>
+        <span>{formatWodType(result.type)}</span>
+        <span>{formatWodOrigin(result.origin)}</span>
+        <span>Versión ID {result.wodVersionId}</span>
       </div>
 
-      {/* FECHA */}
-
-      <p className="my-wod-result-date">{formatDate(result.performedAt)}</p>
-
-      {/* RESULTADO */}
+      <p className="my-wod-result-date">
+        {formatWodResultDate(result.performedAt)}
+      </p>
 
       <div className="my-wod-result-content">{renderResult()}</div>
+
+      <button
+        type="button"
+        className="my-wod-result-delete"
+        disabled={deleting}
+        onClick={() => onDelete(result.id)}
+        aria-label={`Eliminar resultado de ${result.wodName}`}
+      >
+        {deleting ? "Eliminando..." : "Eliminar resultado"}
+      </button>
     </article>
   );
 }

@@ -6,7 +6,13 @@ import type { MyWodResultsViewProps } from "./MyWodResultsView.Types";
 
 import WodResultsList from "./components/WodResultsList";
 
-function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
+function MyWodResultsView({
+  results,
+  loading,
+  error,
+  deletingId,
+  onDelete,
+}: MyWodResultsViewProps) {
   return (
     <section className="wod-page my-wod-results-page">
       <div className="wod-container">
@@ -18,8 +24,7 @@ function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
           <h1>Mis WODs</h1>
 
           <p className="wod-description">
-            Consulta tus resultados y sigue tu progreso en cada
-            entrenamientoaaa.
+            Consulta tus resultados y sigue tu progreso en cada entrenamiento.
           </p>
         </header>
 
@@ -55,7 +60,11 @@ function MyWodResultsView({ results, loading, error }: MyWodResultsViewProps) {
             Todavía no has registrado ningún resultado de WOD.
           </p>
         ) : (
-          <WodResultsList results={results} />
+          <WodResultsList
+            results={results}
+            deletingId={deletingId}
+            onDelete={onDelete}
+          />
         )}
       </div>
     </section>

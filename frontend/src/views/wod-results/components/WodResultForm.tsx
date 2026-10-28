@@ -42,15 +42,17 @@ function WodResultForm({
 
           <select
             id="result-wod"
-            value={values.wodId}
-            onChange={(event) => onChange("wodId", event.target.value)}
+            value={values.wodVersionId}
+            onChange={(event) =>
+              onChange("wodVersionId", event.target.value)
+            }
             required
           >
             <option value="">Selecciona un entrenamiento</option>
 
             {wods.map((wod) => (
-              <option key={wod.id} value={wod.id}>
-                {wod.name} — {wod.version.type}
+              <option key={wod.version.id} value={wod.version.id}>
+                {wod.name} — versión {wod.version.versionNumber} — {wod.version.type}
               </option>
             ))}
           </select>

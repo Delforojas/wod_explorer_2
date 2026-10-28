@@ -25,6 +25,16 @@ export async function getWods(): Promise<WodAggregateResponse[]> {
   return parseJson(response, wodAggregateResponseListSchema);
 }
 
+export async function getAvailableWods(): Promise<WodAggregateResponse[]> {
+  const response = await apiRequest(API_ENDPOINTS.WODS.BASE, {
+    headers: getAuthHeaders(),
+  });
+
+  handleApiError(response, API_ERROR_MESSAGES.WODS.GET_ALL);
+
+  return parseJson(response, wodAggregateResponseListSchema);
+}
+
 export async function getWodById(id: number): Promise<WodAggregateResponse> {
   const token = localStorage.getItem("token");
 
@@ -109,6 +119,16 @@ export async function getWodVersions(): Promise<WodVersionResponse[]> {
   return parseJson(response, wodVersionResponseListSchema);
 }
 
+export async function getAvailableWodVersions(): Promise<WodVersionResponse[]> {
+  const response = await apiRequest(API_ENDPOINTS.WOD_VERSIONS.BASE, {
+    headers: getAuthHeaders(),
+  });
+
+  handleApiError(response, API_ERROR_MESSAGES.WOD_VERSIONS.GET_ALL);
+
+  return parseJson(response, wodVersionResponseListSchema);
+}
+
 export async function getWodVersionById(
   id: number,
 ): Promise<WodVersionResponse> {
@@ -121,6 +141,18 @@ export async function getWodVersionById(
 
 export async function getWodVersionItems(): Promise<WodVersionItemResponse[]> {
   const response = await apiRequest(API_ENDPOINTS.WOD_VERSION_ITEMS.BASE);
+
+  handleApiError(response, API_ERROR_MESSAGES.WOD_VERSION_ITEMS.GET_ALL);
+
+  return parseJson(response, wodVersionItemResponseListSchema);
+}
+
+export async function getAvailableWodVersionItems(): Promise<
+  WodVersionItemResponse[]
+> {
+  const response = await apiRequest(API_ENDPOINTS.WOD_VERSION_ITEMS.BASE, {
+    headers: getAuthHeaders(),
+  });
 
   handleApiError(response, API_ERROR_MESSAGES.WOD_VERSION_ITEMS.GET_ALL);
 

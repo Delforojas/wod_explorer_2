@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import type { FormEvent } from "react";
 
-import { getMyWods } from "../api/wodsApi";
+import {
+  getAvailableWodVersionItems,
+  getAvailableWodVersions,
+  getAvailableWods,
+} from "../api/wodsApi";
 import { createWodResult } from "../api/wodsResultsApi";
 
 import type { WodAggregateResponse } from "../types/Wod";
@@ -20,7 +25,7 @@ function getLocalDateTime(): string {
 }
 
 const initialValues: WodResultFormValues = {
-  wodId: "",
+  wodVersionId: "",
   performedAt: getLocalDateTime(),
   completed: true,
   timeSeconds: "",
@@ -39,6 +44,8 @@ function optionalNumber(value: string): number | undefined {
 
 function RegisterWodResultPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedWodId = searchParams.get("wodId");
 
   const [wods, setWods] = useState<WodAggregateResponse[]>([]);
   const [values, setValues] = useState<WodResultFormValues>(initialValues);
@@ -48,20 +55,68 @@ function RegisterWodResultPage() {
   const [error, setError] = useState<string | null>(null);
 
   const selectedWod =
-    wods.find((wod) => wod.id === Number(values.wodId)) ?? null;
+    wods.find((wod) => wod.version.id === Number(values.wodVersionId)) ?? null;
 
   useEffect(() => {
     let active = true;
 
-    getMyWods()
-      .then((data) => {
+    Promise.all([
+      getAvailableWods(),
+      getAvailableWodVersions(),
+      getAvailableWodVersionItems(),
+    ])
+      .then(([availableWods, versions, versionItems]) => {
+        const selectableWods = versions
+          .map((version) => {
+            const wod = availableWods.find((item) => item.id === version.wodId);
+
+            if (!wod) {
+              return null;
+            }
+
+            return {
+              ...wod,
+              version,
+              composition: versionItems.filter(
+                (item) => item.wodVersionId === version.id,
+              ),
+            };
+          })
+          .filter((wod): wod is WodAggregateResponse => wod !== null)
+          .sort((first, second) =>
+            `${first.name}-${first.version.versionNumber}`.localeCompare(
+              `${second.name}-${second.version.versionNumber}`,
+            ),
+          );
+
         if (active) {
-          setWods(data);
+          setWods(selectableWods);
+
+          if (requestedWodId !== null) {
+            const requestedWod = selectableWods
+              .filter((wod) => wod.id === Number(requestedWodId))
+              .sort(
+                (first, second) =>
+                  second.version.versionNumber - first.version.versionNumber,
+              )[0];
+
+            if (requestedWod) {
+              setValues((current) =>
+                current.wodVersionId
+                  ? current
+                  : { ...current, wodVersionId: String(requestedWod.version.id) },
+              );
+            }
+          }
         }
       })
-      .catch(() => {
+      .catch((cause) => {
         if (active) {
-          setError("No se pudieron cargar tus WODs");
+          setError(
+            cause instanceof Error
+              ? cause.message
+              : "No se pudieron cargar tus WODs y sus versiones",
+          );
         }
       })
       .finally(() => {
@@ -73,17 +128,17 @@ function RegisterWodResultPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [requestedWodId]);
 
   function handleChange(
     field: keyof WodResultFormValues,
     value: string | boolean,
   ) {
-    if (field === "wodId") {
+    if (field === "wodVersionId") {
       setValues({
         ...initialValues,
         performedAt: values.performedAt,
-        wodId: String(value),
+        wodVersionId: String(value),
       });
 
       return;
@@ -172,8 +227,12 @@ function RegisterWodResultPage() {
       navigate("/my-wod-results", {
         replace: true,
       });
-    } catch {
-      setError("No se pudo guardar el resultado del WOD");
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "No se pudo guardar el resultado del WOD",
+      );
     } finally {
       setSaving(false);
     }
