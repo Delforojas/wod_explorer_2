@@ -56,11 +56,11 @@ Rules:
 - Follow the active spec for implementation scope.
 
 - Enforce resource ownership in backend operations.
-- Allow users to create, correct, and delete only their own results.
+- Allow users to create and delete only their own results; results are immutable after creation.
 - Preserve the exact WOD version associated with each result.
 - Validate FOR_TIME, AMRAP, and EMOM results against DOMAIN.md.
 - Do not calculate ranked personal records for EMOM.
-- Never change historical WOD definitions when correcting results.
+- Never change historical WOD definitions or stored results after creation.
 - Do not use Hibernate schema generation as a replacement
   for the approved migration strategy.
 - Inspect the existing schema before making persistence changes.

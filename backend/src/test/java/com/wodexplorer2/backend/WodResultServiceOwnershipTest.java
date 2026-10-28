@@ -2,6 +2,8 @@ package com.wodexplorer2.backend;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.wodexplorer2.backend.entity.User;
@@ -60,6 +62,19 @@ class WodResultServiceOwnershipTest {
     when(result.getUser()).thenReturn(otherUser);
 
     assertThrows(ForbiddenException.class, () -> wodResultService.findById(1L));
+  }
+
+  @Test
+  void rejectsDeletingAnotherUsersResult() {
+    User currentUser = user(7L);
+    User otherUser = user(8L);
+    WodResult result = mock(WodResult.class);
+    when(currentUserService.require()).thenReturn(currentUser);
+    when(wodResultRepository.findById(1L)).thenReturn(Optional.of(result));
+    when(result.getUser()).thenReturn(otherUser);
+
+    assertThrows(ForbiddenException.class, () -> wodResultService.deleteById(1L));
+    verify(wodResultRepository, never()).delete(result);
   }
 
   private User user(Long id) {
