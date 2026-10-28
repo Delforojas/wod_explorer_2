@@ -2,6 +2,7 @@ package com.wodexplorer2.backend;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -64,6 +66,15 @@ class ApiSecurityTests {
   void resultsArePrivate() throws Exception {
     mockMvc.perform(get("/api/wod-results"))
         .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @WithMockUser
+  void wodResultsDoNotExposeUpdateEndpoint() throws Exception {
+    mockMvc.perform(put("/api/wod-results/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{}"))
+        .andExpect(status().isMethodNotAllowed());
   }
 
   @Test

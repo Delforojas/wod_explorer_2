@@ -1,9 +1,14 @@
 # SDD: Resultados, historial y mejores marcas personales
 
+> **Vigencia:** Este documento conserva la evidencia de la implementacion
+> historica de Issue #5. La politica de correccion de resultados descrita en esa
+> implementacion queda supersedida por Issue #11; el contrato vigente es
+> inmutable y append-only.
+
 ## Objetivo
 
 Implementar el agregado independiente de resultados para que un usuario autenticado
-pueda registrar, consultar, corregir y eliminar sus intentos de WOD, manteniendo la
+pueda registrar, consultar y eliminar sus intentos de WOD, manteniendo la
 semántica de `FOR_TIME`, `AMRAP` y `EMOM`. El historial y las mejores marcas se
 derivan bajo demanda de los resultados válidos existentes.
 
@@ -12,15 +17,15 @@ derivan bajo demanda de los resultados válidos existentes.
 - Registrar resultados de versiones de WOD genéricas y de WOD personales propios.
 - Validar la forma del resultado contra la modalidad de la versión ejecutada.
 - Conservar múltiples intentos independientes para una misma versión de WOD.
-- Permitir consultar, modificar y eliminar únicamente resultados propios.
+- Permitir consultar y eliminar únicamente resultados propios.
 - Consultar el historial propio con ordenación descendente y filtros por WOD,
   modalidad, origen e intervalo de fechas.
 - Devolver en el historial el WOD, la versión, la modalidad, el origen, la fecha y
   los datos deportivos del resultado.
 - Calcular mejores marcas desde resultados propios válidos, sin persistir una
   entidad o columna derivada.
-- Recalcular automáticamente las mejores marcas después de crear, modificar o
-  eliminar resultados porque cada consulta vuelve a derivarlas.
+- Recalcular automáticamente las mejores marcas después de crear o eliminar
+  resultados porque cada consulta vuelve a derivarlas.
 - Añadir tests de validación, propiedad, historial y comparación por modalidad.
 
 ## Contrato de API
@@ -29,8 +34,6 @@ derivan bajo demanda de los resultados válidos existentes.
 - `GET /api/wod-results`: devuelve el historial propio ordenado por
   `performedAt DESC, id DESC`. Admite `wodId`, `type`, `origin`, `from` y `to`.
 - `GET /api/wod-results/{id}`: devuelve un resultado propio.
-- `PUT /api/wod-results/{id}`: corrige los datos de ejecución del resultado propio.
-  La versión ejecutada no puede cambiar durante una corrección.
 - `DELETE /api/wod-results/{id}`: elimina el resultado propio sin afectar a otros
   intentos.
 - `GET /api/wod-results/personal-bests`: devuelve la mejor marca derivada por
@@ -50,10 +53,8 @@ resultado, sin serializar entidades JPA.
   WOD no esté archivado.
 - Una versión personal solo puede usarse por su propietario y mientras el WOD no
   esté archivado.
-- Consultar, corregir o eliminar un resultado de otro usuario falla con la misma
+- Consultar o eliminar un resultado de otro usuario falla con la misma
   política de ownership existente.
-- Una corrección conserva el `wodVersionId` original y permite operar sobre un
-  resultado histórico aunque su WOD personal haya sido archivado.
 
 ### Validación por modalidad
 
@@ -77,7 +78,7 @@ resultado, sin serializar entidades JPA.
 - `EMOM`: mayor progreso entre resultados compatibles de la misma versión y regla
   de progreso; reglas distintas no se comparan entre sí.
 - Los resultados incompletos de `FOR_TIME` no participan en la mejor marca.
-- Crear, corregir o eliminar un resultado cambia el resultado de la consulta de
+- Crear o eliminar un resultado cambia el resultado de la consulta de
   mejores marcas sin actualizar ninguna tabla derivada.
 
 ## Criterios de aceptación trazables
@@ -86,11 +87,11 @@ resultado, sin serializar entidades JPA.
   existente del WOD.
 - [x] Se rechazan datos incompatibles con `FOR_TIME`, `AMRAP` y `EMOM`.
 - [x] Se conservan varios intentos para la misma versión sin sobrescritura.
-- [x] Un usuario no puede consultar ni alterar resultados ajenos.
+- [x] Un usuario no puede consultar ni eliminar resultados ajenos.
 - [x] El historial muestra WOD, versión, fecha, origen y resultado, con filtros y
   ordenación definidos.
 - [x] La mejor marca se deriva solo de resultados válidos existentes.
-- [x] Crear, corregir o eliminar un resultado se refleja en la mejor marca derivada.
+- [x] Crear o eliminar un resultado se refleja en la mejor marca derivada.
 - [x] Existen tests para las tres modalidades y las reglas de propiedad, historial
   y comparación.
 
@@ -101,5 +102,6 @@ resultado, sin serializar entidades JPA.
 - No se implementan resultados públicos, competiciones, clasificaciones, marcas
   independientes de ejercicios, frontend ni funcionalidades sociales.
 - No se admiten modalidades distintas de las tres aprobadas en `DOMAIN.md`.
-- No se cambia una versión ejecutada durante la corrección de un resultado.
+- No existe una operación de corrección ni se cambia la versión ejecutada de un
+  resultado ya registrado.
 - La documentación del SDD se mantiene en español.

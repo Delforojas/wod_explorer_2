@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.wodexplorer2.backend.dto.WodResultRequest;
-import com.wodexplorer2.backend.dto.WodResultUpdateRequest;
 import com.wodexplorer2.backend.entity.User;
 import com.wodexplorer2.backend.entity.Wod;
 import com.wodexplorer2.backend.entity.WodOrigin;
@@ -169,42 +168,22 @@ class WodResultServiceTest {
   }
 
   @Test
-  void updatesOnlyOwnResultAndKeepsItsVersion() {
+  void deletesOwnResultAndDerivedBestMarksReadCurrentResults() {
     User user = user(7L);
-    WodVersion version = versionForUpdate(WodType.FOR_TIME);
-    WodResult result = mock(WodResult.class);
+    WodVersion version = versionForBest(1L, WodType.FOR_TIME);
+    WodResult result = forTimeResult(version, 10L, 240);
     when(currentUserService.require()).thenReturn(user);
     when(wodResultRepository.findById(10L)).thenReturn(Optional.of(result));
     when(result.getUser()).thenReturn(user);
-    when(result.getWodVersion()).thenReturn(version);
-    when(wodResultRepository.save(result)).thenReturn(result);
+    when(wodResultRepository.findHistory(7L, null, null, null, null, null))
+        .thenReturn(List.of(result), List.of());
 
-    WodResultUpdateRequest request = new WodResultUpdateRequest(
-        LocalDateTime.parse("2026-09-26T10:30:00"),
-        true,
-        240,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null);
+    assertEquals(List.of(result), wodResultService.findPersonalBests());
 
-    wodResultService.update(10L, request);
+    wodResultService.deleteById(10L);
 
-    verify(result).update(
-        request.performedAt(),
-        request.completed(),
-        request.timeSeconds(),
-        request.progressRounds(),
-        null,
-        request.progressReps(),
-        request.progressDistanceM(),
-        request.progressDurationSeconds(),
-        request.amrapRounds(),
-        request.amrapExtraReps());
-    verify(result).getWodVersion();
+    verify(wodResultRepository).delete(result);
+    assertEquals(List.of(), wodResultService.findPersonalBests());
   }
 
   @Test
@@ -259,12 +238,6 @@ class WodResultServiceTest {
     when(version.getWod()).thenReturn(wod);
     when(wod.getDeletedAt()).thenReturn(null);
     when(wod.getOrigin()).thenReturn(WodOrigin.GENERIC);
-    return version;
-  }
-
-  private WodVersion versionForUpdate(WodType type) {
-    WodVersion version = mock(WodVersion.class);
-    when(version.getType()).thenReturn(type);
     return version;
   }
 

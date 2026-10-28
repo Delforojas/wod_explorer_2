@@ -45,7 +45,7 @@ Legacy databases and diagrams are references, not authoritative specifications.
   modality-specific results, and historical integrity.
 - Treat diagrams and legacy schemas as references only.
 - Never infer missing domain requirements or database constraints.
-- Support owner-authorized result corrections and deletions
+- Support owner-authorized result deletions; results are immutable after creation
 - Follow `DOMAIN.md` for modality-specific result fields;
   EMOM records completion status only.
 

@@ -47,7 +47,7 @@ An authenticated user may additionally:
 
 - Create and manage their own personal WODs.
 - Record multiple attempts for generic or owned personal WODs.
-- View, correct, and delete their own results.
+- View and delete their own results.
 - Access their own workout history and personal records.
 
 Every private operation must validate ownership using the authenticated identity, not merely a resource identifier.
@@ -213,7 +213,7 @@ Rules:
 - EMOM results do not generate ranked personal records.
 - Multiple EMOM attempts may be recorded.
 - Results remain associated with the exact WOD version performed.
-- Users may correct or delete their own EMOM results.
+- Users may delete their own EMOM results.
 
 ## 6. Workout Results
 
@@ -234,10 +234,9 @@ Business rules:
 - Users may record attempts for generic WODs or their own active personal WODs.
 - Multiple attempts for the same WOD are permitted.
 - Recording an attempt never replaces previous attempts.
-- Users may view, modify, correct, and delete **only their own results**.
-- Correcting one attempt must not change other attempts.
-- Corrections must preserve ownership, WOD-version association, and modality compatibility.
-- Result changes must not retroactively modify the definition of the WOD performed.
+- Users may view and delete **only their own results**.
+- Deleting one attempt must not change other attempts.
+- Result deletion must not retroactively modify the definition of the WOD performed.
 - Results are private and cannot be accessed by other users.
 
 Notes are outside the current result model.
@@ -265,7 +264,7 @@ A personal record is derived from valid, comparable results.
 Rules:
 
 - Personal records are not independently created or edited.
-- Creating, modifying, or deleting a result must be reflected when records are recalculated.
+- Creating or deleting a result must be reflected when records are recalculated.
 - Only comparable attempts may compete.
 - WODs with identical names are not automatically equivalent.
 - Historical version compatibility must be respected.
@@ -303,7 +302,7 @@ Its consistency responsibilities include:
 - Valid modality-specific values.
 - Ownership enforcement.
 - Historical version integrity.
-- Independent modification and deletion of individual attempts.
+- Independent deletion of individual attempts.
 
 History and personal records are derived projections, not separate mutable aggregates.
 
@@ -321,7 +320,7 @@ The following conditions must always hold:
 8. Modifying a WOD never changes the meaning of recorded historical attempts.
 9. A WOD with historical results cannot be physically deleted in a way that invalidates them.
 10. An archived personal WOD cannot receive new results.
-11. Result corrections do not modify other attempts or historical WOD definitions.
+11. Result deletion does not modify other attempts or historical WOD definitions.
 12. History and personal records derive from actual stored results.
 13. Personal records compare only compatible attempts.
 14. EMOM results contain completion status only and have no ranked personal record.
