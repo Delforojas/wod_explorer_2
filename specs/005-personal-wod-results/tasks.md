@@ -2,6 +2,10 @@
 
 > **Nota historica:** Las tareas de correccion que aparecen en el historial de
 > Issue #5 quedan supersedidas por Issue #11. No forman parte del contrato actual.
+>
+> La semántica EMOM histórica basada en progreso y comparación queda supersedida
+> por Issue #85. El contrato actual solo permite `completed` y excluye EMOM de
+> mejores marcas clasificadas.
 
 ## Orden de implementación
 
@@ -16,15 +20,16 @@
 - [x] Añadir una excepción de resultado inválido y mapearla a `400` con el formato
   de error existente.
 - [x] Implementar la validación de `FOR_TIME`, `AMRAP` y `EMOM`, incluyendo
-  progreso, métricas incompatibles y pertenencia de `progressItemId`.
+  progreso donde aplica, métricas incompatibles y pertenencia de
+  `progressItemId`; EMOM solo admite `completed`.
 - [x] Mantener las operaciones transaccionales de creación y eliminación de
   resultados propios sin mutar una versión ejecutada.
 - [x] Mantener creación de múltiples intentos y borrado con ownership, rechazando
   versiones personales ajenas y WOD archivados para nuevos registros.
 - [x] Implementar consulta privada de historial con ordenación y filtros de WOD,
   modalidad, origen e intervalo de fechas.
-- [x] Implementar consulta de mejores marcas derivada para las modalidades
-  aprobadas y reglas de compatibilidad de EMOM.
+- [x] Implementar consulta de mejores marcas derivada para `FOR_TIME` y `AMRAP`,
+  excluyendo EMOM de las mejores marcas clasificadas.
 - [x] Añadir tests unitarios de validación, privacidad, múltiples intentos,
   historial, `FOR_TIME`, `AMRAP`, `EMOM` y derivación después de eliminar
   resultados.

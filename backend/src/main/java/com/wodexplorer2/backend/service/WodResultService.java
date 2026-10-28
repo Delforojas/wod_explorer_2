@@ -285,16 +285,6 @@ public class WodResultService {
         || progressDurationSeconds != null;
   }
 
-  private int countNonNull(Object... values) {
-    int count = 0;
-    for (Object value : values) {
-      if (value != null) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   private void validateNonNegative(Integer value, String field) {
     if (value != null && value < 0) {
       throw invalid(field + " no puede ser negativo");
@@ -346,38 +336,11 @@ public class WodResultService {
               result.getProgressDistanceM(),
               result.getProgressDurationSeconds());
     }
-    return result.getProgressRounds() != null
-        && result.getProgressRounds() >= 0
-        && result.getTimeSeconds() == null
-        && result.getAmrapRounds() == null
-        && result.getAmrapExtraReps() == null
-        && countNonNull(
-            result.getProgressReps(),
-            result.getProgressDistanceM(),
-            result.getProgressDurationSeconds()) <= 1;
+    return false;
   }
 
   private BestKey bestKey(WodResult result) {
-    if (result.getWodVersion().getType() != WodType.EMOM) {
-      return new BestKey(result.getWodVersion().getId(), null, null);
-    }
-    return new BestKey(
-        result.getWodVersion().getId(),
-        result.getProgressItem() == null ? null : result.getProgressItem().getId(),
-        progressMetric(result));
-  }
-
-  private String progressMetric(WodResult result) {
-    if (result.getProgressReps() != null) {
-      return "reps";
-    }
-    if (result.getProgressDistanceM() != null) {
-      return "distance";
-    }
-    if (result.getProgressDurationSeconds() != null) {
-      return "duration";
-    }
-    return "none";
+    return new BestKey(result.getWodVersion().getId());
   }
 
   private int compareForBest(WodResult candidate, WodResult currentBest) {
@@ -385,33 +348,15 @@ public class WodResultService {
     if (type == WodType.FOR_TIME) {
       return Integer.compare(currentBest.getTimeSeconds(), candidate.getTimeSeconds());
     }
-    if (type == WodType.AMRAP) {
-      int rounds = Integer.compare(candidate.getAmrapRounds(), currentBest.getAmrapRounds());
-      return rounds != 0
-          ? rounds
-          : Integer.compare(candidate.getAmrapExtraReps(), currentBest.getAmrapExtraReps());
+    if (type != WodType.AMRAP) {
+      throw new IllegalArgumentException("Solo FOR_TIME y AMRAP se comparan como mejores marcas");
     }
-    int rounds = Integer.compare(candidate.getProgressRounds(), currentBest.getProgressRounds());
-    if (rounds != 0) {
-      return rounds;
-    }
-    return compareEmomMetric(candidate, currentBest);
+    int rounds = Integer.compare(candidate.getAmrapRounds(), currentBest.getAmrapRounds());
+    return rounds != 0
+        ? rounds
+        : Integer.compare(candidate.getAmrapExtraReps(), currentBest.getAmrapExtraReps());
   }
 
-  private int compareEmomMetric(WodResult candidate, WodResult currentBest) {
-    if (candidate.getProgressReps() != null) {
-      return Integer.compare(candidate.getProgressReps(), currentBest.getProgressReps());
-    }
-    if (candidate.getProgressDistanceM() != null) {
-      return candidate.getProgressDistanceM().compareTo(currentBest.getProgressDistanceM());
-    }
-    if (candidate.getProgressDurationSeconds() != null) {
-      return Integer.compare(
-          candidate.getProgressDurationSeconds(), currentBest.getProgressDurationSeconds());
-    }
-    return 0;
-  }
-
-  private record BestKey(Long versionId, Long progressItemId, String metric) {
+  private record BestKey(Long versionId) {
   }
 }

@@ -4,6 +4,10 @@
 > historica de Issue #5. La politica de correccion de resultados descrita en esa
 > implementacion queda supersedida por Issue #11; el contrato vigente es
 > inmutable y append-only.
+>
+> La semantica EMOM historica basada en progreso y mejores marcas queda
+> supersedida por la Issue #85. La regla vigente, derivada de `DOMAIN.md`, solo
+> permite `completed` y excluye EMOM de mejores marcas clasificadas.
 
 ## Objetivo
 
@@ -63,9 +67,9 @@ resultado, sin serializar entidades JPA.
   admite tiempo y debe conservar al menos un dato de progreso no negativo.
 - `AMRAP`: requiere `amrapRounds` y `amrapExtraReps` no negativos y no admite
   tiempo ni campos de progreso.
-- `EMOM`: requiere `progressRounds` no negativo; puede referenciar un elemento de
-  la versión y, como máximo, una métrica no negativa entre repeticiones, distancia
-  o duración. No admite tiempo ni campos AMRAP.
+- `EMOM`: requiere `completed` y no admite tiempo, campos de progreso ni campos
+  AMRAP. Los intentos EMOM pueden aparecer en el historial, pero no participan
+  en mejores marcas clasificadas.
 - Una referencia `progressItemId` debe pertenecer a la versión ejecutada.
 - Los valores negativos o combinaciones incompatibles se rechazan antes de
   persistir.
@@ -75,8 +79,7 @@ resultado, sin serializar entidades JPA.
 - `FOR_TIME`: menor tiempo entre resultados completados válidos de la misma versión.
 - `AMRAP`: mayor número de rondas y, en empate, mayor número de repeticiones
   adicionales de la misma versión.
-- `EMOM`: mayor progreso entre resultados compatibles de la misma versión y regla
-  de progreso; reglas distintas no se comparan entre sí.
+- `EMOM`: no genera una mejor marca clasificada.
 - Los resultados incompletos de `FOR_TIME` no participan en la mejor marca.
 - Crear o eliminar un resultado cambia el resultado de la consulta de
   mejores marcas sin actualizar ninguna tabla derivada.

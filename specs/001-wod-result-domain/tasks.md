@@ -11,7 +11,9 @@
 
 - [x] Sustituir en `DOMAIN.md` la modificación/corrección de resultados por inmutabilidad después del registro.
 - [x] Mantener la eliminación exclusivamente para el usuario propietario y conservar múltiples intentos.
-- [x] Fijar `FOR_TIME`, `AMRAP` y `EMOM` como modalidades iniciales y documentar sus representaciones y reglas de comparación.
+- [x] Fijar `FOR_TIME`, `AMRAP` y `EMOM` como modalidades iniciales y documentar
+  sus representaciones; EMOM solo conserva `completed` y no se compara como
+  mejor marca.
 - [x] Documentar prescripciones mínimas, posiciones ordenadas y repetición de ejercicios.
 - [x] Documentar la referencia a la versión concreta ejecutada y el archivo de WOD personal con resultados.
 - [x] Documentar historial y mejores marcas como consultas derivadas, incluyendo creación y eliminación de resultados.

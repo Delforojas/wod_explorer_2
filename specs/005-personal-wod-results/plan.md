@@ -4,6 +4,10 @@
 > historica de este plan queda reemplazada por Issue #11. Los resultados actuales
 > son inmutables despues de crearse y solo admiten consulta y eliminacion por su
 > propietario.
+>
+> La comparación EMOM basada en progreso que aparece en la evidencia histórica
+> queda supersedida por Issue #85. La regla vigente es binaria y EMOM no participa
+> en mejores marcas clasificadas.
 
 ## Enfoque
 
@@ -53,8 +57,8 @@ No se modifican tablas, scripts SQL, Docker Compose, dependencias ni frontend.
 7. Mantener la version exacta de cada resultado y permitir eliminar resultados
    propios aunque el WOD historico ya no admita nuevos intentos.
 8. Añadir tests unitarios para validación, propiedad, múltiples intentos,
-   ordenación/filtros, comparación `FOR_TIME`, `AMRAP` y `EMOM`, y derivacion tras
-   eliminación.
+   ordenación/filtros, comparación `FOR_TIME` y `AMRAP`, exclusión de `EMOM` y
+   derivacion tras eliminación.
 
 ## Estrategia de verificación
 
