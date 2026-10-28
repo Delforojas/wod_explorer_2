@@ -21,4 +21,4 @@
 - [x] V1. Ejecutar tests, validación Maven, empaquetado y `git diff --check`.
 - [x] V2. Revisar el diff y confirmar que no hay cambios de esquema, frontend,
   dependencias o archivos ajenos.
-- [ ] V3. Sincronizar el SDD con el resultado real y preparar el commit local.
+- [x] V3. Sincronizar el SDD con el resultado real y preparar el commit local.
