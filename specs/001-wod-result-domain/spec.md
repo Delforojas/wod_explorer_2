@@ -1,5 +1,11 @@
 # SDD: Decisiones de dominio para versiones y resultados WOD
 
+> **Vigencia EMOM:** Esta spec conserva la decisión histórica que acompañó la
+> primera definición de resultados. Su regla de progreso EMOM quedó supersedida
+> por `DOMAIN.md` y la Issue #85. La regla vigente es binaria: solo se registra
+> `COMPLETED` o `NOT_COMPLETED`, sin progreso parcial y sin mejor marca
+> clasificada.
+
 ## Objetivo
 
 Fijar las reglas funcionales de las modalidades iniciales, la composición histórica de los WOD, los resultados personales y las mejores marcas derivadas antes de implementar persistencia o API para estos flujos.
@@ -21,7 +27,8 @@ Fijar las reglas funcionales de las modalidades iniciales, la composición hist�
 
 - `FOR_TIME`: un resultado completado contiene `time_seconds` positivo. Un resultado no completado puede conservar el progreso alcanzado mediante los campos de progreso definidos para la versión ejecutada. Solo los resultados completados y compatibles participan en la mejor marca; gana el menor tiempo.
 - `AMRAP`: un resultado contiene `amrap_rounds` y `amrap_extra_reps`, ambos no negativos. La comparación es lexicográfica por rondas completas y después repeticiones adicionales; gana el mayor trabajo.
-- `EMOM`: un resultado conserva la ronda alcanzada y, cuando proceda, el elemento y la métrica de progreso alcanzados. La comparación solo se realiza entre resultados compatibles de la misma versión y regla de progreso; gana el mayor progreso válido.
+- `EMOM` (decisión histórica, supersedida): un resultado conservaba la ronda alcanzada y, cuando procedía, el elemento y la métrica de progreso alcanzados. La comparación se realizaba entre resultados compatibles. Esta regla ya no es un requisito activo.
+- `EMOM` (regla vigente): un resultado solo conserva `completed`; no registra progreso parcial ni genera una mejor marca clasificada.
 - No se admiten modalidades adicionales hasta que exista una decisión explícita que defina su resultado y comparación.
 - Los campos de resultado deben ser compatibles con la modalidad y no deben reducir modalidades distintas a una cifra genérica.
 

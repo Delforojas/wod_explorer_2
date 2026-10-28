@@ -16,7 +16,9 @@ No se modifican código Java, entidades JPA, SQL, Docker, APIs ni dependencias.
 ## Cambios técnicos previstos
 
 1. Reemplazar las referencias a modificación o corrección de resultados por la regla append-only.
-2. Documentar las modalidades iniciales `FOR_TIME`, `AMRAP` y `EMOM` y sus formas de resultado.
+2. Documentar las modalidades iniciales `FOR_TIME`, `AMRAP` y `EMOM` y sus formas
+   de resultado; EMOM queda representado solo por `completed` y no se compara
+   como mejor marca.
 3. Documentar que cada resultado queda asociado a la versión ejecutada del WOD.
 4. Documentar el archivo de WOD personal con resultados y la prohibición de crear nuevos resultados sobre un WOD archivado.
 5. Documentar historial y mejores marcas como consultas derivadas sin almacenamiento duplicado.

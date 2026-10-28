@@ -111,7 +111,7 @@ class WodResultServiceTest {
   }
 
   @Test
-  void rejectsEmomWithMultipleProgressMetrics() {
+  void rejectsEmomWithProgressFields() {
     User user = mock(User.class);
     WodVersion version = versionForCreate(WodType.EMOM);
     when(currentUserService.require()).thenReturn(user);
@@ -120,7 +120,7 @@ class WodResultServiceTest {
     WodResultRequest request = new WodResultRequest(
         1L,
         LocalDateTime.parse("2026-09-26T10:00:00"),
-        null,
+        true,
         null,
         4,
         null,
@@ -132,6 +132,88 @@ class WodResultServiceTest {
 
     assertThrows(InvalidWodResultException.class, () -> wodResultService.create(request));
     verify(wodResultRepository, never()).save(any());
+  }
+
+  @Test
+  void rejectsEmomWithTimeOrAmrapFields() {
+    User user = mock(User.class);
+    WodVersion version = versionForCreate(WodType.EMOM);
+    when(currentUserService.require()).thenReturn(user);
+    when(wodVersionRepository.findById(1L)).thenReturn(Optional.of(version));
+
+    WodResultRequest withTime = new WodResultRequest(
+        1L,
+        LocalDateTime.parse("2026-09-26T10:00:00"),
+        true,
+        60,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
+    WodResultRequest withAmrap = new WodResultRequest(
+        1L,
+        LocalDateTime.parse("2026-09-26T10:00:00"),
+        true,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        2,
+        1);
+
+    assertThrows(InvalidWodResultException.class, () -> wodResultService.create(withTime));
+    assertThrows(InvalidWodResultException.class, () -> wodResultService.create(withAmrap));
+    verify(wodResultRepository, never()).save(any());
+  }
+
+  @Test
+  void acceptsCompletedAndNotCompletedEmomWithOnlyCompletionStatus() {
+    User user = mock(User.class);
+    WodVersion version = versionForCreate(WodType.EMOM);
+    WodResult completed = mock(WodResult.class);
+    WodResult notCompleted = mock(WodResult.class);
+    when(currentUserService.require()).thenReturn(user);
+    when(wodVersionRepository.findById(1L)).thenReturn(Optional.of(version));
+    when(wodResultMapper.toEntity(any(), eq(user), eq(version), eq(null)))
+        .thenReturn(completed, notCompleted);
+    when(wodResultRepository.save(completed)).thenReturn(completed);
+    when(wodResultRepository.save(notCompleted)).thenReturn(notCompleted);
+
+    WodResultRequest completedRequest = new WodResultRequest(
+        1L,
+        LocalDateTime.parse("2026-09-26T10:00:00"),
+        true,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
+    WodResultRequest notCompletedRequest = new WodResultRequest(
+        1L,
+        LocalDateTime.parse("2026-09-26T11:00:00"),
+        false,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
+
+    wodResultService.create(completedRequest);
+    wodResultService.create(notCompletedRequest);
+
+    verify(wodResultRepository).save(completed);
+    verify(wodResultRepository).save(notCompleted);
   }
 
   @Test
@@ -204,7 +286,7 @@ class WodResultServiceTest {
   }
 
   @Test
-  void derivesBestMarksForForTimeAmrapAndEmom() {
+  void derivesBestMarksForForTimeAndAmrapButNotEmom() {
     User user = user(7L);
     when(currentUserService.require()).thenReturn(user);
 
@@ -216,19 +298,21 @@ class WodResultServiceTest {
     WodResult lowerAmrap = amrapResult(amrap, 200L, 5, 2);
     WodResult higherAmrap = amrapResult(amrap, 201L, 5, 6);
 
-    WodVersion emom = versionForBest(3L, WodType.EMOM);
-    WodResult lowerEmom = emomResult(emom, 300L, 4, 5);
-    WodResult higherEmom = emomResult(emom, 301L, 6, 1);
+    WodVersion emom = mock(WodVersion.class);
+    when(emom.getType()).thenReturn(WodType.EMOM);
+    WodResult lowerEmom = emomResult(emom, 300L);
+    WodResult higherEmom = emomResult(emom, 301L);
 
     when(wodResultRepository.findHistory(7L, null, null, null, null, null))
         .thenReturn(List.of(slowForTime, fastForTime, lowerAmrap, higherAmrap, lowerEmom, higherEmom));
 
     List<WodResult> bests = wodResultService.findPersonalBests();
 
-    assertEquals(3, bests.size());
+    assertEquals(2, bests.size());
     org.junit.jupiter.api.Assertions.assertTrue(bests.contains(fastForTime));
     org.junit.jupiter.api.Assertions.assertTrue(bests.contains(higherAmrap));
-    org.junit.jupiter.api.Assertions.assertTrue(bests.contains(higherEmom));
+    org.junit.jupiter.api.Assertions.assertFalse(bests.contains(lowerEmom));
+    org.junit.jupiter.api.Assertions.assertFalse(bests.contains(higherEmom));
   }
 
   private WodVersion versionForCreate(WodType type) {
@@ -277,17 +361,9 @@ class WodResultServiceTest {
     return result;
   }
 
-  private WodResult emomResult(WodVersion version, Long id, int rounds, int reps) {
+  private WodResult emomResult(WodVersion version, Long id) {
     WodResult result = mock(WodResult.class);
     when(result.getWodVersion()).thenReturn(version);
-    when(result.getProgressRounds()).thenReturn(rounds);
-    when(result.getProgressReps()).thenReturn(reps);
-    when(result.getTimeSeconds()).thenReturn(null);
-    when(result.getProgressItem()).thenReturn(null);
-    when(result.getProgressDistanceM()).thenReturn(null);
-    when(result.getProgressDurationSeconds()).thenReturn(null);
-    when(result.getAmrapRounds()).thenReturn(null);
-    when(result.getAmrapExtraReps()).thenReturn(null);
     return result;
   }
 
