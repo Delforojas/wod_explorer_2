@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 
-import type { ExercisesViewProps } from "../ExercisesView.Types";
+import type { ExercisesViewProps } from "../../views/exercises/ExercisesView.Types";
+
 import {
   filterExercises,
   hasActiveExerciseFilters,
-} from "../exerciseFilters";
+} from "../../views/exercises/exerciseFilters";
 
 type ExercisesListProps = Pick<ExercisesViewProps, "exercises">;
 
@@ -36,9 +37,7 @@ function ExercisesList({ exercises }: ExercisesListProps) {
       {/* BUSCADOR */}
 
       <div className="exercise-search">
-        <label htmlFor="exercise-search-input">
-          Buscar ejercicios
-        </label>
+        <label htmlFor="exercise-search-input">Buscar ejercicios</label>
 
         <input
           id="exercise-search-input"
@@ -93,9 +92,7 @@ function ExercisesList({ exercises }: ExercisesListProps) {
                 {/* TÍTULO */}
 
                 <h2>
-                  <span className="exercise-card-title">
-                    {exercise.name}
-                  </span>
+                  <span className="exercise-card-title">{exercise.name}</span>
                 </h2>
 
                 {/* CATEGORÍA Y MEDICIÓN */}
@@ -116,10 +113,7 @@ function ExercisesList({ exercises }: ExercisesListProps) {
                     >
                       <span>Registrar resultado</span>
 
-                      <span
-                        className="exercise-card-arrow"
-                        aria-hidden="true"
-                      >
+                      <span className="exercise-card-arrow" aria-hidden="true">
                         →
                       </span>
                     </Link>

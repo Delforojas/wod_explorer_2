@@ -1,4 +1,4 @@
-import type { ExercisesViewProps } from "../ExercisesView.Types";
+import type { ExercisesViewProps } from "../../views/exercises/ExercisesView.Types";
 
 type ExerciseDetailProps = Pick<ExercisesViewProps, "selectedExercise">;
 
