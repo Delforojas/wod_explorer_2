@@ -23,6 +23,10 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
   const hasActiveFilters = hasActiveWodFilters(search);
 
   const filteredWods = useMemo(() => filterWods(wods, search), [wods, search]);
+  const hasFilteredResults = filteredWods.length > 0;
+  const shouldShowSearchClear = hasActiveFilters && hasFilteredResults;
+  const shouldShowEmptyClear =
+    hasActiveFilters && wods.length > 0 && !hasFilteredResults;
 
   useEffect(() => {
     function handleScroll() {
@@ -77,7 +81,7 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             autoComplete="off"
           />
 
-          {hasActiveFilters && (
+          {shouldShowSearchClear && (
             <button
               type="button"
               className="wod-clear-filters"
@@ -99,11 +103,33 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
         {/* LISTADO */}
 
         {filteredWods.length === 0 ? (
-          <p className="wod-empty">
-            {wods.length === 0
-              ? "No hay entrenamientos disponibles."
-              : "No se encontraron entrenamientos con ese nombre."}
-          </p>
+          <div className="wod-empty-state" role="status" aria-live="polite">
+            <span className="wod-empty-state-icon" aria-hidden="true">
+              ?
+            </span>
+
+            <h2>
+              {wods.length === 0
+                ? "No hay entrenamientos disponibles"
+                : "No se encontraron WODs"}
+            </h2>
+
+            <p>
+              {wods.length === 0
+                ? "Ahora mismo no hay WODs disponibles en el catálogo."
+                : "No hay entrenamientos que coincidan con los criterios seleccionados."}
+            </p>
+
+            {shouldShowEmptyClear && (
+              <button
+                type="button"
+                className="wod-clear-filters"
+                onClick={() => setSearch("")}
+              >
+                Limpiar filtros
+              </button>
+            )}
+          </div>
         ) : (
           <div className="wod-grid">
             {filteredWods.map((wod) => (
