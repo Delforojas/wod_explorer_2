@@ -1,8 +1,6 @@
 import type { WodsViewProps } from "./WodsView.Types";
-
-import WodsList from "./components/WodsList";
-import WodDetail from "./components/WodDetail";
-
+import WodsList from "../../components/wodFilter/WodsList";
+import WodDetail from "../../components/wodFilter/WodDetail";
 
 function WodsView(props: WodsViewProps) {
   const { loading, error, selectedWod } = props;

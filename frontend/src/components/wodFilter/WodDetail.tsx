@@ -1,4 +1,4 @@
-import type { WodsViewProps } from "../WodsView.Types";
+import type { WodsViewProps } from "../../views/wods/WodsView.Types";
 
 type WodDetailProps = Pick<WodsViewProps, "selectedWod" | "onBack">;
 

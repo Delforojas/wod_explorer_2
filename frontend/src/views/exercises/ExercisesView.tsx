@@ -1,7 +1,7 @@
 import type { ExercisesViewProps } from "./ExercisesView.Types";
 
-import ExercisesList from "./components/ExercisesList";
-import ExerciseDetail from "./components/ExerciseDetail";
+import ExercisesList from "../../components/ExerciseFilter/ExercisesList";
+import ExerciseDetail from "../../components/ExerciseFilter/ExerciseDetail";
 
 function ExercisesView({
   exercises,

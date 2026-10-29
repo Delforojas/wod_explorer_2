@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { WodsViewProps } from "../WodsView.Types";
-import type { WodAggregateResponse } from "../../../types/Wod";
-import { filterWods, hasActiveWodFilters } from "../wodFilters";
-import { getScrollBehavior, shouldShowScrollTop } from "../wodScroll";
+import type { WodsViewProps } from "../../views/wods/WodsView.Types";
+import type { WodAggregateResponse } from "../../types/Wod";
+import { filterWods, hasActiveWodFilters } from "../../views/wods/wodFilters";
+import { getScrollBehavior, shouldShowScrollTop } from "../../views/wods/wodScroll";
 
 type WodsListProps = Pick<WodsViewProps, "wods" | "onSelectWod">;
 
