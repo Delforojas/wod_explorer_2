@@ -8,6 +8,9 @@ function LoginView({
   onPasswordChange,
   onSubmit,
   onGoogleLogin,
+  error,
+  isSubmitting,
+  isSuccess,
 }: LoginViewProps) {
   return (
     <section className="login-page">
@@ -39,6 +42,7 @@ function LoginView({
               placeholder="Introduce tu usuario"
               autoComplete="username"
               required
+              disabled={isSubmitting || isSuccess}
               value={username}
               onChange={(event) => onUsernameChange(event.target.value)}
             />
@@ -54,13 +58,31 @@ function LoginView({
               placeholder="Introduce tu contraseña"
               autoComplete="current-password"
               required
+              disabled={isSubmitting || isSuccess}
               value={password}
               onChange={(event) => onPasswordChange(event.target.value)}
             />
           </div>
 
-          <button className="login-submit" type="submit">
-            Iniciar sesión
+          {error && (
+            <p role="alert" className="auth-error">
+              {error}
+            </p>
+          )}
+
+          {isSuccess && (
+            <p role="status" className="auth-success">
+              Sesión iniciada. Redirigiendo...
+            </p>
+          )}
+
+          <button
+            className="login-submit"
+            type="submit"
+            disabled={isSubmitting || isSuccess}
+            aria-busy={isSubmitting}
+          >
+            {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
           </button>
         </form>
 
@@ -70,7 +92,12 @@ function LoginView({
         </div>
 
         {/* Google OAuth */}
-        <button className="login-google" type="button" onClick={onGoogleLogin}>
+        <button
+          className="login-google"
+          type="button"
+          onClick={onGoogleLogin}
+          disabled={isSubmitting || isSuccess}
+        >
           <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
             <path
               fill="#EA4335"

@@ -1,8 +1,9 @@
 import * as z from "zod";
+import { getValidAuthToken } from "../../auth/authSession";
 import { API_URL } from "./apiEndpoints";
 
 export function getToken(): string {
-  const token = localStorage.getItem("token");
+  const token = getValidAuthToken();
 
   if (!token) {
     throw new Error("Debes iniciar sesión");

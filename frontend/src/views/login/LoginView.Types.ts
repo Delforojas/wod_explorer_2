@@ -7,4 +7,7 @@ export interface LoginViewProps {
   onPasswordChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGoogleLogin: () => void;
+  error: string | null;
+  isSubmitting: boolean;
+  isSuccess: boolean;
 }

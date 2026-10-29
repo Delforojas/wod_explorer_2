@@ -1,9 +1,11 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
 
 function RequireAuth() {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
-  if (!localStorage.getItem("token")) {
+  if (!isAuthenticated) {
     return (
       <Navigate
         to="/login"

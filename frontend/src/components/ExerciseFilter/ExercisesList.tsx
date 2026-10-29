@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
+import { useAuth } from "../../auth/useAuth";
 
 import type { ExercisesViewProps } from "../../views/exercises/ExercisesView.Types";
 
@@ -11,7 +12,7 @@ import {
 type ExercisesListProps = Pick<ExercisesViewProps, "exercises">;
 
 function ExercisesList({ exercises }: ExercisesListProps) {
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
+  const { isAuthenticated } = useAuth();
 
   const [search, setSearch] = useState("");
   const hasActiveFilters = hasActiveExerciseFilters(search);

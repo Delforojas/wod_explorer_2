@@ -11,6 +11,7 @@ function RegisterView({
   onSubmit,
   error,
   isSubmitting,
+  isSuccess,
 }: RegisterViewProps) {
   return (
     <section className="login-page">
@@ -42,6 +43,7 @@ function RegisterView({
               autoComplete="username"
               required
               maxLength={50}
+              disabled={isSubmitting || isSuccess}
               value={username}
               onChange={(event) => onUsernameChange(event.target.value)}
             />
@@ -57,6 +59,7 @@ function RegisterView({
               autoComplete="email"
               required
               maxLength={254}
+              disabled={isSubmitting || isSuccess}
               value={email}
               onChange={(event) => onEmailChange(event.target.value)}
             />
@@ -73,6 +76,7 @@ function RegisterView({
               required
               minLength={8}
               maxLength={72}
+              disabled={isSubmitting || isSuccess}
               value={password}
               onChange={(event) => onPasswordChange(event.target.value)}
             />
@@ -85,11 +89,18 @@ function RegisterView({
             </p>
           )}
 
+          {isSuccess && (
+            <p role="status" className="auth-success">
+              Cuenta creada. Redirigiendo...
+            </p>
+          )}
+
           {/* Botón de registro */}
           <button
             className="login-submit"
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isSuccess}
+            aria-busy={isSubmitting}
           >
             {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
           </button>
