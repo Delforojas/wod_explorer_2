@@ -73,7 +73,7 @@
   font-size: 18px;
   font-weight: 600;
 
-  color: #efeded;
+  color: var(--color-heading-strong);
 }
 
 .wod-exercise-card-badge {

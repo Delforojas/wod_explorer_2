@@ -403,7 +403,7 @@
 .wod-empty-state h2 {
   margin: 0;
 
-  color: #efeded;
+  color: var(--color-heading-strong);
 
   font-family: var(--font-display);
   font-size: 18px;

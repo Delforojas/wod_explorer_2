@@ -353,7 +353,7 @@
   font-size: 13px;
   line-height: 1.7;
 
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--color-text-description);
 }
 
 .exercise-count,
@@ -366,7 +366,7 @@
   font-size: 13px;
   line-height: 1.7;
 
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--color-text-description);
 }
 
 .exercise-grid,
@@ -531,7 +531,7 @@
   font-size: 13px;
   line-height: 1.7;
 
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--color-text-description);
 }
 
 .register-result-page,
@@ -584,7 +584,7 @@
   line-height: 1.2;
   letter-spacing: -1px;
 
-  color: #efeded;
+  color: var(--color-heading-strong);
 }
 
 .register-result-loading,
