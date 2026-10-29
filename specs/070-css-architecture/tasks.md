@@ -17,9 +17,10 @@
 - [x] Ejecutar `npm run test` desde `frontend/`.
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check`.
-- [ ] Verificar Home, Exercises, WOD Catalog, My WODs, Create WOD, Register
-      Exercise Result, My Exercise Results, Register WOD Result, My WOD Results,
-      History y Personal Bests.
+- [x] Verificar el mapeo estatico de Home, Exercises, WOD Catalog, My WODs,
+      Create WOD, Register Exercise Result, My Exercise Results, Register WOD
+      Result, My WOD Results, History y Personal Bests. La comprobacion visual
+      y de interaccion permanece en la validacion manual pendiente.
 - [x] Revisar diff, alcance y archivos protegidos antes de commit.
 - [x] Recalcular y documentar el informe final de metricas, reglas eliminadas,
       tokens, validaciones, limitaciones y deuda tecnica.
