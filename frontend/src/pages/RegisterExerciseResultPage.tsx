@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { getExercises } from "../api/exercisesApi";
 import { createExerciseResult } from "../api/exerciseResultsApi";
 
 import type { ExerciseResponse } from "../types/Exercise";
 import type { ExerciseResultRequest } from "../api/apiTypes";
+import { resolveExerciseSelection } from "../utils/exerciseSelection";
 
 import RegisterExerciseResultView from "../views/register-exercise-result/RegisterExerciseResultView";
 
 function RegisterExerciseResultPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const exerciseIdParam = searchParams.get("exerciseId");
 
   // TEMPORIZADOR DE REDIRECCIÓN
 
@@ -50,6 +53,11 @@ function RegisterExerciseResultPage() {
     getExercises()
       .then((data) => {
         setExercises(data);
+
+        const selection = resolveExerciseSelection(data, exerciseIdParam);
+
+        setSelectedExerciseId(selection.selectedExerciseId);
+        setError(selection.error);
       })
       .catch(() => {
         setError("No se pudieron cargar los ejercicios");
@@ -57,7 +65,7 @@ function RegisterExerciseResultPage() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [exerciseIdParam]);
 
   // LIMPIAR TEMPORIZADOR AL SALIR DE LA PÁGINA
 

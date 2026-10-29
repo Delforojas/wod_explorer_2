@@ -9,9 +9,12 @@ import {
   hasActiveExerciseFilters,
 } from "../../views/exercises/exerciseFilters";
 
-type ExercisesListProps = Pick<ExercisesViewProps, "exercises">;
+type ExercisesListProps = Pick<
+  ExercisesViewProps,
+  "exercises" | "onSelectExercise"
+>;
 
-function ExercisesList({ exercises }: ExercisesListProps) {
+function ExercisesList({ exercises, onSelectExercise }: ExercisesListProps) {
   const { isAuthenticated } = useAuth();
 
   const [search, setSearch] = useState("");
@@ -103,10 +106,23 @@ function ExercisesList({ exercises }: ExercisesListProps) {
                   <span>{exercise.measurementType}</span>
                 </div>
 
-                {/* ACCIÓN PARA USUARIOS AUTENTICADOS */}
+                {/* ACCIONES DEL EJERCICIO */}
 
-                {isAuthenticated && (
-                  <div className="exercise-card-actions">
+                <div className="exercise-card-actions">
+                  <button
+                    className="exercise-card-action"
+                    type="button"
+                    onClick={() => onSelectExercise(exercise.id)}
+                    aria-label={`Ver detalle de ${exercise.name}`}
+                  >
+                    <span>Ver detalle</span>
+
+                    <span className="exercise-card-arrow" aria-hidden="true">
+                      →
+                    </span>
+                  </button>
+
+                  {isAuthenticated && (
                     <Link
                       to={`/exercise-results/new?exerciseId=${exercise.id}`}
                       className="exercise-card-action exercise-card-register"
@@ -118,8 +134,8 @@ function ExercisesList({ exercises }: ExercisesListProps) {
                         →
                       </span>
                     </Link>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </article>
           ))}
