@@ -15,6 +15,9 @@
 - [x] Ejecutar `npm run test` desde `frontend/`.
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check` y revisar el alcance del diff.
-- [ ] Realizar validacion manual pendiente de aprobacion en movil y escritorio,
-      incluyendo teclado, foco visible, catalogo vacio y filtros sin
-      coincidencias.
+
+## Validacion manual pendiente
+
+La validacion visual y de interaccion en movil y escritorio queda pendiente de
+aprobacion explicita del usuario. Debe cubrir teclado, foco visible, catalogo
+vacio y filtros sin coincidencias.
