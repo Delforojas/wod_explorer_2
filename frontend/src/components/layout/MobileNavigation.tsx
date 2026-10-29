@@ -5,11 +5,13 @@ import { mobilePrimaryNavigation, publicNavigation } from "./navigation";
 
 interface MobileNavigationProps {
   isAuthenticated: boolean;
+  username: string | null;
   onLogout: () => void;
 }
 
 function MobileNavigation({
   isAuthenticated,
+  username,
   onLogout,
 }: MobileNavigationProps) {
   const navigationItems = isAuthenticated
@@ -26,13 +28,12 @@ function MobileNavigation({
         listClassName="mobile-nav-list"
       />
 
-      {!isAuthenticated && (
-        <AuthActions
-          className="mobile-auth-actions"
-          isAuthenticated={isAuthenticated}
-          onLogout={onLogout}
-        />
-      )}
+      <AuthActions
+        className="mobile-auth-actions"
+        isAuthenticated={isAuthenticated}
+        username={username}
+        onLogout={onLogout}
+      />
     </nav>
   );
 }

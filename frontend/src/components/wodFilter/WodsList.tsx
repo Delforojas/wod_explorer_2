@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useAuth } from "../../auth/useAuth";
 
 import type { WodsViewProps } from "../../views/wods/WodsView.Types";
 import type { WodAggregateResponse } from "../../types/Wod";
@@ -13,7 +14,7 @@ function formatWodType(type: WodAggregateResponse["version"]["type"]) {
 }
 
 function WodsList({ wods, onSelectWod }: WodsListProps) {
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
+  const { isAuthenticated } = useAuth();
 
   const [search, setSearch] = useState("");
   const [showScrollTop, setShowScrollTop] = useState(() =>

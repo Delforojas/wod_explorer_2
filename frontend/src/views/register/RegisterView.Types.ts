@@ -13,4 +13,5 @@ export interface RegisterViewProps {
 
   error: string | null;
   isSubmitting: boolean;
+  isSuccess: boolean;
 }

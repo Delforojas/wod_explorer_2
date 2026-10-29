@@ -18,7 +18,10 @@ export async function login(request: LoginRequest): Promise<string> {
     body: JSON.stringify(request),
   });
 
-  handleApiError(response, API_ERROR_MESSAGES.AUTH.LOGIN);
+  handleApiError(response, API_ERROR_MESSAGES.AUTH.LOGIN, {
+    clearSessionOnUnauthorized: false,
+    unauthorizedMessage: "Usuario o contraseña incorrectos.",
+  });
 
   return response.text();
 }
@@ -34,7 +37,10 @@ export async function register(request: RegisterRequest): Promise<string> {
     body: JSON.stringify(request),
   });
 
-  handleApiError(response, API_ERROR_MESSAGES.AUTH.REGISTER);
+  handleApiError(response, API_ERROR_MESSAGES.AUTH.REGISTER, {
+    clearSessionOnUnauthorized: false,
+    unauthorizedMessage: "No se ha podido completar el registro.",
+  });
 
   return response.text();
 }

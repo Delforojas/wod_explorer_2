@@ -1,19 +1,12 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import AuthActions from "./AuthActions";
 import DesktopNavigation from "./DesktopNavigation";
-import { getAuthenticatedUsername } from "../../utils/auth";
+import { useAuth } from "../../auth/useAuth";
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const username = getAuthenticatedUsername();
-  const isAuthenticated = Boolean(username);
-
-  function handleLogout() {
-    localStorage.removeItem("token");
-    navigate("/");
-  }
+  const { isAuthenticated, username, signOut } = useAuth();
 
   return (
     <header className="site-navbar">
@@ -30,7 +23,10 @@ function Navbar() {
               className="desktop-auth-actions"
               isAuthenticated={isAuthenticated}
               username={username}
-              onLogout={handleLogout}
+              onLogout={() => {
+                signOut();
+                navigate("/");
+              }}
               withTextRoll
             />
           ) : null}

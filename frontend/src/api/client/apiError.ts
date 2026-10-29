@@ -1,3 +1,5 @@
+import { expireAuthSession } from "../../auth/authSession";
+
 export const API_ERROR_MESSAGES = {
   AUTH: {
     LOGIN: "Error al iniciar sesión",
@@ -50,10 +52,26 @@ export const API_ERROR_MESSAGES = {
   },
 } as const;
 
-export function handleApiError(response: Response, message: string): void {
+interface ApiErrorOptions {
+  clearSessionOnUnauthorized?: boolean;
+  unauthorizedMessage?: string;
+}
+
+export function handleApiError(
+  response: Response,
+  message: string,
+  options: ApiErrorOptions = {},
+): void {
   if (!response.ok) {
     if (response.status === 401) {
-      throw new Error("Tu sesión ha expirado. Inicia sesión de nuevo.");
+      if (options.clearSessionOnUnauthorized !== false) {
+        expireAuthSession();
+      }
+
+      throw new Error(
+        options.unauthorizedMessage ??
+          "Tu sesión ha expirado. Inicia sesión de nuevo.",
+      );
     }
 
     if (response.status === 403) {

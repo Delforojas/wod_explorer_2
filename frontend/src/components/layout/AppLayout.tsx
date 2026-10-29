@@ -4,17 +4,18 @@ import Footer from "./Footer";
 import MobileNavigation from "./MobileNavigation";
 import Navbar from "./Navbar";
 import PulsarGridBackground from "./PulsarGridBackground";
+import { useAuth } from "../../auth/useAuth";
 
 interface AppLayoutProps {
   children: ReactNode;
 }
 
 function AppLayout({ children }: AppLayoutProps) {
+  const { isAuthenticated, username, signOut } = useAuth();
   const navigate = useNavigate();
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   function handleLogout() {
-    localStorage.removeItem("token");
+    signOut();
     navigate("/");
   }
 
@@ -34,6 +35,7 @@ function AppLayout({ children }: AppLayoutProps) {
 
       <MobileNavigation
         isAuthenticated={isAuthenticated}
+        username={username}
         onLogout={handleLogout}
       />
 

@@ -16,6 +16,7 @@ import {
   wodVersionResponseListSchema,
   wodVersionResponseSchema,
 } from "../schemas/wodSchemas";
+import { getValidAuthToken } from "../auth/authSession";
 
 export async function getWods(): Promise<WodAggregateResponse[]> {
   const response = await apiRequest(API_ENDPOINTS.WODS.BASE);
@@ -36,7 +37,7 @@ export async function getAvailableWods(): Promise<WodAggregateResponse[]> {
 }
 
 export async function getWodById(id: number): Promise<WodAggregateResponse> {
-  const token = localStorage.getItem("token");
+  const token = getValidAuthToken();
 
   const response = await apiRequest(API_ENDPOINTS.WODS.BY_ID(id), {
     headers: token
