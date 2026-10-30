@@ -4,6 +4,7 @@ export const API_ERROR_MESSAGES = {
   AUTH: {
     LOGIN: "Error al iniciar sesión",
     REGISTER: "Error al registrar el usuario",
+    GOOGLE_EXCHANGE: "Error al completar el acceso con Google",
   },
 
   WODS: {
@@ -55,6 +56,8 @@ export const API_ERROR_MESSAGES = {
 interface ApiErrorOptions {
   clearSessionOnUnauthorized?: boolean;
   unauthorizedMessage?: string;
+  badRequestMessage?: string;
+  conflictMessage?: string;
 }
 
 export function handleApiError(
@@ -84,8 +87,16 @@ export function handleApiError(
       throw new Error("El WOD o resultado solicitado no existe.");
     }
 
+    if (response.status === 409) {
+      throw new Error(
+        options.conflictMessage ?? "La operación no se pudo completar.",
+      );
+    }
+
     if (response.status === 400 || response.status === 422) {
-      throw new Error("Los datos del resultado no son válidos.");
+      throw new Error(
+        options.badRequestMessage ?? "Los datos del resultado no son válidos.",
+      );
     }
 
     throw new Error(message);

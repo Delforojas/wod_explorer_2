@@ -11,7 +11,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import com.wodexplorer2.backend.security.OAuth2AuthenticationSuccessHandler;
+import com.wodexplorer2.backend.security.OAuth2AuthenticationFailureHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,15 +28,21 @@ public class SecurityConfig {
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
         private final ApiErrorWriter apiErrorWriter;
         private final OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler;
+        private final OAuth2AuthenticationFailureHandler oauth2AuthenticationFailureHandler;
+        private final String frontendUrl;
 
         public SecurityConfig(
                         JwtAuthenticationFilter jwtAuthenticationFilter,
                         ApiErrorWriter apiErrorWriter,
-                        OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler) {
+                        OAuth2AuthenticationSuccessHandler oauth2AuthenticationSuccessHandler,
+                        OAuth2AuthenticationFailureHandler oauth2AuthenticationFailureHandler,
+                        @Value("${app.frontend-url}") String frontendUrl) {
 
                 this.jwtAuthenticationFilter = jwtAuthenticationFilter;
                 this.apiErrorWriter = apiErrorWriter;
                 this.oauth2AuthenticationSuccessHandler = oauth2AuthenticationSuccessHandler;
+                this.oauth2AuthenticationFailureHandler = oauth2AuthenticationFailureHandler;
+                this.frontendUrl = frontendUrl.replaceAll("/+$", "");
         }
 
         @Bean
@@ -44,7 +54,13 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                                 .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+
+                                .securityContext(securityContext -> securityContext
+                                                .securityContextRepository(new NullSecurityContextRepository()))
+
+                                .requestCache(requestCache -> requestCache
+                                                .requestCache(new NullRequestCache()))
 
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/api/auth/**").permitAll()
@@ -77,7 +93,8 @@ public class SecurityConfig {
                                                                                 "No tienes permisos para realizar esta operación")))
 
                                 .oauth2Login(oauth2 -> oauth2
-                                                .successHandler(oauth2AuthenticationSuccessHandler))
+                                                .successHandler(oauth2AuthenticationSuccessHandler)
+                                                .failureHandler(oauth2AuthenticationFailureHandler))
 
                                 .addFilterBefore(
                                                 jwtAuthenticationFilter,
@@ -95,7 +112,7 @@ public class SecurityConfig {
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(List.of("http://localhost:5174"));
+                configuration.setAllowedOrigins(List.of(frontendUrl));
 
                 configuration.setAllowedMethods(
                                 List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
