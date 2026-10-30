@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
     REGISTER: "/auth/register",
+    GOOGLE_EXCHANGE: "/auth/google/exchange",
   },
 
   EXERCISES: {

@@ -44,3 +44,22 @@ export async function register(request: RegisterRequest): Promise<string> {
 
   return response.text();
 }
+
+export async function exchangeGoogleCode(code: string): Promise<string> {
+  const response = await apiRequest(API_ENDPOINTS.AUTH.GOOGLE_EXCHANGE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  });
+
+  handleApiError(response, API_ERROR_MESSAGES.AUTH.GOOGLE_EXCHANGE, {
+    clearSessionOnUnauthorized: false,
+    unauthorizedMessage: "El enlace de Google no es válido o ha expirado.",
+    badRequestMessage: "El enlace de Google no es válido.",
+    conflictMessage: "No se ha podido completar el acceso con Google.",
+  });
+
+  return response.text();
+}

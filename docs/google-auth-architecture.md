@@ -1,7 +1,8 @@
-# Arquitectura propuesta para Google Login
+# Arquitectura para Google Login
 
-Estado: diseño técnico para la Issue #23. No es una especificación de
-implementación ni activa el flujo OAuth/OIDC.
+Estado: arquitectura aprobada en la Issue #23 e implementada parcialmente en
+la Issue #93. El flujo sigue requiriendo credenciales Google configuradas por
+entorno para una validación manual completa.
 
 ## 1. Contexto actual
 
@@ -22,13 +23,13 @@ También existe una integración Google parcial en el código actual:
 - `GoogleOAuthService` busca o crea usuarios y emite el JWT propio.
 - `UserIdentity` relaciona un usuario con `AuthProvider.GOOGLE` y un
   `providerUserId`.
-- `LoginPage` inicia ahora la navegación al endpoint backend
-  `/oauth2/authorization/google`; `GoogleCallbackPage` todavía no procesa el
-  resultado.
-- El handler actual envía el JWT en el fragmento `#token` de la redirección.
+- `LoginPage` inicia la navegación al endpoint backend
+  `/oauth2/authorization/google`; `GoogleCallbackPage` intercambia el handoff
+  opaco y actualiza la sesión local.
+- El handler redirige con un código de un solo uso; el JWT no viaja en la URL.
 
-La integración parcial se documenta para evitar duplicar decisiones. No se
-amplía ni se corrige en esta Issue.
+La integración existente se conserva y se completa mediante el handoff descrito
+en la Issue #93.
 
 ## 2. Decisión arquitectónica
 
@@ -190,12 +191,9 @@ El modelo existente ya contiene la relación principal:
 - Las restricciones únicas existentes impiden repetir una identidad Google o
   asociar dos identidades Google al mismo usuario.
 
-Hay una discrepancia que debe resolverse antes de implementar: la entidad
-`User` y la base accesible permiten `password_hash = null` para usuarios
-proveedor-only, mientras `Docker/mysql/init/001_baseline.sql` declara esa
-columna como `NOT NULL`. La corrección debe hacerse mediante una decisión y un
-script SQL posterior o una actualización coherente del baseline, nunca como un
-cambio manual no documentado dentro de esta Issue.
+La discrepancia entre la entidad `User` y el baseline se resuelve mediante
+`Docker/mysql/init/002_google_oauth.sql`, que permite `password_hash = NULL`
+para usuarios proveedor-only.
 
 Para el handoff de un solo uso se necesita un mecanismo server-side. La
 arquitectura objetivo usa una tabla MySQL versionada llamada
@@ -208,8 +206,9 @@ arquitectura objetivo usa una tabla MySQL versionada llamada
 - fecha de consumo;
 - redirección permitida y correlación no sensible.
 
-La tabla y su migracion no forman parte de esta Issue; se implementaran en una
-Issue posterior.
+La tabla se implementa mediante la migración `002_google_oauth.sql`. El backend
+guarda únicamente el hash SHA-256 del código, fecha de expiración, consumo y
+referencia al usuario.
 
 ## 7. Endpoints y callbacks previstos
 
@@ -221,10 +220,9 @@ Issue posterior.
 - `POST /api/auth/register`: registro local existente.
 - `GET /auth/google/callback`: ruta frontend ya declarada.
 
-### Previsto para implementación posterior
+### Implementado en la Issue #93
 
-- `POST /api/auth/google/exchange`: consume el handoff y devuelve el JWT
-  propio. Este es el endpoint de intercambio definido por esta arquitectura.
+- `POST /api/auth/google/exchange`: consume el handoff y devuelve el JWT propio.
 
 Las Issues de implementacion deben respetar estas responsabilidades: Google y
 su callback permanecen en backend y el frontend consume unicamente la sesion
@@ -232,7 +230,7 @@ propia.
 
 ## 8. Configuración
 
-La implementación futura necesitará, como mínimo:
+La implementación utiliza, como mínimo:
 
 - `GOOGLE_CLIENT_ID`;
 - `GOOGLE_CLIENT_SECRET`;
@@ -262,19 +260,40 @@ secretos del entorno. No deben aparecer en Git, `PROJECT.md`,
 - Revisar CORS, cookies, CSRF y CSP durante la implementación del handoff.
 - Mantener la validación de ownership en los servicios backend existentes.
 
+El JWT propio se mantiene en `localStorage` por decisión de la Issue #91. Esto
+permite que un XSS lea y exfiltre la sesión del navegador. La mitigación futura
+sería migrar la sesión a una cookie `HttpOnly` con protección CSRF; ese cambio
+queda fuera de la Issue #93.
+
+El handoff de Google queda vinculado al `JSESSIONID` de la transacción OAuth.
+El backend persiste únicamente el hash SHA-256 de ese vínculo y rechaza el
+intercambio desde otra sesión HTTP.
+
 ## 10. Descomposición de la implementación futura
 
-La arquitectura permite separar el trabajo posterior en unidades manejables:
+La implementación se separó en estas unidades:
 
 1. Alinear persistencia e identidad externa, incluida la nulabilidad de
    `password_hash` y el almacenamiento temporal del handoff.
 2. Implementar el cliente OAuth2 backend, validación OIDC, resolución de
    usuarios y emisión del JWT.
 3. Implementar el intercambio y callback frontend integrado con la sesión.
-4. Añadir tests de seguridad para cuentas vinculadas, cuentas nuevas, email
-   local existente, códigos expirados, reutilización y redirect inválido.
+4. Añadir tests unitarios para cuentas vinculadas, cuentas nuevas, email local
+   existente, códigos expirados y reutilización.
 
-## Fuera de alcance de esta Issue
+La migración `002_google_oauth.sql` valida la estructura existente antes de
+aplicar cambios. Para una base ya inicializada debe ejecutarse explícitamente
+`scripts/migrate-google-oauth.sh --apply`; el script no elimina volúmenes y
+requiere una confirmación explícita para modificar la base configurada.
+
+## 11. Issue independiente: limpieza de handoffs
+
+La limpieza periódica queda fuera de la Issue #93. Debe abordarse en una Issue
+independiente con una tarea programada para eliminar handoffs expirados o
+consumidos, una política de retención, métricas de filas retenidas y pruebas de
+que no se eliminan handoffs activos.
+
+## Fuera de alcance de la Issue #23
 
 - Flujo OAuth/OIDC ejecutable.
 - Endpoints o callbacks funcionales.
