@@ -10,20 +10,37 @@ function MyExerciseResultsPage() {
   const [exercises, setExercises] = useState<ExerciseResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     Promise.all([getExerciseResults(), getExercises()])
       .then(([resultsData, exercisesData]) => {
+        if (cancelled) {
+          return;
+        }
+
         setResults(resultsData);
         setExercises(exercisesData);
       })
       .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
         setError("No se pudieron cargar tus marcas");
       })
       .finally(() => {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
 
   return (
     <MyExerciseResultsView
@@ -31,6 +48,11 @@ function MyExerciseResultsPage() {
       exercises={exercises}
       loading={loading}
       error={error}
+      onRetry={() => {
+        setError(null);
+        setLoading(true);
+        setReloadKey((current) => current + 1);
+      }}
     />
   );
 }

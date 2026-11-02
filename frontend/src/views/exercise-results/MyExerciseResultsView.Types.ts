@@ -6,4 +6,5 @@ export interface MyExerciseResultsViewProps {
   exercises: ExerciseResponse[];
   loading: boolean;
   error: string | null;
+  onRetry: () => void;
 }
