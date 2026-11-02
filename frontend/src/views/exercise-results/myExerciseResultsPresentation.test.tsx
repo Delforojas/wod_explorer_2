@@ -41,10 +41,18 @@ function renderView(
 ): string {
   const props: MyExerciseResultsViewProps = {
     results,
+    personalBests: results,
     exercises,
-    loading: false,
-    error: null,
-    onRetry: () => undefined,
+    mode: "all",
+    resultsLoading: false,
+    personalBestsLoading: false,
+    resultsError: null,
+    personalBestsError: null,
+    exercisesError: null,
+    onModeChange: () => undefined,
+    onRetryResults: () => undefined,
+    onRetryPersonalBests: () => undefined,
+    onRetryExercises: () => undefined,
     ...overrides,
   };
 
@@ -56,26 +64,88 @@ function renderView(
 }
 
 describe("my exercise results presentation", () => {
-  it("renders the search input and preserves registration", () => {
+  it("renders the mode toggle, search input, and preserves registration", () => {
     const markup = renderView();
 
     expect(markup).toContain("Buscar por ejercicio");
     expect(markup).toContain('type="search"');
     expect(markup).toContain('placeholder="Buscar ejercicio..."');
     expect(markup).toContain("exercise-results-search-icon");
+    expect(markup).toContain("Todas las marcas");
+    expect(markup).toContain("Mejores marcas");
+    expect(markup).toContain('aria-pressed="true"');
     expect(markup).not.toContain("<select");
     expect(markup).toContain('href="/exercise-results/new"');
-    expect(markup).not.toContain("Mejores marcas");
   });
 
   it("renders loading, error with recovery, and empty states", () => {
-    const loadingMarkup = renderView({ loading: true });
-    const errorMarkup = renderView({ error: "No se pudieron cargar tus marcas" });
+    const loadingMarkup = renderView({ resultsLoading: true });
+    const errorMarkup = renderView({
+      resultsError: "No se pudieron cargar tus marcas",
+    });
     const emptyMarkup = renderView({ results: [] });
 
     expect(loadingMarkup).toContain("Cargando tus marcas...");
     expect(errorMarkup).toContain("No se pudieron cargar tus marcas");
     expect(errorMarkup).toContain("Reintentar");
     expect(emptyMarkup).toContain("Todavía no has registrado ninguna marca.");
+  });
+
+  it("keeps the personal-bests state independent from the history state", () => {
+    const historyMarkup = renderView({
+      resultsError: "No se pudieron cargar tus marcas",
+      personalBestsError: null,
+    });
+    const personalBestsMarkup = renderView({
+      mode: "best",
+      resultsError: null,
+      personalBestsError: "No se pudieron cargar tus mejores marcas",
+    });
+
+    expect(historyMarkup).toContain("No se pudieron cargar tus marcas");
+    expect(historyMarkup).not.toContain("No se pudieron cargar tus mejores marcas");
+    expect(personalBestsMarkup).toContain("No se pudieron cargar tus mejores marcas");
+    expect(personalBestsMarkup).not.toContain("No se pudieron cargar tus marcas");
+  });
+
+  it("uses independent loading messages for each mode", () => {
+    const historyMarkup = renderView({ resultsLoading: true });
+    const personalBestsMarkup = renderView({
+      mode: "best",
+      personalBestsLoading: true,
+    });
+
+    expect(historyMarkup).toContain("Cargando tus marcas...");
+    expect(personalBestsMarkup).toContain("Cargando tus mejores marcas...");
+  });
+
+  it("shows backend-selected personal bests in both modes", () => {
+    const allMarkup = renderView({ results, personalBests: results });
+    const bestMarkup = renderView({
+      mode: "best",
+      results: [],
+      personalBests: results,
+    });
+
+    expect(allMarkup).toContain('aria-label="Récord personal"');
+    expect(bestMarkup).toContain('aria-label="Récord personal"');
+  });
+
+  it("shows PR in the initial all-results mode without switching tabs", () => {
+    const markup = renderView({
+      mode: "all",
+      results,
+      personalBests: results,
+    });
+
+    expect(markup).toContain(">PR</span>");
+    expect(markup).toContain('aria-label="Récord personal"');
+  });
+
+  it("exposes an empty state for a mode without personal bests", () => {
+    const markup = renderView({ results, personalBests: [] });
+
+    expect(markup).toContain("Todas las marcas");
+    expect(markup).toContain("Mejores marcas");
   });
 });

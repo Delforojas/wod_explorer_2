@@ -79,7 +79,8 @@ Conceptual attributes:
 
 Categories may include weightlifting, gymnastics, strongman, cardio, and other.
 
-Measurement types may include weight, repetitions, time, distance, weight-distance, and other.
+Measurement types may include weight, repetitions, time, distance, weight-distance,
+distance-time, and other.
 
 Rules:
 
@@ -272,6 +273,20 @@ Rules:
 - `AMRAP`: highest valid rounds and additional repetitions.
 - `EMOM`: no ranked personal records.
 
+For exercise-result personal records, only comparable results compete within the
+same user and exercise. The supported measurement rules are:
+
+- `WEIGHT`: group by exercise and repetitions; the highest valid load wins.
+- `REPS`: group by exercise; the highest valid repetition count wins.
+- `DISTANCE_TIME`: group by exercise and numeric distance; only results with
+  positive distance and positive duration are comparable, and the lowest
+  duration wins. Different distances always produce independent records.
+
+When comparable exercise results have the same winning value, the result with
+the most recent `performedAt` wins, followed by the highest result ID as a
+deterministic tie-breaker. Exercise-result personal records remain derived from
+the owning user's stored results and never modify those results.
+
 A personal record must always be traceable to an existing valid attempt.
 
 ## 8. Domain Aggregates
@@ -324,6 +339,8 @@ The following conditions must always hold:
 12. History and personal records derive from actual stored results.
 13. Personal records compare only compatible attempts.
 14. EMOM results contain completion status only and have no ranked personal record.
+15. Exercise-result personal records preserve separate `DISTANCE_TIME` records
+    for each positive distance and compare only results owned by the current user.
 
 ## 10. Search and Filtering
 

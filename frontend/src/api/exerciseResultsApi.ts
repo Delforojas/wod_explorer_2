@@ -18,6 +18,16 @@ export async function getExerciseResults(): Promise<ExerciseResultResponse[]> {
   return parseJson(response, exerciseResultResponseListSchema);
 }
 
+export async function getExercisePersonalBests(): Promise<ExerciseResultResponse[]> {
+  const response = await apiRequest(API_ENDPOINTS.EXERCISE_RESULTS.PERSONAL_BESTS, {
+    headers: getAuthHeaders(),
+  });
+
+  handleApiError(response, API_ERROR_MESSAGES.EXERCISE_RESULTS.GET_PERSONAL_BESTS);
+
+  return parseJson(response, exerciseResultResponseListSchema);
+}
+
 export async function createExerciseResult(
   request: ExerciseResultRequest,
 ): Promise<ExerciseResultResponse> {

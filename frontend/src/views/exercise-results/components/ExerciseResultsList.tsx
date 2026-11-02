@@ -5,9 +5,15 @@ import ExerciseResultCard from "./ExerciseResultCard";
 type ExerciseResultsListProps = Pick<
   MyExerciseResultsViewProps,
   "results" | "exercises"
->;
+> & {
+  personalBestIds: ReadonlySet<number>;
+};
 
-function ExerciseResultsList({ results, exercises }: ExerciseResultsListProps) {
+function ExerciseResultsList({
+  results,
+  exercises,
+  personalBestIds,
+}: ExerciseResultsListProps) {
   function getExerciseName(exerciseId: number): string {
     const exercise = exercises.find((item) => item.id === exerciseId);
 
@@ -21,6 +27,7 @@ function ExerciseResultsList({ results, exercises }: ExerciseResultsListProps) {
           key={result.id}
           result={result}
           exerciseName={getExerciseName(result.exerciseId)}
+          isPersonalBest={personalBestIds.has(result.id)}
         />
       ))}
     </div>

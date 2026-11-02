@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
   EXERCISE_RESULTS: {
     BASE: "/exercise-results",
     BY_ID: (id: number) => `/exercise-results/${id}`,
+    PERSONAL_BESTS: "/exercise-results/personal-bests",
   },
 
   USERS: {

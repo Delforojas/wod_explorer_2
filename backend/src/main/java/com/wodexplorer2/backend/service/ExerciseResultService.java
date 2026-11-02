@@ -3,14 +3,21 @@ package com.wodexplorer2.backend.service;
 import com.wodexplorer2.backend.dto.ExerciseResultRequest;
 import com.wodexplorer2.backend.entity.Exercise;
 import com.wodexplorer2.backend.entity.ExerciseResult;
+import com.wodexplorer2.backend.entity.MeasurementType;
 import com.wodexplorer2.backend.entity.User;
 import com.wodexplorer2.backend.exception.ForbiddenException;
 import com.wodexplorer2.backend.exception.ResourceNotFoundException;
 import com.wodexplorer2.backend.mapper.ExerciseResultMapper;
 import com.wodexplorer2.backend.repository.ExerciseRepository;
 import com.wodexplorer2.backend.repository.ExerciseResultRepository;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ExerciseResultService {
@@ -31,9 +38,44 @@ public class ExerciseResultService {
         this.currentUserService = currentUserService;
     }
 
+    @Transactional(readOnly = true)
     public List<ExerciseResult> findAll() {
         return exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(
                 currentUserService.require().getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExerciseResult> findPersonalBests() {
+        User user = currentUserService.require();
+        List<ExerciseResult> results = exerciseResultRepository
+                .findByUserIdOrderByPerformedAtDesc(user.getId());
+        Map<BestKey, ExerciseResult> bestByKey = new HashMap<>();
+
+        for (ExerciseResult result : results) {
+            MeasurementType measurementType = result.getExercise().getMeasurementType();
+            if (!isEligibleForPersonalBest(result, measurementType)) {
+                continue;
+            }
+
+            BestKey key = new BestKey(
+                    result.getExercise().getId(),
+                    measurementType == MeasurementType.WEIGHT ? result.getReps() : null,
+                    measurementType == MeasurementType.DISTANCE_TIME
+                            ? result.getDistanceM().stripTrailingZeros()
+                            : null);
+            ExerciseResult currentBest = bestByKey.get(key);
+
+            if (currentBest == null || isBetter(result, currentBest, measurementType)) {
+                bestByKey.put(key, result);
+            }
+        }
+
+        List<ExerciseResult> bests = new ArrayList<>(bestByKey.values());
+        bests.sort(
+                Comparator.comparing(ExerciseResult::getPerformedAt)
+                        .reversed()
+                        .thenComparing(ExerciseResult::getId, Comparator.reverseOrder()));
+        return bests;
     }
 
     public ExerciseResult findById(Long id) {
@@ -160,5 +202,66 @@ public class ExerciseResultService {
         }
 
         return result;
+    }
+
+    private boolean isEligibleForPersonalBest(
+            ExerciseResult result,
+            MeasurementType measurementType) {
+        if (measurementType == MeasurementType.WEIGHT) {
+            return result.getReps() != null
+                    && result.getWeightKg() != null
+                    && result.getDistanceM() == null
+                    && result.getDurationSeconds() == null;
+        }
+
+        if (measurementType == MeasurementType.REPS) {
+            return result.getReps() != null
+                    && result.getWeightKg() == null
+                    && result.getDistanceM() == null
+                    && result.getDurationSeconds() == null;
+        }
+
+        if (measurementType == MeasurementType.DISTANCE_TIME) {
+            return result.getDistanceM() != null
+                    && result.getDistanceM().signum() > 0
+                    && result.getDurationSeconds() != null
+                    && result.getDurationSeconds() > 0
+                    && result.getReps() == null
+                    && result.getWeightKg() == null;
+        }
+
+        return false;
+    }
+
+    private boolean isBetter(
+            ExerciseResult candidate,
+            ExerciseResult currentBest,
+            MeasurementType measurementType) {
+        if (measurementType == MeasurementType.DISTANCE_TIME) {
+            int durationComparison = Integer.compare(
+                    candidate.getDurationSeconds(), currentBest.getDurationSeconds());
+            if (durationComparison != 0) {
+                return durationComparison < 0;
+            }
+        } else {
+            int valueComparison = measurementType == MeasurementType.WEIGHT
+                    ? candidate.getWeightKg().compareTo(currentBest.getWeightKg())
+                    : Integer.compare(candidate.getReps(), currentBest.getReps());
+
+            if (valueComparison != 0) {
+                return valueComparison > 0;
+            }
+        }
+
+        int performedAtComparison = candidate.getPerformedAt()
+                .compareTo(currentBest.getPerformedAt());
+        if (performedAtComparison != 0) {
+            return performedAtComparison > 0;
+        }
+
+        return candidate.getId() > currentBest.getId();
+    }
+
+    private record BestKey(Long exerciseId, Integer reps, BigDecimal distanceM) {
     }
 }
