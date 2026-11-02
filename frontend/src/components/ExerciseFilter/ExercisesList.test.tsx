@@ -40,6 +40,9 @@ describe("ExercisesList", () => {
     expect(markup).not.toContain("Ver detalle");
     expect(markup).not.toContain("exercise-detail");
     expect(markup).not.toContain("/exercise-results/new");
+    expect(markup).toContain("resource-row");
+    expect(markup).toContain("GYMNASTICS");
+    expect(markup).toContain("REPS");
   });
 
   it("preserves result registration for authenticated users without details", () => {
@@ -49,5 +52,6 @@ describe("ExercisesList", () => {
     expect(markup).not.toContain("exercise-detail");
     expect(markup).toContain('href="/exercise-results/new?exerciseId=7"');
     expect(markup).toContain("Registrar resultado");
+    expect(markup).toContain("catalog-search-icon");
   });
 });

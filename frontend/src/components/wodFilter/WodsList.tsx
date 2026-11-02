@@ -45,24 +45,36 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
         <div className="wod-search">
           <label htmlFor="wod-search-input">Buscar WODs</label>
 
-          <input
-            id="wod-search-input"
-            type="search"
-            placeholder="Buscar WOD..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            autoComplete="off"
-          />
+          <div className="catalog-search-control">
+            <span className="catalog-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="11" cy="11" r="6" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </span>
 
-          {shouldShowSearchClear && (
-            <button
-              type="button"
-              className="wod-clear-filters"
-              onClick={() => setSearch("")}
-            >
-              Limpiar filtros
-            </button>
-          )}
+            <input
+              id="wod-search-input"
+              type="search"
+              placeholder="Buscar WOD..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              autoComplete="off"
+            />
+
+            {shouldShowSearchClear && (
+              <button
+                type="button"
+                className="catalog-search-clear"
+                aria-label="Limpiar búsqueda de WODs"
+                onClick={() => setSearch("")}
+              >
+                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path d="m7 7 10 10M17 7 7 17" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* CONTADOR */}
@@ -104,16 +116,20 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             )}
           </div>
         ) : (
-          <div className="wod-grid">
+          <ul
+            className="resource-list catalog-list wod-list"
+            aria-label="WODs disponibles"
+          >
             {filteredWods.map((wod) => (
-              <article className="wod-card" key={wod.id}>
-                {/* NOMBRE */}
+              <li
+                className="resource-row editorial-row catalog-row wod-row"
+                key={wod.id}
+              >
+                <header>
+                  <h2>{wod.name}</h2>
+                </header>
 
-                <h2>{wod.name}</h2>
-
-                {/* METADATOS */}
-
-                <div className="wod-card-meta">
+                <div className="resource-meta">
                   <span>{formatWodType(wod.version.type)}</span>
 
                   {wod.version.timeCapSeconds != null && (
@@ -123,35 +139,31 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
                   )}
                 </div>
 
-                {/* ACCIONES */}
-
-                <div className="wod-card-actions">
-                  {/* VER WOD */}
-
+                <div className="resource-actions wod-row-actions">
                   <button
-                    className="wod-card-action"
+                    className="row-action wod-view-action"
                     type="button"
                     onClick={() => onSelectWod(wod.id)}
                     aria-label={`Abrir entrenamiento ${wod.name}`}
                   >
-                    Ver →
+                    Ver WOD
+                    <span aria-hidden="true">→</span>
                   </button>
-
-                  {/* REGISTRAR RESULTADO */}
 
                   {isAuthenticated && (
                     <Link
                       to={`/my-wod-results/new?wodId=${wod.id}`}
-                      className="wod-card-action wod-card-register"
+                      className="row-action wod-register-action"
                       aria-label={`Registrar resultado de ${wod.name}`}
                     >
-                      Registrar resultado →
+                      Registrar resultado
+                      <span aria-hidden="true">→</span>
                     </Link>
                   )}
                 </div>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
 
       </div>

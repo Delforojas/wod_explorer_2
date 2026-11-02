@@ -43,24 +43,36 @@ function ExercisesList({ exercises }: ExercisesListProps) {
       <div className="exercise-search">
         <label htmlFor="exercise-search-input">Buscar ejercicios</label>
 
-        <input
-          id="exercise-search-input"
-          type="search"
-          placeholder="Buscar ejercicio..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          autoComplete="off"
-        />
+        <div className="catalog-search-control">
+          <span className="catalog-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="11" cy="11" r="6" />
+              <path d="m16 16 4 4" />
+            </svg>
+          </span>
 
-        {hasActiveFilters && (
-          <button
-            type="button"
-            className="exercise-clear-filters"
-            onClick={() => setSearch("")}
-          >
-            Limpiar filtros
-          </button>
-        )}
+          <input
+            id="exercise-search-input"
+            type="search"
+            placeholder="Buscar ejercicio..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            autoComplete="off"
+          />
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="catalog-search-clear"
+              aria-label="Limpiar búsqueda de ejercicios"
+              onClick={() => setSearch("")}
+            >
+              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <path d="m7 7 10 10M17 7 7 17" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* CONTADOR */}
@@ -80,53 +92,41 @@ function ExercisesList({ exercises }: ExercisesListProps) {
             : "No se encontraron ejercicios con ese nombre."}
         </p>
       ) : (
-        <div
-          className={`exercise-grid ${
-            !isAuthenticated ? "exercise-grid-guest" : ""
-          }`}
+        <ul
+          className="resource-list catalog-list exercise-list"
+          aria-label="Ejercicios disponibles"
         >
           {filteredExercises.map((exercise) => (
-            <article
+            <li
               key={exercise.id}
-              className={`exercise-card ${
-                !isAuthenticated ? "exercise-card-guest" : ""
-              }`}
+              className="resource-row editorial-row catalog-row exercise-row"
             >
-              <div className="exercise-card-content">
-                {/* TÍTULO */}
-
+              <header>
                 <h2>
-                  <span className="exercise-card-title">{exercise.name}</span>
+                  <span>{exercise.name}</span>
                 </h2>
+              </header>
 
-                {/* CATEGORÍA Y MEDICIÓN */}
-
-                <div className="exercise-card-meta">
-                  <span>{exercise.category}</span>
-                  <span>{exercise.measurementType}</span>
-                </div>
-
-                {/* ACCIONES DEL EJERCICIO */}
-
-                {isAuthenticated && (
-                  <div className="exercise-card-actions">
-                    <Link
-                      to={`/exercise-results/new?exerciseId=${exercise.id}`}
-                      className="exercise-card-action exercise-card-register"
-                      aria-label={`Registrar resultado de ${exercise.name}`}
-                    >
-                      <span>Registrar resultado</span>
-
-                      <span className="exercise-card-arrow" aria-hidden="true">
-                        →
-                      </span>
-                    </Link>
-                  </div>
-                )}
+              <div className="resource-meta">
+                <span>{exercise.category}</span>
+                <span>{exercise.measurementType}</span>
               </div>
-            </article>
+
+              {isAuthenticated && (
+                <div className="resource-actions exercise-row-action">
+                  <Link
+                    to={`/exercise-results/new?exerciseId=${exercise.id}`}
+                    className="row-action exercise-register-action"
+                    aria-label={`Registrar resultado de ${exercise.name}`}
+                  >
+                    Registrar resultado
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              )}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </>
   );
