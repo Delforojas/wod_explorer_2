@@ -33,7 +33,7 @@
 - [x] Ejecutar `./mvnw -q test` desde `backend/`.
 - [x] Ejecutar `git diff --check`.
 - [x] Revisar diff final y crear commit local sin push.
-- [x] Documentar la Issue y preparar checklist manual sin aprobarla.
+- [x] Documentar la Issue y registrar la aprobación de la validación manual.
 
 ## Resultado de verificación
 
@@ -42,7 +42,7 @@
 - `npm run lint`, `npm run test` y `npm run build` desde `frontend/`: correctos.
 - `git diff --check`: correcto.
 - La integración local de `main` actualizado se realizó sin conflictos en el
-  commit `76d4ea5`; no se hizo push, PR, merge remoto ni cierre de la Issue.
+  commit `76d4ea5`.
 - La validación visual manual de datos mixtos, filtros, cronología, ejercicios
-  inactivos, estados parciales, responsive y teclado sigue pendiente de
-  aprobación explícita.
+  inactivos, estados parciales, responsive y teclado fue aprobada explícitamente
+  por el usuario mediante `/finish-issue 129`.

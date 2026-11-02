@@ -48,19 +48,19 @@ formato y diseño existentes.
 
 ## Criterios de aceptación
 
-- [ ] Historial incluye resultados propios de WODs y ejercicios en una única cronología.
-- [ ] Filtros `Todos`, `WODs` y `Ejercicios` funcionan y el rango de fechas es común.
-- [ ] Se conservan los filtros por WOD, modalidad y origen en modo `WODs`.
-- [ ] El orden descendente por `performedAt` tiene desempate determinista.
-- [ ] Cada entrada presenta tipo, nombre, fecha y puntuación correcta.
-- [ ] Se preservan `FOR_TIME`, `AMRAP`, `EMOM`, estados incompletos y los seis tipos de medición.
-- [ ] Los ejercicios desactivados conservan nombre y `measurementType`.
-- [ ] No se exponen resultados de otros usuarios y `/history` sigue siendo privada.
-- [ ] Un fallo parcial no oculta los datos disponibles de la otra fuente.
-- [ ] El diseño mantiene accesibilidad, responsive y consistencia con Benchmarks/WOD Results.
-- [ ] Existen pruebas frontend y backend para datos mixtos, filtros, orden, formato, errores, mapeo, inactivos y privacidad.
-- [ ] Lint, tests, build, validación backend y `git diff --check` pasan.
-- [ ] Se prepara validación visual manual sin marcarla como aprobada.
+- [x] Historial incluye resultados propios de WODs y ejercicios en una única cronología.
+- [x] Filtros `Todos`, `WODs` y `Ejercicios` funcionan y el rango de fechas es común.
+- [x] Se conservan los filtros por WOD, modalidad y origen en modo `WODs`.
+- [x] El orden descendente por `performedAt` tiene desempate determinista.
+- [x] Cada entrada presenta tipo, nombre, fecha y puntuación correcta.
+- [x] Se preservan `FOR_TIME`, `AMRAP`, `EMOM`, estados incompletos y los seis tipos de medición.
+- [x] Los ejercicios desactivados conservan nombre y `measurementType`.
+- [x] No se exponen resultados de otros usuarios y `/history` sigue siendo privada.
+- [x] Un fallo parcial no oculta los datos disponibles de la otra fuente.
+- [x] El diseño mantiene accesibilidad, responsive y consistencia con Benchmarks/WOD Results.
+- [x] Existen pruebas frontend y backend para datos mixtos, filtros, orden, formato, errores, mapeo, inactivos y privacidad.
+- [x] Lint, tests, build, validación backend y `git diff --check` pasan.
+- [x] La validación visual manual fue aprobada explícitamente por el usuario.
 
 ## Restricciones
 
