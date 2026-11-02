@@ -1,10 +1,18 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import WodDetail from "../wodFilter/WodDetail";
 import type { WodAggregateResponse } from "../../types/Wod";
 import MyWodDetail from "../../views/my-wods/components/MyWodDetail";
+
+const authState = vi.hoisted(() => ({
+  isAuthenticated: false,
+}));
+
+vi.mock("../../auth/useAuth", () => ({
+  useAuth: () => authState,
+}));
 
 const wod: WodAggregateResponse = {
   id: 17,
@@ -48,6 +56,11 @@ const wod: WodAggregateResponse = {
   ],
 };
 
+const publicWod: WodAggregateResponse = {
+  ...wod,
+  origin: "GENERIC",
+};
+
 function renderDetail(element: React.ReactElement): string {
   return renderToStaticMarkup(
     <MemoryRouter>{element}</MemoryRouter>,
@@ -55,9 +68,13 @@ function renderDetail(element: React.ReactElement): string {
 }
 
 describe("shared WOD detail presentation", () => {
-  it("keeps public details ordered and without a registration CTA", () => {
+  beforeEach(() => {
+    authState.isAuthenticated = false;
+  });
+
+  it("hides the public registration CTA for visitors", () => {
     const markup = renderDetail(
-      <WodDetail selectedWod={wod} onBack={() => undefined} />,
+      <WodDetail selectedWod={publicWod} onBack={() => undefined} />,
     );
 
     expect(markup).toContain("Engine Builder");
@@ -75,7 +92,21 @@ describe("shared WOD detail presentation", () => {
     expect(markup).not.toContain("/my-wod-results/new");
   });
 
-  it("keeps the personal registration route and CTA in the shared layout", () => {
+  it("shows the public registration CTA for authenticated users", () => {
+    authState.isAuthenticated = true;
+
+    const markup = renderDetail(
+      <WodDetail selectedWod={publicWod} onBack={() => undefined} />,
+    );
+
+    expect(markup).toContain("Registrar resultado");
+    expect(markup).toContain('class="wod-detail-register"');
+    expect(markup).toContain('href="/my-wod-results/new?wodId=17"');
+  });
+
+  it("keeps the personal registration route and CTA for the owner", () => {
+    authState.isAuthenticated = true;
+
     const markup = renderDetail(
       <MyWodDetail selectedWod={wod} onBack={() => undefined} />,
     );

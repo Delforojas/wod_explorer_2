@@ -12,7 +12,8 @@ contratos API.
 - Auditar y reutilizar una única vista presentacional para los detalles público
   y personal cuando la estructura de datos sea equivalente.
 - Mantener wrappers mínimos para conservar las diferencias de contexto:
-  descripción/eyebrow y CTA de registro solo cuando el usuario tiene permiso.
+  descripción/eyebrow y CTA de registro solo cuando la sesión autenticada y el
+  contexto de ownership lo permiten.
 - Presentar `Volver`, nombre y descripción opcional con una cabecera centrada y
   espaciada.
 - Separar visualmente modalidad, rondas y límite de tiempo con badges legibles,
@@ -20,7 +21,8 @@ contratos API.
 - Mostrar la composición en una lista ordenada visible, conservando el orden y
   todos los valores existentes de repeticiones, carga, distancia y duración.
 - Sustituir el enlace azul de registro personal por un CTA local naranja que
-  conserve exactamente la ruta existente y no aparezca en el detalle público.
+  conserve exactamente la ruta existente, aparezca también en el detalle de un
+  WOD público cuando el usuario esté autenticado y no aparezca para invitados.
 - Reemplazar tarjetas pesadas por filas con separadores sutiles, tokens
   existentes, fondo oscuro, acentos naranjas y tipografía actual.
 - Unificar los estados de carga, error y vacío de las vistas afectadas cuando
@@ -39,8 +41,10 @@ contratos API.
    inventados ni valores omitidos.
 4. Los ejercicios permanecen en el mismo orden de composición y muestran todas
    sus prescripciones disponibles, incluso combinaciones.
-5. `Registrar resultado` solo aparece para el detalle personal autorizado,
-   conserva `/my-wod-results/new?wodId=<id>` y utiliza el CTA naranja.
+5. `Registrar resultado` no aparece para invitados en WODs públicos, aparece
+   para usuarios autenticados en WODs públicos y se mantiene para el detalle
+   personal propio; conserva `/my-wod-results/new?wodId=<id>` y utiliza el CTA
+   naranja.
 6. Los estados de carga, error y vacío mantienen mensajes y semántica
    comprensibles.
 7. La vista no produce overflow horizontal, texto truncado ni solapamientos con
@@ -55,7 +59,9 @@ contratos API.
 - [ ] Modalidad, rondas, tiempo límite y prescripciones son claros y están
       separados visualmente.
 - [ ] Se conserva exactamente el orden y todos los valores de prescripción.
-- [ ] El CTA personal usa naranja y conserva ruta, autenticación y permisos.
+- [ ] El CTA usa naranja y conserva ruta, autenticación y ownership: está oculto
+      para invitados, visible en WODs públicos autenticados y visible en WODs
+      personales propios.
 - [ ] `Volver`, rutas y acciones siguen operativos.
 - [ ] Móvil, tablet y desktop no tienen overflow ni solapamientos con el dock.
 - [ ] Estados y accesibilidad de teclado, foco, semántica y contraste son

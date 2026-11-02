@@ -13,6 +13,8 @@
       metadata y composición ordenada.
 - [x] Convertir los detalles público y personal en wrappers del componente común,
       conservando Volver, rutas y contextos de autorización.
+- [x] Habilitar el CTA del detalle público solo para usuarios autenticados,
+      reutilizando `useAuth` y la ruta/formulario de resultados existentes.
 - [x] Rediseñar `wod-detail.css` con filas ligeras, separadores, badges, CTA
       naranja, focus-visible y responsive sin overflow.
 - [x] Alinear los wrappers de estados de carga/error/ vacío sin cambiar sus

@@ -14,7 +14,7 @@ reemplazará las tarjetas pesadas por filas numeradas con separadores.
 - `frontend/src/components/wodDetail/WodDetail.tsx`: nueva vista compartida de
   cabecera, metadata, composición ordenada y CTA opcional.
 - `frontend/src/components/wodFilter/WodDetail.tsx`: wrapper público que
-  conserva la API de props y no muestra registro.
+  consulta `useAuth` y habilita el registro solo con sesión autenticada.
 - `frontend/src/views/my-wods/components/MyWodDetail.tsx`: wrapper personal que
   configura el CTA existente y el copy personal.
 - `frontend/src/styles/wod-detail.css`: sistema visual compartido, filas,
@@ -36,7 +36,9 @@ registro de resultados ni reglas de ownership.
 2. Renderizar cada prescripción como texto independiente dentro de la fila,
    manteniendo los cuatro campos actuales y su combinación cuando exista.
 3. Renderizar el CTA solo si recibe un destino autorizado; usar un enlace
-   nativo con estilo local naranja y foco visible.
+   nativo con estilo local naranja y foco visible. El wrapper público lo recibe
+   únicamente con sesión autenticada y el wrapper personal conserva el destino
+   del WOD propio.
 4. Reemplazar estilos de panel/tarjeta por una superficie de composición ligera
    con separadores, wrapping seguro y breakpoints mobile-first.
 5. Hacer que el detalle personal use exactamente el mismo componente que el
