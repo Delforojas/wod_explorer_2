@@ -160,26 +160,22 @@
 /* Animación exclusiva de dispositivos con ratón */
 
 @media (hover: hover) and (pointer: fine) {
-  .nav-link:hover .text-roll-line-primary .text-roll-character,
-  .auth-logout:hover .text-roll-line-primary .text-roll-character {
+  .nav-link:hover .text-roll-line-primary .text-roll-character {
     transform: translateY(-100%);
   }
 
-  .nav-link:hover .text-roll-line-secondary .text-roll-character,
-  .auth-logout:hover .text-roll-line-secondary .text-roll-character {
+  .nav-link:hover .text-roll-line-secondary .text-roll-character {
     transform: translateY(0);
   }
 }
 
 /* Mantener animación accesible mediante teclado */
 
-.nav-link:focus-visible .text-roll-line-primary .text-roll-character,
-.auth-logout:focus-visible .text-roll-line-primary .text-roll-character {
+.nav-link:focus-visible .text-roll-line-primary .text-roll-character {
   transform: translateY(-100%);
 }
 
-.nav-link:focus-visible .text-roll-line-secondary .text-roll-character,
-.auth-logout:focus-visible .text-roll-line-secondary .text-roll-character {
+.nav-link:focus-visible .text-roll-line-secondary .text-roll-character {
   transform: translateY(0);
 }
 
@@ -193,6 +189,146 @@
 
   flex: none;
   color: currentColor;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-menu-trigger {
+  display: inline-flex;
+  min-height: 44px;
+
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+
+  background: transparent;
+  color: var(--color-foreground-soft);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.user-menu-avatar {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+
+  flex: none;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgb(255 107 0 / 65%);
+  border-radius: 50%;
+
+  background: rgb(255 107 0 / 14%);
+  color: var(--color-orange-300);
+}
+
+.user-menu-avatar svg,
+.user-menu-chevron svg,
+.user-menu-logout svg {
+  width: 18px;
+  height: 18px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.user-menu-chevron {
+  display: inline-flex;
+  margin-left: auto;
+
+  transition: transform 180ms ease;
+}
+
+.user-menu-trigger[aria-expanded="true"] .user-menu-chevron {
+  transform: rotate(180deg);
+}
+
+.user-menu-panel {
+  position: absolute;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: 0;
+  z-index: 1100;
+
+  display: grid;
+  gap: var(--space-2);
+
+  width: min(220px, calc(100vw - 32px));
+  padding: var(--space-2);
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-modal);
+}
+
+.user-menu[data-placement="bottom"] .user-menu-panel {
+  top: calc(100% + var(--space-2));
+}
+
+.user-menu-logout {
+  display: flex;
+  min-height: 44px;
+
+  align-items: center;
+  gap: var(--space-3);
+
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+
+  background: transparent;
+  color: var(--color-orange-300);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .user-menu-trigger:hover,
+  .user-menu-trigger[aria-expanded="true"] {
+    border-color: rgb(255 107 0 / 35%);
+    background: rgb(255 107 0 / 10%);
+    color: #ffffff;
+  }
+
+  .user-menu-logout:hover {
+    border-color: rgb(255 107 0 / 35%);
+    background: rgb(255 107 0 / 10%);
+    color: #ffffff;
+  }
 }
 
 /* ==========================================================
@@ -224,46 +360,14 @@
   gap: var(--space-2);
 }
 
-.auth-user {
-  color: #f1f1f4;
-  font-size: 13px;
-}
-
-.auth-logout {
-  border: 1px solid transparent;
-  border-radius: 6px;
-
-  padding: var(--space-2) var(--space-3);
-
-  background: transparent;
-  color: #eeeef2;
-
-  font-size: 13px;
-  text-decoration: none;
-
-  cursor: pointer;
-
-  transition:
-    color 180ms ease,
-    background-color 180ms ease,
-    border-color 180ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .auth-logout:hover {
-    background: rgb(255 107 0 / 8%);
-    border-color: #262626;
-    color: var(--color-orange-500);
-  }
-}
-
 /* ==========================================================
    10. ACCESIBILIDAD
-   ========================================================== */
+========================================================== */
 
 .navbar-brand:focus-visible,
 .nav-link:focus-visible,
-.auth-logout:focus-visible {
+.user-menu-trigger:focus-visible,
+.user-menu-logout:focus-visible {
   outline: 2px solid var(--color-orange-500);
   outline-offset: 3px;
 }
@@ -315,6 +419,11 @@
     flex-direction: column;
   }
 
+  .desktop-auth-actions .user-menu,
+  .desktop-auth-actions .user-menu-trigger {
+    width: 100%;
+  }
+
   /* Sidebar principal */
 
   .site-navbar {
@@ -350,6 +459,48 @@
   }
 }
 
+/* Navbar superior en responsive: la cuenta baja desde el borde superior. */
+
+@media (max-width: 899px) {
+  .desktop-auth-actions {
+    display: block;
+  }
+
+  .desktop-auth-actions .user-menu-panel {
+    right: 0;
+    left: auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .navbar-header {
+    gap: var(--space-2);
+    padding-inline: var(--space-3);
+  }
+
+  .navbar-brand {
+    min-width: 0;
+
+    overflow: hidden;
+
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .desktop-auth-actions .user-menu-trigger {
+    gap: var(--space-1);
+    padding-inline: var(--space-2);
+
+    font-size: 12px;
+  }
+
+  .desktop-auth-actions .user-menu-avatar {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 /* ==========================================================
    12. MOVIMIENTO REDUCIDO
    ========================================================== */
@@ -357,7 +508,9 @@
 @media (prefers-reduced-motion: reduce) {
   .nav-link,
   .navbar-brand,
-  .auth-logout,
+  .user-menu-trigger,
+  .user-menu-chevron,
+  .user-menu-logout,
   .text-roll-character {
     transition: none;
   }

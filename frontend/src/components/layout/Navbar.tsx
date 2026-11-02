@@ -27,6 +27,7 @@ function Navbar() {
                 signOut();
                 navigate("/");
               }}
+              placement="bottom"
               withTextRoll
             />
           ) : null}

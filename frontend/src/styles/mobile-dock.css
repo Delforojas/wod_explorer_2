@@ -72,8 +72,7 @@
 
  */
 
-.mobile-navigation .mobile-nav-list,
-.mobile-navigation .mobile-auth-actions {
+.mobile-navigation .mobile-nav-list {
   display: contents;
 }
 
@@ -83,8 +82,7 @@
 
 /* Los li intermedios tampoco deben alterar el reparto equitativo. */
 
-.mobile-navigation .mobile-nav-list > li,
-.mobile-navigation .mobile-auth-actions > li {
+.mobile-navigation .mobile-nav-list > li {
   display: contents;
 }
 
@@ -95,7 +93,6 @@
    \========================================================== */
 
 .mobile-navigation .mobile-nav-list .nav-link,
-.mobile-navigation .mobile-auth-actions .nav-link,
 .mobile-navigation .mobile-more-button {
   position: relative;
 
@@ -193,7 +190,6 @@
 
 @media (hover: hover) and (pointer: fine) {
   .mobile-navigation .mobile-nav-list .nav-link:hover,
-  .mobile-navigation .mobile-auth-actions .nav-link:hover,
   .mobile-navigation .mobile-more-button:hover:not(:disabled) {
     z-index: 10;
 
@@ -436,7 +432,6 @@
    \========================================================== */
 
 .mobile-navigation .mobile-nav-list .nav-link:active,
-.mobile-navigation .mobile-auth-actions .nav-link:active,
 .mobile-navigation .mobile-more-button:active {
   transform: scale(0.96);
 }
@@ -463,7 +458,6 @@
 @media (prefers-reduced-motion: reduce) {
   .mobile-navigation .nav-link,
   .mobile-navigation .mobile-nav-list .nav-link,
-  .mobile-navigation .mobile-auth-actions .nav-link,
   .mobile-navigation .mobile-more-button,
   .mobile-navigation .nav-icon {
     transition: none;
@@ -471,7 +465,6 @@
 
   .mobile-navigation .nav-link:hover,
   .mobile-navigation .mobile-nav-list .nav-link:hover,
-  .mobile-navigation .mobile-auth-actions .nav-link:hover,
   .mobile-navigation .mobile-more-button:hover,
   .mobile-navigation .mobile-more-button:hover:not(:disabled),
   .mobile-navigation .nav-link:active,
@@ -487,6 +480,16 @@
    13\. ADAPTACIÓN A PANTALLAS PEQUEÑAS
 
    \========================================================== */
+
+@media (max-width: 599px) {
+  .mobile-navigation .mobile-nav-list .nav-link,
+  .mobile-navigation .mobile-more-button {
+    flex: 0 0 56px;
+    width: 56px;
+    min-width: 56px;
+    max-width: 56px;
+  }
+}
 
 @media (max-width: 380px) {
   .mobile-navigation {
@@ -504,7 +507,6 @@
   }
 
   .mobile-navigation .mobile-nav-list .nav-link,
-  .mobile-navigation .mobile-auth-actions .nav-link,
   .mobile-navigation .mobile-more-button {
     flex: 0 0 52px;
 
@@ -528,6 +530,7 @@
 
     font-size: 9px;
   }
+
 }
 
 /* ==========================================================

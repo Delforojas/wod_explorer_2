@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import MobileNavigation from "./MobileNavigation";
 import Navbar from "./Navbar";
@@ -12,13 +11,7 @@ interface AppLayoutProps {
 }
 
 function AppLayout({ children }: AppLayoutProps) {
-  const { isAuthenticated, username, signOut } = useAuth();
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    signOut();
-    navigate("/");
-  }
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="app-layout">
@@ -36,11 +29,7 @@ function AppLayout({ children }: AppLayoutProps) {
 
       <ScrollToTopButton />
 
-      <MobileNavigation
-        isAuthenticated={isAuthenticated}
-        username={username}
-        onLogout={handleLogout}
-      />
+      <MobileNavigation isAuthenticated={isAuthenticated} />
 
       <Footer isAuthenticated={isAuthenticated} />
     </div>
