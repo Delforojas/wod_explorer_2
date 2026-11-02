@@ -17,7 +17,15 @@ sin alterar los datos, el orden, la privacidad ni los contratos de la Issue
 - Eliminar del Historial los filtros de WOD, modalidad y origen, junto con el
   estado y código frontend que queden inutilizados.
 - Mantener `Desde` / `Hasta`, su aplicación explícita y limpieza en cualquier
-  modo, con rango inclusivo basado en `performedAt`.
+  modo, con rango inclusivo basado en `performedAt`, dentro de un panel de
+  fechas desplegable cerrado por defecto.
+- Mostrar bajo el selector de modo un resumen compacto con icono de calendario,
+  `Todas las fechas` o `Filtro de fechas activo`, y un control para abrir u
+  ocultar el panel.
+- Mantener el resumen y el panel compactos en escritorio, con márgenes del
+  contenido y adaptación sin overflow en móvil.
+- Mantener separados los valores editados en el panel del rango aplicado; cerrar
+  sin aplicar no modifica el filtro efectivo.
 - Mostrar un mensaje accesible y evitar aplicar un rango inválido cuando
   `Desde` sea posterior a `Hasta`.
 - Eliminar el contenedor negro exterior y presentar las entradas como filas
@@ -34,17 +42,25 @@ sin alterar los datos, el orden, la privacidad ni los contratos de la Issue
 
 1. El selector de modo ocupa el ancho del contenido y conserva el modo activo
    con el mismo tratamiento segmentado que Benchmarks.
-2. Los únicos campos visibles son `Desde` y `Hasta`, independientemente del
-   modo activo.
-3. Aplicar filtra ambos tipos por el día completo de `performedAt`; limpiar
-   elimina ambas fechas y restablece los resultados sin filtros.
-4. Cambiar entre modos no borra ni reaplica de forma inesperada el rango de
-   fechas.
-5. Un rango inválido se comunica de forma accesible y no se aplica.
-6. Las entradas aparecen como filas independientes sobre el fondo general,
+2. El resumen de fechas muestra `Todas las fechas` inicialmente y el panel
+   permanece cerrado hasta activar `Filtrar por fecha`.
+3. El panel abierto muestra únicamente `Desde`, `Hasta`, `Aplicar` y `Limpiar`;
+   su control cambia a `Ocultar filtros` y expone `aria-expanded` y
+   `aria-controls`.
+4. Aplicar filtra ambos tipos por el día completo de `performedAt`, admite solo
+   Desde, solo Hasta o ambos, actualiza el resumen a `Filtro de fechas activo` y
+   cierra el panel.
+5. Limpiar elimina ambas fechas, restablece `Todas las fechas`, muestra todos
+   los resultados del modo seleccionado y cierra el panel.
+6. Cerrar sin aplicar no modifica el rango efectivo ni la consulta activa.
+7. Cambiar entre modos no borra el rango aplicado y conserva la separación entre
+   valores editados y valores efectivos.
+8. Un rango inválido se comunica de forma accesible, mantiene abierto el panel
+   y no se aplica.
+9. Las entradas aparecen como filas independientes sobre el fondo general,
    con separación horizontal ligera y sin contenedor negro o tarjeta exterior.
-7. No se muestra ningún ID técnico de versión en la UI.
-8. La funcionalidad y los estados heredados de #129 permanecen intactos.
+10. No se muestra ningún ID técnico de versión en la UI.
+11. La funcionalidad y los estados heredados de #129 permanecen intactos.
 
 ## Criterios de aceptación
 
@@ -52,11 +68,16 @@ sin alterar los datos, el orden, la privacidad ni los contratos de la Issue
   ancho completo de Benchmarks.
 - [x] Las entradas se muestran sin contenedor negro ni tarjeta exterior, con
   filas ligeras, separadores sutiles y espaciado correcto.
-- [x] Solo aparecen `Desde` y `Hasta` en los tres modos.
-- [x] Aplicar, limpiar, rango inclusivo y conservación del rango al cambiar de
-  modo funcionan correctamente.
-- [x] El rango inválido se comunica y no sustituye los datos por un filtro
-  inválido.
+- [x] El panel de fechas está cerrado inicialmente y muestra `Todas las fechas`.
+- [x] Al abrirlo solo aparecen `Desde`, `Hasta`, Aplicar y Limpiar; el disparador
+  expone el estado accesible y cambia entre `Filtrar por fecha`/`Ocultar filtros`.
+- [x] El resumen y el panel son compactos en escritorio y respetan el viewport,
+  el dock y los márgenes responsive en móvil.
+- [x] Aplicar, limpiar, cierre automático, rangos parciales y conservación del
+  rango al cambiar de modo funcionan correctamente.
+- [x] El rango inválido se comunica, mantiene abierto el panel y no sustituye
+  los datos por un filtro inválido.
+- [x] Solo se mantienen los campos de fecha en la implementación.
 - [x] Datos mixtos, orden, formatos WOD/ejercicio y estados incompletos se
   conservan.
 - [x] Los nombres y fechas son claros y no muestran IDs técnicos de versión.

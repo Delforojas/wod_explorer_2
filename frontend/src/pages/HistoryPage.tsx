@@ -57,6 +57,8 @@ function HistoryPage() {
   const [filters, setFilters] = useState<HistoryFilterValues>(initialFilters);
   const [appliedFilters, setAppliedFilters] =
     useState<HistoryFilterValues>(initialFilters);
+  const [dateFiltersOpen, setDateFiltersOpen] = useState(false);
+  const [dateFiltersMounted, setDateFiltersMounted] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -129,6 +131,22 @@ function HistoryPage() {
     setMode(nextMode);
   }
 
+  function toggleDateFilters() {
+    if (dateFiltersOpen) {
+      setDateFiltersOpen(false);
+      return;
+    }
+
+    setDateFiltersMounted(true);
+    setDateFiltersOpen(true);
+  }
+
+  function handleDateFiltersAnimationEnd() {
+    if (!dateFiltersOpen) {
+      setDateFiltersMounted(false);
+    }
+  }
+
   function handleFilterChange(
     field: keyof HistoryFilterValues,
     value: string,
@@ -140,6 +158,7 @@ function HistoryPage() {
     setWodState({ data: [], loading: true, error: null });
     setExerciseState({ data: [], loading: true, error: null });
     setAppliedFilters({ ...filters });
+    setDateFiltersOpen(false);
   }
 
   function clearFilters() {
@@ -147,6 +166,7 @@ function HistoryPage() {
     setExerciseState({ data: [], loading: true, error: null });
     setFilters(initialFilters);
     setAppliedFilters({ ...initialFilters });
+    setDateFiltersOpen(false);
   }
 
   const entries = filterHistoryEntries(
@@ -160,12 +180,17 @@ function HistoryPage() {
       entries={entries}
       mode={mode}
       filters={filters}
+      appliedFilters={appliedFilters}
+      dateFiltersOpen={dateFiltersOpen}
+      dateFiltersMounted={dateFiltersMounted}
       wodLoading={wodState.loading}
       exerciseLoading={exerciseState.loading}
       wodError={wodState.error}
       exerciseError={exerciseState.error}
       onFilterChange={handleFilterChange}
       onModeChange={handleModeChange}
+      onToggleDateFilters={toggleDateFilters}
+      onDateFiltersAnimationEnd={handleDateFiltersAnimationEnd}
       onApplyFilters={applyFilters}
       onClearFilters={clearFilters}
       onRetryWods={retryWods}

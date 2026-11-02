@@ -49,12 +49,17 @@ function renderView(overrides: Partial<HistoryViewProps> = {}): string {
     entries,
     mode: "ALL",
     filters: { from: "", to: "" },
+    appliedFilters: { from: "", to: "" },
+    dateFiltersOpen: false,
+    dateFiltersMounted: false,
     wodLoading: false,
     exerciseLoading: false,
     wodError: null,
     exerciseError: null,
     onFilterChange: () => undefined,
     onModeChange: () => undefined,
+    onToggleDateFilters: () => undefined,
+    onDateFiltersAnimationEnd: () => undefined,
     onApplyFilters: () => undefined,
     onClearFilters: () => undefined,
     onRetryWods: () => undefined,
@@ -69,6 +74,19 @@ describe("history view", () => {
   it("renders mixed WOD and exercise entries with explicit types", () => {
     const markup = renderView();
 
+    expect(markup).toContain('class="exercise-results-page history-page"');
+    expect(markup).toContain('class="exercise-results-container history-container"');
+    expect(markup).toContain('class="exercise-results-eyebrow"');
+    expect(markup).toContain('class="exercise-results-description"');
+    expect(markup).toContain('class="exercise-results-mode-toggle"');
+    expect(markup).toContain('class="exercise-results-mode-button"');
+    expect(markup).toContain('aria-expanded="false"');
+    expect(markup).toContain("Todas las fechas");
+    expect(markup).toContain("Filtrar por fecha");
+    expect(markup).not.toContain('id="history-date-filters"');
+    expect(markup).not.toContain('id="history-from"');
+    expect(markup).not.toContain('id="history-to"');
+    expect(markup).not.toContain("history-date-chip");
     expect(markup).toContain("Fran");
     expect(markup).toContain("Back Squat");
     expect(markup).toContain(">WOD</span>");
@@ -78,8 +96,6 @@ describe("history view", () => {
     expect(markup).toContain("Ejercicios");
     expect(markup).toContain('role="group"');
     expect(markup).toContain('aria-pressed="true"');
-    expect(markup).toContain('id="history-from"');
-    expect(markup).toContain('id="history-to"');
     expect(markup).not.toContain('id="history-wod"');
     expect(markup).not.toContain('id="history-type"');
     expect(markup).not.toContain('id="history-origin"');
@@ -111,6 +127,8 @@ describe("history view", () => {
 
   it("communicates an invalid date range and disables applying it", () => {
     const markup = renderView({
+      dateFiltersOpen: true,
+      dateFiltersMounted: true,
       filters: { from: "2026-02-01", to: "2026-01-01" },
     });
 
@@ -122,11 +140,54 @@ describe("history view", () => {
   it("keeps the date range visible across activity modes", () => {
     const filters = { from: "2026-01-01", to: "2026-01-31" };
 
-    expect(renderView({ mode: "WODS", filters })).toContain(
-      'value="2026-01-01"',
-    );
-    expect(renderView({ mode: "EXERCISES", filters })).toContain(
-      'value="2026-01-31"',
-    );
+    expect(
+      renderView({
+        mode: "WODS",
+        filters,
+        dateFiltersOpen: true,
+        dateFiltersMounted: true,
+      }),
+    ).toContain('value="2026-01-01"');
+    expect(
+      renderView({
+        mode: "EXERCISES",
+        filters,
+        dateFiltersOpen: true,
+        dateFiltersMounted: true,
+      }),
+    ).toContain('value="2026-01-31"');
+  });
+
+  it("shows the active date summary and open panel state", () => {
+    const markup = renderView({
+      dateFiltersOpen: true,
+      dateFiltersMounted: true,
+      filters: { from: "2026-01-01", to: "" },
+      appliedFilters: { from: "2026-01-01", to: "" },
+    });
+
+    expect(markup).toContain('aria-expanded="true"');
+    expect(markup).toContain("Filtro de fechas activo");
+    expect(markup).toContain("Ocultar filtros");
+    expect(markup).toContain('id="history-date-filters"');
+    expect(markup).toContain('aria-hidden="false"');
+    expect(markup).toContain("Aplicar");
+    expect(markup).toContain("Limpiar");
+    expect(markup).toContain('class="history-date-filter-icon"');
+    expect(markup).toContain("Desde 2026-01-01");
+    expect(markup).toContain('aria-label="Eliminar filtro de fechas"');
+  });
+
+  it("renders the closing panel without focusable date controls", () => {
+    const markup = renderView({
+      dateFiltersMounted: true,
+      dateFiltersOpen: false,
+    });
+
+    expect(markup).toContain('class="history-filters history-filters-closing"');
+    expect(markup).toContain('aria-hidden="true"');
+    expect(markup).toContain('id="history-from"');
+    expect(markup).toContain('id="history-to"');
+    expect(markup).toContain('tabindex="-1"');
   });
 });

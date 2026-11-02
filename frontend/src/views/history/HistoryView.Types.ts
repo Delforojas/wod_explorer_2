@@ -22,6 +22,9 @@ export interface HistoryViewProps {
   entries: HistoryEntry[];
   mode: HistoryMode;
   filters: HistoryFilterValues;
+  appliedFilters: HistoryFilterValues;
+  dateFiltersOpen: boolean;
+  dateFiltersMounted: boolean;
   wodLoading: boolean;
   exerciseLoading: boolean;
   wodError: string | null;
@@ -31,6 +34,8 @@ export interface HistoryViewProps {
     value: string,
   ) => void;
   onModeChange: (mode: HistoryMode) => void;
+  onToggleDateFilters: () => void;
+  onDateFiltersAnimationEnd: () => void;
   onApplyFilters: () => void;
   onClearFilters: () => void;
   onRetryWods: () => void;

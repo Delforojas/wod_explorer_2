@@ -14,6 +14,13 @@
 - [x] Retirar estado, carga y UI de WOD, modalidad y origen.
 - [x] Conservar el rango al cambiar de modo y filtrar ambos tipos por fecha.
 - [x] Validar y comunicar rangos inválidos sin aplicarlos.
+- [x] Mantener separado el borrador de fechas del rango aplicado.
+- [x] Añadir resumen `Todas las fechas` / `Filtro de fechas activo` y panel
+  desplegable cerrado por defecto.
+- [x] Adaptar resumen, panel, chip y botón X al patrón compacto de filtros de
+  referencia sin instalar Tailwind, shadcn ni dependencias Radix.
+- [x] Implementar apertura/cierre accesible, Aplicar, Limpiar y cierre automático.
+- [x] Cubrir filtros parciales y cierre sin aplicar sin alterar la consulta activa.
 - [x] Alinear el selector de modos con el control segmentado de Benchmarks.
 - [x] Renderizar filas integradas sin panel negro, tarjetas pesadas ni IDs
   técnicos de versión.
@@ -27,9 +34,11 @@
 - [x] Actualizar pruebas de render para selector, campos visibles, filas y
   ausencia de IDs técnicos.
 - [x] Añadir cobertura para rango inválido y conservación del rango entre modos.
+- [x] Añadir cobertura para estado inicial cerrado, resumen, aplicar, limpiar,
+  filtros parciales y cierre sin aplicar.
 
 Comprobación dirigida: `npm run test -- src/views/history/HistoryView.test.tsx
-src/views/history/historyPresentation.test.ts` pasó (2 archivos, 9 tests).
+src/views/history/historyPresentation.test.ts` pasó (2 archivos, 10 tests).
 
 ## Verificación y handoff
 
@@ -48,6 +57,9 @@ src/views/history/historyPresentation.test.ts` pasó (2 archivos, 9 tests).
 - `npm run test` desde `frontend/`: correcto, 27 archivos / 105 tests.
 - `npm run build` desde `frontend/`: correcto.
 - `git diff --check`: correcto.
+- La mejora aprobada del panel de fechas usa estado separado para borrador y
+  rango aplicado, cierre por defecto, resumen accesible, acciones de aplicación/
+  limpieza y rangos parciales.
 - La revisión estática confirma cambios solo en Historial frontend, pruebas y
   SDD; no hay cambios backend, DB, API, dominio, auth, Benchmarks ni acciones
   destructivas.

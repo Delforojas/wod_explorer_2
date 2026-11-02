@@ -104,6 +104,20 @@ describe("history presentation", () => {
         (entry) => entry.result.id,
       ),
     ).toEqual([3]);
+
+    expect(
+      filterHistoryEntries(entries, "ALL", {
+        ...emptyFilters,
+        from: "2026-01-11",
+      }).map((entry) => entry.result.id),
+    ).toEqual([2]);
+
+    expect(
+      filterHistoryEntries(entries, "ALL", {
+        ...emptyFilters,
+        to: "2026-01-10",
+      }).map((entry) => entry.result.id),
+    ).toEqual([1, 3]);
   });
 
   it("detects an invalid date range", () => {
