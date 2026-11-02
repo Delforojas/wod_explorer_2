@@ -1,159 +1,151 @@
-/* ==========================================
-   WOD EXPLORER 2.0
-   MY WOD RESULTS — GLASSMORPHISM
-========================================== */
-
-/* ==========================================
-   NAVEGACIÓN
-========================================== */
-
-.my-wod-results-navigation {
-  width: 100%;
+.my-wod-results-page .my-wod-results-navigation {
+  margin-bottom: 0;
 }
 
-.my-wod-results-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+.my-wod-results-page .my-wod-results-list {
   width: 100%;
+  border-color: var(--color-white-alpha-09);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.my-wod-results-page .my-wod-result-row {
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
 }
 
-/* ==========================================
-   TARJETA DE RESULTADO
-========================================== */
+.my-wod-results-page .my-wod-result-row:hover,
+.my-wod-results-page .my-wod-result-row:focus-within {
+  background: rgb(255 107 0 / 8%);
+}
 
-.my-wod-result-card {
-  justify-content: flex-start;
+.my-wod-result-row-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.8fr);
   gap: var(--space-5);
-}
-
-/* ==========================================
-   FECHA DEL ENTRENAMIENTO
-========================================== */
-
-.my-wod-result-date {
-  margin: 0;
-
-  font-size: 12px;
-  line-height: 1.6;
-
-  text-align: center;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-/* ==========================================
-   CONTENEDOR DEL RESULTADO
-========================================== */
-
-.my-wod-result-content {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-
-  width: 100%;
-
-  margin-top: auto;
-  padding: var(--space-5) var(--space-4);
-
-  box-sizing: border-box;
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-
-  background: rgba(255, 255, 255, 0.05);
 }
 
-/* ==========================================
-   VALOR PRINCIPAL
-========================================== */
+.my-wod-result-identity {
+  min-width: 0;
+}
 
-.my-wod-result-value {
-  margin: 0;
+.my-wod-result-row h2 {
+  min-width: 0;
+  margin: 0 0 var(--space-2);
+  overflow-wrap: anywhere;
 
-  font-family: var(--font-display);
-  font-size: 18px;
+  color: #e8e8e8;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 1.4;
-
-  text-align: center;
-
-  color: #ffffff;
+  line-height: 24px;
 }
 
-/* ==========================================
-   PROGRESO DEL ENTRENAMIENTO
-========================================== */
+.my-wod-result-row .resource-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.my-wod-result-row .resource-meta span + span::before {
+  margin-right: var(--space-2);
+  color: #555555;
+  content: "·";
+}
 
 .my-wod-result-progress {
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  align-items: center;
-
-  width: 100%;
-  gap: 10px;
+  gap: 2px;
+  align-items: flex-start;
 }
 
-/* ==========================================
-   METADATOS DE PROGRESO
-========================================== */
+.my-wod-result-value,
+.my-wod-result-meta {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.my-wod-result-value {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  font-variant-numeric: tabular-nums;
+}
 
 .my-wod-result-meta {
-  margin: 0;
-
+  color: var(--color-text-secondary);
   font-size: 12px;
-  line-height: 1.6;
-
-  text-align: center;
-
-  color: rgba(255, 255, 255, 0.55);
+  line-height: 18px;
 }
 
-/* ==========================================
-   TABLETS
-========================================== */
+.my-wod-result-row-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
 
-@media (max-width: 768px) {
-  .my-wod-result-card {
-    gap: 18px;
-  }
+.my-wod-result-row-footer time {
+  min-height: 36px;
+  align-items: center;
+}
 
-  .my-wod-result-content {
-    padding: 18px 14px;
+.my-wod-result-delete {
+  min-height: 40px;
+  color: #d1d5db;
+}
+
+.my-wod-result-delete:hover:not(:disabled),
+.my-wod-result-delete:focus-visible {
+  border-color: rgb(239 68 68 / 60%);
+  background: rgb(239 68 68 / 10%);
+  color: #fca5a5;
+}
+
+@media (min-width: 600px) {
+  .my-wod-results-page .my-wod-result-row {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-/* ==========================================
-   MÓVILES
-========================================== */
-
-@media (max-width: 480px) {
-  .my-wod-results-navigation,
-  .my-wod-results-actions {
+@media (max-width: 599px) {
+  .my-wod-results-page .my-wod-results-navigation {
     padding: 0 var(--space-6);
     box-sizing: border-box;
   }
 
-  .my-wod-results-actions .my-wods-nav-link {
+  .my-wod-results-page .my-wod-results-navigation .exercise-results-nav-link {
     width: 100%;
   }
 
-  .my-wod-result-card {
-    gap: var(--space-4);
+  .my-wod-results-page .my-wod-results-list {
+    width: calc(100% - 48px);
   }
 
-  .my-wod-result-date {
-    font-size: 12px;
+  .my-wod-results-page .my-wod-result-row {
+    padding: var(--space-4);
   }
 
-  .my-wod-result-content {
-    padding: var(--space-5) var(--space-4);
+  .my-wod-result-row-header {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
   }
 
-  .my-wod-result-value {
-    font-size: 17px;
+  .my-wod-result-row-footer {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-wod-result-row,
+  .my-wod-result-delete {
+    transition: none;
   }
 }

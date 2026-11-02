@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 
-import MyWodsNavigation from "../../components/layout/MyWodsNavigation";
-
 import type { MyWodResultsViewProps } from "./MyWodResultsView.Types";
 
 import WodResultsList from "./components/WodResultsList";
@@ -18,45 +16,42 @@ function MyWodResultsView({
       <div className="wod-container">
         {/* ENCABEZADO */}
 
-        <header className="wod-header">
-          <p className="wod-eyebrow">MIS ENTRENAMIENTOS</p>
+        <header className="wod-header exercise-results-header">
+          <p className="wod-eyebrow">SEGUIMIENTO PERSONAL</p>
 
-          <h1>Mis WODs</h1>
+          <h1>WOD Results</h1>
 
           <p className="wod-description">
-            Consulta tus resultados y sigue tu progreso en cada entrenamiento.
+            Consulta tus resultados y sigue tu evolución en cada entrenamiento.
           </p>
         </header>
-
-        {/* NAVEGACIÓN SECUNDARIA */}
-
-        <div className="my-wod-results-navigation">
-          <MyWodsNavigation />
-        </div>
 
         {/* REGISTRAR RESULTADO */}
 
         <nav
-          className="my-wod-results-actions"
+          className="exercise-results-navigation my-wod-results-navigation"
           aria-label="Acciones de resultados"
         >
-          <Link to="/my-wod-results/new" className="my-wods-nav-link">
-            + Registrar resultado
+          <Link
+            to="/my-wod-results/new"
+            className="exercise-results-nav-link exercise-results-nav-action"
+          >
+            + Add Score
           </Link>
         </nav>
 
         {/* ESTADOS */}
 
         {loading ? (
-          <p className="wod-empty" role="status">
+          <p className="exercise-results-loading" role="status">
             Cargando resultados de WODs...
           </p>
         ) : error ? (
-          <p className="wod-error" role="alert">
+          <p className="exercise-results-error" role="alert">
             {error}
           </p>
         ) : results.length === 0 ? (
-          <p className="wod-empty">
+          <p className="exercise-results-empty" role="status" aria-live="polite">
             Todavía no has registrado ningún resultado de WOD.
           </p>
         ) : (
