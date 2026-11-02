@@ -1,10 +1,12 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import TextRoll from "./TextRoll";
+import UserMenu, { type UserMenuPlacement } from "./UserMenu";
 
 interface AuthActionsProps {
   isAuthenticated: boolean;
   username?: string | null;
   onLogout: () => void;
+  placement: UserMenuPlacement;
   onNavigate?: () => void;
   className?: string;
   withTextRoll?: boolean;
@@ -14,11 +16,13 @@ function AuthActions({
   isAuthenticated,
   username,
   onLogout,
+  placement,
   onNavigate,
   className,
   withTextRoll = false,
 }: AuthActionsProps) {
   const classes = ["auth-actions", className].filter(Boolean).join(" ");
+  const location = useLocation();
 
   if (!isAuthenticated) {
     return (
@@ -43,15 +47,12 @@ function AuthActions({
 
   return (
     <div className={classes}>
-      {username && <span className="auth-user">{username}</span>}
-
-      <button
-        type="button"
-        className="auth-logout"
-        onClick={onLogout}
-        aria-label="Cerrar sesión"
-        title="Cerrar sesión"
-      ></button>
+      <UserMenu
+        key={`${location.pathname}${location.search}${location.hash}`}
+        username={username}
+        onLogout={onLogout}
+        placement={placement}
+      />
     </div>
   );
 }
