@@ -8,6 +8,7 @@
 @import "./styles/navigation.css";
 @import "./styles/mobile-dock.css";
 @import "./styles/footer.css";
+@import "./styles/scroll-to-top.css";
 
 /* Patrones compartidos antes de las variantes locales. */
 @import "./styles/surfaces.css";

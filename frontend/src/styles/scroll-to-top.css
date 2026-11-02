@@ -1,0 +1,102 @@
+.scroll-to-top {
+  --scroll-to-top-background: #242424;
+  --scroll-to-top-background-hover: #2d2d2d;
+  --scroll-to-top-border: #d7842d;
+  --scroll-to-top-icon: #f1a14c;
+
+  position: fixed;
+  right: calc(var(--space-6) + env(safe-area-inset-right));
+  bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  min-width: 56px;
+  height: 56px;
+  min-height: 56px;
+  padding: 0;
+  box-sizing: border-box;
+
+  border: 1px solid var(--scroll-to-top-border);
+  border-radius: 50%;
+
+  background: var(--scroll-to-top-background);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
+
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.scroll-to-top::before,
+.scroll-to-top::after {
+  position: absolute;
+
+  display: block;
+
+  content: "";
+
+  pointer-events: none;
+}
+
+.scroll-to-top::before {
+  top: 17px;
+  left: 50%;
+
+  width: 10px;
+  height: 10px;
+
+  border-top: 2px solid var(--scroll-to-top-icon);
+  border-left: 2px solid var(--scroll-to-top-icon);
+
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.scroll-to-top::after {
+  top: 24px;
+  left: calc(50% - 1px);
+
+  width: 2px;
+  height: 15px;
+
+  border-radius: 999px;
+
+  background: var(--scroll-to-top-icon);
+}
+
+.scroll-to-top:focus-visible {
+  outline: 2px solid var(--color-primary-300);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 4px rgb(145 174 255 / 20%),
+    0 2px 8px rgb(0 0 0 / 18%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .scroll-to-top:hover {
+    border-color: var(--scroll-to-top-icon);
+    background: var(--scroll-to-top-background-hover);
+  }
+}
+
+@media (max-width: 899px) {
+  .scroll-to-top {
+    right: calc(var(--space-4) + env(safe-area-inset-right));
+    bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top {
+    transition: none;
+  }
+}

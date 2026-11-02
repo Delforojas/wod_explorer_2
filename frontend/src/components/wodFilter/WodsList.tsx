@@ -1,11 +1,10 @@
 import { Link } from "react-router-dom";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "../../auth/useAuth";
 
 import type { WodsViewProps } from "../../views/wods/WodsView.Types";
 import type { WodAggregateResponse } from "../../types/Wod";
 import { filterWods, hasActiveWodFilters } from "../../views/wods/wodFilters";
-import { getScrollBehavior, shouldShowScrollTop } from "../../views/wods/wodScroll";
 
 type WodsListProps = Pick<WodsViewProps, "wods" | "onSelectWod">;
 
@@ -17,10 +16,6 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
   const { isAuthenticated } = useAuth();
 
   const [search, setSearch] = useState("");
-  const [showScrollTop, setShowScrollTop] = useState(() =>
-    shouldShowScrollTop(window.scrollY),
-  );
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const hasActiveFilters = hasActiveWodFilters(search);
 
   const filteredWods = useMemo(() => filterWods(wods, search), [wods, search]);
@@ -29,36 +24,13 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
   const shouldShowEmptyClear =
     hasActiveFilters && wods.length > 0 && !hasFilteredResults;
 
-  useEffect(() => {
-    function handleScroll() {
-      setShowScrollTop(shouldShowScrollTop(window.scrollY));
-    }
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  function handleScrollToTop() {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    window.scrollTo({
-      top: 0,
-      behavior: getScrollBehavior(prefersReducedMotion),
-    });
-
-    headingRef.current?.focus({ preventScroll: true });
-  }
-
   return (
     <section className="wod-page">
       <div className="wod-container">
         {/* ENCABEZADO */}
 
         <header className="wod-header">
-          <h1 ref={headingRef} tabIndex={-1}>
+          <h1>
             WODs
           </h1>
 
@@ -182,16 +154,6 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
           </div>
         )}
 
-        {showScrollTop && (
-          <button
-            type="button"
-            className="wod-scroll-top"
-            onClick={handleScrollToTop}
-            aria-label="Volver arriba"
-          >
-            Volver arriba
-          </button>
-        )}
       </div>
     </section>
   );
