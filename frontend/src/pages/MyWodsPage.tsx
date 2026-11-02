@@ -260,6 +260,10 @@ function MyWodsPage() {
   // Eliminar WOD
 
   async function handleDeleteWod(id: number) {
+    if (!window.confirm("¿Quieres eliminar este WOD?")) {
+      return;
+    }
+
     try {
       setError(null);
 
