@@ -344,6 +344,10 @@
   padding: var(--space-8);
 }
 
+.home-dashboard-hero-copy {
+  min-width: 0;
+}
+
 .home-dashboard-hero .home-logo {
   width: 48px;
   height: 48px;
@@ -369,6 +373,8 @@
   font-family: var(--font-display);
   font-size: clamp(30px, 6vw, 48px);
   letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .home-dashboard-hero .home-description {
@@ -377,7 +383,13 @@
   color: var(--color-text-secondary);
 }
 
-.home-dashboard-primary {
+.home-dashboard-hero-actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.home-dashboard-primary,
+.home-dashboard-secondary {
   display: flex;
   min-height: 52px;
   align-items: center;
@@ -390,6 +402,12 @@
   color: #080808;
   font-weight: 800;
   text-decoration: none;
+}
+
+.home-dashboard-secondary {
+  border-color: var(--color-orange-500);
+  background: transparent;
+  color: var(--color-orange-300);
 }
 
 .home-dashboard-actions {
@@ -493,6 +511,25 @@
   font-size: 15px;
 }
 
+.home-activity-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.home-activity-kind {
+  padding: 2px var(--space-2);
+  border: 1px solid rgb(255 154 60 / 45%);
+  border-radius: var(--radius-sm);
+  color: var(--color-orange-300);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .home-activity-item p,
 .home-activity-result span {
   color: var(--color-text-muted);
@@ -547,6 +584,7 @@
 }
 
 .home-dashboard-primary:focus-visible,
+.home-dashboard-secondary:focus-visible,
 .home-dashboard-action:focus-visible,
 .home-activity-link:focus-visible,
 .home-retry:focus-visible {
@@ -558,6 +596,11 @@
   .home-dashboard-primary:hover {
     background: var(--color-orange-300);
     color: #080808;
+  }
+
+  .home-dashboard-secondary:hover {
+    background: rgb(255 107 0 / 12%);
+    color: var(--color-orange-300);
   }
 
   .home-dashboard-action:hover {
@@ -578,6 +621,10 @@
   .home-dashboard-top {
     grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
     align-items: stretch;
+  }
+
+  .home-dashboard-hero-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -610,8 +657,15 @@
   }
 }
 
+@media (max-width: 899px) {
+  .home-dashboard-page {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-dashboard-primary,
+  .home-dashboard-secondary,
   .home-dashboard-action,
   .home-activity-link,
   .home-retry {
