@@ -29,5 +29,5 @@
 - [x] Ejecutar `npm run test` desde `frontend/`.
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check`.
-- [ ] Revisar diff final y crear commit local sin push.
+- [x] Revisar diff final y crear commit local sin push.
 - [x] Preparar checklist de validación manual sin marcarla como aprobada.
