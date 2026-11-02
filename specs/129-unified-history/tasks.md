@@ -32,5 +32,5 @@
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [ ] Ejecutar `./mvnw -q test` desde `backend/`.
 - [x] Ejecutar `git diff --check`.
-- [ ] Revisar diff final y crear commit local sin push.
-- [ ] Documentar la Issue y preparar checklist manual sin aprobarla.
+- [x] Revisar diff final y crear commit local sin push.
+- [x] Documentar la Issue y preparar checklist manual sin aprobarla.
