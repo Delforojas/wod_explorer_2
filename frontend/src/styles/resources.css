@@ -210,6 +210,59 @@
   outline-offset: 3px;
 }
 
+/* ACCIÓN DESTRUCTIVA COMPACTA */
+
+.delete-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 10px;
+
+  border: 1px solid rgb(239 68 68 / 32%);
+  border-radius: var(--radius-md);
+
+  background: var(--color-background-100);
+  color: #fca5a5;
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.delete-icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.delete-icon-button:hover:not(:disabled) {
+  border-color: rgb(239 68 68 / 65%);
+  background: rgb(239 68 68 / 12%);
+  color: #fecaca;
+}
+
+.delete-icon-button:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 3px;
+}
+
+.delete-icon-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 /* FLECHA DEL EJERCICIO */
 
 .exercise-row-action {
@@ -388,7 +441,8 @@
   .resource-row,
   .resource-row h2,
   .resource-row h3,
-  .row-action {
+  .row-action,
+  .delete-icon-button {
     transition: none;
   }
 }

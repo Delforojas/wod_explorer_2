@@ -175,13 +175,6 @@
   color: #ffffff;
 }
 
-/* ELIMINAR */
-
-.my-wods-delete {
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #fca5a5;
-}
-
 /* CTA COMPACTO COMPARTIDO DE CATÁLOGOS */
 
 .catalog-register-action {
@@ -229,11 +222,6 @@
     color: #ffffff;
   }
 
-  .my-wods-delete:hover {
-    border-color: rgba(239, 68, 68, 0.6);
-    background: rgba(239, 68, 68, 0.12);
-    color: #fecaca;
-  }
 }
 
 /* ACCESIBILIDAD */

@@ -25,6 +25,7 @@ export interface MyWodsViewProps {
   // Estados
   loading: boolean;
   submitting: boolean;
+  deletingId: number | null;
   error: string | null;
 
   // Consultas

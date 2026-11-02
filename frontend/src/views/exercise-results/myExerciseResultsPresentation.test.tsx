@@ -49,10 +49,13 @@ function renderView(
     resultsError: null,
     personalBestsError: null,
     exercisesError: null,
+    deleteError: null,
+    deletingId: null,
     onModeChange: () => undefined,
     onRetryResults: () => undefined,
     onRetryPersonalBests: () => undefined,
     onRetryExercises: () => undefined,
+    onDelete: () => undefined,
     ...overrides,
   };
 
@@ -82,6 +85,8 @@ describe("my exercise results presentation", () => {
     expect(markup).toContain('aria-pressed="true"');
     expect(markup).not.toContain("<select");
     expect(markup).toContain('href="/exercise-results/new"');
+    expect(markup).toContain('aria-label="Eliminar resultado de Back Squat"');
+    expect(markup).not.toContain(">Eliminar</button>");
   });
 
   it("renders loading, error with recovery, and empty states", () => {
@@ -135,6 +140,32 @@ describe("my exercise results presentation", () => {
 
     expect(allMarkup).toContain('aria-label="Récord personal"');
     expect(bestMarkup).toContain('aria-label="Récord personal"');
+  });
+
+  it("renders the same delete action in All Scores and Personal Records", () => {
+    const allMarkup = renderView({ mode: "all" });
+    const bestMarkup = renderView({ mode: "best" });
+
+    expect(allMarkup).toContain('aria-label="Eliminar resultado de Back Squat"');
+    expect(bestMarkup).toContain('aria-label="Eliminar resultado de Back Squat"');
+    expect(allMarkup).toContain("delete-icon-button");
+    expect(bestMarkup).toContain("delete-icon-button");
+  });
+
+  it("communicates a delete error without replacing the current list", () => {
+    const markup = renderView({ deleteError: "No se pudo eliminar la marca" });
+
+    expect(markup).toContain('role="alert"');
+    expect(markup).toContain("No se pudo eliminar la marca");
+    expect(markup).toContain("Back Squat");
+  });
+
+  it("disables the result currently being deleted", () => {
+    const markup = renderView({ deletingId: 1 });
+
+    expect(markup).toContain('aria-label="Eliminando..."');
+    expect(markup).toContain('aria-busy="true"');
+    expect(markup).toContain("disabled");
   });
 
   it("shows PR in the initial all-results mode without switching tabs", () => {

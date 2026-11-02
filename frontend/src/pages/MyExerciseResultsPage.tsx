@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import {
+  deleteExerciseResult,
   getExercisePersonalBests,
   getExerciseResults,
 } from "../api/exerciseResultsApi";
 import { getExercises } from "../api/exercisesApi";
+import { createSubmissionGuard } from "../utils/submissionGuard";
 import type { ExerciseResultResponse } from "../types/ExerciseResult";
 import type { ExerciseResponse } from "../types/Exercise";
 import MyExerciseResultsView from "../views/exercise-results/MyExerciseResultsView";
@@ -47,6 +49,9 @@ function MyExerciseResultsPage() {
   const [resultsReloadKey, setResultsReloadKey] = useState(0);
   const [personalBestsReloadKey, setPersonalBestsReloadKey] = useState(0);
   const [exercisesReloadKey, setExercisesReloadKey] = useState(0);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteGuard] = useState(createSubmissionGuard);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,6 +172,42 @@ function MyExerciseResultsPage() {
     setExercisesReloadKey((current) => current + 1);
   }
 
+  async function handleDelete(id: number) {
+    if (deletingId !== null) {
+      return;
+    }
+
+    if (!deleteGuard.tryAcquire()) {
+      return;
+    }
+
+    if (!window.confirm("¿Quieres eliminar esta marca?")) {
+      deleteGuard.release();
+      return;
+    }
+
+    setDeleteError(null);
+    setDeletingId(id);
+
+    try {
+      await deleteExerciseResult(id);
+
+      setResultsState({ data: [], status: "loading", error: null });
+      setPersonalBestsState({ data: [], status: "loading", error: null });
+      setResultsReloadKey((current) => current + 1);
+      setPersonalBestsReloadKey((current) => current + 1);
+    } catch (cause) {
+      setDeleteError(
+        cause instanceof Error
+          ? cause.message
+          : "No se pudo eliminar la marca",
+      );
+    } finally {
+      deleteGuard.release();
+      setDeletingId(null);
+    }
+  }
+
   return (
     <MyExerciseResultsView
       results={resultsState.data}
@@ -178,10 +219,13 @@ function MyExerciseResultsPage() {
       resultsError={resultsState.error}
       personalBestsError={personalBestsState.error}
       exercisesError={exercisesState.error}
+      deleteError={deleteError}
+      deletingId={deletingId}
       onModeChange={handleModeChange}
       onRetryResults={retryResults}
       onRetryPersonalBests={retryPersonalBests}
       onRetryExercises={retryExercises}
+      onDelete={handleDelete}
     />
   );
 }

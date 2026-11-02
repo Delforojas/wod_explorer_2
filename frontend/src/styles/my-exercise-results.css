@@ -260,6 +260,19 @@
   margin-top: var(--space-1);
 }
 
+.exercise-result-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.exercise-result-card-footer .resource-meta {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
 .exercise-result-personal-best {
   display: inline-flex;
   align-items: center;
