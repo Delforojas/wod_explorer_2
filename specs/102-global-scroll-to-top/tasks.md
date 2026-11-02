@@ -33,7 +33,7 @@
 - [x] Ejecutar `npm run lint` desde `frontend/`.
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check`.
-- [ ] Revisar el diff y preparar un único commit con solo la Issue #102 y su
+- [x] Revisar el diff y preparar un único commit con solo la Issue #102 y su
       SDD.
 
 ## Validación manual pendiente
