@@ -1,16 +1,22 @@
 import type { ExerciseResultResponse } from "../../../types/ExerciseResult";
+import DeleteIconButton from "../../../components/DeleteIconButton";
+
 import PersonalBestBadge from "./PersonalBestBadge";
 
 interface ExerciseResultCardProps {
   result: ExerciseResultResponse;
   exerciseName: string;
   isPersonalBest: boolean;
+  deleting: boolean;
+  onDelete: (id: number) => void;
 }
 
 function ExerciseResultCard({
   result,
   exerciseName,
   isPersonalBest,
+  deleting,
+  onDelete,
 }: ExerciseResultCardProps) {
   // FORMATO DE FECHA
 
@@ -103,7 +109,14 @@ function ExerciseResultCard({
 
       {/* FECHA */}
 
-      <p className="resource-meta">{formatDate(result.performedAt)}</p>
+      <footer className="exercise-result-card-footer">
+        <p className="resource-meta">{formatDate(result.performedAt)}</p>
+        <DeleteIconButton
+          label={`Eliminar resultado de ${exerciseName}`}
+          deleting={deleting}
+          onClick={() => onDelete(result.id)}
+        />
+      </footer>
     </article>
   );
 }

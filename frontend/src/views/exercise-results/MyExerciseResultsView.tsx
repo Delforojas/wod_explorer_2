@@ -21,6 +21,9 @@ function MyExerciseResultsView({
   onRetryResults,
   onRetryPersonalBests,
   onRetryExercises,
+  deleteError,
+  deletingId,
+  onDelete,
 }: MyExerciseResultsViewProps) {
   const [search, setSearch] = useState("");
   const activeResults = getResultsForMode(results, personalBests, mode);
@@ -139,6 +142,12 @@ function MyExerciseResultsView({
           </div>
         )}
 
+        {deleteError && (
+          <p className="exercise-results-error" role="alert">
+            {deleteError}
+          </p>
+        )}
+
         {activeLoading ? (
           <p className="exercise-results-loading" role="status">
             {mode === "best"
@@ -171,6 +180,8 @@ function MyExerciseResultsView({
             results={visibleResults}
             exercises={exercises}
             personalBestIds={personalBestIds}
+            deletingId={deletingId}
+            onDelete={onDelete}
           />
         )}
       </div>

@@ -31,6 +31,7 @@ function renderList(wods: WodAggregateResponse[]): string {
     <MemoryRouter>
       <MyWodsList
         wods={wods}
+        deletingId={null}
         onSelectWod={() => undefined}
         onEditWod={() => undefined}
         onDeleteWod={() => undefined}
@@ -52,6 +53,7 @@ function renderView(overrides: Partial<MyWodsViewProps> = {}): string {
     editItems: [],
     loading: false,
     submitting: false,
+    deletingId: null,
     error: null,
     getExercise: () => undefined,
     onSelectWod: () => undefined,
@@ -95,6 +97,10 @@ describe("my WODs presentation", () => {
     expect(markup).toContain('aria-label="Ver WOD Morning Engine"');
     expect(markup).toContain('aria-label="Editar Morning Engine"');
     expect(markup).toContain('aria-label="Eliminar Morning Engine"');
+    expect(markup).toContain("delete-icon-button");
+    expect(markup).toContain('data-variant="destructive"');
+    expect(markup).toContain('data-size="icon"');
+    expect(markup).not.toContain(">Eliminar</button>");
     expect(markup).toContain("my-wod-row");
     expect(markup).not.toContain("my-wods-button");
   });

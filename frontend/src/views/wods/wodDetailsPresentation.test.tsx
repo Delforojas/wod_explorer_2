@@ -38,6 +38,7 @@ function renderPersonalView(overrides: Partial<MyWodsViewProps> = {}): string {
     editItems: [],
     loading: false,
     submitting: false,
+    deletingId: null,
     error: null,
     getExercise: () => undefined,
     onSelectWod: () => undefined,

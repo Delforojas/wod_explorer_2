@@ -43,7 +43,9 @@ function MyWodsPage() {
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [submitGuard] = useState(createSubmissionGuard);
+  const [deleteGuard] = useState(createSubmissionGuard);
   const [error, setError] = useState<string | null>(null);
   const selectionRequest = useRef(0);
   const mounted = useRef(true);
@@ -260,12 +262,22 @@ function MyWodsPage() {
   // Eliminar WOD
 
   async function handleDeleteWod(id: number) {
+    if (deletingId !== null) {
+      return;
+    }
+
+    if (!deleteGuard.tryAcquire()) {
+      return;
+    }
+
     if (!window.confirm("¿Quieres eliminar este WOD?")) {
+      deleteGuard.release();
       return;
     }
 
     try {
       setError(null);
+      setDeletingId(id);
 
       await deleteWod(id);
 
@@ -276,6 +288,9 @@ function MyWodsPage() {
       }
     } catch {
       setError("No se pudo eliminar el WOD");
+    } finally {
+      deleteGuard.release();
+      setDeletingId(null);
     }
   }
 
@@ -299,6 +314,7 @@ function MyWodsPage() {
       editItems={editItems}
       loading={loading}
       submitting={submitting}
+      deletingId={deletingId}
       error={error}
       getExercise={getExercise}
       onSelectWod={handleSelectWod}

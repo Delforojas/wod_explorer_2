@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom";
+
+import DeleteIconButton from "../../../components/DeleteIconButton";
+
 import type { MyWodsViewProps } from "../MyWodsView.Types";
 
 type MyWodsListProps = Pick<
   MyWodsViewProps,
-  "wods" | "onSelectWod" | "onEditWod" | "onDeleteWod"
+  "wods" | "deletingId" | "onSelectWod" | "onEditWod" | "onDeleteWod"
 >;
 
 function MyWodsList({
   wods,
+  deletingId,
   onSelectWod,
   onEditWod,
   onDeleteWod,
@@ -85,14 +89,11 @@ function MyWodsList({
                     Editar
                   </button>
 
-                  <button
-                    className="my-wods-action my-wods-delete"
-                    type="button"
+                  <DeleteIconButton
+                    label={`Eliminar ${wod.name}`}
+                    deleting={deletingId === wod.id}
                     onClick={() => onDeleteWod(wod.id)}
-                    aria-label={`Eliminar ${wod.name}`}
-                  >
-                    Eliminar
-                  </button>
+                  />
                 </div>
               </article>
             ))}

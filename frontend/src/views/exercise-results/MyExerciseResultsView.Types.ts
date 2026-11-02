@@ -12,8 +12,11 @@ export interface MyExerciseResultsViewProps {
   resultsError: string | null;
   personalBestsError: string | null;
   exercisesError: string | null;
+  deleteError: string | null;
+  deletingId: number | null;
   onModeChange: (mode: ExerciseResultsMode) => void;
   onRetryResults: () => void;
   onRetryPersonalBests: () => void;
   onRetryExercises: () => void;
+  onDelete: (id: number) => void;
 }
