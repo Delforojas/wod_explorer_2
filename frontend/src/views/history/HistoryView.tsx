@@ -5,11 +5,11 @@ import {
   formatWodType,
   getExerciseResultLines,
   getWodResultLines,
+  isHistoryDateRangeInvalid,
 } from "./historyPresentation";
 
 function HistoryView({
   entries,
-  wods,
   mode,
   filters,
   wodLoading,
@@ -26,6 +26,7 @@ function HistoryView({
   const loading = wodLoading && exerciseLoading && entries.length === 0;
   const hasSourceError = wodError !== null || exerciseError !== null;
   const hasCompleteFailure = wodError !== null && exerciseError !== null;
+  const invalidDateRange = isHistoryDateRangeInvalid(filters);
 
   return (
     <section className="page history-page">
@@ -35,7 +36,11 @@ function HistoryView({
         <p>Consulta tus intentos y filtra tu evolución por contexto.</p>
       </header>
 
-      <div className="history-modes" aria-label="Tipo de actividad">
+      <div
+        className="history-modes"
+        role="group"
+        aria-label="Tipo de actividad"
+      >
         {(
           [
             ["ALL", "Todos"],
@@ -44,7 +49,7 @@ function HistoryView({
           ] as const
         ).map(([value, label]) => (
           <button
-            className={mode === value ? "history-mode-active" : ""}
+            className={mode === value ? "history-mode-active" : undefined}
             key={value}
             type="button"
             aria-pressed={mode === value}
@@ -57,64 +62,23 @@ function HistoryView({
 
       <form
         className="history-filters"
+        aria-label="Filtrar historial por fecha"
         onSubmit={(event) => {
           event.preventDefault();
-          onApplyFilters();
+          if (!invalidDateRange) {
+            onApplyFilters();
+          }
         }}
       >
-        {mode === "WODS" && (
-          <>
-            <div className="history-filter-field">
-              <label htmlFor="history-wod">WOD</label>
-              <select
-                id="history-wod"
-                value={filters.wodId}
-                onChange={(event) => onFilterChange("wodId", event.target.value)}
-              >
-                <option value="">Todos los WODs</option>
-                {wods.map((wod) => (
-                  <option key={wod.id} value={wod.id}>
-                    {wod.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="history-filter-field">
-              <label htmlFor="history-type">Modalidad</label>
-              <select
-                id="history-type"
-                value={filters.type}
-                onChange={(event) => onFilterChange("type", event.target.value)}
-              >
-                <option value="">Todas</option>
-                <option value="FOR_TIME">FOR TIME</option>
-                <option value="AMRAP">AMRAP</option>
-                <option value="EMOM">EMOM</option>
-              </select>
-            </div>
-
-            <div className="history-filter-field">
-              <label htmlFor="history-origin">Origen</label>
-              <select
-                id="history-origin"
-                value={filters.origin}
-                onChange={(event) => onFilterChange("origin", event.target.value)}
-              >
-                <option value="">Todos</option>
-                <option value="GENERIC">Genéricos</option>
-                <option value="PERSONAL">Personales</option>
-              </select>
-            </div>
-          </>
-        )}
-
         <div className="history-filter-field">
           <label htmlFor="history-from">Desde</label>
           <input
             id="history-from"
             type="date"
             value={filters.from}
+            max={filters.to || undefined}
+            aria-invalid={invalidDateRange}
+            aria-describedby={invalidDateRange ? "history-date-error" : undefined}
             onChange={(event) => onFilterChange("from", event.target.value)}
           />
         </div>
@@ -125,12 +89,25 @@ function HistoryView({
             id="history-to"
             type="date"
             value={filters.to}
+            min={filters.from || undefined}
+            aria-invalid={invalidDateRange}
+            aria-describedby={invalidDateRange ? "history-date-error" : undefined}
             onChange={(event) => onFilterChange("to", event.target.value)}
           />
         </div>
 
+        {invalidDateRange && (
+          <p id="history-date-error" className="history-filter-error" role="alert">
+            La fecha Desde no puede ser posterior a Hasta.
+          </p>
+        )}
+
         <div className="history-filter-actions">
-          <button type="submit" className="history-filter-submit">
+          <button
+            type="submit"
+            className="history-filter-submit"
+            disabled={invalidDateRange}
+          >
             Aplicar filtros
           </button>
           <button
@@ -174,10 +151,10 @@ function HistoryView({
             : "Todavía no has registrado ningún resultado."}
         </p>
       ) : (
-        <div className="resource-list glass-panel">
+        <div className="history-list">
           {entries.map((entry) => (
             <article
-              className="resource-row resource-row-static history-entry"
+              className="history-entry"
               key={`${entry.kind}-${entry.result.id}`}
             >
               {entry.kind === "WOD" ? (
@@ -190,9 +167,6 @@ function HistoryView({
                     <div className="history-result-badges">
                       <span className="resource-meta">{formatWodType(entry.result.type)}</span>
                       <span className="resource-meta">{formatWodOrigin(entry.result.origin)}</span>
-                      <span className="resource-meta">
-                        Versión ID {entry.result.wodVersionId}
-                      </span>
                     </div>
                   </header>
                   <p className="resource-meta">{formatExerciseResultDate(entry.result.performedAt)}</p>

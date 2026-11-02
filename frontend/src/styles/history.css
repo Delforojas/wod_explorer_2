@@ -5,12 +5,41 @@
 
 .history-modes {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  width: 100%;
+  gap: 4px;
+  padding: 4px;
+  box-sizing: border-box;
+
+  border: 1px solid var(--color-white-alpha-09);
+  border-radius: 14px;
+
+  background: rgba(8, 12, 18, 0.6);
   margin-bottom: var(--space-4);
 }
 
-.history-modes button,
+.history-modes button {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.history-modes button:hover {
+  color: var(--color-foreground);
+}
+
 .history-source-error button {
   min-height: 44px;
   padding: 9px var(--space-3);
@@ -23,8 +52,6 @@
   cursor: pointer;
 }
 
-.history-modes button:hover,
-.history-modes button:focus-visible,
 .history-source-error button:hover,
 .history-source-error button:focus-visible {
   border-color: var(--color-orange-300);
@@ -38,9 +65,9 @@
 }
 
 .history-modes .history-mode-active {
-  border-color: var(--color-orange-500);
-  background: var(--color-orange-500);
-  color: #080808;
+  border-color: rgb(255 107 0 / 40%);
+  background: rgb(255 107 0 / 14%);
+  color: var(--color-foreground);
 }
 
 .history-filters {
@@ -65,7 +92,6 @@
   font-weight: 600;
 }
 
-.history-filter-field select,
 .history-filter-field input {
   min-height: 48px;
   padding: 10px var(--space-3);
@@ -82,27 +108,15 @@
     box-shadow 180ms ease;
 }
 
-.history-filter-field select {
-  appearance: none;
-  padding-right: 42px;
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ff9a3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 15px center;
-  background-size: 16px;
-}
-
 .history-filter-field input[type="date"] {
   color-scheme: dark;
 }
 
-.history-filter-field select:hover:not(:disabled),
 .history-filter-field input:hover:not(:disabled) {
   border-color: var(--color-orange-300);
   background-color: var(--color-glass-field-background);
 }
 
-.history-filter-field select:focus-visible,
 .history-filter-field input:focus-visible {
   border-color: var(--color-orange-300);
   outline: 0;
@@ -110,10 +124,17 @@
   box-shadow: 0 0 0 3px rgb(255 107 0 / 20%);
 }
 
-.history-filter-field select:disabled,
 .history-filter-field input:disabled {
   cursor: not-allowed;
   opacity: 0.65;
+}
+
+.history-filter-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--color-error-500);
+  font-size: 13px;
+  line-height: 20px;
 }
 
 .history-filter-actions {
@@ -192,6 +213,40 @@
 
 .history-result-value p {
   margin: 0;
+}
+
+.history-list {
+  width: 100%;
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.history-entry {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+}
+
+.history-entry:hover,
+.history-entry:focus-within {
+  background: var(--color-surface-interactive);
+}
+
+.history-entry > header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.history-entry-heading h2 {
+  color: var(--color-foreground);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
 }
 
 .history-entry-heading {
@@ -336,6 +391,11 @@
     flex: 1;
   }
 
+  .history-modes button {
+    padding-inline: var(--space-2);
+    font-size: 12px;
+  }
+
   .personal-best-card-header {
     flex-direction: column;
   }
@@ -345,14 +405,7 @@
   }
 }
 
-@media (min-width: 900px) {
-  .history-filters {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .history-filter-field select,
   .history-filter-field input,
   .history-filter-submit,
   .history-filter-clear {

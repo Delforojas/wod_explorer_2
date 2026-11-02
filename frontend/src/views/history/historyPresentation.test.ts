@@ -5,14 +5,12 @@ import type { WodResultResponse } from "../../types/WodResult";
 import {
   filterHistoryEntries,
   getExerciseResultLines,
+  isHistoryDateRangeInvalid,
   normalizeHistoryResults,
 } from "./historyPresentation";
 import type { HistoryFilterValues } from "./HistoryView.Types";
 
 const emptyFilters: HistoryFilterValues = {
-  wodId: "",
-  type: "",
-  origin: "",
   from: "",
   to: "",
 };
@@ -84,38 +82,37 @@ describe("history presentation", () => {
     ]);
   });
 
-  it("applies mode, WOD filters, and an inclusive date range", () => {
+  it("applies mode and an inclusive date range to both result types", () => {
     const entries = normalizeHistoryResults(
       [
         createWodResult(1, { performedAt: "2026-01-10T23:59:59" }),
-        createWodResult(2, {
-          wodId: 99,
-          type: "AMRAP",
-          origin: "PERSONAL",
-          performedAt: "2026-01-11T00:00:00",
-        }),
+        createWodResult(2, { performedAt: "2026-01-11T00:00:00" }),
       ],
       [createExerciseResult(3, "REPS", { performedAt: "2026-01-10T12:00:00" })],
     );
 
     expect(
-      filterHistoryEntries(entries, "WODS", {
-        ...emptyFilters,
-        wodId: "99",
-        type: "AMRAP",
-        origin: "PERSONAL",
-        from: "2026-01-11",
-        to: "2026-01-11",
-      }).map((entry) => entry.result.id),
-    ).toEqual([2]);
-
-    expect(
-      filterHistoryEntries(entries, "EXERCISES", {
+      filterHistoryEntries(entries, "ALL", {
         ...emptyFilters,
         from: "2026-01-10",
         to: "2026-01-10",
       }).map((entry) => entry.result.id),
+    ).toEqual([1, 3]);
+
+    expect(
+      filterHistoryEntries(entries, "EXERCISES", emptyFilters).map(
+        (entry) => entry.result.id,
+      ),
     ).toEqual([3]);
+  });
+
+  it("detects an invalid date range", () => {
+    expect(
+      isHistoryDateRangeInvalid({ from: "2026-02-01", to: "2026-01-01" }),
+    ).toBe(true);
+    expect(
+      isHistoryDateRangeInvalid({ from: "2026-01-01", to: "2026-02-01" }),
+    ).toBe(false);
   });
 
   it("formats every supported exercise measurement type", () => {

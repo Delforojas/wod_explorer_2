@@ -47,9 +47,8 @@ const entries: HistoryViewProps["entries"] = [
 function renderView(overrides: Partial<HistoryViewProps> = {}): string {
   const props: HistoryViewProps = {
     entries,
-    wods: [{ id: 2, name: "Fran" }],
     mode: "ALL",
-    filters: { wodId: "", type: "", origin: "", from: "", to: "" },
+    filters: { from: "", to: "" },
     wodLoading: false,
     exerciseLoading: false,
     wodError: null,
@@ -77,6 +76,14 @@ describe("history view", () => {
     expect(markup).toContain("Todos");
     expect(markup).toContain("WODs");
     expect(markup).toContain("Ejercicios");
+    expect(markup).toContain('role="group"');
+    expect(markup).toContain('aria-pressed="true"');
+    expect(markup).toContain('id="history-from"');
+    expect(markup).toContain('id="history-to"');
+    expect(markup).not.toContain('id="history-wod"');
+    expect(markup).not.toContain('id="history-type"');
+    expect(markup).not.toContain('id="history-origin"');
+    expect(markup).not.toContain("Versión ID");
   });
 
   it("keeps available data visible when one source fails", () => {
@@ -100,5 +107,26 @@ describe("history view", () => {
     expect(markup).toContain("No se pudo cargar ninguna actividad del historial");
     expect(markup).toContain("Reintentar WODs");
     expect(markup).toContain("Reintentar ejercicios");
+  });
+
+  it("communicates an invalid date range and disables applying it", () => {
+    const markup = renderView({
+      filters: { from: "2026-02-01", to: "2026-01-01" },
+    });
+
+    expect(markup).toContain("La fecha Desde no puede ser posterior a Hasta.");
+    expect(markup).toContain('aria-invalid="true"');
+    expect(markup).toContain("disabled");
+  });
+
+  it("keeps the date range visible across activity modes", () => {
+    const filters = { from: "2026-01-01", to: "2026-01-31" };
+
+    expect(renderView({ mode: "WODS", filters })).toContain(
+      'value="2026-01-01"',
+    );
+    expect(renderView({ mode: "EXERCISES", filters })).toContain(
+      'value="2026-01-31"',
+    );
   });
 });
