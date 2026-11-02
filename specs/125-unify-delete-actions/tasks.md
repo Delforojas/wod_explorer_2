@@ -30,4 +30,6 @@
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check`.
 - [x] Revisar diff final y crear commit local sin push.
-- [x] Preparar checklist de validación manual sin marcarla como aprobada.
+- [x] Ejecutar y aprobar la validación manual visual y funcional: diseño
+      destructive con Trash2, Mis WODs, Benchmarks, confirmación/cancelación,
+      permisos, loading, errores, actualización de PR y responsive.

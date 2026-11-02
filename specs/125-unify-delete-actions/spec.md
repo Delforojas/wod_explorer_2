@@ -49,26 +49,26 @@ eliminar un resultado.
 
 ## Criterios de aceptación
 
-- [ ] Mis WODs muestra el botón destructivo compacto de solo icono, sin texto
+- [x] Mis WODs muestra el botón destructivo compacto de solo icono, sin texto
       visible, con nombre accesible y estados interactivos.
-- [ ] Benchmarks muestra exactamente el mismo control en cada resultado de
+- [x] Benchmarks muestra exactamente el mismo control en cada resultado de
       All Scores y Personal Records.
-- [ ] Se elimina únicamente el resultado o WOD seleccionado mediante los
+- [x] Se elimina únicamente el resultado o WOD seleccionado mediante los
       clientes y endpoints existentes.
-- [ ] Cancelar la confirmación no modifica datos ni estado visible.
-- [ ] El éxito actualiza la lista personal y los récords sin recargar la página.
-- [ ] Eliminar un PR permite que el servidor promocione el siguiente resultado
+- [x] Cancelar la confirmación no modifica datos ni estado visible.
+- [x] El éxito actualiza la lista personal y los récords sin recargar la página.
+- [x] Eliminar un PR permite que el servidor promocione el siguiente resultado
       comparable o deje el modo sin PR cuando no exista otro.
-- [ ] Los errores no eliminan prematuramente registros y los envíos duplicados
+- [x] Los errores no eliminan prematuramente registros y los envíos duplicados
       quedan bloqueados.
-- [ ] La acción funciona con búsqueda activa, en ambos modos y sin overflow en
+- [x] La acción funciona con búsqueda activa, en ambos modos y sin overflow en
       móvil o desktop.
-- [ ] El control es accesible por teclado, tiene foco visible, etiqueta
+- [x] El control es accesible por teclado, tiene foco visible, etiqueta
       contextual, contraste y estado disabled/loading.
-- [ ] Existen regresiones para confirmación/cancelación, éxito/error, ambos
+- [x] Existen regresiones para confirmación/cancelación, éxito/error, ambos
       modos, PR y presentación del control; pasan lint, tests, build y
       `git diff --check`.
-- [ ] No hay cambios en entidades, tablas, cálculos de dominio, otros
+- [x] No hay cambios en entidades, tablas, cálculos de dominio, otros
       endpoints ni reglas de `DOMAIN.md`.
 
 ## Restricciones

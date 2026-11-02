@@ -38,6 +38,8 @@ describe("exercise result personal-best badge", () => {
     expect(markup).toContain("exercise-result-card");
     expect(markup).toContain("exercise-result-card-header");
     expect(markup).toContain("delete-icon-button");
+    expect(markup).toContain('data-variant="destructive"');
+    expect(markup).toContain('data-size="icon"');
     expect(markup).toContain('aria-label="Eliminar resultado de Run"');
     expect(markup).not.toContain(">Eliminar</button>");
   });

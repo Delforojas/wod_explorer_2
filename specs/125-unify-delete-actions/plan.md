@@ -61,5 +61,6 @@ ni cálculos de personal records.
 - Revisión: `git diff --check`.
 - Revisión estática: endpoint existente, estado de confirmación, bloqueo de
   duplicados, refresco de ambas listas y ausencia de cambios backend/domain.
-- Validación manual pendiente: icono, tooltip, foco, confirmación/cancelación,
-  éxito/error, promoción de PR, búsqueda, ambos modos y responsive.
+- Validación manual aprobada por el usuario: icono Trash2 y variante destructive,
+  tooltip, foco, confirmación/cancelación, éxito/error, promoción de PR,
+  búsqueda, ambos modos y responsive.

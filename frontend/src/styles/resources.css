@@ -221,19 +221,17 @@
   min-width: 44px;
   height: 44px;
   min-height: 44px;
-  padding: 10px;
+  padding: 0;
 
-  border: 1px solid rgb(239 68 68 / 32%);
+  border: 0;
   border-radius: var(--radius-md);
 
-  background: var(--color-background-100);
-  color: #fca5a5;
+  background: var(--color-button-error-background);
+  color: var(--color-foreground);
   cursor: pointer;
 
   transition:
-    border-color 180ms ease,
     background-color 180ms ease,
-    color 180ms ease,
     opacity 180ms ease;
 }
 
@@ -244,18 +242,17 @@
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.8;
+  stroke-width: 2;
 }
 
 .delete-icon-button:hover:not(:disabled) {
-  border-color: rgb(239 68 68 / 65%);
-  background: rgb(239 68 68 / 12%);
-  color: #fecaca;
+  background: var(--color-button-error-hover-background);
 }
 
 .delete-icon-button:focus-visible {
-  outline: 2px solid #fca5a5;
-  outline-offset: 3px;
+  outline: 2px solid var(--color-primary-300);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-button-error-focus-ring);
 }
 
 .delete-icon-button:disabled {
