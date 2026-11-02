@@ -67,12 +67,18 @@ describe("my exercise results presentation", () => {
   it("renders the mode toggle, search input, and preserves registration", () => {
     const markup = renderView();
 
-    expect(markup).toContain("Buscar por ejercicio");
+    expect(markup).toContain("<h1>Benchmarks</h1>");
+    expect(markup).toContain("+ Add Score");
+    expect(markup).toContain('aria-label="Secciones de Benchmarks"');
+    expect(markup).toContain('aria-label="Modo de Benchmarks"');
+    expect(markup).toContain("Buscar ejercicio");
     expect(markup).toContain('type="search"');
     expect(markup).toContain('placeholder="Buscar ejercicio..."');
     expect(markup).toContain("exercise-results-search-icon");
-    expect(markup).toContain("Todas las marcas");
-    expect(markup).toContain("Mejores marcas");
+    expect(markup).toContain("All Scores");
+    expect(markup).toContain("Personal Records");
+    expect(markup).not.toContain(">Todas las marcas</button>");
+    expect(markup).not.toContain(">Mejores marcas</button>");
     expect(markup).toContain('aria-pressed="true"');
     expect(markup).not.toContain("<select");
     expect(markup).toContain('href="/exercise-results/new"');
@@ -145,7 +151,7 @@ describe("my exercise results presentation", () => {
   it("exposes an empty state for a mode without personal bests", () => {
     const markup = renderView({ results, personalBests: [] });
 
-    expect(markup).toContain("Todas las marcas");
-    expect(markup).toContain("Mejores marcas");
+    expect(markup).toContain("All Scores");
+    expect(markup).toContain("Personal Records");
   });
 });

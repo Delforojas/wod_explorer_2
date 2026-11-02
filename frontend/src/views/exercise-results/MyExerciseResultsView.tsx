@@ -42,7 +42,7 @@ function MyExerciseResultsView({
             Seguimiento personal
           </p>
 
-          <h1>Marcas</h1>
+          <h1>Benchmarks</h1>
 
           <p className="exercise-results-description">
             Registra tus resultados, consulta tus marcas y sigue tus progresos.
@@ -53,20 +53,20 @@ function MyExerciseResultsView({
 
         <nav
           className="exercise-results-navigation"
-          aria-label="Secciones de marcas"
+          aria-label="Secciones de Benchmarks"
         >
           <NavLink
             to="/exercise-results/new"
             className="exercise-results-nav-link exercise-results-nav-action"
           >
-            + Registrar marca
+            + Add Score
           </NavLink>
         </nav>
 
         <div
           className="exercise-results-mode-toggle"
           role="group"
-          aria-label="Modo de marcas"
+          aria-label="Modo de Benchmarks"
         >
           <button
             type="button"
@@ -74,7 +74,7 @@ function MyExerciseResultsView({
             aria-pressed={mode === "all"}
             onClick={() => onModeChange("all")}
           >
-            Todas las marcas
+            All Scores
           </button>
           <button
             type="button"
@@ -82,13 +82,13 @@ function MyExerciseResultsView({
             aria-pressed={mode === "best"}
             onClick={() => onModeChange("best")}
           >
-            Mejores marcas
+            Personal Records
           </button>
         </div>
 
         <div className="exercise-results-filter">
           <label htmlFor="exercise-results-exercise-filter">
-            Buscar por ejercicio
+            Buscar ejercicio
           </label>
           <div className="exercise-results-search-control">
             <span className="exercise-results-search-icon" aria-hidden="true">

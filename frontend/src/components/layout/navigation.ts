@@ -30,7 +30,7 @@ export const personalNavigation: readonly NavigationItem[] = [
   { label: "Crear WOD", to: "/create-wod", icon: "plus" },
   { label: "Historial", to: "/history", icon: "clock" },
   { label: "Registrar marca", to: "/exercise-results/new", icon: "plus" },
-  { label: "Mis marcas", to: "/my-exercise-results", icon: "activity" },
+  { label: "Benchmarks", to: "/my-exercise-results", icon: "activity" },
   { label: "Mejores marcas", to: "/personal-bests", icon: "trophy" },
 ];
 
@@ -44,7 +44,7 @@ export const mobilePrimaryNavigation: readonly NavigationItem[] = [
   personalNavigation[0], // Mis WODs
 
   {
-    label: "Marcas",
+    label: "Benchmarks",
     to: "/my-exercise-results",
     icon: "trophy",
   },

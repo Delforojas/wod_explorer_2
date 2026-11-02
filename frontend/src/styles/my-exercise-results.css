@@ -76,6 +76,7 @@
   font: inherit;
   font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -402,6 +403,11 @@
   .exercise-results-mode-toggle,
   .exercise-results-filter {
     width: calc(100% - 48px);
+  }
+
+  .exercise-results-mode-button {
+    padding-inline: var(--space-3);
+    font-size: 12px;
   }
 
   .exercise-results-nav-link {
