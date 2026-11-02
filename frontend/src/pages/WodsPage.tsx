@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { WodAggregateResponse } from "../types/Wod";
 import { getWods, getWodById } from "../api/wodsApi";
 import WodsView from "../views/wods/WodsView";
+import { isLatestRequest } from "../utils/asyncRequest";
 
 function WodsPage() {
   const [wods, setWods] = useState<WodAggregateResponse[]>([]);
@@ -10,34 +11,58 @@ function WodsPage() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const selectionRequest = useRef(0);
+  const mounted = useRef(true);
 
   useEffect(() => {
+    let active = true;
+    mounted.current = true;
+
     getWods()
       .then((data) => {
-        console.log("WODs recibidos:", data);
-        setWods(data);
+        if (active) {
+          setWods(data);
+        }
       })
       .catch(() => {
-        setError("No se pudieron cargar los WODs");
+        if (active) {
+          setError("No se pudieron cargar los WODs");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+      mounted.current = false;
+    };
   }, []);
 
   async function handleSelectWod(id: number) {
+    const requestId = ++selectionRequest.current;
+
     try {
       setError(null);
 
       const wod = await getWodById(id);
 
+      if (!mounted.current || !isLatestRequest(requestId, selectionRequest.current)) {
+        return;
+      }
+
       setSelectedWod(wod);
     } catch {
-      setError("No se pudo cargar el WOD");
+      if (mounted.current && isLatestRequest(requestId, selectionRequest.current)) {
+        setError("No se pudo cargar el WOD");
+      }
     }
   }
 
   function handleBack() {
+    selectionRequest.current += 1;
     setSelectedWod(null);
   }
 

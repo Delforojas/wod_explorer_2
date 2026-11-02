@@ -130,7 +130,8 @@ function WodExerciseCard({
         {/* DISTANCIA */}
 
         {(exercise?.measurementType === "DISTANCE" ||
-          exercise?.measurementType === "WEIGHT_DISTANCE") && (
+          exercise?.measurementType === "WEIGHT_DISTANCE" ||
+          exercise?.measurementType === "DISTANCE_TIME") && (
           <div className="wod-exercise-card-field">
             <label htmlFor={`distance-${index}`}>Distancia (m)</label>
 
@@ -156,7 +157,8 @@ function WodExerciseCard({
 
         {/* DURACIÓN */}
 
-        {exercise?.measurementType === "TIME" && (
+        {(exercise?.measurementType === "TIME" ||
+          exercise?.measurementType === "DISTANCE_TIME") && (
           <div className="wod-exercise-card-field">
             <label htmlFor={`duration-${index}`}>Duración (segundos)</label>
 

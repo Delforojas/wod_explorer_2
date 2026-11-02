@@ -10,6 +10,7 @@ export interface CreateWodViewProps {
   timeCapSeconds: number | undefined;
   items: WodCompositionItemRequest[];
   loading: boolean;
+  submitting: boolean;
   error: string | null;
   success: string | null;
   getExercise: (exerciseId: number) => ExerciseResponse | undefined;

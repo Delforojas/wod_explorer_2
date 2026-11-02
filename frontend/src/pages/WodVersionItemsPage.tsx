@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { WodVersionItemResponse, WodVersionResponse } from "../types/Wod";
 import {
   getWodVersionItems,
@@ -6,6 +6,7 @@ import {
   getWodVersions,
 } from "../api/wodsApi";
 import WodVersionItemsView from "../views/wod-versions/WodVersionItemsView";
+import { isLatestRequest } from "../utils/asyncRequest";
 
 function WodVersionItemsPage() {
   const [items, setItems] = useState<WodVersionItemResponse[]>([]);
@@ -14,30 +15,54 @@ function WodVersionItemsPage() {
   const [versions, setVersions] = useState<WodVersionResponse[]>([]);
   const [selectedItem, setSelectedItem] =
     useState<WodVersionItemResponse | null>(null);
+  const selectionRequest = useRef(0);
+  const mounted = useRef(true);
 
   useEffect(() => {
+    let active = true;
+    mounted.current = true;
+
     Promise.all([getWodVersionItems(), getWodVersions()])
       .then(([itemsData, versionsData]) => {
-        setItems(itemsData);
-        setVersions(versionsData);
+        if (active) {
+          setItems(itemsData);
+          setVersions(versionsData);
+        }
       })
       .catch(() => {
-        setError("No se pudieron cargar los elementos de los WODs");
+        if (active) {
+          setError("No se pudieron cargar los elementos de los WODs");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+      mounted.current = false;
+    };
   }, []);
 
   async function handleSelectItem(id: number) {
+    const requestId = ++selectionRequest.current;
+
     try {
       setError(null);
 
       const item = await getWodVersionItemById(id);
 
+      if (!mounted.current || !isLatestRequest(requestId, selectionRequest.current)) {
+        return;
+      }
+
       setSelectedItem(item);
     } catch {
-      setError("No se pudo cargar el elemento");
+      if (mounted.current && isLatestRequest(requestId, selectionRequest.current)) {
+        setError("No se pudo cargar el elemento");
+      }
     }
   }
 

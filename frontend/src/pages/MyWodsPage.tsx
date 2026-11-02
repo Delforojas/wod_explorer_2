@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { deleteWod, getMyWods, getWodById, updateWod } from "../api/wodsApi";
@@ -15,6 +15,9 @@ import type {
 } from "../types/Wod";
 
 import MyWodsView from "../views/my-wods/MyWodsView";
+import { isLatestRequest } from "../utils/asyncRequest";
+import { createSubmissionGuard } from "../utils/submissionGuard";
+import { validateWodDefinition } from "../utils/wodDefinitionValidation";
 
 function MyWodsPage() {
   const [wods, setWods] = useState<WodAggregateResponse[]>([]);
@@ -39,12 +42,17 @@ function MyWodsPage() {
   const [editItems, setEditItems] = useState<WodCompositionItemRequest[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitGuard] = useState(createSubmissionGuard);
   const [error, setError] = useState<string | null>(null);
+  const selectionRequest = useRef(0);
+  const mounted = useRef(true);
 
   // Cargar WODs y ejercicios
 
   useEffect(() => {
     let active = true;
+    mounted.current = true;
 
     Promise.all([getMyWods(), getExercises()])
       .then(([wodsData, exercisesData]) => {
@@ -66,6 +74,7 @@ function MyWodsPage() {
 
     return () => {
       active = false;
+      mounted.current = false;
     };
   }, []);
 
@@ -78,19 +87,29 @@ function MyWodsPage() {
   // Consultar WOD
 
   async function handleSelectWod(id: number) {
+    const requestId = ++selectionRequest.current;
+
     try {
       setError(null);
 
       const wod = await getWodById(id);
+
+      if (!mounted.current || !isLatestRequest(requestId, selectionRequest.current)) {
+        return;
+      }
+
       setSelectedWod(wod);
     } catch {
-      setError("No se pudo cargar el WOD");
+      if (mounted.current && isLatestRequest(requestId, selectionRequest.current)) {
+        setError("No se pudo cargar el WOD");
+      }
     }
   }
 
   // Preparar edición
 
   function handleEditWod(wod: WodAggregateResponse) {
+    selectionRequest.current += 1;
     setSelectedWod(null);
     setEditingWod(wod);
 
@@ -111,6 +130,7 @@ function MyWodsPage() {
   }
 
   function handleCancelEdit() {
+    selectionRequest.current += 1;
     setEditingWod(null);
     setEditItems([]);
   }
@@ -200,14 +220,27 @@ function MyWodsPage() {
     setError(null);
 
     const request: WodDefinitionRequest = {
-      name: editName,
+      name: editName.trim(),
       type: editType,
       timeCapSeconds: editTimeCapSeconds,
       rounds: editType === "FOR_TIME" ? editRounds : undefined,
       items: editItems,
     };
 
+    const validationErrors = validateWodDefinition(request, exercises);
+
+    if (validationErrors.length > 0) {
+      setError(validationErrors.map(({ message }) => message).join(" "));
+      return;
+    }
+
+    if (!submitGuard.tryAcquire()) {
+      return;
+    }
+
     try {
+      setSubmitting(true);
+
       const updatedWod = await updateWod(editingWod.id, request);
 
       setWods((currentWods) =>
@@ -218,6 +251,9 @@ function MyWodsPage() {
       setEditItems([]);
     } catch {
       setError("No se pudo actualizar el WOD");
+    } finally {
+      submitGuard.release();
+      setSubmitting(false);
     }
   }
 
@@ -242,6 +278,7 @@ function MyWodsPage() {
   // Volver al listado
 
   function handleBack() {
+    selectionRequest.current += 1;
     setSelectedWod(null);
   }
 
@@ -257,6 +294,7 @@ function MyWodsPage() {
       editTimeCapSeconds={editTimeCapSeconds}
       editItems={editItems}
       loading={loading}
+      submitting={submitting}
       error={error}
       getExercise={getExercise}
       onSelectWod={handleSelectWod}

@@ -9,6 +9,7 @@ function CreateWodView({
   timeCapSeconds,
   items,
   loading,
+  submitting,
   error,
   success,
   getExercise,
@@ -304,7 +305,8 @@ function CreateWodView({
                       {/* DISTANCIA */}
 
                       {(exercise?.measurementType === "DISTANCE" ||
-                        exercise?.measurementType === "WEIGHT_DISTANCE") && (
+                        exercise?.measurementType === "WEIGHT_DISTANCE" ||
+                        exercise?.measurementType === "DISTANCE_TIME") && (
                         <div className="wod-exercise-card-field">
                           <label htmlFor={`distance-${index}`}>
                             Distancia (m)
@@ -330,7 +332,8 @@ function CreateWodView({
 
                       {/* DURACIÓN */}
 
-                      {exercise?.measurementType === "TIME" && (
+                      {(exercise?.measurementType === "TIME" ||
+                        exercise?.measurementType === "DISTANCE_TIME") && (
                         <div className="wod-exercise-card-field">
                           <label htmlFor={`duration-${index}`}>
                             Duración (segundos)
@@ -386,9 +389,9 @@ function CreateWodView({
             <button
               className="create-wod-form-submit"
               type="submit"
-              disabled={items.length === 0}
+              disabled={items.length === 0 || submitting}
             >
-              Crear WOD
+              {submitting ? "Creando..." : "Crear WOD"}
             </button>
           </div>
         </form>

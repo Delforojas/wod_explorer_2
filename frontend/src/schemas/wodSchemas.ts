@@ -16,36 +16,36 @@ export const wodResponseSchema = z.object({
 });
 
 export const wodCompositionItemRequestSchema = z.object({
-  exerciseId: z.number(),
-  reps: z.number().optional(),
-  weightKg: z.number().optional(),
-  distanceM: z.number().optional(),
-  durationSeconds: z.number().optional(),
+  exerciseId: z.number().int().positive(),
+  reps: z.number().int().nonnegative().optional(),
+  weightKg: z.number().finite().nonnegative().optional(),
+  distanceM: z.number().finite().nonnegative().optional(),
+  durationSeconds: z.number().int().nonnegative().optional(),
 });
 
 export const wodDefinitionRequestSchema = z.object({
-  name: z.string(),
+  name: z.string().trim().min(1).max(100),
   type: wodTypeSchema,
-  timeCapSeconds: z.number().optional(),
-  rounds: z.number().optional(),
-  items: z.array(wodCompositionItemRequestSchema),
+  timeCapSeconds: z.number().int().positive().optional(),
+  rounds: z.number().int().positive().optional(),
+  items: z.array(wodCompositionItemRequestSchema).min(1),
 });
 
 export const wodVersionRequestSchema = z.object({
-  wodId: z.number(),
+  wodId: z.number().int().positive(),
   type: wodTypeSchema,
-  timeCapSeconds: z.number().optional(),
-  rounds: z.number().optional(),
+  timeCapSeconds: z.number().int().positive().optional(),
+  rounds: z.number().int().positive().optional(),
 });
 
 export const wodVersionItemRequestSchema = z.object({
-  wodVersionId: z.number(),
-  exerciseId: z.number(),
-  position: z.number(),
-  reps: z.number().optional(),
-  weightKg: z.number().optional(),
-  distanceM: z.number().optional(),
-  durationSeconds: z.number().optional(),
+  wodVersionId: z.number().int().positive(),
+  exerciseId: z.number().int().positive(),
+  position: z.number().int().positive(),
+  reps: z.number().int().nonnegative().optional(),
+  weightKg: z.number().finite().nonnegative().optional(),
+  distanceM: z.number().finite().nonnegative().optional(),
+  durationSeconds: z.number().int().nonnegative().optional(),
 });
 
 export const wodVersionResponseSchema = z.object({
