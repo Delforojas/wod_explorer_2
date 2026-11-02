@@ -105,7 +105,6 @@
   backdrop-filter: blur(1rem);
   -webkit-backdrop-filter: blur(1rem);
 
-  transform: rotate(-1deg);
   top: 0;
   padding: 3px 0;
 }
