@@ -64,16 +64,12 @@ export function filterHistoryEntries(
       return false;
     }
 
-    if (entry.kind !== "WOD" || mode !== "WODS") {
-      return true;
-    }
-
-    return (
-      (!filters.wodId || String(entry.result.wodId) === filters.wodId) &&
-      (!filters.type || entry.result.type === filters.type) &&
-      (!filters.origin || entry.result.origin === filters.origin)
-    );
+    return true;
   });
+}
+
+export function isHistoryDateRangeInvalid(filters: HistoryFilterValues): boolean {
+  return Boolean(filters.from && filters.to && filters.from > filters.to);
 }
 
 export function formatExerciseResultDate(date: string): string {
