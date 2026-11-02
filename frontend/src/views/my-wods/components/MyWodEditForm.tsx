@@ -9,6 +9,8 @@ type MyWodEditFormProps = Pick<
   | "editRounds"
   | "editTimeCapSeconds"
   | "editItems"
+  | "submitting"
+  | "error"
   | "getExercise"
   | "onCancelEdit"
   | "onEditNameChange"
@@ -32,6 +34,8 @@ function MyWodEditForm({
   editRounds,
   editTimeCapSeconds,
   editItems,
+  submitting,
+  error,
   getExercise,
   onCancelEdit,
   onEditNameChange,
@@ -64,6 +68,12 @@ function MyWodEditForm({
       </button>
 
       <h1>Editar WOD</h1>
+
+      {error && (
+        <p className="ui-error" role="alert">
+          {error}
+        </p>
+      )}
 
       <form className="form-layout surface glass-panel" onSubmit={onUpdateWod}>
         {/* NOMBRE */}
@@ -245,7 +255,8 @@ function MyWodEditForm({
 
               {/* DISTANCIA */}
 
-              {exercise?.measurementType === "DISTANCE" && (
+              {(exercise?.measurementType === "DISTANCE" ||
+                exercise?.measurementType === "DISTANCE_TIME") && (
                 <div className="form-field">
                   <label htmlFor={`edit-distance-${index}`}>
                     Distancia (m)
@@ -269,7 +280,8 @@ function MyWodEditForm({
 
               {/* TIEMPO */}
 
-              {exercise?.measurementType === "TIME" && (
+              {(exercise?.measurementType === "TIME" ||
+                exercise?.measurementType === "DISTANCE_TIME") && (
                 <div className="form-field">
                   <label htmlFor={`edit-duration-${index}`}>
                     Duración (segundos)
@@ -359,8 +371,8 @@ function MyWodEditForm({
 
         {/* GUARDAR */}
 
-        <button type="submit" disabled={editItems.length === 0}>
-          Guardar cambios
+        <button type="submit" disabled={editItems.length === 0 || submitting}>
+          {submitting ? "Guardando..." : "Guardar cambios"}
         </button>
 
         {/* CANCELAR */}

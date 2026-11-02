@@ -15,16 +15,16 @@ function MyWodsView(props: MyWodsViewProps) {
     );
   }
 
+  if (editingWod) {
+    return <MyWodEditForm {...props} />;
+  }
+
   if (error) {
     return (
       <p className="ui-error" role="alert">
         {error}
       </p>
     );
-  }
-
-  if (editingWod) {
-    return <MyWodEditForm {...props} />;
   }
 
   if (selectedWod) {

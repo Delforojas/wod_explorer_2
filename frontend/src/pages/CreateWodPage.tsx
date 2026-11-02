@@ -7,6 +7,8 @@ import type {
 } from "../types/Wod";
 import { getExercises } from "../api/exercisesApi";
 import { createWod } from "../api/wodsApi";
+import { createSubmissionGuard } from "../utils/submissionGuard";
+import { validateWodDefinition } from "../utils/wodDefinitionValidation";
 import CreateWodView from "../views/create-wod/CreateWodView";
 
 function CreateWodPage() {
@@ -20,20 +22,34 @@ function CreateWodPage() {
   const [items, setItems] = useState<WodCompositionItemRequest[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitGuard] = useState(createSubmissionGuard);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
+    let active = true;
+
     getExercises()
       .then((data) => {
-        setExercises(data);
+        if (active) {
+          setExercises(data);
+        }
       })
       .catch(() => {
-        setError("No se pudieron cargar los ejercicios");
+        if (active) {
+          setError("No se pudieron cargar los ejercicios");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   function getExercise(exerciseId: number) {
@@ -132,14 +148,27 @@ function CreateWodPage() {
     setSuccess(null);
 
     const request: WodDefinitionRequest = {
-      name,
+      name: name.trim(),
       type,
       timeCapSeconds,
       rounds: type === "FOR_TIME" ? rounds : undefined,
       items,
     };
 
+    const validationErrors = validateWodDefinition(request, exercises);
+
+    if (validationErrors.length > 0) {
+      setError(validationErrors.map(({ message }) => message).join(" "));
+      return;
+    }
+
+    if (!submitGuard.tryAcquire()) {
+      return;
+    }
+
     try {
+      setSubmitting(true);
+
       const createdWod = await createWod(request);
 
       setSuccess(`WOD "${createdWod.name}" creado correctamente`);
@@ -151,6 +180,9 @@ function CreateWodPage() {
       setItems([]);
     } catch {
       setError("No se pudo crear el WOD");
+    } finally {
+      submitGuard.release();
+      setSubmitting(false);
     }
   }
 
@@ -163,6 +195,7 @@ function CreateWodPage() {
       timeCapSeconds={timeCapSeconds}
       items={items}
       loading={loading}
+      submitting={submitting}
       error={error}
       success={success}
       getExercise={getExercise}

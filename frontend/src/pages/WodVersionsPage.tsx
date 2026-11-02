@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { WodVersionResponse, WodVersionItemResponse } from "../types/Wod";
 import {
   getWodVersions,
@@ -6,6 +6,7 @@ import {
   getWodVersionItems,
 } from "../api/wodsApi";
 import WodVersionsView from "../views/wod-versions/WodVersionsView";
+import { isLatestRequest } from "../utils/asyncRequest";
 
 function WodVersionsPage() {
   const [versions, setVersions] = useState<WodVersionResponse[]>([]);
@@ -17,20 +18,38 @@ function WodVersionsPage() {
   const [selectedItems, setSelectedItems] = useState<WodVersionItemResponse[]>(
     [],
   );
+  const selectionRequest = useRef(0);
+  const mounted = useRef(true);
   useEffect(() => {
+    let active = true;
+    mounted.current = true;
+
     getWodVersions()
       .then((data) => {
-        setVersions(data);
+        if (active) {
+          setVersions(data);
+        }
       })
       .catch(() => {
-        setError("No se pudieron cargar las versiones de los WODs");
+        if (active) {
+          setError("No se pudieron cargar las versiones de los WODs");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+      mounted.current = false;
+    };
   }, []);
 
   async function handleSelectVersion(id: number) {
+    const requestId = ++selectionRequest.current;
+
     try {
       setError(null);
 
@@ -39,10 +58,16 @@ function WodVersionsPage() {
 
       const versionItems = items.filter((item) => item.wodVersionId === id);
 
+      if (!mounted.current || !isLatestRequest(requestId, selectionRequest.current)) {
+        return;
+      }
+
       setSelectedVersion(version);
       setSelectedItems(versionItems);
     } catch {
-      setError("No se pudo cargar la versión");
+      if (mounted.current && isLatestRequest(requestId, selectionRequest.current)) {
+        setError("No se pudo cargar la versión");
+      }
     }
   }
 

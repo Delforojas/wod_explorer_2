@@ -50,8 +50,14 @@ function RegisterExerciseResultPage() {
   // CARGAR EJERCICIOS
 
   useEffect(() => {
+    let active = true;
+
     getExercises()
       .then((data) => {
+        if (!active) {
+          return;
+        }
+
         setExercises(data);
 
         const selection = resolveExerciseSelection(data, exerciseIdParam);
@@ -60,11 +66,19 @@ function RegisterExerciseResultPage() {
         setError(selection.error);
       })
       .catch(() => {
-        setError("No se pudieron cargar los ejercicios");
+        if (active) {
+          setError("No se pudieron cargar los ejercicios");
+        }
       })
       .finally(() => {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+    };
   }, [exerciseIdParam]);
 
   // LIMPIAR TEMPORIZADOR AL SALIR DE LA PÁGINA

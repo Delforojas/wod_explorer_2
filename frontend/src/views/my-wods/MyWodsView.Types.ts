@@ -24,6 +24,7 @@ export interface MyWodsViewProps {
 
   // Estados
   loading: boolean;
+  submitting: boolean;
   error: string | null;
 
   // Consultas
