@@ -9,9 +9,11 @@ function MyWodsView(props: MyWodsViewProps) {
 
   if (loading) {
     return (
-      <p className="ui-loading" role="status">
-        Cargando tus WODs...
-      </p>
+      <section className="wod-page my-wods-state-page">
+        <p className="wod-empty" role="status">
+          Cargando tus WODs...
+        </p>
+      </section>
     );
   }
 
@@ -21,9 +23,11 @@ function MyWodsView(props: MyWodsViewProps) {
 
   if (error) {
     return (
-      <p className="ui-error" role="alert">
-        {error}
-      </p>
+      <section className="wod-page my-wods-state-page">
+        <p className="wod-error" role="alert">
+          {error}
+        </p>
+      </section>
     );
   }
 
