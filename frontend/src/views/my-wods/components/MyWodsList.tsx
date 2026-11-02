@@ -15,8 +15,6 @@ function MyWodsList({
   return (
     <section className="wod-page my-wods-page">
       <div className="wod-container">
-        {/* ENCABEZADO */}
-
         <header className="wod-header">
           <p className="wod-eyebrow">MIS ENTRENAMIENTOS</p>
 
@@ -27,10 +25,11 @@ function MyWodsList({
           </p>
         </header>
 
-        {/* NAVEGACIÓN */}
-
         <nav className="my-wods-navigation" aria-label="Acciones de mis WODs">
-          <Link to="/my-wod-results" className="my-wods-nav-link">
+          <Link
+            to="/my-wod-results"
+            className="my-wods-nav-link my-wods-results-link"
+          >
             Resultados
           </Link>
 
@@ -39,53 +38,58 @@ function MyWodsList({
           </Link>
         </nav>
 
-        {/* CONTADOR */}
-
         <p className="wod-count">{wods.length} entrenamientos personales</p>
 
-        {/* LISTADO */}
-
         {wods.length === 0 ? (
-          <p className="wod-empty">Todavía no has creado ningún WOD.</p>
+          <p className="wod-empty my-wods-empty" role="status">
+            Todavía no has creado ningún WOD.
+          </p>
         ) : (
-          <div className="wod-grid">
+          <div className="my-wods-list">
             {wods.map((wod) => (
-              <article className="wod-card" key={wod.id}>
-                <h2>{wod.name}</h2>
+              <article className="my-wod-row" key={wod.id}>
+                <div className="my-wod-content">
+                  <h2>{wod.name}</h2>
 
-                <div className="wod-card-meta">
-                  <span>{wod.version.type}</span>
+                  <div className="my-wod-meta">
+                    <span>{wod.version.type}</span>
 
-                  {wod.version.timeCapSeconds != null && (
-                    <span>
-                      {Math.floor(wod.version.timeCapSeconds / 60)} min
-                    </span>
-                  )}
+                    {wod.version.timeCapSeconds != null && (
+                      <span>
+                        {Math.floor(wod.version.timeCapSeconds / 60)} min
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* ACCIONES */}
-
-                <div className="my-wods-actions">
+                <div
+                  className="my-wods-actions"
+                  role="group"
+                  aria-label={`Acciones para ${wod.name}`}
+                >
                   <button
-                    className="wod-card-action"
+                    className="my-wods-action my-wods-view-action"
                     type="button"
                     onClick={() => onSelectWod(wod.id)}
+                    aria-label={`Ver WOD ${wod.name}`}
                   >
-                    Ver WOD →
+                    Ver WOD
                   </button>
 
                   <button
-                    className="my-wods-button"
+                    className="my-wods-action"
                     type="button"
                     onClick={() => onEditWod(wod)}
+                    aria-label={`Editar ${wod.name}`}
                   >
                     Editar
                   </button>
 
                   <button
-                    className="my-wods-button my-wods-delete"
+                    className="my-wods-action my-wods-delete"
                     type="button"
                     onClick={() => onDeleteWod(wod.id)}
+                    aria-label={`Eliminar ${wod.name}`}
                   >
                     Eliminar
                   </button>
