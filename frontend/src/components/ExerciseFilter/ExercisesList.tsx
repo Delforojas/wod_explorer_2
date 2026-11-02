@@ -43,24 +43,36 @@ function ExercisesList({ exercises }: ExercisesListProps) {
       <div className="exercise-search">
         <label htmlFor="exercise-search-input">Buscar ejercicios</label>
 
-        <input
-          id="exercise-search-input"
-          type="search"
-          placeholder="Buscar ejercicio..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          autoComplete="off"
-        />
+        <div className="catalog-search-control">
+          <span className="catalog-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="11" cy="11" r="6" />
+              <path d="m16 16 4 4" />
+            </svg>
+          </span>
 
-        {hasActiveFilters && (
-          <button
-            type="button"
-            className="exercise-clear-filters"
-            onClick={() => setSearch("")}
-          >
-            Limpiar filtros
-          </button>
-        )}
+          <input
+            id="exercise-search-input"
+            type="search"
+            placeholder="Buscar ejercicio..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            autoComplete="off"
+          />
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="catalog-search-clear"
+              aria-label="Limpiar búsqueda de ejercicios"
+              onClick={() => setSearch("")}
+            >
+              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <path d="m7 7 10 10M17 7 7 17" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* CONTADOR */}
@@ -80,50 +92,37 @@ function ExercisesList({ exercises }: ExercisesListProps) {
             : "No se encontraron ejercicios con ese nombre."}
         </p>
       ) : (
-        <div
-          className={`exercise-grid ${
-            !isAuthenticated ? "exercise-grid-guest" : ""
-          }`}
-        >
+        <div className="my-wods-list exercise-catalog-list">
           {filteredExercises.map((exercise) => (
             <article
               key={exercise.id}
-              className={`exercise-card ${
-                !isAuthenticated ? "exercise-card-guest" : ""
-              }`}
+              className="my-wod-row exercise-catalog-row"
             >
-              <div className="exercise-card-content">
-                {/* TÍTULO */}
-
+              <div className="my-wod-content">
                 <h2>
-                  <span className="exercise-card-title">{exercise.name}</span>
+                  <span>{exercise.name}</span>
                 </h2>
 
-                {/* CATEGORÍA Y MEDICIÓN */}
-
-                <div className="exercise-card-meta">
+                <div className="my-wod-meta">
                   <span>{exercise.category}</span>
                   <span>{exercise.measurementType}</span>
                 </div>
-
-                {/* ACCIONES DEL EJERCICIO */}
-
-                {isAuthenticated && (
-                  <div className="exercise-card-actions">
-                    <Link
-                      to={`/exercise-results/new?exerciseId=${exercise.id}`}
-                      className="exercise-card-action exercise-card-register"
-                      aria-label={`Registrar resultado de ${exercise.name}`}
-                    >
-                      <span>Registrar resultado</span>
-
-                      <span className="exercise-card-arrow" aria-hidden="true">
-                        →
-                      </span>
-                    </Link>
-                  </div>
-                )}
               </div>
+
+              {isAuthenticated && (
+                <div className="my-wods-actions catalog-row-actions">
+                  <Link
+                    to={`/exercise-results/new?exerciseId=${exercise.id}`}
+                    className="my-wods-action catalog-register-action"
+                    aria-label={`Registrar resultado de ${exercise.name}`}
+                  >
+                    <span className="catalog-register-icon" aria-hidden="true">
+                      +
+                    </span>
+                    <span>Registrar</span>
+                  </Link>
+                </div>
+              )}
             </article>
           ))}
         </div>

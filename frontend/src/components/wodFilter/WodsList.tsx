@@ -45,24 +45,36 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
         <div className="wod-search">
           <label htmlFor="wod-search-input">Buscar WODs</label>
 
-          <input
-            id="wod-search-input"
-            type="search"
-            placeholder="Buscar WOD..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            autoComplete="off"
-          />
+          <div className="catalog-search-control">
+            <span className="catalog-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="11" cy="11" r="6" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </span>
 
-          {shouldShowSearchClear && (
-            <button
-              type="button"
-              className="wod-clear-filters"
-              onClick={() => setSearch("")}
-            >
-              Limpiar filtros
-            </button>
-          )}
+            <input
+              id="wod-search-input"
+              type="search"
+              placeholder="Buscar WOD..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              autoComplete="off"
+            />
+
+            {shouldShowSearchClear && (
+              <button
+                type="button"
+                className="catalog-search-clear"
+                aria-label="Limpiar búsqueda de WODs"
+                onClick={() => setSearch("")}
+              >
+                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path d="m7 7 10 10M17 7 7 17" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* CONTADOR */}
@@ -104,48 +116,50 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             )}
           </div>
         ) : (
-          <div className="wod-grid">
+          <div className="my-wods-list wod-catalog-list">
             {filteredWods.map((wod) => (
-              <article className="wod-card" key={wod.id}>
-                {/* NOMBRE */}
+              <article
+                className="my-wod-row wod-catalog-row"
+                key={wod.id}
+              >
+                <div className="my-wod-content">
+                  <h2>{wod.name}</h2>
 
-                <h2>{wod.name}</h2>
+                  <div className="my-wod-meta">
+                    <span>{formatWodType(wod.version.type)}</span>
 
-                {/* METADATOS */}
-
-                <div className="wod-card-meta">
-                  <span>{formatWodType(wod.version.type)}</span>
-
-                  {wod.version.timeCapSeconds != null && (
-                    <span>
-                      {Math.floor(wod.version.timeCapSeconds / 60)} min
-                    </span>
-                  )}
+                    {wod.version.timeCapSeconds != null && (
+                      <span>
+                        {Math.floor(wod.version.timeCapSeconds / 60)} min
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* ACCIONES */}
-
-                <div className="wod-card-actions">
-                  {/* VER WOD */}
-
+                <div
+                  className="my-wods-actions catalog-row-actions"
+                  role="group"
+                  aria-label={`Acciones para ${wod.name}`}
+                >
                   <button
-                    className="wod-card-action"
+                    className="my-wods-action my-wods-view-action"
                     type="button"
                     onClick={() => onSelectWod(wod.id)}
-                    aria-label={`Abrir entrenamiento ${wod.name}`}
+                    aria-label={`Ver WOD ${wod.name}`}
                   >
-                    Ver →
+                    Ver WOD
                   </button>
-
-                  {/* REGISTRAR RESULTADO */}
 
                   {isAuthenticated && (
                     <Link
                       to={`/my-wod-results/new?wodId=${wod.id}`}
-                      className="wod-card-action wod-card-register"
+                      className="my-wods-action catalog-register-action"
                       aria-label={`Registrar resultado de ${wod.name}`}
                     >
-                      Registrar resultado →
+                      <span className="catalog-register-icon" aria-hidden="true">
+                        +
+                      </span>
+                      <span>Registrar</span>
                     </Link>
                   )}
                 </div>
