@@ -40,7 +40,7 @@ public class ExerciseResultService {
 
     @Transactional(readOnly = true)
     public List<ExerciseResult> findAll() {
-        return exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(
+        return exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(
                 currentUserService.require().getId());
     }
 
@@ -48,7 +48,7 @@ public class ExerciseResultService {
     public List<ExerciseResult> findPersonalBests() {
         User user = currentUserService.require();
         List<ExerciseResult> results = exerciseResultRepository
-                .findByUserIdOrderByPerformedAtDesc(user.getId());
+                .findByUserIdOrderByPerformedAtDescIdDesc(user.getId());
         Map<BestKey, ExerciseResult> bestByKey = new HashMap<>();
 
         for (ExerciseResult result : results) {

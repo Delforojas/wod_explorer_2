@@ -7,6 +7,8 @@ import ExerciseResultCard from "./ExerciseResultCard";
 const result: ExerciseResultResponse = {
   id: 1,
   exerciseId: 112,
+  exerciseName: "Run",
+  measurementType: "DISTANCE_TIME",
   reps: null,
   weightKg: null,
   distanceM: 5000,

@@ -21,6 +21,8 @@ function createResult(id: number, exerciseId: number): ExerciseResultResponse {
   return {
     id,
     exerciseId,
+    exerciseName: `Exercise ${exerciseId}`,
+    measurementType: "REPS",
     reps: 10,
     weightKg: null,
     distanceM: null,

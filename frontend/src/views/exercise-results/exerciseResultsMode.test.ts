@@ -9,6 +9,8 @@ function createResult(id: number): ExerciseResultResponse {
   return {
     id,
     exerciseId: id,
+    exerciseName: `Exercise ${id}`,
+    measurementType: "REPS",
     reps: id,
     weightKg: null,
     distanceM: null,
