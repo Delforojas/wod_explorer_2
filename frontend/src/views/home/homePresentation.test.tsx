@@ -76,6 +76,8 @@ describe("home presentation", () => {
     expect(markup).toContain("Catálogo de ejercicios");
     expect(markup).toContain("Iniciar sesión");
     expect(markup).not.toContain("Registrar resultado de WOD");
+    expect(markup).not.toContain("Registrar resultado de ejercicio");
+    expect(markup).not.toContain("Benchmarks");
   });
 
   it("renders authenticated shortcuts and recent activity", () => {
@@ -83,10 +85,28 @@ describe("home presentation", () => {
 
     expect(markup).toContain("Hola, Rogue");
     expect(markup).toContain("Registrar resultado de WOD");
+    expect(markup).toContain('href="/my-wod-results/new"');
+    expect(markup).toContain("Registrar resultado de ejercicio");
+    expect(markup).toContain('href="/exercise-results/new"');
     expect(markup).toContain("Mis WODs");
+    expect(markup).toContain("Benchmarks");
+    expect(markup).toContain('href="/my-exercise-results"');
     expect(markup).toContain("Crear WOD personal");
     expect(markup).toContain("Actividad reciente");
+    expect(markup).toContain("home-activity-kind");
+    expect(markup).toContain(">WOD</span>");
     expect(markup).toContain("WOD 1");
+    expect(markup).not.toContain("Iniciar sesión");
+  });
+
+  it("wraps long authenticated display names without changing the guest home", () => {
+    const markup = renderHome({
+      ...authenticatedProps,
+      username: "usuario-de-pruebas-con-un-nombre-muy-largo",
+    });
+
+    expect(markup).toContain("usuario-de-pruebas-con-un-nombre-muy-largo");
+    expect(markup).toContain("home-dashboard-hero-copy");
     expect(markup).not.toContain("Iniciar sesión");
   });
 

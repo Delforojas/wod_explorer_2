@@ -26,7 +26,7 @@ function HomeView({
                 <span>WE</span>
               </div>
 
-              <div>
+              <div className="home-dashboard-hero-copy">
                 <p className="home-eyebrow">TU ENTRENAMIENTO</p>
                 <h1>Hola, {getHomeDisplayName(username)}</h1>
                 <p className="home-description">
@@ -35,9 +35,21 @@ function HomeView({
                 </p>
               </div>
 
-              <Link className="home-dashboard-primary" to="/my-wod-results/new">
-                Registrar resultado de WOD <span aria-hidden="true">→</span>
-              </Link>
+              <div className="home-dashboard-hero-actions">
+                <Link
+                  className="home-dashboard-primary"
+                  to="/my-wod-results/new"
+                >
+                  Registrar resultado de WOD <span aria-hidden="true">→</span>
+                </Link>
+                <Link
+                  className="home-dashboard-secondary"
+                  to="/exercise-results/new"
+                >
+                  Registrar resultado de ejercicio
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
             </header>
 
             <nav
@@ -50,6 +62,17 @@ function HomeView({
                 <span>
                   <strong>Mis WODs</strong>
                   <small>Revisa tus entrenamientos personales</small>
+                </span>
+                <span aria-hidden="true">→</span>
+              </Link>
+
+              <Link
+                className="home-dashboard-action"
+                to="/my-exercise-results"
+              >
+                <span>
+                  <strong>Benchmarks</strong>
+                  <small>Consulta tus marcas de ejercicios</small>
                 </span>
                 <span aria-hidden="true">→</span>
               </Link>
@@ -119,7 +142,8 @@ function HomeView({
                   <li className="home-activity-item" key={result.id}>
                     <div>
                       <h3>{result.wodName}</h3>
-                      <p>
+                      <p className="home-activity-meta">
+                        <span className="home-activity-kind">WOD</span>
                         {formatWodType(result.type)} ·{" "}
                         {formatWodResultDate(result.performedAt)}
                       </p>
