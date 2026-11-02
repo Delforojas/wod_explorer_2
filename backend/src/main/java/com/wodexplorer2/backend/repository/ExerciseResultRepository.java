@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface ExerciseResultRepository
         extends JpaRepository<ExerciseResult, Long> {
 
-    List<ExerciseResult> findByUserIdOrderByPerformedAtDesc(Long userId);
+    List<ExerciseResult> findByUserIdOrderByPerformedAtDescIdDesc(Long userId);
 
     Optional<ExerciseResult> findByIdAndUserId(Long id, Long userId);
 }

@@ -60,7 +60,7 @@ class ExerciseResultServiceTest {
                 3L, 10L, 5, "70", "2026-01-03T10:00:00");
 
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(7L))
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(7L))
                 .thenReturn(List.of(lighterThreeReps, heavierThreeReps, differentRepGroup));
 
         List<ExerciseResult> bests = exerciseResultService.findPersonalBests();
@@ -76,7 +76,7 @@ class ExerciseResultServiceTest {
         ExerciseResult otherExercise = repsResult(3L, 20L, 10, "2026-01-03T10:00:00");
 
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(7L))
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(7L))
                 .thenReturn(List.of(fewerReps, moreReps, otherExercise));
 
         List<ExerciseResult> bests = exerciseResultService.findPersonalBests();
@@ -97,7 +97,7 @@ class ExerciseResultServiceTest {
                 4L, 20L, "5000", 300, "2026-01-04T10:00:00");
 
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(7L))
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(7L))
                 .thenReturn(List.of(slowerFiveK, fasterFiveK, oneK, otherExercise));
 
         List<ExerciseResult> bests = exerciseResultService.findPersonalBests();
@@ -116,7 +116,7 @@ class ExerciseResultServiceTest {
                 10L, 10L, "5000.00", 1472, "2026-01-02T10:00:00");
 
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(7L))
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(7L))
                 .thenReturn(List.of(olderHigherId, newerLowerId, sameDateHigherId));
 
         List<ExerciseResult> bests = exerciseResultService.findPersonalBests();
@@ -135,7 +135,7 @@ class ExerciseResultServiceTest {
                 10L, 10L, 3, "90", "2026-01-02T10:00:00");
 
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(7L))
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(7L))
                 .thenReturn(List.of(olderHigherId, newerLowerId, sameDateHigherId));
 
         List<ExerciseResult> bests = exerciseResultService.findPersonalBests();
@@ -184,7 +184,7 @@ class ExerciseResultServiceTest {
                 "2026-01-04T10:00:00");
 
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(7L))
+         when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(7L))
                 .thenReturn(List.of(time, distance, weightDistance, invalidDistanceTime));
 
         assertEquals(List.of(), exerciseResultService.findPersonalBests());
@@ -196,12 +196,26 @@ class ExerciseResultServiceTest {
         ExerciseResult currentUserResult = distanceTimeResult(
                 1L, 10L, "5000", 1472, "2026-01-01T10:00:00");
         when(currentUserService.require()).thenReturn(user);
-        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDesc(42L))
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(42L))
                 .thenReturn(List.of(currentUserResult));
 
         assertEquals(List.of(currentUserResult), exerciseResultService.findPersonalBests());
 
-        verify(exerciseResultRepository).findByUserIdOrderByPerformedAtDesc(42L);
+        verify(exerciseResultRepository).findByUserIdOrderByPerformedAtDescIdDesc(42L);
+    }
+
+    @Test
+    void findsAllResultsUsingDeterministicDateAndIdOrder() {
+        User user = user(42L);
+        List<ExerciseResult> results = List.of(
+                distanceTimeResult(8L, 10L, "5000", 1472, "2026-01-02T10:00:00"),
+                distanceTimeResult(3L, 10L, "5000", 1500, "2026-01-02T10:00:00"));
+        when(currentUserService.require()).thenReturn(user);
+        when(exerciseResultRepository.findByUserIdOrderByPerformedAtDescIdDesc(42L))
+                .thenReturn(results);
+
+        assertEquals(results, exerciseResultService.findAll());
+        verify(exerciseResultRepository).findByUserIdOrderByPerformedAtDescIdDesc(42L);
     }
 
     private ExerciseResult weightResult(
@@ -265,8 +279,8 @@ class ExerciseResultServiceTest {
             String performedAt) {
         Exercise exercise = org.mockito.Mockito.mock(Exercise.class);
         ExerciseResult result = org.mockito.Mockito.mock(ExerciseResult.class);
-        when(exercise.getMeasurementType()).thenReturn(measurementType);
-        when(result.getExercise()).thenReturn(exercise);
+        lenient().when(exercise.getMeasurementType()).thenReturn(measurementType);
+        lenient().when(result.getExercise()).thenReturn(exercise);
 
         if (measurementType == MeasurementType.WEIGHT
                 || measurementType == MeasurementType.REPS

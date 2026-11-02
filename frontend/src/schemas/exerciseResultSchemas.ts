@@ -12,6 +12,15 @@ export const exerciseResultRequestSchema = z.object({
 export const exerciseResultResponseSchema = z.object({
   id: z.number(),
   exerciseId: z.number(),
+  exerciseName: z.string(),
+  measurementType: z.enum([
+    "WEIGHT",
+    "REPS",
+    "TIME",
+    "DISTANCE",
+    "WEIGHT_DISTANCE",
+    "DISTANCE_TIME",
+  ]),
   reps: z.number().nullable(),
   weightKg: z.number().nullable(),
   distanceM: z.number().nullable(),

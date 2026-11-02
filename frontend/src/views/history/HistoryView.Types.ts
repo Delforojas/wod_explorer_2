@@ -1,5 +1,18 @@
 import type { WodResultResponse } from "../../types/WodResult";
+import type { ExerciseResultResponse } from "../../types/ExerciseResult";
 import type { WodOrigin, WodType } from "../../types/Wod";
+
+export type HistoryMode = "ALL" | "WODS" | "EXERCISES";
+
+export type HistoryEntry =
+  | {
+      kind: "WOD";
+      result: WodResultResponse;
+    }
+  | {
+      kind: "EXERCISE";
+      result: ExerciseResultResponse;
+    };
 
 export interface HistoryWodOption {
   id: number;
@@ -15,15 +28,21 @@ export interface HistoryFilterValues {
 }
 
 export interface HistoryViewProps {
-  results: WodResultResponse[];
+  entries: HistoryEntry[];
   wods: HistoryWodOption[];
+  mode: HistoryMode;
   filters: HistoryFilterValues;
-  loading: boolean;
-  error: string | null;
+  wodLoading: boolean;
+  exerciseLoading: boolean;
+  wodError: string | null;
+  exerciseError: string | null;
   onFilterChange: (
     field: keyof HistoryFilterValues,
     value: string,
   ) => void;
+  onModeChange: (mode: HistoryMode) => void;
   onApplyFilters: () => void;
   onClearFilters: () => void;
+  onRetryWods: () => void;
+  onRetryExercises: () => void;
 }

@@ -32,6 +32,8 @@ public class ExerciseResultMapper {
     return new ExerciseResultResponse(
         exerciseResult.getId(),
         exerciseResult.getExercise().getId(),
+        exerciseResult.getExercise().getName(),
+        exerciseResult.getExercise().getMeasurementType(),
         exerciseResult.getReps(),
         exerciseResult.getWeightKg(),
         exerciseResult.getDistanceM(),
