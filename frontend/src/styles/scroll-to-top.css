@@ -1,0 +1,60 @@
+.scroll-to-top {
+  position: fixed;
+  right: calc(var(--space-6) + env(safe-area-inset-right));
+  bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+  z-index: 20;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-raised);
+
+  color: var(--color-foreground-soft);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+.scroll-to-top:focus-visible {
+  outline: 2px solid var(--color-orange-500);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .scroll-to-top {
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .scroll-to-top:hover {
+    border-color: var(--color-orange-500);
+    background: var(--color-accent);
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 899px) {
+  .scroll-to-top {
+    right: calc(var(--space-4) + env(safe-area-inset-right));
+    bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top {
+    transition: none;
+  }
+}

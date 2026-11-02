@@ -4,6 +4,7 @@ import Footer from "./Footer";
 import MobileNavigation from "./MobileNavigation";
 import Navbar from "./Navbar";
 import PulsarGridBackground from "./PulsarGridBackground";
+import ScrollToTopButton from "./ScrollToTopButton";
 import { useAuth } from "../../auth/useAuth";
 
 interface AppLayoutProps {
@@ -32,6 +33,8 @@ function AppLayout({ children }: AppLayoutProps) {
 
         <div className="app-main-content">{children}</div>
       </main>
+
+      <ScrollToTopButton />
 
       <MobileNavigation
         isAuthenticated={isAuthenticated}
