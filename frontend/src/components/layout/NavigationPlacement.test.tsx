@@ -50,4 +50,14 @@ describe("navigation user menu placement", () => {
     expect(markup).toContain("Iniciar sesión");
     expect(markup).not.toContain("user-menu");
   });
+
+  it("labels the exercise results navigation as Benchmarks", () => {
+    const desktopMarkup = renderNavigation(<Navbar />);
+    const mobileMarkup = renderNavigation(<MobileNavigation isAuthenticated />);
+
+    expect(desktopMarkup).toContain('href="/my-exercise-results"');
+    expect(desktopMarkup).toContain(">Benchmarks</span>");
+    expect(mobileMarkup).toContain('href="/my-exercise-results"');
+    expect(mobileMarkup).toContain(">Benchmarks</span>");
+  });
 });
