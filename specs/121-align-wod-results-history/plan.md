@@ -11,8 +11,8 @@ acción nativa, sin alterar los handlers recibidos por props.
 ## Archivos afectados
 
 - `frontend/src/views/wod-results/MyWodResultsView.tsx`: retirar
-  `MyWodsNavigation`, ajustar el copy de contexto y aplicar la navegación/CTA
-  compartida de Benchmarks.
+  `MyWodsNavigation`, aplicar el título, etiqueta y subtítulo aprobados, y
+  reutilizar la navegación/CTA compartida de Benchmarks.
 - `frontend/src/views/wod-results/components/WodResultsList.tsx`: cambiar el
   wrapper visual de grid de tarjetas por un listado ligero específico.
 - `frontend/src/views/wod-results/components/WodResultCard.tsx`: reorganizar
@@ -34,8 +34,8 @@ backend, rutas, confirmación nativa ni persistencia.
 1. Eliminar el wrapper `MyWodsNavigation` de la vista y conservar solo el CTA
    de registro con `exercise-results-navigation`, `exercise-results-nav-link`
    y `exercise-results-nav-action`.
-2. Mantener cabecera, contador y estados existentes, cambiando únicamente el
-   subtítulo para distinguir historial de resultados de WODs creados.
+2. Mantener contador y estados existentes, usando exactamente el título,
+   etiqueta, subtítulo y CTA aprobados por la Issue.
 3. Renderizar la colección con un contenedor `resource-list` específico y cada
    resultado como fila con nombre, modalidad/origen, fecha, todas las líneas
    del resultado y botón de eliminación.

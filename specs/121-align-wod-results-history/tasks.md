@@ -11,7 +11,8 @@
 
 - [x] Retirar el botón/tab `Resultados` únicamente de `MyWodResultsView` y
       conservar el CTA/formulario de registro.
-- [x] Alinear cabecera, CTA y contexto de la vista con Benchmarks.
+- [x] Alinear cabecera, CTA y contexto de la vista con Benchmarks, incluyendo
+      `WOD Results`, `SEGUIMIENTO PERSONAL`, el subtítulo aprobado y `+ Add Score`.
 - [x] Convertir cards de resultados en filas ligeras con metadata y acciones
       accesibles.
 - [x] Conservar la representación completa de FOR_TIME, AMRAP, EMOM y progreso

@@ -52,9 +52,12 @@ describe("my WOD results presentation", () => {
   it("renders the history CTA and lightweight result row", () => {
     const markup = renderView();
 
-    expect(markup).toContain("Mis WODs");
-    expect(markup).toContain("Historial de resultados registrados");
-    expect(markup).toContain("+ Registrar resultado");
+    expect(markup).toContain("WOD Results");
+    expect(markup).toContain("SEGUIMIENTO PERSONAL");
+    expect(markup).toContain(
+      "Consulta tus resultados y sigue tu evolución en cada entrenamiento.",
+    );
+    expect(markup).toContain("+ Add Score");
     expect(markup).toContain('href="/my-wod-results/new"');
     expect(markup).not.toContain(">Resultados</a>");
     expect(markup).toContain("Fran");

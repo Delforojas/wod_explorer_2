@@ -17,12 +17,12 @@ function MyWodResultsView({
         {/* ENCABEZADO */}
 
         <header className="wod-header exercise-results-header">
-          <p className="wod-eyebrow">MIS ENTRENAMIENTOS</p>
+          <p className="wod-eyebrow">SEGUIMIENTO PERSONAL</p>
 
-          <h1>Mis WODs</h1>
+          <h1>WOD Results</h1>
 
           <p className="wod-description">
-            Historial de resultados registrados en tus entrenamientos.
+            Consulta tus resultados y sigue tu evolución en cada entrenamiento.
           </p>
         </header>
 
@@ -36,7 +36,7 @@ function MyWodResultsView({
             to="/my-wod-results/new"
             className="exercise-results-nav-link exercise-results-nav-action"
           >
-            + Registrar resultado
+            + Add Score
           </Link>
         </nav>
 
