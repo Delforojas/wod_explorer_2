@@ -30,7 +30,19 @@
 - [x] Ejecutar `npm run lint` desde `frontend/`.
 - [x] Ejecutar `npm run test` desde `frontend/`.
 - [x] Ejecutar `npm run build` desde `frontend/`.
-- [ ] Ejecutar `./mvnw -q test` desde `backend/`.
+- [x] Ejecutar `./mvnw -q test` desde `backend/`.
 - [x] Ejecutar `git diff --check`.
 - [x] Revisar diff final y crear commit local sin push.
 - [x] Documentar la Issue y preparar checklist manual sin aprobarla.
+
+## Resultado de verificación
+
+- `./mvnw -q test` desde `backend/`: correcto, incluyendo las pruebas de
+  mapper, servicio y privacidad de resultados de ejercicios.
+- `npm run lint`, `npm run test` y `npm run build` desde `frontend/`: correctos.
+- `git diff --check`: correcto.
+- La integración local de `main` actualizado se realizó sin conflictos en el
+  commit `76d4ea5`; no se hizo push, PR, merge remoto ni cierre de la Issue.
+- La validación visual manual de datos mixtos, filtros, cronología, ejercicios
+  inactivos, estados parciales, responsive y teclado sigue pendiente de
+  aprobación explícita.
