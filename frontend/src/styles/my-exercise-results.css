@@ -49,6 +49,51 @@
   gap: var(--space-3);
 }
 
+.exercise-results-mode-toggle {
+  display: flex;
+  width: 100%;
+  gap: 4px;
+  padding: 4px;
+  box-sizing: border-box;
+
+  border: 1px solid var(--results-border);
+  border-radius: 14px;
+
+  background: rgba(8, 12, 18, 0.6);
+}
+
+.exercise-results-mode-button {
+  flex: 1;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.exercise-results-mode-button[aria-pressed="true"] {
+  border-color: rgba(255, 107, 0, 0.4);
+  background: rgba(255, 107, 0, 0.14);
+  color: #ffffff;
+}
+
+.exercise-results-mode-button:hover {
+  color: #ffffff;
+}
+
+.exercise-results-mode-button:focus-visible {
+  outline: 2px solid var(--results-orange);
+  outline-offset: 2px;
+}
+
 .exercise-results-filter {
   display: flex;
   flex-direction: column;
@@ -178,6 +223,74 @@
   border-color: rgba(255, 107, 0, 0.4);
 }
 
+.exercise-result-card {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.exercise-result-card-header {
+  display: flex;
+  min-width: 0;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.exercise-result-card-header h2 {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+}
+
+.exercise-result-card-header .exercise-result-personal-best {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.exercise-result-card > .result-value {
+  min-width: 0;
+  margin-top: var(--space-1);
+  overflow-wrap: anywhere;
+}
+
+.exercise-result-card > .resource-meta {
+  margin-top: var(--space-1);
+}
+
+.exercise-result-personal-best {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 107, 0, 0.4);
+  border-radius: 6px;
+
+  background: rgba(255, 107, 0, 0.12);
+  color: var(--results-orange-light);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.exercise-result-personal-best svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
 /* HOVER */
 
 @media (hover: hover) and (pointer: fine) {
@@ -284,6 +397,11 @@
   .exercise-results-navigation {
     padding: 0 var(--space-6);
     box-sizing: border-box;
+  }
+
+  .exercise-results-mode-toggle,
+  .exercise-results-filter {
+    width: calc(100% - 48px);
   }
 
   .exercise-results-nav-link {

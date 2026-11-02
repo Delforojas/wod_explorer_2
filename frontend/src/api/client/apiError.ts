@@ -47,6 +47,7 @@ export const API_ERROR_MESSAGES = {
 
   EXERCISE_RESULTS: {
     GET_ALL: "Error al obtener las marcas de ejercicios",
+    GET_PERSONAL_BESTS: "Error al obtener tus mejores marcas de ejercicios",
     CREATE: "Error al registrar la marca",
     DELETE: "Error al eliminar la marca",
   },

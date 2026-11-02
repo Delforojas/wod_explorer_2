@@ -31,6 +31,13 @@ public class ExerciseResultController {
                 .toList();
     }
 
+    @GetMapping("/personal-bests")
+    public List<ExerciseResultResponse> findPersonalBests() {
+        return exerciseResultService.findPersonalBests().stream()
+                .map(exerciseResultMapper::toResponse)
+                .toList();
+    }
+
     @GetMapping("/{id}")
     public ExerciseResultResponse findById(@PathVariable Long id) {
         return exerciseResultMapper.toResponse(exerciseResultService.findById(id));

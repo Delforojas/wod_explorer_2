@@ -1,11 +1,17 @@
 import type { ExerciseResultResponse } from "../../../types/ExerciseResult";
+import PersonalBestBadge from "./PersonalBestBadge";
 
 interface ExerciseResultCardProps {
   result: ExerciseResultResponse;
   exerciseName: string;
+  isPersonalBest: boolean;
 }
 
-function ExerciseResultCard({ result, exerciseName }: ExerciseResultCardProps) {
+function ExerciseResultCard({
+  result,
+  exerciseName,
+  isPersonalBest,
+}: ExerciseResultCardProps) {
   // FORMATO DE FECHA
 
   function formatDate(date: string): string {
@@ -83,11 +89,12 @@ function ExerciseResultCard({ result, exerciseName }: ExerciseResultCardProps) {
   }
 
   return (
-    <article className="resource-row resource-row-static">
+    <article className="resource-row resource-row-static exercise-result-card">
       {/* NOMBRE DEL EJERCICIO */}
 
-      <header>
+      <header className="exercise-result-card-header">
         <h2>{exerciseName}</h2>
+        {isPersonalBest && <PersonalBestBadge />}
       </header>
 
       {/* RESULTADO */}

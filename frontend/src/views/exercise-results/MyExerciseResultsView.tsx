@@ -5,16 +5,31 @@ import type { MyExerciseResultsViewProps } from "./MyExerciseResultsView.Types";
 
 import ExerciseResultsList from "./components/ExerciseResultsList";
 import { filterExerciseResults } from "./exerciseResultsFilter";
+import { getResultsForMode } from "./exerciseResultsMode";
 
 function MyExerciseResultsView({
   results,
+  personalBests,
   exercises,
-  loading,
-  error,
-  onRetry,
+  mode,
+  resultsLoading,
+  personalBestsLoading,
+  resultsError,
+  personalBestsError,
+  exercisesError,
+  onModeChange,
+  onRetryResults,
+  onRetryPersonalBests,
+  onRetryExercises,
 }: MyExerciseResultsViewProps) {
   const [search, setSearch] = useState("");
-  const visibleResults = filterExerciseResults(results, exercises, search);
+  const activeResults = getResultsForMode(results, personalBests, mode);
+  const visibleResults = filterExerciseResults(activeResults, exercises, search);
+  const personalBestIds = new Set(personalBests.map((result) => result.id));
+  const activeLoading = mode === "best" ? personalBestsLoading : resultsLoading;
+  const activeError = mode === "best" ? personalBestsError : resultsError;
+  const activeErrorRetry =
+    mode === "best" ? onRetryPersonalBests : onRetryResults;
 
   return (
     <section className="exercise-results-page">
@@ -47,6 +62,29 @@ function MyExerciseResultsView({
             + Registrar marca
           </NavLink>
         </nav>
+
+        <div
+          className="exercise-results-mode-toggle"
+          role="group"
+          aria-label="Modo de marcas"
+        >
+          <button
+            type="button"
+            className="exercise-results-mode-button"
+            aria-pressed={mode === "all"}
+            onClick={() => onModeChange("all")}
+          >
+            Todas las marcas
+          </button>
+          <button
+            type="button"
+            className="exercise-results-mode-button"
+            aria-pressed={mode === "best"}
+            onClick={() => onModeChange("best")}
+          >
+            Mejores marcas
+          </button>
+        </div>
 
         <div className="exercise-results-filter">
           <label htmlFor="exercise-results-exercise-filter">
@@ -86,33 +124,53 @@ function MyExerciseResultsView({
 
         {/* CONTENIDO */}
 
-        {loading ? (
-          <p className="exercise-results-loading" role="status">
-            Cargando tus marcas...
-          </p>
-        ) : error ? (
+        {exercisesError && (
           <div className="exercise-results-state">
             <p className="exercise-results-error" role="alert">
-              {error}
+              {exercisesError}
             </p>
             <button
               className="exercise-results-retry"
               type="button"
-              onClick={onRetry}
+              onClick={onRetryExercises}
+            >
+              Reintentar nombres
+            </button>
+          </div>
+        )}
+
+        {activeLoading ? (
+          <p className="exercise-results-loading" role="status">
+            {mode === "best"
+              ? "Cargando tus mejores marcas..."
+              : "Cargando tus marcas..."}
+          </p>
+        ) : activeError ? (
+          <div className="exercise-results-state">
+            <p className="exercise-results-error" role="alert">
+              {activeError}
+            </p>
+            <button
+              className="exercise-results-retry"
+              type="button"
+              onClick={activeErrorRetry}
             >
               Reintentar
             </button>
           </div>
         ) : visibleResults.length === 0 ? (
           <p className="exercise-results-empty" role="status" aria-live="polite">
-            {results.length === 0
-              ? "Todavía no has registrado ninguna marca."
+            {activeResults.length === 0
+              ? mode === "best"
+                ? "Todavía no tienes mejores marcas calculables."
+                : "Todavía no has registrado ninguna marca."
               : `No se encontraron marcas para "${search.trim()}".`}
           </p>
         ) : (
           <ExerciseResultsList
             results={visibleResults}
             exercises={exercises}
+            personalBestIds={personalBestIds}
           />
         )}
       </div>
