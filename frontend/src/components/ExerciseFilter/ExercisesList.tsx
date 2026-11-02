@@ -92,41 +92,40 @@ function ExercisesList({ exercises }: ExercisesListProps) {
             : "No se encontraron ejercicios con ese nombre."}
         </p>
       ) : (
-        <ul
-          className="resource-list catalog-list exercise-list"
-          aria-label="Ejercicios disponibles"
-        >
+        <div className="my-wods-list exercise-catalog-list">
           {filteredExercises.map((exercise) => (
-            <li
+            <article
               key={exercise.id}
-              className="resource-row editorial-row catalog-row exercise-row"
+              className="my-wod-row exercise-catalog-row"
             >
-              <header>
+              <div className="my-wod-content">
                 <h2>
                   <span>{exercise.name}</span>
                 </h2>
-              </header>
 
-              <div className="resource-meta">
-                <span>{exercise.category}</span>
-                <span>{exercise.measurementType}</span>
+                <div className="my-wod-meta">
+                  <span>{exercise.category}</span>
+                  <span>{exercise.measurementType}</span>
+                </div>
               </div>
 
               {isAuthenticated && (
-                <div className="resource-actions exercise-row-action">
+                <div className="my-wods-actions catalog-row-actions">
                   <Link
                     to={`/exercise-results/new?exerciseId=${exercise.id}`}
-                    className="row-action exercise-register-action"
+                    className="my-wods-action catalog-register-action"
                     aria-label={`Registrar resultado de ${exercise.name}`}
                   >
-                    Registrar resultado
-                    <span aria-hidden="true">→</span>
+                    <span className="catalog-register-icon" aria-hidden="true">
+                      +
+                    </span>
+                    <span>Registrar</span>
                   </Link>
                 </div>
               )}
-            </li>
+            </article>
           ))}
-        </ul>
+        </div>
       )}
     </>
   );

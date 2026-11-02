@@ -40,7 +40,8 @@ describe("ExercisesList", () => {
     expect(markup).not.toContain("Ver detalle");
     expect(markup).not.toContain("exercise-detail");
     expect(markup).not.toContain("/exercise-results/new");
-    expect(markup).toContain("resource-row");
+    expect(markup).toContain("my-wod-row");
+    expect(markup).not.toContain("resource-list");
     expect(markup).toContain("GYMNASTICS");
     expect(markup).toContain("REPS");
   });
@@ -51,7 +52,10 @@ describe("ExercisesList", () => {
     expect(markup).not.toContain("Ver detalle");
     expect(markup).not.toContain("exercise-detail");
     expect(markup).toContain('href="/exercise-results/new?exerciseId=7"');
-    expect(markup).toContain("Registrar resultado");
+    expect(markup).toContain("catalog-register-action");
+    expect(markup).toContain("catalog-register-icon");
+    expect(markup).toContain(">Registrar</span>");
+    expect(markup).not.toContain("→");
     expect(markup).toContain("catalog-search-icon");
   });
 });

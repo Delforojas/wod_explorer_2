@@ -20,11 +20,12 @@
 
 ## Verificación y handoff
 
-- [ ] Revisar que no existan cambios en backend, API, dominio, ownership,
+- [x] Revisar que no existan cambios en backend, API, dominio, ownership,
       persistencia o formularios.
 - [x] Ejecutar `npm run lint` desde `frontend/`.
 - [x] Ejecutar `npm run test` desde `frontend/`.
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check`.
 - [ ] Revisar diff final y crear commit local sin push.
-- [ ] Dejar validación visual manual pendiente si no hay navegador disponible.
+- [x] Completar la validación visual manual en escritorio y móvil con aprobación
+      explícita del usuario.

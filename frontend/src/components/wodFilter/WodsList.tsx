@@ -116,54 +116,56 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             )}
           </div>
         ) : (
-          <ul
-            className="resource-list catalog-list wod-list"
-            aria-label="WODs disponibles"
-          >
+          <div className="my-wods-list wod-catalog-list">
             {filteredWods.map((wod) => (
-              <li
-                className="resource-row editorial-row catalog-row wod-row"
+              <article
+                className="my-wod-row wod-catalog-row"
                 key={wod.id}
               >
-                <header>
+                <div className="my-wod-content">
                   <h2>{wod.name}</h2>
-                </header>
 
-                <div className="resource-meta">
-                  <span>{formatWodType(wod.version.type)}</span>
+                  <div className="my-wod-meta">
+                    <span>{formatWodType(wod.version.type)}</span>
 
-                  {wod.version.timeCapSeconds != null && (
-                    <span>
-                      {Math.floor(wod.version.timeCapSeconds / 60)} min
-                    </span>
-                  )}
+                    {wod.version.timeCapSeconds != null && (
+                      <span>
+                        {Math.floor(wod.version.timeCapSeconds / 60)} min
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="resource-actions wod-row-actions">
+                <div
+                  className="my-wods-actions catalog-row-actions"
+                  role="group"
+                  aria-label={`Acciones para ${wod.name}`}
+                >
                   <button
-                    className="row-action wod-view-action"
+                    className="my-wods-action my-wods-view-action"
                     type="button"
                     onClick={() => onSelectWod(wod.id)}
-                    aria-label={`Abrir entrenamiento ${wod.name}`}
+                    aria-label={`Ver WOD ${wod.name}`}
                   >
                     Ver WOD
-                    <span aria-hidden="true">→</span>
                   </button>
 
                   {isAuthenticated && (
                     <Link
                       to={`/my-wod-results/new?wodId=${wod.id}`}
-                      className="row-action wod-register-action"
+                      className="my-wods-action catalog-register-action"
                       aria-label={`Registrar resultado de ${wod.name}`}
                     >
-                      Registrar resultado
-                      <span aria-hidden="true">→</span>
+                      <span className="catalog-register-icon" aria-hidden="true">
+                        +
+                      </span>
+                      <span>Registrar</span>
                     </Link>
                   )}
                 </div>
-              </li>
+              </article>
             ))}
-          </ul>
+          </div>
         )}
 
       </div>

@@ -52,6 +52,8 @@ describe("WodsList", () => {
     expect(markup).toContain("For Time");
     expect(markup).toContain("15 min");
     expect(markup).toContain("Ver WOD");
+    expect(markup).toContain("my-wod-row");
+    expect(markup).not.toContain("resource-list");
     expect(markup).not.toContain("/my-wod-results/new");
   });
 
@@ -59,7 +61,10 @@ describe("WodsList", () => {
     const markup = renderWodsList(true);
 
     expect(markup).toContain('href="/my-wod-results/new?wodId=12"');
-    expect(markup).toContain("Registrar resultado");
+    expect(markup).toContain("catalog-register-action");
+    expect(markup).toContain("catalog-register-icon");
+    expect(markup).toContain(">Registrar</span>");
+    expect(markup).not.toContain("→");
     expect(markup).toContain("catalog-search-icon");
   });
 });

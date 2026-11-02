@@ -182,6 +182,46 @@
   color: #fca5a5;
 }
 
+/* CTA COMPACTO COMPARTIDO DE CATÁLOGOS */
+
+.catalog-register-action {
+  gap: var(--space-2);
+
+  border-color: var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  background: var(--color-background-100);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.catalog-register-icon {
+  color: var(--color-orange-500);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .catalog-register-action:hover {
+    border-color: var(--color-orange-500);
+    background: var(--color-background-100);
+    color: #ffffff;
+    text-decoration: none;
+  }
+}
+
+.catalog-register-action:focus,
+.catalog-register-action:focus-visible,
+.catalog-register-action:active {
+  text-decoration: none;
+}
+
+.catalog-register-action:focus-visible {
+  outline: 2px solid var(--color-orange-500);
+  outline-offset: 3px;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .my-wods-action:hover {
     border-color: var(--color-orange-500);
@@ -239,6 +279,14 @@
   .my-wods-action {
     flex: 1 1 auto;
   }
+}
+
+.catalog-row-actions {
+  justify-content: flex-end;
+}
+
+.catalog-register-action {
+  flex: 0 0 auto;
 }
 
 /* MOVIMIENTO REDUCIDO */
