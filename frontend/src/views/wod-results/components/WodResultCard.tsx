@@ -31,30 +31,35 @@ function WodResultCard({ result, deleting, onDelete }: WodResultCardProps) {
   }
 
   return (
-    <article className="wod-card my-wod-result-card">
-      <h2>{result.wodName}</h2>
+    <article className="resource-row my-wod-result-row">
+      <header className="my-wod-result-row-header">
+        <div className="my-wod-result-identity">
+          <h2>{result.wodName}</h2>
 
-      <div className="wod-card-meta">
-        <span>{formatWodType(result.type)}</span>
-        <span>{formatWodOrigin(result.origin)}</span>
-        <span>Versión ID {result.wodVersionId}</span>
-      </div>
+          <div className="resource-meta">
+            <span>{formatWodType(result.type)}</span>
+            <span>{formatWodOrigin(result.origin)}</span>
+          </div>
+        </div>
 
-      <p className="my-wod-result-date">
-        {formatWodResultDate(result.performedAt)}
-      </p>
+        {renderResult()}
+      </header>
 
-      <div className="my-wod-result-content">{renderResult()}</div>
+      <footer className="my-wod-result-row-footer">
+        <time className="resource-meta" dateTime={result.performedAt}>
+          {formatWodResultDate(result.performedAt)}
+        </time>
 
-      <button
-        type="button"
-        className="my-wod-result-delete"
-        disabled={deleting}
-        onClick={() => onDelete(result.id)}
-        aria-label={`Eliminar resultado de ${result.wodName}`}
-      >
-        {deleting ? "Eliminando..." : "Eliminar resultado"}
-      </button>
+        <button
+          type="button"
+          className="row-action my-wod-result-delete"
+          disabled={deleting}
+          onClick={() => onDelete(result.id)}
+          aria-label={`Eliminar resultado de ${result.wodName}`}
+        >
+          {deleting ? "Eliminando..." : "Eliminar resultado"}
+        </button>
+      </footer>
     </article>
   );
 }

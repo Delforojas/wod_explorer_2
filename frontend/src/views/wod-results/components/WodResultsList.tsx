@@ -16,7 +16,7 @@ function WodResultsList({ results, deletingId, onDelete }: WodResultsListProps) 
 
       {/* LISTADO */}
 
-      <div className="wod-grid">
+      <div className="resource-list my-wod-results-list">
         {results.map((result) => (
           <WodResultCard
             key={result.id}
