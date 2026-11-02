@@ -307,3 +307,314 @@
     transform: none;
   }
 }
+
+/* ==========================================
+   DASHBOARD AUTENTICADO
+========================================== */
+
+.home-dashboard-page {
+  align-items: stretch;
+  justify-content: flex-start;
+  max-width: 980px;
+}
+
+.home-dashboard {
+  display: grid;
+  width: 100%;
+  gap: var(--space-8);
+}
+
+.home-dashboard-top {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.home-dashboard-hero,
+.home-dashboard-actions,
+.home-activity {
+  border: 1px solid #242424;
+  border-radius: var(--radius-lg);
+  background: rgb(0 0 0 / 68%);
+}
+
+.home-dashboard-hero {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+  padding: var(--space-8);
+}
+
+.home-dashboard-hero .home-logo {
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  border-color: rgb(255 107 0 / 35%);
+  background: rgb(255 107 0 / 12%);
+  color: var(--color-orange-300);
+  box-shadow: none;
+}
+
+.home-dashboard-hero .home-eyebrow,
+.home-dashboard-label {
+  margin: 0 0 var(--space-2);
+  color: var(--color-orange-300);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.home-dashboard-hero h1 {
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 6vw, 48px);
+  letter-spacing: -0.04em;
+}
+
+.home-dashboard-hero .home-description {
+  max-width: 46ch;
+  margin-bottom: 0;
+  color: var(--color-text-secondary);
+}
+
+.home-dashboard-primary {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-orange-500);
+  border-radius: var(--radius-md);
+  background: var(--color-orange-500);
+  color: #080808;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.home-dashboard-actions {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-5);
+}
+
+.home-dashboard-actions .home-dashboard-label {
+  margin-bottom: var(--space-2);
+}
+
+.home-dashboard-action {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #262626;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.home-dashboard-action span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.home-dashboard-action strong {
+  font-size: 14px;
+}
+
+.home-dashboard-action small {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.home-dashboard-action > span:last-child,
+.home-activity-link {
+  color: var(--color-orange-300);
+}
+
+.home-activity {
+  padding: var(--space-6);
+}
+
+.home-activity-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid #242424;
+}
+
+.home-activity-header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+
+.home-activity-link {
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.home-activity-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid #202020;
+}
+
+.home-activity-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.home-activity-item h3,
+.home-activity-item p,
+.home-activity-result {
+  margin: 0;
+}
+
+.home-activity-item h3 {
+  margin-bottom: var(--space-1);
+  font-size: 15px;
+}
+
+.home-activity-item p,
+.home-activity-result span {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.home-activity-result {
+  display: grid;
+  flex: 0 0 auto;
+  gap: var(--space-1);
+  text-align: right;
+}
+
+.home-activity-result strong {
+  color: var(--color-heading-strong);
+  font-size: 13px;
+}
+
+.home-activity-state {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-6) 0 var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.home-activity-state p {
+  margin: 0;
+}
+
+.home-activity-empty-title {
+  color: var(--color-heading-strong);
+  font-weight: 700;
+}
+
+.home-activity-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.home-retry {
+  justify-self: start;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-orange-500);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-orange-300);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.home-dashboard-primary:focus-visible,
+.home-dashboard-action:focus-visible,
+.home-activity-link:focus-visible,
+.home-retry:focus-visible {
+  outline: 2px solid var(--color-orange-300);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-dashboard-primary:hover {
+    background: var(--color-orange-300);
+    color: #080808;
+  }
+
+  .home-dashboard-action:hover {
+    border-color: rgb(255 107 0 / 60%);
+    background: rgb(255 107 0 / 8%);
+  }
+
+  .home-activity-link:hover {
+    color: #ffffff;
+  }
+
+  .home-retry:hover {
+    background: rgb(255 107 0 / 12%);
+  }
+}
+
+@media (min-width: 760px) {
+  .home-dashboard-top {
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-dashboard-page {
+    min-height: calc(100dvh - 60px);
+    padding: var(--space-5);
+  }
+
+  .home-dashboard-hero {
+    padding: var(--space-6);
+  }
+
+  .home-activity {
+    padding: var(--space-5);
+  }
+
+  .home-activity-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-activity-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-activity-result {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-dashboard-primary,
+  .home-dashboard-action,
+  .home-activity-link,
+  .home-retry {
+    transition: none;
+  }
+}
