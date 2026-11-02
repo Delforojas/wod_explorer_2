@@ -40,7 +40,7 @@ src/views/history/historyPresentation.test.ts` pasó (2 archivos, 9 tests).
 - [x] Ejecutar `npm run build` desde `frontend/`.
 - [x] Ejecutar `git diff --check`.
 - [x] Revisar diff final y crear commit local sin push.
-- [ ] Documentar la Issue con el commit y dejar validación manual pendiente.
+- [x] Documentar la Issue con los commits y dejar validación manual pendiente.
 
 ## Resultado de verificación
 
