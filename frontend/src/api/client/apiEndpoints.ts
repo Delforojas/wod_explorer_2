@@ -33,7 +33,6 @@ export const API_ENDPOINTS = {
 
   EXERCISES: {
     BASE: "/exercises",
-    BY_ID: (id: number) => `/exercises/${id}`,
   },
 
   EXERCISE_RESULTS: {

@@ -335,69 +335,6 @@
 }
 
 /* ==========================================
-   DETALLE DEL EJERCICIO
-========================================== */
-
-.exercise-detail {
-  width: 100%;
-
-  padding: var(--space-10) 35px;
-
-  box-sizing: border-box;
-
-  border: 1px solid var(--exercise-border);
-  border-radius: 28px;
-
-  background: var(--exercise-card-background);
-
-  box-shadow:
-    0 15px 40px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-/* ==========================================
-   DATOS DEL EJERCICIO
-========================================== */
-
-.exercise-detail-data {
-  display: grid;
-
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-
-  gap: var(--space-5);
-  margin: 0;
-}
-
-.exercise-detail-data div {
-  display: flex;
-  flex-direction: column;
-
-  min-width: 0;
-  gap: var(--space-2);
-}
-
-.exercise-detail-data dt {
-  font-size: 10px;
-  font-weight: 600;
-
-  letter-spacing: 2px;
-  text-transform: uppercase;
-
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.exercise-detail-data dd {
-  margin: 0;
-
-  font-size: 13px;
-  line-height: 1.7;
-
-  color: #ffffff;
-
-  overflow-wrap: anywhere;
-}
-
-/* ==========================================
    ESTADOS DE CARGA Y ERROR
 ========================================== */
 
@@ -436,9 +373,6 @@
     padding: var(--space-4) var(--space-5) 110px;
   }
 
-  .exercise-detail {
-    padding: 35px 30px;
-  }
 }
 /* ==========================================
    WOD EXPLORER 2.0
@@ -656,14 +590,6 @@
     min-height: 46px;
   }
 
-  /* DETALLE */
-
-  .exercise-detail {
-    width: auto;
-
-    margin: 0 var(--space-6);
-    padding: var(--space-8) var(--space-6);
-  }
   .exercise-search {
     max-width: none;
 

@@ -43,7 +43,6 @@ export const API_ERROR_MESSAGES = {
 
   EXERCISES: {
     GET_ALL: "Error al obtener los ejercicios",
-    GET_BY_ID: "Error al obtener el ejercicio",
   },
 
   EXERCISE_RESULTS: {

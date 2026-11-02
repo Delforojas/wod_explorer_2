@@ -1,14 +1,11 @@
 import type { ExercisesViewProps } from "./ExercisesView.Types";
 
 import ExercisesList from "../../components/ExerciseFilter/ExercisesList";
-import ExerciseDetail from "../../components/ExerciseFilter/ExerciseDetail";
 
 function ExercisesView({
   exercises,
-  selectedExercise,
   loading,
   error,
-  onSelectExercise,
 }: ExercisesViewProps) {
   if (loading) {
     return (
@@ -33,14 +30,7 @@ function ExercisesView({
   return (
     <section className="exercise-page">
       <div className="exercise-container">
-        <ExercisesList
-          exercises={exercises}
-          onSelectExercise={onSelectExercise}
-        />
-
-        {selectedExercise && (
-          <ExerciseDetail selectedExercise={selectedExercise} />
-        )}
+        <ExercisesList exercises={exercises} />
       </div>
     </section>
   );

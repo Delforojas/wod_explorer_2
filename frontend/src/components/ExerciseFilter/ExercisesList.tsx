@@ -11,10 +11,10 @@ import {
 
 type ExercisesListProps = Pick<
   ExercisesViewProps,
-  "exercises" | "onSelectExercise"
+  "exercises"
 >;
 
-function ExercisesList({ exercises, onSelectExercise }: ExercisesListProps) {
+function ExercisesList({ exercises }: ExercisesListProps) {
   const { isAuthenticated } = useAuth();
 
   const [search, setSearch] = useState("");
@@ -108,21 +108,8 @@ function ExercisesList({ exercises, onSelectExercise }: ExercisesListProps) {
 
                 {/* ACCIONES DEL EJERCICIO */}
 
-                <div className="exercise-card-actions">
-                  <button
-                    className="exercise-card-action"
-                    type="button"
-                    onClick={() => onSelectExercise(exercise.id)}
-                    aria-label={`Ver detalle de ${exercise.name}`}
-                  >
-                    <span>Ver detalle</span>
-
-                    <span className="exercise-card-arrow" aria-hidden="true">
-                      →
-                    </span>
-                  </button>
-
-                  {isAuthenticated && (
+                {isAuthenticated && (
+                  <div className="exercise-card-actions">
                     <Link
                       to={`/exercise-results/new?exerciseId=${exercise.id}`}
                       className="exercise-card-action exercise-card-register"
@@ -134,8 +121,8 @@ function ExercisesList({ exercises, onSelectExercise }: ExercisesListProps) {
                         →
                       </span>
                     </Link>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </article>
           ))}
