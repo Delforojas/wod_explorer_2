@@ -30,7 +30,10 @@ function createResult(id: number, exerciseId: number): ExerciseResultResponse {
   };
 }
 
-const exercises = [createExercise(10, "Snatch"), createExercise(20, "Snatch")];
+const exercises = [
+  createExercise(10, "Back Squat"),
+  createExercise(20, "Hang Squat Clean"),
+];
 const results = [createResult(1, 10)];
 
 function renderView(
@@ -53,13 +56,14 @@ function renderView(
 }
 
 describe("my exercise results presentation", () => {
-  it("renders the exercise filter with an all-exercises option and preserves registration", () => {
+  it("renders the search input and preserves registration", () => {
     const markup = renderView();
 
-    expect(markup).toContain("Ejercicio");
-    expect(markup).toContain("Todos los ejercicios");
-    expect(markup).toContain('value="10"');
-    expect(markup).toContain('value="20"');
+    expect(markup).toContain("Buscar por ejercicio");
+    expect(markup).toContain('type="search"');
+    expect(markup).toContain('placeholder="Buscar ejercicio..."');
+    expect(markup).toContain("exercise-results-search-icon");
+    expect(markup).not.toContain("<select");
     expect(markup).toContain('href="/exercise-results/new"');
     expect(markup).not.toContain("Mejores marcas");
   });

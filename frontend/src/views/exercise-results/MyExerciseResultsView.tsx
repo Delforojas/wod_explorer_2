@@ -13,13 +13,8 @@ function MyExerciseResultsView({
   error,
   onRetry,
 }: MyExerciseResultsViewProps) {
-  const [selectedExerciseId, setSelectedExerciseId] = useState<number | null>(
-    null,
-  );
-  const visibleResults = filterExerciseResults(results, selectedExerciseId);
-  const selectedExercise = exercises.find(
-    (exercise) => exercise.id === selectedExerciseId,
-  );
+  const [search, setSearch] = useState("");
+  const visibleResults = filterExerciseResults(results, exercises, search);
 
   return (
     <section className="exercise-results-page">
@@ -54,22 +49,39 @@ function MyExerciseResultsView({
         </nav>
 
         <div className="exercise-results-filter">
-          <label htmlFor="exercise-results-exercise-filter">Ejercicio</label>
-          <select
-            id="exercise-results-exercise-filter"
-            value={selectedExerciseId ?? ""}
-            onChange={(event) => {
-              const value = event.target.value;
-              setSelectedExerciseId(value === "" ? null : Number(value));
-            }}
-          >
-            <option value="">Todos los ejercicios</option>
-            {exercises.map((exercise) => (
-              <option key={exercise.id} value={exercise.id}>
-                {exercise.name}
-              </option>
-            ))}
-          </select>
+          <label htmlFor="exercise-results-exercise-filter">
+            Buscar por ejercicio
+          </label>
+          <div className="exercise-results-search-control">
+            <span className="exercise-results-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="11" cy="11" r="6" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </span>
+
+            <input
+              id="exercise-results-exercise-filter"
+              type="search"
+              placeholder="Buscar ejercicio..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              autoComplete="off"
+            />
+
+            {search.length > 0 && (
+              <button
+                type="button"
+                className="exercise-results-search-clear"
+                aria-label="Limpiar búsqueda de ejercicio"
+                onClick={() => setSearch("")}
+              >
+                <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                  <path d="m7 7 10 10M17 7 7 17" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* CONTENIDO */}
@@ -92,10 +104,10 @@ function MyExerciseResultsView({
             </button>
           </div>
         ) : visibleResults.length === 0 ? (
-          <p className="exercise-results-empty">
-            {selectedExercise
-              ? `Todavía no has registrado marcas de ${selectedExercise.name}.`
-              : "Todavía no has registrado ninguna marca."}
+          <p className="exercise-results-empty" role="status" aria-live="polite">
+            {results.length === 0
+              ? "Todavía no has registrado ninguna marca."
+              : `No se encontraron marcas para "${search.trim()}".`}
           </p>
         ) : (
           <ExerciseResultsList

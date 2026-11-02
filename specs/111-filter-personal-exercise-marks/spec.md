@@ -8,13 +8,14 @@ como estado inicial y retirando de esa pantalla el CTA «Mejores marcas».
 
 ## Alcance
 
-- Añadir un selector accesible de ejercicio con la opción inicial «Todos los
-  ejercicios».
-- Filtrar en cliente los resultados ya cargados usando `exerciseId`, no el
-  nombre visible del ejercicio.
-- Restaurar el listado completo al limpiar el selector.
+- Añadir un input accesible de búsqueda por nombre de ejercicio con icono de
+  lupa y acción de limpieza rápida.
+- Filtrar en cliente los resultados ya cargados según coincidencias parciales
+  del nombre del ejercicio, resolviendo después los resultados mediante su
+  `exerciseId`.
+- Restaurar el listado completo cuando el texto esté vacío o se limpie.
 - Mostrar estados de carga, error con reintento, listado vacío global y listado
-  vacío para el ejercicio seleccionado.
+  vacío cuando la búsqueda no tenga coincidencias.
 - Mantener los datos, formato, orden cronológico recibido, privacidad,
   navegación y enlace «+ Registrar marca» existentes.
 - Retirar únicamente el enlace «Mejores marcas» de la navegación de esta
@@ -29,37 +30,35 @@ como estado inicial y retirando de esa pantalla el CTA «Mejores marcas».
 2. Mientras la carga está pendiente se muestra el estado de carga actual.
 3. Si falla la carga se muestra un error comprensible y un control «Reintentar»
    que vuelve a solicitar los datos.
-4. Sin selección, el selector muestra «Todos los ejercicios» y se renderizan
-   todas las marcas en el orden recibido.
-5. Al elegir un ejercicio, solo se renderizan resultados cuyo `exerciseId`
-   coincide exactamente con el ID seleccionado, incluso si hay nombres
-   repetidos.
-6. Si el ejercicio seleccionado no tiene resultados, se muestra un estado vacío
-   específico y no se muestran resultados de otros ejercicios.
-7. Al seleccionar «Todos los ejercicios», vuelve a mostrarse el listado
-   completo.
-8. Cambiar de ejercicio solo deriva el listado desde el estado actual y los
-   datos cargados, por lo que no puede conservar resultados obsoletos de una
-   selección anterior.
-9. La navegación conserva «+ Registrar marca» y ya no contiene «Mejores
+4. Sin texto de búsqueda se renderizan todas las marcas en el orden recibido.
+5. Al escribir, se ignoran mayúsculas/minúsculas y los espacios exteriores; una
+   coincidencia parcial como «squat» incluye «Back Squat» y «Hang Squat Clean».
+6. Los resultados visibles se resuelven mediante el `exerciseId` de cada marca,
+   por lo que los nombres coincidentes no mezclan datos de forma incorrecta.
+7. Si no hay coincidencias, se muestra un estado vacío informativo sin
+   resultados ajenos.
+8. Al limpiar el texto, vuelve a mostrarse el listado completo.
+9. Cada cambio de texto deriva el listado desde el estado actual y los datos
+   cargados, por lo que no puede conservar resultados obsoletos.
+10. La navegación conserva «+ Registrar marca» y ya no contiene «Mejores
    marcas» dentro de esta pantalla.
 
 ## Criterios de aceptación
 
-- [ ] Sin filtro se muestran todas las marcas personales disponibles.
-- [ ] El filtro usa `exerciseId` y solo muestra las marcas del ejercicio
-      seleccionado.
+- [ ] Sin texto se muestran todas las marcas personales disponibles.
+- [ ] La búsqueda parcial por nombre resuelve resultados mediante `exerciseId`.
+- [ ] La búsqueda ignora mayúsculas/minúsculas y espacios exteriores.
 - [ ] Cambios rápidos entre ejercicios no muestran resultados obsoletos.
-- [ ] Limpiar el filtro restablece todas las marcas.
-- [ ] Un ejercicio sin marcas muestra un estado vacío informativo sin resultados
-      ajenos.
+- [ ] Limpiar el texto restablece todas las marcas.
+- [ ] Una búsqueda sin coincidencias muestra un estado vacío informativo sin
+      resultados ajenos.
 - [ ] «Mejores marcas» desaparece de esta pantalla sin interacción residual.
 - [ ] «+ Registrar marca» sigue operativo.
 - [ ] Las fechas, cargas, repeticiones, distancias y tiempos se conservan.
 - [ ] La pantalla funciona tras recarga en sesión autenticada y mantiene el
       layout responsive y la accesibilidad del control.
-- [ ] Existen pruebas para filtrado por ID, nombres repetidos, ausencia de
-      resultados, limpieza, cambios rápidos, CTA y estados de recuperación.
+- [ ] Existen pruebas para búsqueda parcial, mayúsculas/minúsculas, texto vacío,
+      ausencia de resultados, limpieza, CTA y estados de recuperación.
 - [ ] Pasan lint, tests, build y `git diff --check`.
 
 ## Restricciones

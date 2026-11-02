@@ -8,16 +8,17 @@
 
 ## Implementación
 
-- [x] Añadir helper puro de filtrado de resultados por `exerciseId` y pruebas de
-      ID, nombres repetidos, vacío, limpieza y cambios rápidos.
+- [x] Sustituir el selector por un helper de búsqueda parcial por nombre que
+      resuelva resultados mediante `exerciseId`.
 - [x] Añadir reintento seguro de carga en `MyExerciseResultsPage` y conectar el
       callback con la vista.
-- [x] Añadir selector accesible con «Todos los ejercicios», selección por ID y
-      estados de vacío global/filtrado.
+- [x] Añadir input accesible con lupa, filtrado en tiempo real, limpieza rápida
+      y estados de vacío global/sin coincidencias.
 - [x] Retirar solo el CTA «Mejores marcas» y conservar «+ Registrar marca».
-- [x] Ajustar estilos responsive, foco y estados del selector sin cambiar el
+- [x] Ajustar estilos responsive, foco y estados del input sin cambiar el
       formato existente de las marcas.
-- [x] Añadir pruebas de presentación para selector, CTA, estados y recuperación.
+- [x] Actualizar pruebas de búsqueda parcial, mayúsculas/minúsculas, vacío,
+      ausencia, limpieza, CTA, estados y recuperación.
 
 ## Verificación y handoff
 

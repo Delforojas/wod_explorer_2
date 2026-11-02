@@ -1,12 +1,24 @@
 import type { ExerciseResultResponse } from "../../types/ExerciseResult";
+import type { ExerciseResponse } from "../../types/Exercise";
 
 export function filterExerciseResults(
   results: ExerciseResultResponse[],
-  selectedExerciseId: number | null,
+  exercises: ExerciseResponse[],
+  search: string,
 ): ExerciseResultResponse[] {
-  if (selectedExerciseId === null) {
+  const normalizedSearch = search.trim().toLowerCase();
+
+  if (normalizedSearch.length === 0) {
     return results;
   }
 
-  return results.filter((result) => result.exerciseId === selectedExerciseId);
+  const matchingExerciseIds = new Set(
+    exercises
+      .filter((exercise) =>
+        exercise.name.trim().toLowerCase().includes(normalizedSearch),
+      )
+      .map((exercise) => exercise.id),
+  );
+
+  return results.filter((result) => matchingExerciseIds.has(result.exerciseId));
 }
