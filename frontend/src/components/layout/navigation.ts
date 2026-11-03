@@ -9,6 +9,7 @@ export type NavigationIconName =
   | "barbell"
   | "clock"
   | "document"
+  | "home"
   | "plus"
   | "trophy";
 
@@ -17,6 +18,7 @@ export type NavigationIconName =
    ======================================== */
 
 export const publicNavigation: readonly NavigationItem[] = [
+  { label: "Inicio", to: "/", icon: "home" },
   { label: "Ejercicios", to: "/exercises", icon: "activity" },
   { label: "WODs", to: "/wods", icon: "barbell" },
 ];
@@ -39,8 +41,9 @@ export const personalNavigation: readonly NavigationItem[] = [
    ======================================== */
 
 export const mobilePrimaryNavigation: readonly NavigationItem[] = [
-  publicNavigation[0], // Ejercicios
-  publicNavigation[1], // WODs
+  publicNavigation[0], // Inicio
+  publicNavigation[1], // Ejercicios
+  publicNavigation[2], // WODs
   personalNavigation[0], // Mis WODs
 
   {

@@ -493,44 +493,42 @@
 
 @media (max-width: 380px) {
   .mobile-navigation {
-    width: max-content;
-
+    display: block;
+    width: calc(100% - 12px);
     max-width: calc(100% - 12px);
-
     bottom: calc(10px + env(safe-area-inset-bottom));
-
-    gap: 3px;
-
     padding: 3px;
-
     border-radius: 10px;
+  }
+
+  .mobile-navigation .mobile-nav-list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2px;
+    width: 100%;
+  }
+
+  .mobile-navigation .mobile-nav-list > li {
+    display: block;
+    min-width: 0;
   }
 
   .mobile-navigation .mobile-nav-list .nav-link,
   .mobile-navigation .mobile-more-button {
-    flex: 0 0 52px;
-
-    width: 52px;
-
-    min-width: 52px;
-
-    max-width: 52px;
-
+    width: 100%;
+    min-width: 0;
+    max-width: none;
     height: 52px;
-
     min-height: 52px;
-
     max-height: 52px;
-
-    gap: 3px;
-
-    padding: 6px 2px;
-
-    border-radius: 12px;
-
+    padding: 4px 1px;
     font-size: 9px;
+    line-height: 12px;
   }
 
+  .mobile-navigation .mobile-dock-label {
+    overflow-wrap: anywhere;
+  }
 }
 
 /* ==========================================================
