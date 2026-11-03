@@ -23,5 +23,5 @@
 - [x] Ejecutar lint, tests, build y `git diff --check`.
 - [x] Confirmar que no se modifican API, Home, Historial, backend ni base de
       datos.
-- [ ] Preparar validación visual manual de móvil y escritorio sin publicar la
+- [x] Preparar validación visual manual de móvil y escritorio sin publicar la
       rama.
