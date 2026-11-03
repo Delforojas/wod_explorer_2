@@ -6,6 +6,7 @@ import type { WodsViewProps } from "../../views/wods/WodsView.Types";
 import type { WodAggregateResponse } from "../../types/Wod";
 import {
   filterWods,
+  getWodCategorySearchParams,
   hasActiveWodFilters,
   isWodCategory,
 } from "../../views/wods/wodFilters";
@@ -51,7 +52,11 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
 
   function clearFilters() {
     setSearch("");
-    setSearchParams({});
+    setSearchParams(getWodCategorySearchParams(searchParams, null));
+  }
+
+  function selectCategory(nextCategory: typeof category) {
+    setSearchParams(getWodCategorySearchParams(searchParams, nextCategory));
   }
 
   return (
@@ -114,6 +119,30 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
               </button>
             )}
           </div>
+        </div>
+
+        <div
+          className="exercise-results-mode-toggle"
+          role="group"
+          aria-label="Filtrar WODs por categoría"
+        >
+          {(
+            [
+              [null, "Todos"],
+              ["CROSSTRAINING", "CROSSTRAINING"],
+              ["HYBRID", "HYBRID"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              className="exercise-results-mode-button"
+              key={label}
+              type="button"
+              aria-pressed={category === value}
+              onClick={() => selectCategory(value)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         {/* CONTADOR */}

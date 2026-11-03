@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { WodAggregateResponse } from "../../types/Wod";
 import {
   filterWods,
+  getWodCategorySearchParams,
   hasActiveWodFilters,
   normalizeWodSearch,
 } from "./wodFilters";
@@ -53,5 +54,16 @@ describe("wod filters", () => {
   it("filters WODs by their catalog category", () => {
     expect(filterWods(wods, "", "CROSSTRAINING")).toEqual([wods[0]]);
     expect(filterWods(wods, "", "HYBRID")).toEqual([wods[1]]);
+    expect(filterWods(wods, "fran", "CROSSTRAINING")).toEqual([wods[0]]);
+    expect(filterWods(wods, "fran", "HYBRID")).toEqual([]);
+  });
+
+  it("updates only the category URL parameter", () => {
+    const params = new URLSearchParams("source=home&category=HYBRID");
+
+    expect(getWodCategorySearchParams(params, "CROSSTRAINING").toString()).toBe(
+      "source=home&category=CROSSTRAINING",
+    );
+    expect(getWodCategorySearchParams(params, null).toString()).toBe("source=home");
   });
 });

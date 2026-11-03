@@ -85,7 +85,7 @@ const wods: WodAggregateResponse[] = [
   },
 ];
 
-function renderWodsList(isAuthenticated: boolean) {
+function renderWodsList(isAuthenticated: boolean, initialEntry = "/wods") {
   return renderToStaticMarkup(
     <AuthContext.Provider
       value={{
@@ -95,7 +95,7 @@ function renderWodsList(isAuthenticated: boolean) {
         signOut: () => undefined,
       }}
     >
-      <MemoryRouter>
+      <MemoryRouter initialEntries={[initialEntry]}>
         <WodsList wods={wods} onSelectWod={() => undefined} />
       </MemoryRouter>
     </AuthContext.Provider>,
@@ -105,6 +105,8 @@ function renderWodsList(isAuthenticated: boolean) {
 describe("WodsList", () => {
   it("keeps public browsing available without exposing registration", () => {
     const markup = renderWodsList(false);
+    const morningEngineMarkup = markup.slice(markup.indexOf("Morning Engine"));
+    const hybridCircuitMarkup = markup.slice(markup.indexOf("Hybrid Circuit"));
 
     expect(markup).toContain("Morning Engine");
     expect(markup).toContain("For Time");
@@ -116,10 +118,18 @@ describe("WodsList", () => {
     expect(markup).toContain("wod-category-badge--neutral");
     expect(markup).toContain("SIN CATEGORÍA");
     expect(markup).toContain("15 min");
-    expect(markup.indexOf("For Time")).toBeLessThan(markup.indexOf("15 min"));
-    expect(markup.indexOf("15 min")).toBeLessThan(markup.indexOf("CROSSTRAINING"));
-    expect(markup.indexOf("AMRAP")).toBeLessThan(markup.indexOf("20 min"));
-    expect(markup.indexOf("20 min")).toBeLessThan(markup.indexOf("HYBRID"));
+    expect(morningEngineMarkup.indexOf("For Time")).toBeLessThan(
+      morningEngineMarkup.indexOf("15 min"),
+    );
+    expect(morningEngineMarkup.indexOf("15 min")).toBeLessThan(
+      morningEngineMarkup.indexOf("CROSSTRAINING"),
+    );
+    expect(hybridCircuitMarkup.indexOf("AMRAP")).toBeLessThan(
+      hybridCircuitMarkup.indexOf("20 min"),
+    );
+    expect(hybridCircuitMarkup.indexOf("20 min")).toBeLessThan(
+      hybridCircuitMarkup.indexOf("HYBRID"),
+    );
     expect(markup).toContain("Ver WOD");
     expect(markup).toContain("my-wod-row");
     expect(markup).not.toContain("resource-list");
@@ -135,5 +145,24 @@ describe("WodsList", () => {
     expect(markup).toContain(">Registrar</span>");
     expect(markup).not.toContain("→");
     expect(markup).toContain("catalog-search-icon");
+  });
+
+  it("reflects category filters received from Home in the selected tab and list", () => {
+    const markup = renderWodsList(false, "/wods?category=HYBRID");
+
+    expect(markup).toContain('aria-label="Filtrar WODs por categoría"');
+    expect(markup).toContain('aria-pressed="false">Todos</button>');
+    expect(markup).toContain('aria-pressed="true">HYBRID</button>');
+    expect(markup).toContain("Hybrid Circuit");
+    expect(markup).not.toContain("Morning Engine");
+    expect(markup).toContain("1 de 4 entrenamientos");
+  });
+
+  it("uses Todos when the category URL parameter is invalid", () => {
+    const markup = renderWodsList(false, "/wods?category=STRENGTH");
+
+    expect(markup).toContain('aria-pressed="true">Todos</button>');
+    expect(markup).toContain("4 entrenamientos disponibles");
+    expect(markup).toContain("Strength Builder");
   });
 });
