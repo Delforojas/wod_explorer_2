@@ -136,6 +136,7 @@ function Footer({ isAuthenticated }: FooterProps) {
         >
           <Link to="/about">Sobre WOD Explorer</Link>
           <Link to="/privacy">Privacidad</Link>
+          <Link to="/legal">Aviso legal</Link>
         </nav>
       </div>
 
