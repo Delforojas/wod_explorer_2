@@ -27,6 +27,9 @@ barra segmentada con las opciones Todos, CROSSTRAINING e HYBRID.
    estado vacío reflejan el resultado combinado.
 5. La barra es operable con teclado, muestra el estado activo mediante texto y
    estilo, mantiene foco visible y se adapta a móvil sin desbordar.
+6. La barra del catálogo hereda los mismos tokens y clases del selector de
+   Historial, por lo que conserva su contenedor oscuro, borde, separación,
+   estados y foco; solo cambian sus textos.
 
 ## Criterios de aceptación
 
@@ -39,6 +42,8 @@ barra segmentada con las opciones Todos, CROSSTRAINING e HYBRID.
 - [ ] Badges, acciones, permisos, orden y estados existentes se conservan.
 - [ ] La barra funciona en móvil y escritorio con semántica, teclado y foco
       visible.
+- [ ] La barra de `/wods` coincide visualmente con la de `/history` en
+      contenedor, borde, fondo, radio, padding, reparto, estados y foco.
 - [ ] Existen pruebas pertinentes y pasan lint, tests, build y revisión de
       diff.
 

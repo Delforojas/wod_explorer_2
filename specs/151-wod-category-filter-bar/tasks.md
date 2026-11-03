@@ -25,3 +25,5 @@
       datos.
 - [x] Preparar validación visual manual de móvil y escritorio sin publicar la
       rama.
+- [x] Corregir el scope de tokens del selector compartido y verificar la
+      coincidencia visual con Historial en escritorio y móvil.

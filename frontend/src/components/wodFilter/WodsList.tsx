@@ -65,23 +65,12 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
         {/* ENCABEZADO */}
 
         <header className="wod-header">
-          <h1>
-            WODs
-          </h1>
+          <h1>WODs</h1>
 
           <p className="wod-description">
             Explora distintos entrenamientos y encuentra el que te apetezca
             hacer hoy.
           </p>
-
-          {category && (
-            <p className="wod-category-context">
-              Categoría: <strong>{category === "HYBRID" ? "Hybrid" : "Crosstraining"}</strong>
-              <button type="button" onClick={clearFilters}>
-                Ver todo
-              </button>
-            </p>
-          )}
         </header>
 
         {/* BUSCADOR */}
@@ -230,7 +219,10 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
                         className="my-wods-action catalog-register-action"
                         aria-label={`Registrar resultado de ${wod.name}`}
                       >
-                        <span className="catalog-register-icon" aria-hidden="true">
+                        <span
+                          className="catalog-register-icon"
+                          aria-hidden="true"
+                        >
                           +
                         </span>
                         <span>Registrar</span>
@@ -242,7 +234,6 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             })}
           </div>
         )}
-
       </div>
     </section>
   );

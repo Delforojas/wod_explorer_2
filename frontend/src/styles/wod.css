@@ -10,6 +10,9 @@
   --wod-orange-light: var(--color-orange-300);
 
   --wod-border: var(--color-white-alpha-09);
+  /* The shared History toggle resolves these tokens from its page scope. */
+  --results-orange: var(--wod-orange);
+  --results-border: var(--wod-border);
 
   --wod-card-background: linear-gradient(
     120deg,

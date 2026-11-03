@@ -9,9 +9,9 @@ La URL seguirá siendo la fuente de verdad de categoría: al seleccionar una
 pestaña se preservarán los demás parámetros y se establecerá o eliminará
 `category`.
 
-Los estilos residirán en `wod.css`, próximos al catálogo. Reutilizarán
-superficies, bordes, espaciado y foco existentes, con un contenedor flexible
-para las etiquetas largas en pantallas pequeñas.
+El catálogo usa las clases compartidas del selector de Historial. `wod.css`
+solo proveerá en `.wod-page` los alias de token que esas clases resuelven en
+`.exercise-results-page`, sin duplicar estilos del control.
 
 ## Componentes afectados
 
@@ -32,8 +32,8 @@ de datos.
 2. Añadir los tres botones después del buscador y antes del contador.
 3. Al seleccionar Todos, eliminar solo `category`; al seleccionar una
    categoría válida, actualizar solo ese parámetro.
-4. Estilizar la barra con botones de al menos 44 px, `aria-pressed`, foco
-   visible y ajuste responsive.
+4. Reutilizar las clases y reglas responsive de Historial; exponer los tokens
+   requeridos en el scope de WOD para igualar borde y foco.
 5. Probar resultados, estados combinados, URL inicial y cambios de pestaña;
    ejecutar las verificaciones del frontend.
 
