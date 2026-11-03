@@ -73,16 +73,28 @@ describe("navigation user menu placement", () => {
     expect(mobileMarkup).toContain(">Benchmarks</span>");
   });
 
-  it("places Inicio first for guests and omits private destinations", () => {
+  it("shows the four public destinations for guests and omits private destinations", () => {
     const markup = renderNavigation(<MobileNavigation isAuthenticated={false} />);
 
+    expect(markup.match(/class="mobile-dock-item"/g)).toHaveLength(4);
     expect(markup.indexOf('href="/"')).toBeLessThan(
       markup.indexOf('href="/exercises"'),
     );
     expect(markup).toContain('aria-label="Inicio"');
     expect(markup).toContain('href="/wods"');
+    expect(markup).toContain('href="/login"');
+    expect(markup).toContain('aria-label="Entrar"');
     expect(markup).not.toContain('href="/my-wods"');
     expect(markup).not.toContain('href="/history"');
+  });
+
+  it("marks Entrar active on the login route for guests", () => {
+    const markup = renderNavigation(
+      <MobileNavigation isAuthenticated={false} />,
+      "/login",
+    );
+
+    expect(getLinkMarkup(markup, "/login")).toContain("nav-link-active");
   });
 
   it("shows the six requested primary destinations after authentication", () => {
@@ -94,6 +106,7 @@ describe("navigation user menu placement", () => {
     expect(markup).toContain('href="/my-wods"');
     expect(markup).toContain('href="/my-exercise-results"');
     expect(markup).toContain('href="/history"');
+    expect(markup).not.toContain('href="/login"');
   });
 
   it("marks Inicio active only for the exact root pathname", () => {

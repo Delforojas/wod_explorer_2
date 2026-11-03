@@ -508,6 +508,10 @@
     width: 100%;
   }
 
+  .mobile-navigation.mobile-navigation-items-4 .mobile-nav-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .mobile-navigation .mobile-nav-list > li {
     display: block;
     min-width: 0;

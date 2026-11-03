@@ -64,6 +64,14 @@ function LoginView({
             />
           </div>
 
+          <button
+            className="login-password-recovery"
+            type="button"
+            disabled
+          >
+            ¿Olvidaste tu contraseña? <span>Próximamente</span>
+          </button>
+
           {error && (
             <p role="alert" className="auth-error">
               {error}
