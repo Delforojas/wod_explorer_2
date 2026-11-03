@@ -173,6 +173,31 @@
   cursor: not-allowed;
 }
 
+.login-password-recovery {
+  align-self: flex-end;
+
+  margin-top: calc(var(--space-3) * -1);
+  padding: 0;
+
+  border: 0;
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.login-password-recovery:disabled {
+  cursor: not-allowed;
+}
+
+.login-password-recovery span {
+  color: rgba(255, 255, 255, 0.38);
+}
+
 /* ==========================================
    BOTÓN PRINCIPAL
 ========================================== */
