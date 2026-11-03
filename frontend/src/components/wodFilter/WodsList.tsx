@@ -16,6 +16,21 @@ function formatWodType(type: WodAggregateResponse["version"]["type"]) {
   return type === "FOR_TIME" ? "For Time" : type === "AMRAP" ? "AMRAP" : "EMOM";
 }
 
+function getWodCategoryBadge(category: WodAggregateResponse["category"]) {
+  if (category === "HYBRID") {
+    return { label: "HYBRID", tone: "hybrid" };
+  }
+
+  if (category === "CROSSTRAINING") {
+    return { label: "CROSSTRAINING", tone: "crosstraining" };
+  }
+
+  return {
+    label: category?.replaceAll("_", " ") || "SIN CATEGORÍA",
+    tone: "neutral",
+  };
+}
+
 function WodsList({ wods, onSelectWod }: WodsListProps) {
   const { isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -141,54 +156,61 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
           </div>
         ) : (
           <div className="my-wods-list wod-catalog-list">
-            {filteredWods.map((wod) => (
-              <article
-                className="my-wod-row wod-catalog-row"
-                key={wod.id}
-              >
-                <div className="my-wod-content">
-                  <h2>{wod.name}</h2>
+            {filteredWods.map((wod) => {
+              const categoryBadge = getWodCategoryBadge(wod.category);
 
-                  <div className="my-wod-meta">
-                    <span>{formatWodType(wod.version.type)}</span>
+              return (
+                <article className="my-wod-row wod-catalog-row" key={wod.id}>
+                  <div className="my-wod-content">
+                    <h2>{wod.name}</h2>
 
-                    {wod.version.timeCapSeconds != null && (
-                      <span>
-                        {Math.floor(wod.version.timeCapSeconds / 60)} min
+                    <div className="my-wod-meta">
+                      <span>{formatWodType(wod.version.type)}</span>
+
+                      {wod.version.timeCapSeconds != null && (
+                        <span>
+                          {Math.floor(wod.version.timeCapSeconds / 60)} min
+                        </span>
+                      )}
+
+                      <span
+                        className={`wod-category-badge wod-category-badge--${categoryBadge.tone}`}
+                      >
+                        {categoryBadge.label}
                       </span>
+                    </div>
+                  </div>
+
+                  <div
+                    className="my-wods-actions catalog-row-actions"
+                    role="group"
+                    aria-label={`Acciones para ${wod.name}`}
+                  >
+                    <button
+                      className="my-wods-action my-wods-view-action"
+                      type="button"
+                      onClick={() => onSelectWod(wod.id)}
+                      aria-label={`Ver WOD ${wod.name}`}
+                    >
+                      Ver WOD
+                    </button>
+
+                    {isAuthenticated && (
+                      <Link
+                        to={`/my-wod-results/new?wodId=${wod.id}`}
+                        className="my-wods-action catalog-register-action"
+                        aria-label={`Registrar resultado de ${wod.name}`}
+                      >
+                        <span className="catalog-register-icon" aria-hidden="true">
+                          +
+                        </span>
+                        <span>Registrar</span>
+                      </Link>
                     )}
                   </div>
-                </div>
-
-                <div
-                  className="my-wods-actions catalog-row-actions"
-                  role="group"
-                  aria-label={`Acciones para ${wod.name}`}
-                >
-                  <button
-                    className="my-wods-action my-wods-view-action"
-                    type="button"
-                    onClick={() => onSelectWod(wod.id)}
-                    aria-label={`Ver WOD ${wod.name}`}
-                  >
-                    Ver WOD
-                  </button>
-
-                  {isAuthenticated && (
-                    <Link
-                      to={`/my-wod-results/new?wodId=${wod.id}`}
-                      className="my-wods-action catalog-register-action"
-                      aria-label={`Registrar resultado de ${wod.name}`}
-                    >
-                      <span className="catalog-register-icon" aria-hidden="true">
-                        +
-                      </span>
-                      <span>Registrar</span>
-                    </Link>
-                  )}
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
 

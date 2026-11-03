@@ -39,8 +39,16 @@ export function getFeaturedWods(
   return picked;
 }
 
-export function formatWodCategory(category: WodCategory): string {
-  return category === "HYBRID" ? "Hybrid" : "Crosstraining";
+export function formatWodCategory(category: WodCategory | string | null | undefined): string {
+  if (category === "HYBRID") {
+    return "Hybrid";
+  }
+
+  if (category === "CROSSTRAINING") {
+    return "Crosstraining";
+  }
+
+  return category?.replaceAll("_", " ") || "Sin categoría";
 }
 
 export function formatWodPrescription(wod: WodAggregateResponse): string {

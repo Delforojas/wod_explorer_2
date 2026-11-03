@@ -2,6 +2,7 @@ import * as z from "zod";
 
 export const wodOriginSchema = z.enum(["GENERIC", "PERSONAL"]);
 export const wodCategorySchema = z.enum(["CROSSTRAINING", "HYBRID"]);
+const wodCatalogCategorySchema = z.string().nullable().optional();
 export const wodTypeSchema = z.enum(["FOR_TIME", "AMRAP", "EMOM"]);
 
 export const wodRequestSchema = z.object({
@@ -13,7 +14,7 @@ export const wodResponseSchema = z.object({
   ownerId: z.number().nullable(),
   name: z.string(),
   origin: wodOriginSchema,
-  category: wodCategorySchema,
+  category: wodCatalogCategorySchema,
   createdAt: z.string(),
 });
 
@@ -78,7 +79,7 @@ export const wodAggregateResponseSchema = z.object({
   ownerId: z.number().nullable(),
   name: z.string(),
   origin: wodOriginSchema,
-  category: wodCategorySchema,
+  category: wodCatalogCategorySchema,
   createdAt: z.string(),
   version: wodVersionResponseSchema,
   composition: z.array(wodVersionItemResponseSchema),
