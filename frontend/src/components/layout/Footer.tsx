@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const LINKEDIN_URL = "https://www.linkedin.com/in/delfinrojas/";
 const GITHUB_URL = "https://github.com/Delforojas";
 const PORTFOLIO_URL = "https://delforojas.es";
@@ -127,6 +129,13 @@ function Footer({ isAuthenticated }: FooterProps) {
 
       <div className="delfo-footer__content">
         <p className="delfo-footer__tagline">ENTRENA. REGISTRA. SUPÉRATE.</p>
+
+        <nav
+          className="delfo-footer__information"
+          aria-label="Información de WOD Explorer"
+        >
+          <Link to="/about">Sobre WOD Explorer</Link>
+        </nav>
       </div>
 
       <div className="delfo-footer__bottom">
