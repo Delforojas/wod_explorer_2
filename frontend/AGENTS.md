@@ -23,26 +23,40 @@ Do not introduce alternative frameworks, styling systems, or state libraries wit
 
 ## 3. Architecture
 
-Use the existing feature-based architecture:
+The current structure is pages/containers plus views/presentation, with shared
+layers. It is not feature-based.
 
-- `src/app/`: application setup and composition
-- `src/features/`: domain-specific features
-- `src/components/`: shared UI components
-- `src/api/`: shared HTTP infrastructure
-- `src/schemas/`: shared Zod schemas
-- `src/types/`: shared TypeScript types
-- `src/hooks/`: shared hooks
-- `src/utils/`: shared pure utilities
-- `src/assets/`: static assets
+- `src/pages/`: route containers. Own page state, effects, API calls, and
+  composition.
+- `src/views/`: per-domain presentation, pure presentation modules, and local
+  subcomponents. Views receive props and do not import `api/`.
+- `src/components/`: shared UI across pages: layout and navigation, auth guard,
+  reusable WOD detail and list components.
+- `src/api/`: one client per domain. `src/api/client/` centralizes HTTP,
+  endpoints, and error handling.
+- `src/auth/`: session context, persistence, and expiration.
+- `src/schemas/`: Zod schemas and the source of truth for external contracts.
+- `src/types/`: TypeScript types and re-exports derived from schemas.
+- `src/utils/`: shared pure utilities for requests, guards, scroll, and
+  validation.
+- `src/styles/`: CSS by responsibility. `src/index.css` is the only entry point;
+  its cascade order is documented in `src/styles/README.md`.
 
-Rules:
+Required rules:
 
-- Keep feature-specific code inside its feature.
+- Keep page orchestration in `pages/` and presentation in `views/`.
+- Call HTTP only through `src/api/`; never use `fetch` in views or components.
+- Import each CSS sheet once from `src/index.css`.
 - Extract shared code only when genuinely reused.
 - Separate presentation, state, business logic, and data access.
-- Prefer component composition over unnecessary abstractions.
-- Avoid unnecessary cross-feature dependencies.
+- Avoid unnecessary cross-domain dependencies.
 - Do not create empty directories or speculative architecture.
+- `src/app/`, `src/features/`, `src/hooks/`, and `src/assets/` do not exist;
+  do not add them without an approved architectural decision.
+
+Guidance:
+
+- Prefer component composition over unnecessary abstractions.
 - Keep components focused and state close to its consumers.
 
 ## 4. TypeScript and Validation
@@ -145,7 +159,6 @@ Available skills: `.agents/skills/frontend/`
 | Skill | Load when |
 
 |---|---|
-ç
 | `vercel-react-best-practices` | React performance, rendering, optimization |
 | `vercel-composition-patterns` | Component composition, architecture, prop design |
 | `typescript-advanced-types` | Complex TypeScript types or inference |
