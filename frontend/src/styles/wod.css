@@ -123,6 +123,28 @@
   line-height: 1.4;
 }
 
+.my-wod-meta .wod-category-badge {
+  font-weight: 700;
+}
+
+.my-wod-meta .wod-category-badge--hybrid {
+  border-color: rgb(74 222 128 / 42%);
+  background: rgb(34 197 94 / 16%);
+  color: #bbf7d0;
+}
+
+.my-wod-meta .wod-category-badge--crosstraining {
+  border-color: rgb(250 204 21 / 42%);
+  background: rgb(234 179 8 / 16%);
+  color: #fef08a;
+}
+
+.my-wod-meta .wod-category-badge--neutral {
+  border-color: rgb(148 163 184 / 32%);
+  background: rgb(148 163 184 / 12%);
+  color: #cbd5e1;
+}
+
 /* COMPOSICIÓN */
 
 .wod-sequence {

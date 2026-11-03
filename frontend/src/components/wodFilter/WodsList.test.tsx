@@ -26,6 +26,63 @@ const wods: WodAggregateResponse[] = [
     },
     composition: [],
   },
+  {
+    id: 13,
+    ownerId: null,
+    name: "Hybrid Circuit",
+    origin: "GENERIC",
+    category: "HYBRID",
+    createdAt: "2026-01-01T00:00:00Z",
+    version: {
+      id: 21,
+      wodId: 13,
+      wodName: "Hybrid Circuit",
+      versionNumber: 1,
+      type: "AMRAP",
+      timeCapSeconds: 1200,
+      rounds: 4,
+      createdAt: "2026-01-01T00:00:00Z",
+    },
+    composition: [],
+  },
+  {
+    id: 14,
+    ownerId: null,
+    name: "Strength Builder",
+    origin: "GENERIC",
+    category: "STRENGTH",
+    createdAt: "2026-01-01T00:00:00Z",
+    version: {
+      id: 22,
+      wodId: 14,
+      wodName: "Strength Builder",
+      versionNumber: 1,
+      type: "EMOM",
+      timeCapSeconds: null,
+      rounds: 5,
+      createdAt: "2026-01-01T00:00:00Z",
+    },
+    composition: [],
+  },
+  {
+    id: 15,
+    ownerId: null,
+    name: "Uncategorized Session",
+    origin: "GENERIC",
+    category: null,
+    createdAt: "2026-01-01T00:00:00Z",
+    version: {
+      id: 23,
+      wodId: 15,
+      wodName: "Uncategorized Session",
+      versionNumber: 1,
+      type: "FOR_TIME",
+      timeCapSeconds: null,
+      rounds: null,
+      createdAt: "2026-01-01T00:00:00Z",
+    },
+    composition: [],
+  },
 ];
 
 function renderWodsList(isAuthenticated: boolean) {
@@ -51,7 +108,18 @@ describe("WodsList", () => {
 
     expect(markup).toContain("Morning Engine");
     expect(markup).toContain("For Time");
+    expect(markup).toContain("CROSSTRAINING");
+    expect(markup).toContain("wod-category-badge--crosstraining");
+    expect(markup).toContain("HYBRID");
+    expect(markup).toContain("wod-category-badge--hybrid");
+    expect(markup).toContain("STRENGTH");
+    expect(markup).toContain("wod-category-badge--neutral");
+    expect(markup).toContain("SIN CATEGORÍA");
     expect(markup).toContain("15 min");
+    expect(markup.indexOf("For Time")).toBeLessThan(markup.indexOf("15 min"));
+    expect(markup.indexOf("15 min")).toBeLessThan(markup.indexOf("CROSSTRAINING"));
+    expect(markup.indexOf("AMRAP")).toBeLessThan(markup.indexOf("20 min"));
+    expect(markup.indexOf("20 min")).toBeLessThan(markup.indexOf("HYBRID"));
     expect(markup).toContain("Ver WOD");
     expect(markup).toContain("my-wod-row");
     expect(markup).not.toContain("resource-list");
