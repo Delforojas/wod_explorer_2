@@ -25,6 +25,7 @@ import MyWodResultsPage from "./pages/MyWodResultsPage";
 import RegisterWodResultPage from "./pages/RegisterWodResultPage";
 
 import RegisterPage from "./pages/RegisterPage";
+import AboutPage from "./pages/AboutPage";
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
         <Route path="/wod-versions" element={<WodVersionsPage />} />
 
         <Route path="/wod-version-items" element={<WodVersionItemsPage />} />
+
+        <Route path="/about" element={<AboutPage />} />
 
         {/* Autenticación */}
 
