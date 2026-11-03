@@ -12,6 +12,7 @@ const wods: WodAggregateResponse[] = [
     ownerId: null,
     name: "Morning Engine",
     origin: "GENERIC",
+    category: "CROSSTRAINING",
     createdAt: "2026-01-01T00:00:00Z",
     version: {
       id: 20,

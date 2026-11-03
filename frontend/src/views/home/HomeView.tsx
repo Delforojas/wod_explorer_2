@@ -6,7 +6,11 @@ import {
   getWodResultLines,
 } from "../wod-results/resultPresentation";
 import type { HomeViewProps } from "./HomeView.Types";
-import { getHomeDisplayName } from "./homePresentation";
+import {
+  formatWodCategory,
+  formatWodPrescription,
+  getHomeDisplayName,
+} from "./homePresentation";
 
 function HomeView({
   isAuthenticated,
@@ -15,6 +19,10 @@ function HomeView({
   activityResults,
   activityError,
   onRetry,
+  featuredStatus,
+  featuredWods,
+  featuredError,
+  onRetryFeatured,
 }: HomeViewProps) {
   if (isAuthenticated) {
     return (
@@ -165,47 +173,122 @@ function HomeView({
   }
 
   return (
-    <section className="home-page">
-      <div className="home-card">
-        {/* Logotipo */}
-        <div className="home-logo">
-          <span>WE</span>
-        </div>
+    <section className="home-page home-guest-page">
+      <div className="home-guest">
+        <header className="home-guest-hero">
+          <div className="home-guest-hero-copy">
+            <p className="home-eyebrow">WOD EXPLORER 2.0</p>
+            <h1>
+              Cada WOD <span>cuenta.</span>
+            </h1>
+            <p>
+              Encuentra sesiones de crosstraining e hybrid, entiende su
+              estructura y elige tu siguiente reto.
+            </p>
+            <div className="home-guest-actions">
+              <Link className="home-guest-primary" to="/wods">
+                Explorar WODs <span aria-hidden="true">→</span>
+              </Link>
+              <Link className="home-guest-secondary" to="/register">
+                Crear cuenta
+              </Link>
+            </div>
+          </div>
 
-        {/* Encabezado */}
-        <header className="home-header">
-          <p className="home-eyebrow">TU ESPACIO DE ENTRENAMIENTO</p>
-
-          <h1>WOD Explorer</h1>
-
-          <p className="home-description">
-            Explora entrenamientos de CrossFit, descubre ejercicios y registra
-            tus resultados para superar tus marcas personales.
-          </p>
+          <div className="home-guest-mark" aria-hidden="true">
+            <span>WE</span>
+            <small>ENTRENA / REGISTRA / SUPÉRATE</small>
+          </div>
         </header>
 
-        {/* Acción principal */}
-        <div className="home-form">
-          <Link className="home-submit" to="/wods">
-            Explorar WODs →
-          </Link>
-        </div>
+        <section className="home-discovery" aria-labelledby="home-discovery-title">
+          <div className="home-section-heading">
+            <p className="home-eyebrow">DESCUBRE EL CATÁLOGO</p>
+            <h2 id="home-discovery-title">Elige tu forma de entrenar</h2>
+          </div>
 
-        {/* Separador */}
-        <div className="home-divider">
-          <span>EXPLORA MÁS</span>
-        </div>
+          <div className="home-category-grid">
+            <Link
+              className="home-category-card home-category-card--cross"
+              to="/wods?category=CROSSTRAINING"
+            >
+              <span className="home-category-card-index" aria-hidden="true">01</span>
+              <div>
+                <p>CROSSTRAINING</p>
+                <h3>Fuerza, técnica e intensidad</h3>
+                <span>Explorar sesiones <b aria-hidden="true">→</b></span>
+              </div>
+            </Link>
 
-        {/* Accesos secundarios */}
-        <nav className="home-form" aria-label="Accesos principales">
-          <Link className="home-link" to="/exercises">
-            Catálogo de ejercicios →
-          </Link>
+            <Link
+              className="home-category-card home-category-card--hybrid"
+              to="/wods?category=HYBRID"
+            >
+              <span className="home-category-card-index" aria-hidden="true">02</span>
+              <div>
+                <p>HYBRID</p>
+                <h3>Carrera, resistencia y estaciones funcionales</h3>
+                <span>Explorar sesiones <b aria-hidden="true">→</b></span>
+              </div>
+            </Link>
+          </div>
+        </section>
 
-          <Link className="home-link" to="/login">
-            Iniciar sesión →
+        <section className="home-featured" aria-labelledby="home-featured-title">
+          <header className="home-featured-header">
+            <div>
+              <p className="home-eyebrow">SELECCIÓN DEL CATÁLOGO</p>
+              <h2 id="home-featured-title">Descubre tu próximo reto</h2>
+            </div>
+            <Link to="/wods">Ver todos <span aria-hidden="true">→</span></Link>
+          </header>
+
+          {featuredStatus === "loading" ? (
+            <div className="home-featured-grid" role="status" aria-live="polite">
+              <p className="home-featured-loading">Cargando WODs destacados...</p>
+              {[0, 1, 2].map((index) => (
+                <div className="home-featured-skeleton" key={index} aria-hidden="true" />
+              ))}
+            </div>
+          ) : featuredStatus === "error" ? (
+            <div className="home-featured-state" role="alert">
+              <p>{featuredError ?? "No se pudieron cargar los WODs destacados."}</p>
+              <button type="button" onClick={onRetryFeatured}>Reintentar</button>
+            </div>
+          ) : featuredWods.length === 0 ? (
+            <div className="home-featured-state" role="status">
+              <p>Aún no hay WODs públicos disponibles en el catálogo.</p>
+              <Link to="/wods">Explorar el catálogo</Link>
+            </div>
+          ) : (
+            <div className="home-featured-grid">
+              {featuredWods.map((wod, index) => (
+                <Link className="home-featured-card" to={`/wods?wodId=${wod.id}`} key={wod.id}>
+                  <span className="home-featured-number" aria-hidden="true">0{index + 1}</span>
+                  <div>
+                    <p>{formatWodCategory(wod.category)}</p>
+                    <h3>{wod.name}</h3>
+                    <span>{wod.version.type === "FOR_TIME" ? "For Time" : wod.version.type} · {formatWodPrescription(wod)}</span>
+                  </div>
+                  <span className="home-featured-arrow" aria-hidden="true">↗</span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="home-value-grid" aria-label="Explora y registra tu entrenamiento">
+          <div className="home-value-panel">
+            <p className="home-eyebrow">TU PROGRESO EMPIEZA AQUÍ</p>
+            <h2>Registra resultados, consulta tu historial y sigue tus mejores marcas.</h2>
+            <Link to="/register">Crear cuenta <span aria-hidden="true">→</span></Link>
+          </div>
+          <Link className="home-exercises-panel" to="/exercises">
+            <p>CATÁLOGO DE EJERCICIOS</p>
+            <h2>Explora los movimientos que construyen cada WOD.</h2>
+            <span>Ver ejercicios <b aria-hidden="true">→</b></span>
           </Link>
-        </nav>
+        </section>
       </div>
     </section>
   );

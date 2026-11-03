@@ -195,6 +195,7 @@ public class WodAggregateService {
         wod.getOwner() != null ? wod.getOwner().getId() : null,
         wod.getName(),
         wod.getOrigin(),
+        wod.getCategory(),
         wod.getCreatedAt(),
         new WodVersionResponse(
             version.getId(),

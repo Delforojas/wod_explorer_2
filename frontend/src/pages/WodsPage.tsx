@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { WodAggregateResponse } from "../types/Wod";
 import { getWods, getWodById } from "../api/wodsApi";
 import WodsView from "../views/wods/WodsView";
 import { isLatestRequest } from "../utils/asyncRequest";
 
 function WodsPage() {
+  const [searchParams] = useSearchParams();
   const [wods, setWods] = useState<WodAggregateResponse[]>([]);
   const [selectedWod, setSelectedWod] = useState<WodAggregateResponse | null>(
     null,
@@ -13,6 +15,7 @@ function WodsPage() {
   const [error, setError] = useState<string | null>(null);
   const selectionRequest = useRef(0);
   const mounted = useRef(true);
+  const selectedWodId = Number(searchParams.get("wodId"));
 
   useEffect(() => {
     let active = true;
@@ -40,6 +43,14 @@ function WodsPage() {
       mounted.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!Number.isInteger(selectedWodId) || selectedWodId <= 0) {
+      return;
+    }
+
+    handleSelectWod(selectedWodId);
+  }, [selectedWodId]);
 
   async function handleSelectWod(id: number) {
     const requestId = ++selectionRequest.current;

@@ -12,6 +12,7 @@ const wod: WodAggregateResponse = {
   ownerId: 4,
   name: "Morning Engine",
   origin: "PERSONAL",
+  category: "CROSSTRAINING",
   createdAt: "2026-11-02T10:00:00Z",
   version: {
     id: 11,

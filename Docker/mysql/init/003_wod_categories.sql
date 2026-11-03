@@ -1,0 +1,3 @@
+ALTER TABLE wods
+  ADD COLUMN category varchar(30) NOT NULL DEFAULT 'CROSSTRAINING' AFTER origin,
+  ADD CONSTRAINT wods_chk_3 CHECK (category IN ('CROSSTRAINING', 'HYBRID'));
