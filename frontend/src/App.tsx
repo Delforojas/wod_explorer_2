@@ -27,6 +27,7 @@ import RegisterWodResultPage from "./pages/RegisterWodResultPage";
 import RegisterPage from "./pages/RegisterPage";
 import AboutPage from "./pages/AboutPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import LegalPage from "./pages/LegalPage";
 
 function App() {
   return (
@@ -48,6 +49,8 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
 
         <Route path="/privacy" element={<PrivacyPage />} />
+
+        <Route path="/legal" element={<LegalPage />} />
 
         {/* Autenticación */}
 
