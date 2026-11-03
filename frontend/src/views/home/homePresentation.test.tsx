@@ -126,7 +126,7 @@ describe("home presentation", () => {
   it("renders authenticated shortcuts and recent activity", () => {
     const markup = renderHome(authenticatedProps);
 
-    expect(markup).toContain("Hola, Rogue");
+    expect(markup).toContain("Hola, <span>Rogue</span>");
     expect(markup).toContain("Registrar resultado de WOD");
     expect(markup).toContain('href="/my-wod-results/new"');
     expect(markup).toContain("Registrar resultado de ejercicio");
@@ -135,6 +135,10 @@ describe("home presentation", () => {
     expect(markup).toContain("Benchmarks");
     expect(markup).toContain('href="/my-exercise-results"');
     expect(markup).toContain("Crear WOD personal");
+    expect(markup).toContain("Tu siguiente movimiento");
+    expect(markup).toContain("Elige tu reto de hoy");
+    expect(markup).toContain('href="/wods?category=CROSSTRAINING"');
+    expect(markup).toContain('href="/wods?category=HYBRID"');
     expect(markup).toContain("Actividad reciente");
     expect(markup).toContain("home-activity-kind");
     expect(markup).toContain(">WOD</span>");
