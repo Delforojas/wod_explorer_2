@@ -80,12 +80,11 @@ describe("shared WOD detail presentation", () => {
 
     expect(markup).toContain("Engine Builder");
     expect(markup).toContain("For Time");
-    expect(markup).toContain("5 rondas");
-    expect(markup).toContain("10 min");
-    expect(markup).toContain("1");
-    expect(markup).toContain("2");
+    expect(markup).toContain("5 ciclos");
+    expect(markup).toContain("10 min límite");
     expect(markup.indexOf("Back Squat")).toBeLessThan(markup.indexOf("Run"));
-    expect(markup).toContain("10 repeticiones");
+    expect(markup).toContain('class="wod-detail-reps">10</span>');
+    expect(markup).toContain("reps");
     expect(markup).toContain("60 kg");
     expect(markup).toContain("400 m");
     expect(markup).toContain("120 segundos");
@@ -116,5 +115,83 @@ describe("shared WOD detail presentation", () => {
     expect(markup).toContain("Registrar resultado");
     expect(markup).toContain('class="wod-detail-register"');
     expect(markup).toContain('href="/my-wod-results/new?wodId=17"');
+  });
+
+  it("makes an AMRAP prescription immediately readable as recurring work", () => {
+    const cindy: WodAggregateResponse = {
+      ...publicWod,
+      name: "Cindy",
+      version: {
+        ...publicWod.version,
+        type: "AMRAP",
+        rounds: null,
+        timeCapSeconds: 1200,
+      },
+      composition: [
+        {
+          ...publicWod.composition[0],
+          exerciseName: "Pull-ups",
+          reps: 5,
+        },
+        {
+          ...publicWod.composition[1],
+          exerciseName: "Push-ups",
+          reps: 10,
+          distanceM: null,
+          durationSeconds: null,
+        },
+        {
+          ...publicWod.composition[1],
+          id: 3,
+          position: 3,
+          exerciseName: "Air Squats",
+          reps: 15,
+          distanceM: null,
+          durationSeconds: null,
+        },
+      ],
+    };
+
+    const markup = renderDetail(
+      <WodDetail selectedWod={cindy} onBack={() => undefined} />,
+    );
+
+    expect(markup).toContain("Cindy");
+    expect(markup).toContain("AMRAP");
+    expect(markup).toContain("20 min de trabajo");
+    expect(markup).toContain('class="wod-detail-reps">5</span>');
+    expect(markup).toContain('class="wod-detail-reps">10</span>');
+    expect(markup).toContain('class="wod-detail-reps">15</span>');
+    expect(markup.indexOf("Pull-ups")).toBeLessThan(markup.indexOf("Push-ups"));
+    expect(markup.indexOf("Push-ups")).toBeLessThan(markup.indexOf("Air Squats"));
+  });
+
+  it("keeps non-repetition prescriptions for EMOM without inventing a cycle", () => {
+    const emom: WodAggregateResponse = {
+      ...publicWod,
+      version: {
+        ...publicWod.version,
+        type: "EMOM",
+        rounds: null,
+        timeCapSeconds: null,
+      },
+      composition: [
+        {
+          ...publicWod.composition[1],
+          reps: null,
+          distanceM: 200,
+          durationSeconds: 45,
+        },
+      ],
+    };
+
+    const markup = renderDetail(
+      <WodDetail selectedWod={emom} onBack={() => undefined} />,
+    );
+
+    expect(markup).toContain("EMOM");
+    expect(markup).toContain("200 m");
+    expect(markup).toContain("45 segundos");
+    expect(markup).not.toContain("ciclos");
   });
 });

@@ -14,6 +14,17 @@ function formatWodType(type: WodAggregateResponse["version"]["type"]): string {
   return type === "FOR_TIME" ? "For Time" : type;
 }
 
+function formatTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (remainingSeconds === 0) {
+    return `${minutes} min`;
+  }
+
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")} min`;
+}
+
 function WodDetail({
   selectedWod,
   onBack,
@@ -40,35 +51,52 @@ function WodDetail({
             <p className="wod-detail-description">{description}</p>
           )}
 
-          <div className="wod-detail-meta">
-            <span className="wod-detail-badge">
+          <div className="wod-detail-prescription-summary">
+            <p className="wod-detail-modality">
               {formatWodType(selectedWod.version.type)}
-            </span>
+            </p>
 
-            {selectedWod.version.rounds != null && (
-              <span className="wod-detail-badge">
-                {selectedWod.version.rounds} rondas
-              </span>
-            )}
+            {(selectedWod.version.timeCapSeconds != null ||
+              selectedWod.version.rounds != null) && (
+              <div className="wod-detail-structure">
+                {selectedWod.version.timeCapSeconds != null && (
+                  <span>
+                    {formatTime(selectedWod.version.timeCapSeconds)}
+                    {selectedWod.version.type === "AMRAP"
+                      ? " de trabajo"
+                      : " límite"}
+                  </span>
+                )}
 
-            {selectedWod.version.timeCapSeconds != null && (
-              <span className="wod-detail-badge">
-                {Math.floor(selectedWod.version.timeCapSeconds / 60)} min ·
-                Tiempo límite
-              </span>
+                {selectedWod.version.rounds != null && (
+                  <span>{selectedWod.version.rounds} ciclos</span>
+                )}
+              </div>
             )}
           </div>
         </header>
 
         <section className="wod-detail-panel">
-          <h2>Entrenamiento</h2>
+          <h2>Prescripción</h2>
 
           <ol className="wod-detail-sequence">
-            {selectedWod.composition.map((item, index) => (
+            {selectedWod.composition.map((item) => (
               <li key={item.id} className="wod-detail-exercise">
-                <span className="wod-detail-exercise-index" aria-hidden="true">
-                  {index + 1}
-                </span>
+                <div className="wod-detail-exercise-prescription">
+                  {item.reps != null && (
+                    <span className="wod-detail-reps">{item.reps}</span>
+                  )}
+
+                  {item.reps == null && (
+                    <span className="wod-detail-reps wod-detail-reps-empty" aria-hidden="true">
+                      —
+                    </span>
+                  )}
+
+                  {item.reps != null && (
+                    <span className="wod-detail-reps-label">reps</span>
+                  )}
+                </div>
 
                 <div className="wod-detail-exercise-content">
                   <h3 className="wod-detail-exercise-title">
@@ -76,8 +104,6 @@ function WodDetail({
                   </h3>
 
                   <div className="wod-detail-exercise-meta">
-                    {item.reps != null && <span>{item.reps} repeticiones</span>}
-
                     {item.weightKg != null && <span>{item.weightKg} kg</span>}
 
                     {item.distanceM != null && <span>{item.distanceM} m</span>}
