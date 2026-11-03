@@ -12,6 +12,21 @@ export function isWodCategory(value: string | null): value is WodCategory {
   return value === "CROSSTRAINING" || value === "HYBRID";
 }
 
+export function getWodCategorySearchParams(
+  searchParams: URLSearchParams,
+  category: WodCategory | null,
+) {
+  const nextSearchParams = new URLSearchParams(searchParams);
+
+  if (category) {
+    nextSearchParams.set("category", category);
+  } else {
+    nextSearchParams.delete("category");
+  }
+
+  return nextSearchParams;
+}
+
 export function filterWods(
   wods: WodAggregateResponse[],
   search: string,

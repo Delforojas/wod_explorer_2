@@ -6,6 +6,7 @@ import type { WodsViewProps } from "../../views/wods/WodsView.Types";
 import type { WodAggregateResponse } from "../../types/Wod";
 import {
   filterWods,
+  getWodCategorySearchParams,
   hasActiveWodFilters,
   isWodCategory,
 } from "../../views/wods/wodFilters";
@@ -51,7 +52,11 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
 
   function clearFilters() {
     setSearch("");
-    setSearchParams({});
+    setSearchParams(getWodCategorySearchParams(searchParams, null));
+  }
+
+  function selectCategory(nextCategory: typeof category) {
+    setSearchParams(getWodCategorySearchParams(searchParams, nextCategory));
   }
 
   return (
@@ -60,23 +65,12 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
         {/* ENCABEZADO */}
 
         <header className="wod-header">
-          <h1>
-            WODs
-          </h1>
+          <h1>WODs</h1>
 
           <p className="wod-description">
             Explora distintos entrenamientos y encuentra el que te apetezca
             hacer hoy.
           </p>
-
-          {category && (
-            <p className="wod-category-context">
-              Categoría: <strong>{category === "HYBRID" ? "Hybrid" : "Crosstraining"}</strong>
-              <button type="button" onClick={clearFilters}>
-                Ver todo
-              </button>
-            </p>
-          )}
         </header>
 
         {/* BUSCADOR */}
@@ -114,6 +108,30 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
               </button>
             )}
           </div>
+        </div>
+
+        <div
+          className="exercise-results-mode-toggle"
+          role="group"
+          aria-label="Filtrar WODs por categoría"
+        >
+          {(
+            [
+              [null, "Todos"],
+              ["CROSSTRAINING", "CROSSTRAINING"],
+              ["HYBRID", "HYBRID"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              className="exercise-results-mode-button"
+              key={label}
+              type="button"
+              aria-pressed={category === value}
+              onClick={() => selectCategory(value)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
         {/* CONTADOR */}
@@ -201,7 +219,10 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
                         className="my-wods-action catalog-register-action"
                         aria-label={`Registrar resultado de ${wod.name}`}
                       >
-                        <span className="catalog-register-icon" aria-hidden="true">
+                        <span
+                          className="catalog-register-icon"
+                          aria-hidden="true"
+                        >
                           +
                         </span>
                         <span>Registrar</span>
@@ -213,7 +234,6 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             })}
           </div>
         )}
-
       </div>
     </section>
   );
