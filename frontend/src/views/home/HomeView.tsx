@@ -28,44 +28,57 @@ function HomeView({
     return (
       <section className="home-page home-dashboard-page">
         <div className="home-dashboard">
-          <div className="home-dashboard-top">
-            <header className="home-dashboard-hero">
-              <div className="home-logo" aria-hidden="true">
+          <header className="home-dashboard-hero">
+            <div className="home-dashboard-hero-copy">
+              <p className="home-eyebrow">TU ESPACIO DE ENTRENAMIENTO</p>
+              <h1>
+                Hola, <span>{getHomeDisplayName(username)}</span>
+              </h1>
+              <p className="home-description">
+                Continúa donde lo dejaste y registra cada sesión para ver tu
+                progreso.
+              </p>
+            </div>
+
+            <div className="home-dashboard-mark" aria-hidden="true">
+              <div>
                 <span>WE</span>
               </div>
+              <small>ENTRENA / REGISTRA / SUPÉRATE</small>
+            </div>
 
-              <div className="home-dashboard-hero-copy">
-                <p className="home-eyebrow">TU ENTRENAMIENTO</p>
-                <h1>Hola, {getHomeDisplayName(username)}</h1>
-                <p className="home-description">
-                  Continúa donde lo dejaste y registra cada sesión para ver tu
-                  progreso.
-                </p>
-              </div>
+            <div className="home-dashboard-hero-actions">
+              <Link
+                className="home-dashboard-primary"
+                to="/my-wod-results/new"
+              >
+                Registrar resultado de WOD <span aria-hidden="true">→</span>
+              </Link>
+              <Link
+                className="home-dashboard-secondary"
+                to="/exercise-results/new"
+              >
+                Registrar resultado de ejercicio
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </header>
 
-              <div className="home-dashboard-hero-actions">
-                <Link
-                  className="home-dashboard-primary"
-                  to="/my-wod-results/new"
-                >
-                  Registrar resultado de WOD <span aria-hidden="true">→</span>
-                </Link>
-                <Link
-                  className="home-dashboard-secondary"
-                  to="/exercise-results/new"
-                >
-                  Registrar resultado de ejercicio
-                  <span aria-hidden="true">→</span>
-                </Link>
+          <section
+            className="home-dashboard-actions"
+            aria-labelledby="home-quick-actions-title"
+          >
+            <header className="home-dashboard-section-header">
+              <div>
+                <p className="home-dashboard-label">ACCESOS RÁPIDOS</p>
+                <h2 id="home-quick-actions-title">Tu siguiente movimiento</h2>
               </div>
             </header>
 
             <nav
-              className="home-dashboard-actions"
+              className="home-dashboard-actions-grid"
               aria-label="Acciones de entrenamiento"
             >
-              <p className="home-dashboard-label">ACCESOS RÁPIDOS</p>
-
               <Link className="home-dashboard-action" to="/my-wods">
                 <span>
                   <strong>Mis WODs</strong>
@@ -73,7 +86,6 @@ function HomeView({
                 </span>
                 <span aria-hidden="true">→</span>
               </Link>
-
               <Link
                 className="home-dashboard-action"
                 to="/my-exercise-results"
@@ -84,7 +96,6 @@ function HomeView({
                 </span>
                 <span aria-hidden="true">→</span>
               </Link>
-
               <Link className="home-dashboard-action" to="/create-wod">
                 <span>
                   <strong>Crear WOD personal</strong>
@@ -92,7 +103,6 @@ function HomeView({
                 </span>
                 <span aria-hidden="true">→</span>
               </Link>
-
               <Link className="home-dashboard-action" to="/wods">
                 <span>
                   <strong>Explorar WODs</strong>
@@ -101,7 +111,47 @@ function HomeView({
                 <span aria-hidden="true">→</span>
               </Link>
             </nav>
-          </div>
+          </section>
+
+          <section
+            className="home-dashboard-discovery"
+            aria-labelledby="home-dashboard-discovery-title"
+          >
+            <header className="home-dashboard-section-header">
+              <div>
+                <p className="home-dashboard-label">DESCUBRE EL CATÁLOGO</p>
+                <h2 id="home-dashboard-discovery-title">Elige tu reto de hoy</h2>
+              </div>
+              <Link className="home-activity-link" to="/wods">
+                Ver todos <span aria-hidden="true">→</span>
+              </Link>
+            </header>
+
+            <div className="home-dashboard-discovery-grid">
+              <Link
+                className="home-dashboard-discovery-card home-dashboard-discovery-card--cross"
+                to="/wods?category=CROSSTRAINING"
+              >
+                <span aria-hidden="true">01</span>
+                <div>
+                  <p>CROSSTRAINING</p>
+                  <h3>Fuerza, técnica e intensidad</h3>
+                </div>
+                <span aria-hidden="true">→</span>
+              </Link>
+              <Link
+                className="home-dashboard-discovery-card home-dashboard-discovery-card--hybrid"
+                to="/wods?category=HYBRID"
+              >
+                <span aria-hidden="true">02</span>
+                <div>
+                  <p>HYBRID</p>
+                  <h3>Carrera, resistencia y estaciones funcionales</h3>
+                </div>
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </section>
 
           <section
             className="home-activity"
