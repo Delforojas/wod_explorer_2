@@ -41,6 +41,9 @@ public class WodVersionItem {
     @Column(name = "duration_seconds")
     private Integer durationSeconds;
 
+    @Column
+    private Integer calories;
+
     public Long getId() {
         return id;
     }
@@ -73,6 +76,10 @@ public class WodVersionItem {
         return durationSeconds;
     }
 
+    public Integer getCalories() {
+        return calories;
+    }
+
     public WodVersionItem(
             WodVersion wodVersion,
             Exercise exercise,
@@ -80,7 +87,8 @@ public class WodVersionItem {
             Integer reps,
             BigDecimal weightKg,
             BigDecimal distanceM,
-            Integer durationSeconds) {
+            Integer durationSeconds,
+            Integer calories) {
 
         this.wodVersion = wodVersion;
         this.exercise = exercise;
@@ -89,6 +97,7 @@ public class WodVersionItem {
         this.weightKg = weightKg;
         this.distanceM = distanceM;
         this.durationSeconds = durationSeconds;
+        this.calories = calories;
     }
 
     protected WodVersionItem() {

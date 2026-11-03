@@ -25,6 +25,28 @@ function formatTime(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")} min`;
 }
 
+function formatVariant(variant: "MEN" | "WOMEN"): string {
+  return variant === "MEN" ? "Hombres" : "Mujeres";
+}
+
+type WodItem = WodAggregateResponse["composition"][number];
+
+function getPrimaryPrescription(item: WodItem): string | null {
+  if (item.reps != null) {
+    return String(item.reps);
+  }
+  if (item.distanceM != null) {
+    return `${item.distanceM} m`;
+  }
+  if (item.calories != null) {
+    return `${item.calories} cal`;
+  }
+  if (item.durationSeconds != null) {
+    return `${item.durationSeconds} s`;
+  }
+  return null;
+}
+
 function WodDetail({
   selectedWod,
   onBack,
@@ -80,42 +102,66 @@ function WodDetail({
           <h2>Prescripción</h2>
 
           <ol className="wod-detail-sequence">
-            {selectedWod.composition.map((item) => (
-              <li key={item.id} className="wod-detail-exercise">
-                <div className="wod-detail-exercise-prescription">
-                  {item.reps != null && (
-                    <span className="wod-detail-reps">{item.reps}</span>
-                  )}
+            {selectedWod.composition.map((item) => {
+              const primaryPrescription = getPrimaryPrescription(item);
 
-                  {item.reps == null && (
-                    <span className="wod-detail-reps wod-detail-reps-empty" aria-hidden="true">
-                      —
-                    </span>
-                  )}
-
-                  {item.reps != null && (
-                    <span className="wod-detail-reps-label">reps</span>
-                  )}
-                </div>
-
-                <div className="wod-detail-exercise-content">
-                  <h3 className="wod-detail-exercise-title">
-                    {item.exerciseName}
-                  </h3>
-
-                  <div className="wod-detail-exercise-meta">
-                    {item.weightKg != null && <span>{item.weightKg} kg</span>}
-
-                    {item.distanceM != null && <span>{item.distanceM} m</span>}
-
-                    {item.durationSeconds != null && (
-                      <span>{item.durationSeconds} segundos</span>
+              return (
+                <li key={item.id} className="wod-detail-exercise">
+                  <div className="wod-detail-exercise-prescription">
+                    {primaryPrescription && (
+                      <span className="wod-detail-primary">
+                        {primaryPrescription}
+                      </span>
                     )}
                   </div>
-                </div>
-              </li>
-            ))}
+
+                  <div className="wod-detail-exercise-content">
+                    <h3 className="wod-detail-exercise-title">
+                      {item.exerciseName}
+                    </h3>
+
+                    <div className="wod-detail-exercise-meta">
+                      {item.weightKg != null && <span>{item.weightKg} kg</span>}
+
+                      {item.reps != null && primaryPrescription !== String(item.reps) && (
+                        <span>{item.reps} reps</span>
+                      )}
+
+                      {item.distanceM != null && primaryPrescription !== `${item.distanceM} m` && (
+                        <span>{item.distanceM} m</span>
+                      )}
+
+                      {item.calories != null && primaryPrescription !== `${item.calories} cal` && (
+                        <span>{item.calories} cal</span>
+                      )}
+
+                      {item.durationSeconds != null && primaryPrescription !== `${item.durationSeconds} s` && (
+                        <span>{item.durationSeconds} s</span>
+                      )}
+
+                      {item.prescriptions?.map((prescription) => (
+                        <span key={prescription.variant}>
+                          {formatVariant(prescription.variant)} {prescription.weightKg} kg
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
+
+          {selectedWod.version.progressionRule && (
+            <p className="wod-detail-rule">
+              Progresión: {selectedWod.version.progressionRule.startReps}, {selectedWod.version.progressionRule.startReps + selectedWod.version.progressionRule.incrementReps}, {selectedWod.version.progressionRule.startReps + selectedWod.version.progressionRule.incrementReps * 2}... reps cada {selectedWod.version.progressionRule.everyRounds} {selectedWod.version.progressionRule.everyRounds === 1 ? "ronda" : "rondas"}
+            </p>
+          )}
+
+          {selectedWod.version.timeExtension && (
+            <p className="wod-detail-rule">
+              {formatTime(selectedWod.version.timeExtension.initialSeconds)} iniciales + {formatTime(selectedWod.version.timeExtension.extensionSeconds)} cada {selectedWod.version.timeExtension.roundsPerExtension} {selectedWod.version.timeExtension.roundsPerExtension === 1 ? "ronda completada" : "rondas completadas"}
+            </p>
+          )}
         </section>
 
         {registrationHref && (
