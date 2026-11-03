@@ -11,7 +11,8 @@ export type NavigationIconName =
   | "document"
   | "home"
   | "plus"
-  | "trophy";
+  | "trophy"
+  | "user";
 
 /* ========================================
    NAVEGACIÓN PÚBLICA
@@ -21,6 +22,7 @@ export const publicNavigation: readonly NavigationItem[] = [
   { label: "Inicio", to: "/", icon: "home" },
   { label: "Ejercicios", to: "/exercises", icon: "activity" },
   { label: "WODs", to: "/wods", icon: "barbell" },
+  { label: "Entrar", to: "/login", icon: "user" },
 ];
 
 /* ========================================

@@ -19,6 +19,7 @@ function NavigationIcon({ icon }: { icon: NavigationIconName }) {
     plus: "M12 5v14m-7-7h14",
     trophy:
       "M8 4h8v5a4 4 0 0 1-8 0V4Zm-3 2H3v2a4 4 0 0 0 4 4m10-6h2v2a4 4 0 0 1-4 4m-6 4v3m-3 2h12",
+    user: "M20 21a8 8 0 0 0-16 0m12-12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z",
   };
 
   return (

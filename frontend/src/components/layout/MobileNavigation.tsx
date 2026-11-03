@@ -13,7 +13,7 @@ function MobileNavigation({ isAuthenticated }: MobileNavigationProps) {
 
   return (
     <nav
-      className="mobile-navigation mobile-navigation-integrated"
+      className={`mobile-navigation mobile-navigation-integrated mobile-navigation-items-${navigationItems.length}`}
       aria-label="Navegación móvil"
     >
       <NavigationLinks
