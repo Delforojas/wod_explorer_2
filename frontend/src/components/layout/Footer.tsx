@@ -135,6 +135,7 @@ function Footer({ isAuthenticated }: FooterProps) {
           aria-label="Información de WOD Explorer"
         >
           <Link to="/about">Sobre WOD Explorer</Link>
+          <Link to="/privacy">Privacidad</Link>
         </nav>
       </div>
 

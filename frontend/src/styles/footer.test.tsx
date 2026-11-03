@@ -23,12 +23,13 @@ describe("footer social links", () => {
     expect(markup).toContain('href="mailto:delfinrojasespina@email.com"');
   });
 
-  it("links to the public about page without rendering legal placeholders", () => {
+  it("links to the public about and privacy pages without rendering legal placeholders", () => {
     const markup = renderFooter();
 
     expect(markup).toContain('href="/about"');
     expect(markup).toContain("Sobre WOD Explorer");
-    expect(markup).not.toContain("Política de privacidad");
+    expect(markup).toContain('href="/privacy"');
+    expect(markup).toContain("Privacidad");
     expect(markup).not.toContain("Aviso legal");
   });
 });

@@ -1,0 +1,109 @@
+.privacy-page {
+  display: grid;
+  width: min(100% - (var(--space-4) * 2), 880px);
+  margin: 0 auto;
+  padding: var(--space-10) 0 var(--space-12);
+  gap: var(--space-6);
+}
+
+.privacy-page__header,
+.privacy-page__section,
+.privacy-page__notice,
+.privacy-page__pending {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.privacy-page__eyebrow,
+.privacy-page h1,
+.privacy-page h2,
+.privacy-page p {
+  margin: 0;
+}
+
+.privacy-page__eyebrow {
+  color: var(--color-orange-300);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.privacy-page h1 {
+  color: var(--color-heading-strong);
+  font-family: var(--font-display);
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 1.05;
+}
+
+.privacy-page h2 {
+  color: var(--color-heading-strong);
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.privacy-page__header > p:last-child,
+.privacy-page__section p,
+.privacy-page__notice p,
+.privacy-page__pending li,
+.privacy-page__reviewed {
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.privacy-page__notice,
+.privacy-page__pending {
+  border: 1px solid rgb(234 179 8 / 48%);
+  border-radius: var(--radius-lg);
+  background: rgb(234 179 8 / 8%);
+  padding: var(--space-5);
+}
+
+.privacy-page__notice h2,
+.privacy-page__pending h2 {
+  color: var(--color-warning);
+}
+
+.privacy-page__sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.privacy-page__section {
+  min-height: 196px;
+  border: 1px solid var(--color-white-alpha-09);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: var(--space-6);
+}
+
+.privacy-page__pending ul {
+  display: grid;
+  margin: 0;
+  padding-left: var(--space-5);
+  gap: var(--space-2);
+}
+
+.privacy-page__reviewed {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+@media (max-width: 599px) {
+  .privacy-page {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
+
+  .privacy-page__sections {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-page__section,
+  .privacy-page__notice,
+  .privacy-page__pending {
+    padding: var(--space-5);
+  }
+}

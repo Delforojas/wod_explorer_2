@@ -297,6 +297,7 @@
 .delfo-footer__information {
   display: flex;
   justify-content: center;
+  gap: var(--space-4);
 }
 
 .delfo-footer__information a {

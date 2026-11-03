@@ -26,6 +26,7 @@ import RegisterWodResultPage from "./pages/RegisterWodResultPage";
 
 import RegisterPage from "./pages/RegisterPage";
 import AboutPage from "./pages/AboutPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
         <Route path="/wod-version-items" element={<WodVersionItemsPage />} />
 
         <Route path="/about" element={<AboutPage />} />
+
+        <Route path="/privacy" element={<PrivacyPage />} />
 
         {/* Autenticación */}
 
