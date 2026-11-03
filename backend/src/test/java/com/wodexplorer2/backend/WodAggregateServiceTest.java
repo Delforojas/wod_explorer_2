@@ -21,6 +21,9 @@ import com.wodexplorer2.backend.repository.ExerciseRepository;
 import com.wodexplorer2.backend.repository.WodRepository;
 import com.wodexplorer2.backend.repository.WodVersionItemRepository;
 import com.wodexplorer2.backend.repository.WodVersionRepository;
+import com.wodexplorer2.backend.repository.WodItemPrescriptionRepository;
+import com.wodexplorer2.backend.repository.WodProgressionRuleRepository;
+import com.wodexplorer2.backend.repository.WodTimeExtensionRepository;
 import com.wodexplorer2.backend.service.CurrentUserService;
 import com.wodexplorer2.backend.service.WodAggregateService;
 import com.wodexplorer2.backend.service.WodService;
@@ -50,6 +53,15 @@ class WodAggregateServiceTest {
   private WodVersionItemRepository wodVersionItemRepository;
 
   @Mock
+  private WodItemPrescriptionRepository wodItemPrescriptionRepository;
+
+  @Mock
+  private WodProgressionRuleRepository wodProgressionRuleRepository;
+
+  @Mock
+  private WodTimeExtensionRepository wodTimeExtensionRepository;
+
+  @Mock
   private ExerciseRepository exerciseRepository;
 
   @Mock
@@ -64,6 +76,9 @@ class WodAggregateServiceTest {
         wodRepository,
         wodVersionRepository,
         wodVersionItemRepository,
+        wodItemPrescriptionRepository,
+        wodProgressionRuleRepository,
+        wodTimeExtensionRepository,
         exerciseRepository,
         currentUserService);
   }
@@ -83,8 +98,8 @@ class WodAggregateServiceTest {
         .thenReturn(List.of());
 
     WodDefinitionRequest request = definition(
-        new WodCompositionItemRequest(11L, 10, null, null, null),
-        new WodCompositionItemRequest(11L, 5, null, null, null));
+        item(11L, 10, null, null, null),
+        item(11L, 5, null, null, null));
 
     aggregateService.create(request);
 
@@ -105,7 +120,7 @@ class WodAggregateServiceTest {
         WodType.FOR_TIME,
         null,
         null,
-        List.of());
+        List.of(), null, null);
 
     assertThrows(InvalidWodDefinitionException.class, () -> aggregateService.create(request));
   }
@@ -114,7 +129,7 @@ class WodAggregateServiceTest {
   void rejectsMissingOrInactiveExerciseBeforeCreatingWod() {
     when(exerciseRepository.findByIdAndActiveTrue(99L)).thenReturn(Optional.empty());
     WodDefinitionRequest request = definition(
-        new WodCompositionItemRequest(99L, null, BigDecimal.ONE, null, null));
+        item(99L, null, BigDecimal.ONE, null, null));
 
     assertThrows(RuntimeException.class, () -> aggregateService.create(request));
   }
@@ -136,7 +151,7 @@ class WodAggregateServiceTest {
         .thenReturn(List.of());
 
     aggregateService.update(4L, definition(
-        new WodCompositionItemRequest(11L, 12, null, null, null)));
+        item(11L, 12, null, null, null)));
 
     ArgumentCaptor<WodVersion> captor = ArgumentCaptor.forClass(WodVersion.class);
     verify(wodVersionRepository).save(captor.capture());
@@ -157,7 +172,17 @@ class WodAggregateServiceTest {
         WodType.FOR_TIME,
         null,
         null,
-        List.of(items));
+        List.of(items), null, null);
+  }
+
+  private WodCompositionItemRequest item(
+      Long exerciseId,
+      Integer reps,
+      BigDecimal weightKg,
+      BigDecimal distanceM,
+      Integer durationSeconds) {
+    return new WodCompositionItemRequest(
+        exerciseId, reps, weightKg, distanceM, durationSeconds, null, null);
   }
 
   private User user(Long id) {

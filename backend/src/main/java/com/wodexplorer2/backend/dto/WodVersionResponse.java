@@ -12,5 +12,7 @@ public record WodVersionResponse(
         WodType type,
         Integer timeCapSeconds,
         Integer rounds,
+        WodProgressionRuleResponse progressionRule,
+        WodTimeExtensionResponse timeExtension,
         LocalDateTime createdAt) {
 }

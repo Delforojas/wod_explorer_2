@@ -11,5 +11,6 @@ public record WodVersionItemRequest(
     @Min(0) Integer reps,
     @Min(0) BigDecimal weightKg,
     @Min(0) BigDecimal distanceM,
-    @Min(0) Integer durationSeconds) {
+    @Min(0) Integer durationSeconds,
+    @Min(0) Integer calories) {
 }

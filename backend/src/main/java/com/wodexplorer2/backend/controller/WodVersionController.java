@@ -24,9 +24,7 @@ public class WodVersionController {
 
     @GetMapping
     public List<WodVersionResponse> findAll() {
-        return wodVersionService.findAll().stream()
-                .map(wodVersionMapper::toResponse)
-                .toList();
+        return wodVersionMapper.toResponses(wodVersionService.findAll());
     }
 
     @GetMapping("/{id}")

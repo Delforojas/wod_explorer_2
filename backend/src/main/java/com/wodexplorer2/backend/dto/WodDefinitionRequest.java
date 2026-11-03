@@ -14,5 +14,7 @@ public record WodDefinitionRequest(
     @NotNull WodType type,
     @Min(1) Integer timeCapSeconds,
     @Min(1) Integer rounds,
-    @NotEmpty List<@Valid WodCompositionItemRequest> items) {
+    @NotEmpty List<@Valid WodCompositionItemRequest> items,
+    @Valid WodProgressionRuleRequest progressionRule,
+    @Valid WodTimeExtensionRequest timeExtension) {
 }

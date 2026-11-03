@@ -64,7 +64,8 @@ public class WodVersionItemService {
         request.reps(),
         request.weightKg(),
         request.distanceM(),
-        request.durationSeconds()));
+        request.durationSeconds(),
+        request.calories()));
   }
 
   public void deleteById(Long id) {

@@ -24,6 +24,11 @@ export const wodCompositionItemRequestSchema = z.object({
   weightKg: z.number().finite().nonnegative().optional(),
   distanceM: z.number().finite().nonnegative().optional(),
   durationSeconds: z.number().int().nonnegative().optional(),
+  calories: z.number().int().nonnegative().optional(),
+  prescriptions: z.array(z.object({
+    variant: z.enum(["MEN", "WOMEN"]),
+    weightKg: z.number().finite().positive(),
+  })).optional(),
 });
 
 export const wodDefinitionRequestSchema = z.object({
@@ -32,6 +37,16 @@ export const wodDefinitionRequestSchema = z.object({
   timeCapSeconds: z.number().int().positive().optional(),
   rounds: z.number().int().positive().optional(),
   items: z.array(wodCompositionItemRequestSchema).min(1),
+  progressionRule: z.object({
+    startReps: z.number().int().positive(),
+    incrementReps: z.number().int().positive(),
+    everyRounds: z.number().int().positive(),
+  }).optional(),
+  timeExtension: z.object({
+    initialSeconds: z.number().int().positive(),
+    extensionSeconds: z.number().int().positive(),
+    roundsPerExtension: z.number().int().positive(),
+  }).optional(),
 });
 
 export const wodVersionRequestSchema = z.object({
@@ -59,6 +74,16 @@ export const wodVersionResponseSchema = z.object({
   type: wodTypeSchema,
   timeCapSeconds: z.number().nullable(),
   rounds: z.number().nullable(),
+  progressionRule: z.object({
+    startReps: z.number(),
+    incrementReps: z.number(),
+    everyRounds: z.number(),
+  }).nullable().optional(),
+  timeExtension: z.object({
+    initialSeconds: z.number(),
+    extensionSeconds: z.number(),
+    roundsPerExtension: z.number(),
+  }).nullable().optional(),
   createdAt: z.string(),
 });
 
@@ -72,6 +97,11 @@ export const wodVersionItemResponseSchema = z.object({
   weightKg: z.number().nullable(),
   distanceM: z.number().nullable(),
   durationSeconds: z.number().nullable(),
+  calories: z.number().nullable(),
+  prescriptions: z.array(z.object({
+    variant: z.enum(["MEN", "WOMEN"]),
+    weightKg: z.number(),
+  })).optional(),
 });
 
 export const wodAggregateResponseSchema = z.object({

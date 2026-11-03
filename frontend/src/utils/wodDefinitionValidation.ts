@@ -4,7 +4,10 @@ import type {
   WodDefinitionRequest,
 } from "../types/Wod";
 
-type PrescriptionField = keyof Omit<WodCompositionItemRequest, "exerciseId">;
+type PrescriptionField = Extract<
+  keyof WodCompositionItemRequest,
+  "reps" | "weightKg" | "distanceM" | "durationSeconds"
+>;
 
 const prescriptionFields: readonly PrescriptionField[] = [
   "reps",

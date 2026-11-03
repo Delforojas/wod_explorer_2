@@ -29,6 +29,8 @@ const wod: WodAggregateResponse = {
     type: "FOR_TIME",
     timeCapSeconds: 600,
     rounds: 5,
+    progressionRule: null,
+    timeExtension: null,
     createdAt: "2026-11-02T10:00:00Z",
   },
   composition: [
@@ -42,6 +44,8 @@ const wod: WodAggregateResponse = {
       weightKg: 60,
       distanceM: null,
       durationSeconds: null,
+      calories: null,
+      prescriptions: [],
     },
     {
       id: 2,
@@ -53,6 +57,8 @@ const wod: WodAggregateResponse = {
       weightKg: null,
       distanceM: 400,
       durationSeconds: 120,
+      calories: null,
+      prescriptions: [],
     },
   ],
 };
@@ -83,11 +89,10 @@ describe("shared WOD detail presentation", () => {
     expect(markup).toContain("5 ciclos");
     expect(markup).toContain("10 min límite");
     expect(markup.indexOf("Back Squat")).toBeLessThan(markup.indexOf("Run"));
-    expect(markup).toContain('class="wod-detail-reps">10</span>');
-    expect(markup).toContain("reps");
+    expect(markup).toContain('class="wod-detail-primary">10</span>');
     expect(markup).toContain("60 kg");
-    expect(markup).toContain("400 m");
-    expect(markup).toContain("120 segundos");
+    expect(markup).toContain('class="wod-detail-primary">400 m</span>');
+    expect(markup).toContain("120 s");
     expect(markup).not.toContain("Registrar resultado");
     expect(markup).not.toContain("/my-wod-results/new");
   });
@@ -159,9 +164,9 @@ describe("shared WOD detail presentation", () => {
     expect(markup).toContain("Cindy");
     expect(markup).toContain("AMRAP");
     expect(markup).toContain("20 min de trabajo");
-    expect(markup).toContain('class="wod-detail-reps">5</span>');
-    expect(markup).toContain('class="wod-detail-reps">10</span>');
-    expect(markup).toContain('class="wod-detail-reps">15</span>');
+    expect(markup).toContain('class="wod-detail-primary">5</span>');
+    expect(markup).toContain('class="wod-detail-primary">10</span>');
+    expect(markup).toContain('class="wod-detail-primary">15</span>');
     expect(markup.indexOf("Pull-ups")).toBeLessThan(markup.indexOf("Push-ups"));
     expect(markup.indexOf("Push-ups")).toBeLessThan(markup.indexOf("Air Squats"));
   });
@@ -190,8 +195,65 @@ describe("shared WOD detail presentation", () => {
     );
 
     expect(markup).toContain("EMOM");
-    expect(markup).toContain("200 m");
-    expect(markup).toContain("45 segundos");
+    expect(markup).toContain('class="wod-detail-primary">200 m</span>');
+    expect(markup).toContain("45 s");
     expect(markup).not.toContain("ciclos");
+  });
+
+  it("uses one highlighted column for distance, calories, duration, and repetitions", () => {
+    const mixedWork: WodAggregateResponse = {
+      ...publicWod,
+      composition: [
+        {
+          ...publicWod.composition[0],
+          exerciseName: "Sled Push",
+          reps: null,
+          distanceM: 50,
+          weightKg: 202,
+        },
+        {
+          ...publicWod.composition[1],
+          exerciseName: "Row",
+          distanceM: null,
+          durationSeconds: null,
+          calories: 20,
+        },
+        {
+          ...publicWod.composition[1],
+          id: 3,
+          exerciseName: "Plank",
+          distanceM: null,
+          durationSeconds: 60,
+          calories: null,
+        },
+        {
+          ...publicWod.composition[0],
+          id: 4,
+          exerciseName: "Thruster",
+          reps: 21,
+          weightKg: 43,
+          prescriptions: [
+            { variant: "MEN", weightKg: 45.359 },
+            { variant: "WOMEN", weightKg: 29.484 },
+          ],
+        },
+      ],
+    };
+
+    const markup = renderDetail(
+      <WodDetail selectedWod={mixedWork} onBack={() => undefined} />,
+    );
+
+    expect(markup).toContain('class="wod-detail-primary">50 m</span>');
+    expect(markup).toContain('class="wod-detail-primary">20 cal</span>');
+    expect(markup).toContain('class="wod-detail-primary">60 s</span>');
+    expect(markup).toContain('class="wod-detail-primary">21</span>');
+    expect(markup).toContain("202 kg");
+    expect(markup).toContain("43 kg");
+    expect(markup).toContain("Hombres 45.359 kg");
+    expect(markup).toContain("Mujeres 29.484 kg");
+    expect(markup.match(/>50 m</g)).toHaveLength(1);
+    expect(markup.match(/>20 cal</g)).toHaveLength(1);
+    expect(markup.match(/>60 s</g)).toHaveLength(1);
   });
 });
