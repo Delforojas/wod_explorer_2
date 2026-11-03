@@ -14,8 +14,20 @@ vi.mock("../../auth/useAuth", () => ({
   useAuth: () => authState,
 }));
 
-function renderNavigation(element: React.ReactElement): string {
-  return renderToStaticMarkup(<MemoryRouter>{element}</MemoryRouter>);
+function renderNavigation(element: React.ReactElement, pathname = "/"): string {
+  return renderToStaticMarkup(
+    <MemoryRouter initialEntries={[pathname]}>{element}</MemoryRouter>,
+  );
+}
+
+function getLinkMarkup(markup: string, href: string): string {
+  const match = markup.match(new RegExp(`<a(?=[^>]*href="${href}")[^>]*>`));
+
+  if (!match) {
+    throw new Error(`No se encontró el enlace ${href}.`);
+  }
+
+  return match[0];
 }
 
 describe("navigation user menu placement", () => {
@@ -59,5 +71,49 @@ describe("navigation user menu placement", () => {
     expect(desktopMarkup).toContain(">Benchmarks</span>");
     expect(mobileMarkup).toContain('href="/my-exercise-results"');
     expect(mobileMarkup).toContain(">Benchmarks</span>");
+  });
+
+  it("places Inicio first for guests and omits private destinations", () => {
+    const markup = renderNavigation(<MobileNavigation isAuthenticated={false} />);
+
+    expect(markup.indexOf('href="/"')).toBeLessThan(
+      markup.indexOf('href="/exercises"'),
+    );
+    expect(markup).toContain('aria-label="Inicio"');
+    expect(markup).toContain('href="/wods"');
+    expect(markup).not.toContain('href="/my-wods"');
+    expect(markup).not.toContain('href="/history"');
+  });
+
+  it("shows the six requested primary destinations after authentication", () => {
+    const markup = renderNavigation(<MobileNavigation isAuthenticated />);
+
+    expect(markup).toContain('href="/"');
+    expect(markup).toContain('href="/exercises"');
+    expect(markup).toContain('href="/wods"');
+    expect(markup).toContain('href="/my-wods"');
+    expect(markup).toContain('href="/my-exercise-results"');
+    expect(markup).toContain('href="/history"');
+  });
+
+  it("marks Inicio active only for the exact root pathname", () => {
+    const rootMarkup = renderNavigation(<MobileNavigation isAuthenticated />, "/");
+    const exercisesMarkup = renderNavigation(
+      <MobileNavigation isAuthenticated />,
+      "/exercises",
+    );
+
+    expect(getLinkMarkup(rootMarkup, "/")).toContain("nav-link-active");
+    expect(getLinkMarkup(exercisesMarkup, "/")).not.toContain(
+      "nav-link-active",
+    );
+  });
+
+  it("keeps Inicio first in the desktop sidebar", () => {
+    const markup = renderNavigation(<Navbar />);
+
+    expect(markup.indexOf('href="/"')).toBeLessThan(
+      markup.indexOf('href="/exercises"'),
+    );
   });
 });
