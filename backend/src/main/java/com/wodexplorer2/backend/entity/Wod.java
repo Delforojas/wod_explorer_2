@@ -33,6 +33,10 @@ public class Wod {
   @Column(nullable = false, length = 20)
   private WodOrigin origin;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 30)
+  private WodCategory category;
+
   @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
   private LocalDateTime createdAt;
 
@@ -53,6 +57,10 @@ public class Wod {
 
   public WodOrigin getOrigin() {
     return origin;
+  }
+
+  public WodCategory getCategory() {
+    return category;
   }
 
   public LocalDateTime getCreatedAt() {
@@ -76,9 +84,19 @@ public class Wod {
       String name,
       WodOrigin origin) {
 
+    this(owner, name, origin, WodCategory.CROSSTRAINING);
+  }
+
+  public Wod(
+      User owner,
+      String name,
+      WodOrigin origin,
+      WodCategory category) {
+
     this.owner = owner;
     this.name = name;
     this.origin = origin;
+    this.category = category;
   }
 
   protected Wod() {

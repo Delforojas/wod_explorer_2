@@ -1,6 +1,7 @@
 export type {
   WodAggregateResponse,
   WodCompositionItemRequest,
+  WodCategory,
   WodDefinitionRequest,
   WodOrigin,
   WodRequest,

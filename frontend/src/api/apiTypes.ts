@@ -17,6 +17,7 @@ export type {
 // WOD
 export type {
   WodAggregateResponse,
+  WodCategory,
   WodDefinitionRequest,
   WodOrigin,
   WodType,

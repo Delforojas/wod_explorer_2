@@ -13,6 +13,7 @@ function createWod(id: number, name: string): WodAggregateResponse {
     ownerId: null,
     name,
     origin: "GENERIC",
+    category: id === 1 ? "CROSSTRAINING" : "HYBRID",
     createdAt: "2026-01-01T00:00:00Z",
     version: {
       id,
@@ -47,5 +48,10 @@ describe("wod filters", () => {
 
   it("filters WODs by name without case sensitivity", () => {
     expect(filterWods(wods, " HEL ")).toEqual([wods[1]]);
+  });
+
+  it("filters WODs by their catalog category", () => {
+    expect(filterWods(wods, "", "CROSSTRAINING")).toEqual([wods[0]]);
+    expect(filterWods(wods, "", "HYBRID")).toEqual([wods[1]]);
   });
 });

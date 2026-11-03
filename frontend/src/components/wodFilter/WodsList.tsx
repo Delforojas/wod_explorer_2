@@ -1,10 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useAuth } from "../../auth/useAuth";
 
 import type { WodsViewProps } from "../../views/wods/WodsView.Types";
 import type { WodAggregateResponse } from "../../types/Wod";
-import { filterWods, hasActiveWodFilters } from "../../views/wods/wodFilters";
+import {
+  filterWods,
+  hasActiveWodFilters,
+  isWodCategory,
+} from "../../views/wods/wodFilters";
 
 type WodsListProps = Pick<WodsViewProps, "wods" | "onSelectWod">;
 
@@ -14,15 +18,26 @@ function formatWodType(type: WodAggregateResponse["version"]["type"]) {
 
 function WodsList({ wods, onSelectWod }: WodsListProps) {
   const { isAuthenticated } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [search, setSearch] = useState("");
-  const hasActiveFilters = hasActiveWodFilters(search);
+  const categoryParam = searchParams.get("category");
+  const category = isWodCategory(categoryParam) ? categoryParam : null;
+  const hasActiveFilters = hasActiveWodFilters(search) || category !== null;
 
-  const filteredWods = useMemo(() => filterWods(wods, search), [wods, search]);
+  const filteredWods = useMemo(
+    () => filterWods(wods, search, category),
+    [category, search, wods],
+  );
   const hasFilteredResults = filteredWods.length > 0;
   const shouldShowSearchClear = hasActiveFilters && hasFilteredResults;
   const shouldShowEmptyClear =
     hasActiveFilters && wods.length > 0 && !hasFilteredResults;
+
+  function clearFilters() {
+    setSearch("");
+    setSearchParams({});
+  }
 
   return (
     <section className="wod-page">
@@ -38,6 +53,15 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
             Explora distintos entrenamientos y encuentra el que te apetezca
             hacer hoy.
           </p>
+
+          {category && (
+            <p className="wod-category-context">
+              Categoría: <strong>{category === "HYBRID" ? "Hybrid" : "Crosstraining"}</strong>
+              <button type="button" onClick={clearFilters}>
+                Ver todo
+              </button>
+            </p>
+          )}
         </header>
 
         {/* BUSCADOR */}
@@ -109,7 +133,7 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
               <button
                 type="button"
                 className="wod-clear-filters"
-                onClick={() => setSearch("")}
+                onClick={clearFilters}
               >
                 Limpiar filtros
               </button>

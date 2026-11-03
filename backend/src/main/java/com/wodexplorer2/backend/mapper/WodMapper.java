@@ -32,6 +32,7 @@ public class WodMapper {
             : null,
         wod.getName(),
         wod.getOrigin(),
+        wod.getCategory(),
         wod.getCreatedAt());
   }
 }
