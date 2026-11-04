@@ -10,7 +10,12 @@
 
 ## Verificación
 
-- [ ] Ejecutar lint, tests, build, `git diff --check` y revisión visual móvil/escritorio.
+- [x] Ejecutar lint, tests, build, `git diff --check`.
+
+## Validaciones manuales pendientes
+
+- [ ] Revisar visualmente los formularios de resultados AMRAP/EMOM/For Time tras la extracción de la base CSS compartida (móvil y escritorio).
+- [ ] Confirmar que no hay regresiones de apariencia/uso en los formularios de resultados existentes.
 
 ## Commit y handoff
 
