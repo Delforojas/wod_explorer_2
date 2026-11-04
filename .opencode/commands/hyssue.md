@@ -1,16 +1,21 @@
 ---
-description: Implements a GitHub Issue using SDD, verification checks, and a local commit; prepares the work for manual validation
+description: Implements a GitHub Issue using the Hybrid Python + AI Harness
 ---
 
-# Issue Development Workflow
+# Hybrid Issue Development Workflow — /hyssue
 
-Implement GitHub Issue **#$1** in the current repository.
+Execute GitHub Issue **#$1** using the `/hyssue` workflow.
 
-This command executes the complete development workflow:
-analysis, branch preparation, SDD, implementation, verification,
-local commit, and handoff for manual validation.
+This command is independent from `/issue`.
 
+The current execution mode is `hyssue`.
+
+Follow all mandatory Issue, Context, Branch, SDD,
+Verification, Commit and Handoff guardrails.
+
+Never bypass a guardrail to resolve a command mismatch.
 **Do not push, merge branches, close the Issue, or execute `/finish-issue`.**
+Never execute `/finish-issue $1` automatically from `/hyssue`.
 
 ## 0. Execution Rules — Hybrid Harness
 
@@ -114,17 +119,32 @@ Additional rules:
 
 ## 1. Retrieve the Issue
 
-Retrieve GitHub Issue #$1 using the configured `github` MCP
-for the current repository.
+Retrieve GitHub Issue #$1 using the configured
+`github` MCP for the current repository.
 
-Identify the title, description, acceptance criteria, scope,
-constraints, dependencies, and relevant references.
+Identify the title, description, acceptance criteria,
+scope, constraints, dependencies, and relevant references.
+
+### Workflow Identity Check
+
+The current command is `/hyssue`.
+
+Verify that the retrieved Issue is compatible with
+the `/hyssue` workflow.
+
+If the Issue explicitly requires `/hyssue`, continue.
+
+If the Issue explicitly requires another workflow,
+return BLOCK and report the contradiction.
+
+Never reinterpret `/hyssue` as `/issue`.
+Never switch workflows automatically.
 
 Load and apply:
 
 `.opencode/commands/guardarails/issue.md`
 
-Continue only when the Issue Guard returns `PASS`.
+Continue only when the Issue Guard returns PASS.
 
 ## 2. Analyze Relevant Context
 
@@ -410,8 +430,6 @@ validation has been demonstrated through automated tests.
 
 Never weaken the original Git safety guarantees to
 reduce token usage.
-
-
 
 ## 4. Create or Complete the SDD — Hybrid
 
@@ -704,8 +722,8 @@ authorization or external intervention:
 
 - Stop and report the blocking condition.
 - Never treat INCOMPLETE as PASS.
-  
-### Migration Compatibility1
+
+### Migration Compatibility
 
 Until `verification_runner.py` is implemented,
 tested, and proven equivalent to the original hook,
@@ -1358,4 +1376,4 @@ the next command is:
 
 `/finish-issue $1`
 
-Never execute it automatically from `/issue`.
+Never execute it automatically from `/hyssue`.
