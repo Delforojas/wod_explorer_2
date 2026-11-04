@@ -42,27 +42,63 @@ implementation of the coordinator never authorizes bypassing a guard.
 
 #### Session coordination
 
-Keep one in-memory controller for the development workflow, using its Python
-API or `python3 scripts/harness/workflow_controller.py --serve` from the
-repository root. Start it with the actual Issue, canonical repository path and
-a unique `workflow_id`, then request phase advancement explicitly.
+Use the local `harness` MCP server to maintain one in-memory
+`WorkflowController` instance throughout the development workflow.
 
-The controller invokes supported local functions and records their returned
-evidence through `evidence_manager.py`. Local CLI examples below describe the
-same operations; when a shared session is active, call them through `invoke`
-rather than creating unrelated standalone sessions. Register real MCP
-observations and semantic guard decisions with their sources and current
-evidence references. Do not execute Markdown as code or invent guard results.
+The MCP server exposes three tools:
 
-Consume JSON objects/session references directly in memory. Protected
-pre/post-commit observations and superseded observation versions are never
-written to intermediate JSON files. Legacy file-based CLI inputs remain
-supported, but they are not a persistence mechanism for protected observations.
+- `harness_status`: inspect the current controller session.
+- `harness_start`: initialize the controller with the actual Issue
+  number and a unique `workflow_id`.
+- `harness_call`: execute supported controller operations.
 
-A session snapshot is transient control data, not an authorized static export.
-Only an explicitly authorized historical static summary may be exported.
-The controller ends at `AWAITING_MANUAL_VALIDATION`; it does not approve manual
-validation, publish, merge, close the Issue or execute `/finish-issue`.
+Before starting a new workflow:
+
+1. Call `harness_status` to inspect the existing session.
+2. If no session exists, call `harness_start` once.
+3. Call `harness_status` again and verify that the Issue,
+   repository, and `workflow_id` match the active workflow.
+4. If an existing session belongs to another workflow,
+   return BLOCK. Never replace an active controller.
+
+Use `harness_call` for all supported controller operations,
+including `invoke`, `record_external`, `record_static`,
+`decide_guard`, `advance`, `notify`, and `snapshot`.
+
+The controller invokes supported local functions and records
+their returned evidence through `evidence_manager.py`.
+
+The local CLI examples below describe the same operations.
+When the MCP session is active, execute supported operations
+through `harness_call` with `operation: "invoke"` rather than
+creating unrelated standalone controller sessions.
+
+Do not launch `workflow_controller.py --serve` directly when
+the `harness` MCP server is available.
+
+Register real GitHub MCP observations and semantic guard
+decisions with their sources and current evidence references.
+Do not execute Markdown as code or invent guard results.
+
+Consume JSON objects and session references directly in memory.
+Protected pre/post-commit observations and superseded observation
+versions must never be written to intermediate JSON files.
+
+Legacy file-based CLI inputs remain supported but must not be
+used to persist protected workflow observations.
+
+If the MCP connection is lost, the server restarts, or the
+controller session becomes unavailable or inconsistent,
+return BLOCK. Never recreate historical protected evidence
+from unverified snapshots or bypass mandatory guardrails.
+
+A session snapshot is transient control data, not an
+authorized static export. Only an explicitly authorized
+historical static summary may be exported.
+
+The controller ends at `AWAITING_MANUAL_VALIDATION`.
+It does not approve manual validation, push, publish, merge,
+close the Issue, or execute `/finish-issue`.
 
 ### 0.3 Workflow Execution Rules
 
@@ -70,7 +106,37 @@ validation, publish, merge, close the Issue or execute `/finish-issue`.
 - Load each `guardarails/`, `hooks/`, or `loops/` file only when its corresponding phase requires it.
 - Treat Markdown hooks as procedures to follow and verify, not automatically executable programs.
 - Use local scripts for supported deterministic operations.
-- Verify that a script exists and has passed the required tests before using it.
+- Verify that each local harness operation exists before using it.
+
+- Do not automatically execute the harness unit test suite
+  when starting `/hyssue` or entering a workflow phase.
+
+- Distinguish harness validation from Issue verification:
+  - Harness tests validate the Python workflow infrastructure.
+  - Issue tests validate the implementation being developed.
+
+- Reuse existing successful harness test evidence only when
+  its source, results, and exact validated code revision
+  can be verified.
+
+- If the harness implementation or relevant dependencies
+  have changed, previously validated evidence is invalid
+  for the affected operations.
+
+- When valid harness test evidence is unavailable, execute
+  the relevant tests required to validate the operation
+  before using it. Do not execute the entire harness suite
+  unless full-suite validation is necessary.
+
+- Failed, incomplete, timed-out, or unverifiable tests
+  must never be treated as PASS.
+
+- Always execute the mandatory Git checks, guardrails,
+  and applicable Issue-specific verification checks.
+
+- Never skip security checks or required verification
+  solely to reduce execution time or token consumption.
+
 - Keep original Markdown procedures active until their local replacements have passed equivalent validation.
 - Reuse available verified evidence. Avoid unnecessary repeated reads or checks.
 - Never weaken verification or security controls to reduce token usage.

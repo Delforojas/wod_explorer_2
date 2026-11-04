@@ -16,6 +16,12 @@
         "X-MCP-Toolsets": "repos,issues,labels,pull_requests,git,actions,projects,notifications,users"
       }
     },
+    "harness": {
+      "type": "local",
+      "command": ["./.venv/bin/python", "scripts/harness/harness_mcp.py"],
+      "enabled": true,
+      "timeout": 30000
+    },
     "21st": {
       "type": "remote",
       "url": "https://21st.dev/api/mcp",
