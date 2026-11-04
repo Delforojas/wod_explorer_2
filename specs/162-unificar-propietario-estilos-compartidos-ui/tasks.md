@@ -16,4 +16,4 @@
 
 ## Commit y handoff
 
-- [ ] Preparar commit local con aprobación del usuario.
+- [x] Preparar commit local con aprobación del usuario.
