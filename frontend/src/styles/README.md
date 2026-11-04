@@ -23,6 +23,10 @@ resultados. `resources.css` comparte cabeceras, metadatos, tarjetas y estados.
 `buttons.css`, aunque no son botones). Las excepciones de catálogo en
 `surfaces.css` conservan intencionadamente las superficies negras existentes.
 
+El propietario de los estilos compartidos `.ui-*` es `surfaces.css`
+(estados de error, vacío, éxito y carga como superficies); los patrones propios de
+formularios permanecen en `forms.css`.
+
 Los grupos enumeran sus consumidores reales: no añaden clases genéricas a React
 ni hacen coincidir componentes ajenos mediante selectores parciales.
 Las diferencias intencionadas y los estilos de hover/foco permanecen locales.
