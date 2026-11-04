@@ -672,6 +672,16 @@ def validate_base(
     PASS means base evidence is valid for this observation.
     It does not authorize Git mutations by itself.
     """
+    return _validate_base(issue, policy_path)
+
+
+def _validate_base(issue, policy_path, *, historical=False):
+    """Recheck approved policy; only standard-main permits later fast-forwards.
+
+    Initial validation and branch preparation always use exact SHA equality.
+    Historical checks never fetch: unavailable ancestry blocks safely.
+    Dependency policies retain their exact approved range validation.
+    """
     evidence: dict[str, Any] = {
         "source": (
             "scripts/harness/git_policy.py validate-base"
@@ -750,13 +760,20 @@ def validate_base(
     if remote_error:
         errors.append(remote_error)
 
-    checks["remote_matches_approved_base"] = (
-        remote_base_sha == base_sha
+    allow_advance = historical and policy_type == "standard-main"
+    remote_check = (
+        "remote_descends_from_approved_base" if allow_advance
+        else "remote_matches_approved_base"
+    )
+    checks[remote_check] = (
+        bool(remote_base_sha and verify_ancestry(base_sha, remote_base_sha))
+        if allow_advance else remote_base_sha == base_sha
     )
 
-    if not checks["remote_matches_approved_base"]:
+    if not checks[remote_check]:
         errors.append(
-            "Remote base SHA differs from approved base SHA"
+            "Remote base does not descend from approved base SHA" if allow_advance
+            else "Remote base SHA differs from approved base SHA"
         )
 
     # --------------------------------------------------------
@@ -783,13 +800,19 @@ def validate_base(
     local_base_sha = resolve_local_commit(base_ref)
     evidence["local_base_sha"] = local_base_sha
 
-    checks["local_base_matches_approved"] = (
-        local_base_sha == base_sha
+    local_check = (
+        "local_base_descends_from_approved" if allow_advance
+        else "local_base_matches_approved"
+    )
+    checks[local_check] = (
+        bool(local_base_sha and verify_ancestry(base_sha, local_base_sha))
+        if allow_advance else local_base_sha == base_sha
     )
 
-    if not checks["local_base_matches_approved"]:
+    if not checks[local_check]:
         errors.append(
-            "Local base ref differs from approved base SHA"
+            "Local base ref does not descend from approved base SHA" if allow_advance
+            else "Local base ref differs from approved base SHA"
         )
 
     # --------------------------------------------------------
@@ -1407,9 +1430,10 @@ def check_branch(
             policy["pr_target_ref"]
         )
 
-        base_result = validate_base(
+        base_result = _validate_base(
             issue=issue,
             policy_path=policy_path,
+            historical=True,
         )["base_validation_evidence"]
 
         checks["canonical_base_valid"] = (

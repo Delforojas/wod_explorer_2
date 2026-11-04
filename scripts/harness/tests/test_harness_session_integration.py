@@ -101,12 +101,37 @@ class HarnessSessionIntegrationTests(unittest.TestCase):
         self.files(self.repo)
         (self.repo/'initial.txt').write_text('approved implementation\n')
         c = WorkflowController(75,self.repo,'wf')
-        c.phase = 9
+        c.phase = 7
         with chdir(self.repo):
+            (self.repo/'check.py').write_text(
+                "from pathlib import Path\nassert Path('initial.txt').read_text() == 'approved implementation\\n'\n")
+            registry = {'checks':[{'id':'unit','command':[sys.executable,'check.py'],
+                'cwd':'.','sources':['initial.txt'],'timeout_seconds':5}]}
+            catalog = c.invoke('verification_runner.discover',{'repo_root':self.repo,'registry_path':registry})['verification_catalog']
+            self.assertEqual(catalog['status'],'PASS',catalog)
+            selection = {'status':'APPROVED','source':'workflow-selection','issue':75,
+                'workflow_id':'wf','repository':str(self.repo),'phase':7,'checks':['unit'],'applicable_checks':['unit'],
+                'catalog_sha256':catalog['catalog_sha256'],'source_fingerprint':catalog['source_fingerprint']['sha256'],
+                'tasks_completed':True,'applicability_complete':True}
+            verification = c.invoke('verification_runner.run_checks',{'issue':75,'workflow_id':'wf',
+                'selected':['unit'],'selection_path':selection,'registry_path':registry,'log_dir':self.root/'logs'})['verification_evidence']
+            self.assertEqual(verification['status'],'PASS',verification)
+            verification_ref = c.evidence.reference('verification_evidence')
+            c.decide_guard('verification','PASS','.opencode/commands/guardarails/verification.md',
+                           [verification_ref],'All applicable checks passed')
+            transition = c.advance()
+            self.assertEqual(transition['phase'],9,transition)
             pre = c.invoke('git_policy.review_changes',{'issue':75,'spec_path':'spec.md','plan_path':'plan.md','tasks_path':'tasks.md'})['pre_stage_evidence']
             pre_ref = c.evidence.reference('pre_stage_evidence')
             c.decide_guard('change-review','PASS','.opencode/commands/guardarails/change-review.md',[pre_ref],'Only initial.txt is approved')
-            self.assertEqual(c.advance()['phase'],10)
+            blocked = c.advance()
+            self.assertEqual(blocked['status'],'BLOCK',blocked)
+            self.assertEqual(blocked['phase'],9,blocked)
+            self.assertIn('Guard does not bind every mandatory current evidence entry',blocked['errors'])
+            c.decide_guard('change-review','PASS','.opencode/commands/guardarails/change-review.md',
+                           [pre_ref,verification_ref],'Changes and current verification reviewed')
+            transition = c.advance()
+            self.assertEqual(transition['phase'],10,transition)
             approved = {'status':'PASS','issue':75,'evidence_sha256':digest(pre), 'manifest':[
                 {'path':'initial.txt','mode':'100644','sha256':hashlib.sha256((self.repo/'initial.txt').read_bytes()).hexdigest()}]}
             staged = c.invoke('git_policy.prepare_staging',{'issue':75,'evidence_path':{'evidence_ref':pre_ref},'approval_path':approved})['staging_preparation_evidence']
@@ -141,5 +166,9 @@ class HarnessSessionIntegrationTests(unittest.TestCase):
                 'message_path':{'text':message},'workflow_id':'wf'})['commit_check_evidence']
             self.assertEqual(final['status'],'PASS',final)
         self.assertEqual(c.commit_step,4)
-        self.assertEqual(list(self.root.rglob('*.json')),[], 'No JSON evidence files should be materialized')
+        # The runner owns a diagnostic source manifest; workflow inputs stay in memory.
+        diagnostic_manifests = list((self.root/'logs').glob('verification-*/source-manifest.json'))
+        self.assertEqual(len(diagnostic_manifests),1)
+        self.assertEqual(list(self.root.rglob('*.json')),diagnostic_manifests,
+                         'Only the runner diagnostic manifest may be materialized')
         self.assertNotIn('pre_stage_evidence',json.dumps(c.export_static(authorized=True)))

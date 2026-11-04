@@ -327,9 +327,6 @@ class CheckBranchTests(unittest.TestCase):
         """
         A valid Issue branch must not become invalid solely
         because origin/main advanced after branch creation.
-
-        This test exposes a known defect in the current
-        implementation until historical validation is fixed.
         """
         original_issue_head = self.head()
 
@@ -360,6 +357,60 @@ class CheckBranchTests(unittest.TestCase):
             ),
         )
         self.assertEqual(process.returncode, 0)
+        self.assertEqual(evidence['base_sha'], self.base_sha)
+        self.assertEqual(evidence['base_remote_sha_latest'], self.git('rev-parse', 'origin/main').stdout.strip())
+
+    def test_historical_check_allows_stale_tracking_ref_after_remote_advance(self):
+        self.git('switch', 'main')
+        self.commit_file('advance.txt', 'advance', 'Advance main')
+        self.git('push', 'origin', 'main')
+        self.git('switch', self.branch_name)
+        self.git('update-ref', 'refs/remotes/origin/main', self.base_sha)
+        process, evidence = self.assert_read_only(self.check_branch)
+        self.assertEqual(evidence['status'], 'PASS', evidence)
+        self.assertEqual(process.returncode, 0)
+
+    def test_historical_check_rejects_remote_rewind(self):
+        original = self.base_sha
+        self.base_sha = self.commit_file('base.txt', 'new base', 'Approved newer base')
+        self.policy['base_sha'] = self.base_sha
+        self.save_policy()
+        self.git('update-ref', 'refs/remotes/origin/main', self.base_sha)
+        # Remote remains at the older commit, although the Issue descends from it.
+        self.assertNotEqual(original, self.base_sha)
+        process, evidence = self.assert_read_only(self.check_branch)
+        self.assertEqual(evidence['status'], 'BLOCK', evidence)
+        self.assertFalse(evidence['checks']['canonical_base_valid'])
+        self.assertIn('Remote base does not descend from approved base SHA', evidence['errors'])
+        self.assertNotEqual(process.returncode, 0)
+
+    def test_historical_check_rejects_diverged_tracking_ref(self):
+        self.git('checkout', '--orphan', 'unrelated')
+        self.commit_file('unrelated.txt', 'unrelated', 'Unrelated root')
+        unrelated = self.head()
+        self.git('switch', self.branch_name)
+        self.git('update-ref', 'refs/remotes/origin/main', unrelated)
+        process, evidence = self.assert_read_only(self.check_branch)
+        self.assertEqual(evidence['status'], 'BLOCK', evidence)
+        self.assertFalse(evidence['checks']['canonical_base_valid'])
+        self.assertIn('Local base ref does not descend from approved base SHA', evidence['errors'])
+        self.assertNotEqual(process.returncode, 0)
+
+    def test_historical_check_rejects_unavailable_remote_object(self):
+        other = self.repo.parent / 'other'
+        self.git('clone', str(self.remote), str(other), cwd=self.repo.parent)
+        self.git('config', 'user.email', 'test@example.com', cwd=other)
+        self.git('config', 'user.name', 'Test User', cwd=other)
+        self.git('checkout', 'main', cwd=other)
+        (other / 'remote-only.txt').write_text('not available in Issue checkout')
+        self.git('add', '.', cwd=other)
+        self.git('commit', '-m', 'Remote-only advance', cwd=other)
+        self.git('push', 'origin', 'main', cwd=other)
+        process, evidence = self.assert_read_only(self.check_branch)
+        self.assertEqual(evidence['status'], 'BLOCK', evidence)
+        self.assertFalse(evidence['checks']['canonical_base_valid'])
+        self.assertIn('Remote base does not descend from approved base SHA', evidence['errors'])
+        self.assertNotEqual(process.returncode, 0)
 
 
 if __name__ == "__main__":
