@@ -10,8 +10,8 @@
 
 ## Verificación
 
-- [ ] Ejecutar tests, lint, build, diff-check y revisión visual.
+- [x] Ejecutar tests, lint, build y `git diff --check`.
 
 ## Commit y handoff
 
-- [ ] Preparar commit local con aprobación del usuario.
+- [x] Preparar commit local con aprobación del usuario.
