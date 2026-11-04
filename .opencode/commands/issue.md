@@ -464,7 +464,7 @@ Manual validation must remain pending user approval.
 
 The final response MUST contain this exact heading:
 
-## Validaciones manuales pendientes
+### Validaciones manuales pendientes
 
 Provide a concise, task-specific Markdown checklist.
 Do not mark any checkbox as completed automatically.
