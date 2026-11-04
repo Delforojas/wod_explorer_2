@@ -11,8 +11,8 @@
 
 ## Verificación
 
-- [ ] Ejecutar pruebas #159, lint, tests, build, diff-check y revisión visual.
+- [x] Ejecutar pruebas #159, lint, tests, build y `git diff --check`.
 
 ## Commit y handoff
 
-- [ ] Preparar commit local con aprobación del usuario.
+- [x] Preparar commit local con aprobación del usuario.
