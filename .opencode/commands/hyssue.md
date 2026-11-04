@@ -146,6 +146,19 @@ Load and apply:
 
 Continue only when the Issue Guard returns PASS.
 
+Resolve the canonical GitHub repository identity from
+the configured Git remote `origin`.
+
+Extract the exact repository owner and name.
+
+Do not infer, normalize, translate, or reconstruct
+the repository name from the local directory name.
+
+Use the verified owner and repository name when
+calling the GitHub MCP.
+
+If repository identity cannot be verified, return BLOCK.
+
 ## 2. Analyze Relevant Context
 
 Before evaluating the Context Guard, inspect only the
