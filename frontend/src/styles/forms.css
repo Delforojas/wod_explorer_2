@@ -83,23 +83,6 @@ textarea:focus-visible {
   font-weight: 600;
 }
 
-.ui-error,
-.ui-success,
-.ui-empty,
-.ui-loading {
-  margin: 0;
-}
-
-.ui-loading {
-  min-height: 96px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  box-shadow: var(--shadow-surface);
-}
-
 .result-value {
   margin: 0;
   color: var(--color-text);
