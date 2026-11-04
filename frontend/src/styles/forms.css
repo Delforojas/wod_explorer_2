@@ -83,6 +83,35 @@ textarea:focus-visible {
   font-weight: 600;
 }
 
+/* Base compartida para campos de resultados WOD */
+
+.amrap-result-fields,
+.emom-result-fields,
+.for-time-result-fields {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: var(--space-6);
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--color-white-alpha-09);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.07),
+    rgba(13, 20, 28, 0.8)
+  );
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
 .result-value {
   margin: 0;
   color: var(--color-text);
