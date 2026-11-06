@@ -10,12 +10,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
+
 HARNESS = Path(__file__).resolve().parents[1]
 if not (HARNESS / 'workflow_controller.py').exists():
     HARNESS = Path(__file__).parent
 sys.path.insert(0, str(HARNESS))
 sys.dont_write_bytecode = True
-from workflow_controller import WorkflowController, GUARDS, REQUIRED
+from workflow_controller import WorkflowController, GUARDS, REQUIRED, perform
 from evidence_manager import EvidenceError, managed_operation
 
 
@@ -307,3 +308,52 @@ class WorkflowControllerTests(unittest.TestCase):
         self.assertEqual(self.c.advance()['status'], 'BLOCK')
         with self.assertRaises(EvidenceError):
             self.guard()
+
+    def test_record_external_rejects_unexpected_source(self):
+        self.c.phase = 1
+
+        action = {
+            'operation': 'record_external',
+            'arguments': {
+                'key': 'github_issue_observation',
+                'payload': self.payload(),
+                'source': 'github',
+            },
+        }
+
+        with self.assertRaisesRegex(EvidenceError, 'invalid arguments'):
+            perform(self.c, action)
+
+        self.assertEqual(self.c.status, 'BLOCKED')
+        self.assertNotIn(
+            'github_issue_observation',
+            self.c.evidence.mutable,
+        )
+
+    def test_git_inspect_rejects_unexpected_workflow_id(self):
+        self.c.phase = 3
+        executed = []
+
+        def fake_inspect(issue, policy_path=None):
+            executed.append(issue)
+            return {'branch_evidence': {'status': 'PASS'}}
+
+        with (
+            chdir(self.repo),
+            patch(
+                'workflow_controller.importlib.import_module',
+                return_value=SimpleNamespace(inspect=fake_inspect),
+            ),
+        ):
+            with self.assertRaisesRegex(EvidenceError, 'invalid arguments'):
+                self.c.invoke(
+                    'git_policy.inspect',
+                    {
+                        'issue': 75,
+                        'workflow_id': 'wf',
+                    },
+                )
+
+        self.assertEqual(self.c.status, 'BLOCKED')
+        self.assertEqual(executed, [])
+        self.assertIn('git_policy.inspect', self.c.blockers)

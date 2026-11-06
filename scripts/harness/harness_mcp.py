@@ -147,6 +147,7 @@ def harness_call(
             "workflow_status": controller.status,
         }
 
+
     except (
         EvidenceError,
         ValueError,
@@ -156,10 +157,18 @@ def harness_call(
         IndexError,
         OSError,
     ) as exc:
+        if _controller is not None:
+            _controller.status = "BLOCKED"
+
         return {
             "status": "BLOCK",
             "error": str(exc),
+            "phase": _controller.phase if _controller is not None else None,
+            "workflow_status": (
+                _controller.status if _controller is not None else "NOT_STARTED"
+            ),
         }
+
 
 
 if __name__ == "__main__":

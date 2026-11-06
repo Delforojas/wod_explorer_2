@@ -9,6 +9,7 @@ import argparse
 from copy import deepcopy
 from datetime import datetime, timezone
 import importlib
+import inspect
 import json
 from pathlib import Path
 import sys
@@ -179,8 +180,18 @@ class WorkflowController:
                     raise EvidenceError('Failed verification requires the approved phase-8 repair route')
         module, function = operation.split('.', 1)
         try:
+            target = getattr(importlib.import_module(module), function)
+
+            try:
+                inspect.signature(target).bind(**arguments)
+            except TypeError as error:
+                raise EvidenceError(
+                    f'{operation}: invalid arguments: {error}'
+                ) from error
+
             with using_evidence(self.evidence):
-                result = getattr(importlib.import_module(module), function)(**arguments)
+                result = target(**arguments)
+
         except (EvidenceError, ValueError, TypeError, KeyError, AttributeError, OSError) as error:
             self.status = 'BLOCKED'
             if operation == 'git_policy.create_commit':
@@ -273,8 +284,8 @@ class WorkflowController:
 
     def advance(self):
         try:
-            if self.forbidden_action or self.handed_off:
-                raise EvidenceError('Workflow cannot advance')
+            if self.status == 'BLOCKED' or self.forbidden_action or self.handed_off:
+                raise EvidenceError('Workflow cannot advance from a blocked or closed session')
             if any(blocker['phase'] == self.phase for blocker in self.blockers.values()):
                 raise EvidenceError('A failed local operation must be resolved by a successful rerun')
             required = []
@@ -323,14 +334,46 @@ class WorkflowController:
             return {'status': 'BLOCK', 'phase': self.phase, 'errors': [str(error)]}
 
 
+
 def perform(controller, action):
     operation = action['operation']
+
     if operation == 'snapshot':
         return controller.snapshot()
-    if operation not in {'advance', 'record_external', 'record_static', 'decide_guard', 'notify',
-                         'invoke', 'enter_repair', 'export_static', 'revisit_phase'}:
+
+    allowed = {
+        'advance',
+        'record_external',
+        'record_static',
+        'decide_guard',
+        'notify',
+        'invoke',
+        'enter_repair',
+        'export_static',
+        'revisit_phase',
+    }
+
+    if operation not in allowed:
         raise EvidenceError('Unsupported workflow operation')
-    return getattr(controller, operation)(**action.get('arguments', {}))
+
+    arguments = action.get('arguments', {})
+
+    if not isinstance(arguments, dict):
+        raise EvidenceError(
+            f'{operation}: arguments must be a dictionary'
+        )
+
+    method = getattr(controller, operation)
+
+    try:
+        inspect.signature(method).bind(**arguments)
+    except TypeError as error:
+        controller.status = 'BLOCKED'
+        raise EvidenceError(
+            f'{operation}: invalid arguments: {error}'
+        ) from error
+
+    return method(**arguments)
 
 
 def serve():
@@ -383,6 +426,7 @@ def main():
             response['status'] = 'BLOCK'
         code = 1 if blocked else 0
     except (EvidenceError, ValueError, TypeError, KeyError, AttributeError, IndexError, OSError) as error:
+
         response, code = {'status': 'BLOCK', 'errors': [str(error)]}, 1
     print(json.dumps(response, ensure_ascii=True, indent=2))
     return code
