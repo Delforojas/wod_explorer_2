@@ -261,34 +261,75 @@ The AI remains responsible for interpreting Issue dependencies,
 selecting the approved base policy, and identifying decisions
 requiring user authorization.
 
+### Phase 3 — MCP Invocation Contract
+
+All Git operations in Phase 3 must execute through the
+active WorkflowController using `harness_call`.
+
+Use this invocation structure:
+
+```json
+{
+  "operation": "invoke",
+  "arguments": {
+    "operation": "git_policy.inspect",
+    "arguments": {
+      "issue": 184
+    }
+  }
+}
+```
+
+The Issue number is dynamic. Replace `184` with the current
+Issue number ($1).
+
+Permitted arguments by operation:
+
+- `git_policy.inspect`:
+  `issue`, `policy_path`
+- `git_policy.validate_base`:
+  `issue`, `policy_path`
+- `git_policy.prepare_branch`:
+  `issue`, `branch_name`, `policy_path`,
+  `expected_head`, `expected_branch`
+- `git_policy.check_branch`:
+  `issue`, `branch_name`, `policy_path`,
+  `approved_commits_path`
+
+Only supply arguments required by the actual Python signature
+and the validated evidence available at the current phase.
+
+Never forward `workflow_id` to these operations.
+The active WorkflowController and EvidenceManager own
+the workflow session identity.
+
+Do not invent parameter names, values, paths or evidence.
+
+Never bypass the controller by executing Git mutation
+operations directly when an MCP invocation fails.
+
+If an operation returns BLOCK, NEEDS_APPROVAL or an error,
+stop immediately.
+
 ### 3.1. Inspect Git State
 
-Execute:
+Invoke `git_policy.inspect` through `harness_call`
+using the active WorkflowController.
 
-`python3 scripts/harness/git_policy.py inspect --issue $1`
+Arguments
 
-The local harness must:
+- `issue`: current Issue number ($1).
+- `policy_path`: only when required.
 
-- Identify the active branch and current HEAD.
-- Inspect the working tree and staging area.
-- Identify staged, unstaged, untracked, and deleted files.
-- Identify existing local branches related to Issue #$1.
-- Retrieve available local and remote reference information.
-- Identify pre-existing local changes that must be preserved.
-- Include `opencode.json` when modified.
-- Return a single structured `branch_evidence` observation.
-- Include observation time, source, status, and Git evidence.
-- Never modify Git state during inspection.
+Never pass `workflow_id` to `git_policy.inspect`.
 
-`git_policy.py` must use `evidence_manager.py` to register
-the verified observation.
+The harness must inspect the active branch, HEAD,
+working tree, staging area, existing Issue branches,
+remote references, and pre-existing changes.
 
-Consume the returned evidence directly.
+Return verified `branch_evidence` without modifying Git.
 
-Do not repeat the inspection unless the evidence becomes
-incomplete, stale, or invalidated by a relevant mutation.
-
-Stop if the inspection fails or mandatory evidence is missing.
+Stop if mandatory evidence is missing or invalid.
 
 ### 3.2. Determine Base Policy
 
@@ -320,12 +361,21 @@ Stop if the policy cannot be determined safely.
 
 ### 3.3. Validate Canonical Base
 
-Execute the validated local harness operation:
+Invoke `git_policy.validate_base` through `harness_call`
+using the active WorkflowController.
 
-`python3 scripts/harness/git_policy.py validate-base --issue $1`
+Arguments:
 
-Pass the selected base policy and its required parameters
-through the implemented CLI contract.
+- `issue`: current Issue number ($1).
+- `policy_path`: only when required by the validated contract.
+
+Use the base policy selected in Phase 3.2 and the
+verified evidence from Phase 3.1.
+
+Do not pass `workflow_id` or unsupported arguments.
+
+If validation fails, returns BLOCK, or mandatory
+evidence is missing, stop immediately.
 
 The local harness must:
 
@@ -363,26 +413,32 @@ Stop if validation fails or evidence is incomplete.
 
 ### 3.4. Validate and Prepare Issue Branch
 
-Execute the validated local harness operation:
+Invoke `git_policy.prepare_branch` through `harness_call`
+using the active WorkflowController.
 
-`python3 scripts/harness/git_policy.py prepare-branch --issue $1`
+Arguments:
 
-Pass the validated canonical base, proposed Issue branch,
-and required authorization evidence through the implemented
-CLI contract.
+- `issue`: current Issue number ($1).
+- `branch_name`: proposed Issue-specific branch.
+- `policy_path`: only when required.
+- `expected_head`: verified HEAD, when required.
+- `expected_branch`: verified active branch, when required.
+
+Use the canonical base and authorization evidence
+validated in previous steps.
 
 Before modifying Git, the harness must:
 
 - Revalidate all safety-critical preconditions.
-- Verify that the canonical base is valid.
-- Identify every existing Issue-related branch.
+- Verify the canonical base and its historical SHA.
+- Identify all existing branches associated with the Issue.
 - Reject ambiguous or duplicate Issue branches.
-- Verify the complete commit range of any reusable branch.
-- Verify ancestry against the approved historical base SHA.
+- Validate the complete commit range of reusable branches.
+- Verify ancestry against the approved base SHA.
 - Require AI validation of Issue ownership and commit scope.
 - Preserve all pre-existing local changes.
 - Preserve unrelated staged and unstaged files.
-- Block operations that would move or overwrite local work.
+- Block operations that could overwrite or move local work.
 
 Branch naming:
 
@@ -397,39 +453,51 @@ Allowed types:
 - `test`
 - `chore`
 
-The slug must be short, descriptive, and derived
-from the actual GitHub Issue title.
+The slug must be derived from the actual GitHub Issue title.
 
 Branch preparation rules:
 
 - Reuse an existing branch only when fully validated.
 - Otherwise create the branch from the exact approved
   historical `base_sha`.
-- Never create the branch from the active branch by default.
+- Never use the active branch as the implicit base.
 - Never create duplicate Issue branches.
 - Never automatically rebase.
-- Never change an existing branch base.
-- Never stash, discard, overwrite, or move unrelated work.
+- Never change the base of an existing branch.
+- Never stash, discard, overwrite or move unrelated work.
 - Never rewrite Git history.
 - Never force-push.
 - Never modify unrelated files.
 
-Actually switch to the validated Issue branch.
+Switch to the validated Issue branch.
 
-After a successful Git mutation, `evidence_manager.py` must:
+After a successful Git mutation, EvidenceManager must:
 
 - Invalidate affected mutable Git evidence.
 - Preserve valid historical static evidence.
 - Preserve the immutable canonical `base_sha`.
 - Require fresh observations at the next security boundary.
 
-Stop if branch preparation cannot be completed safely.
+Stop if branch preparation fails or mandatory
+evidence is missing.
 
 ### 3.5. Validate Branch Guard
 
-Execute:
+Invoke `git_policy.check_branch` through `harness_call`
+using the active WorkflowController.
 
-`python3 scripts/harness/git_policy.py check-branch --issue $1`
+Arguments:
+
+- `issue`: current Issue number ($1).
+- `branch_name`: validated Issue-specific branch.
+- `policy_path`: only when required.
+- `approved_commits_path`: only when required by the
+  verified branch-validation contract.
+
+Do not pass `workflow_id` or unsupported arguments.
+
+Continue to Phase 4 only when the complete Branch Guard
+returns PASS.
 
 The local harness must verify:
 
