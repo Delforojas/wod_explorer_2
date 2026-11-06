@@ -61,6 +61,42 @@ Before starting a new workflow:
 4. If an existing session belongs to another workflow,
    return BLOCK. Never replace an active controller.
 
+#### Initial Phase Transition — Mandatory
+
+A newly initialized WorkflowController starts at phase 0.
+
+Phase 0 establishes the harness execution rules and
+the active session. It does not register GitHub Issue
+evidence and does not require a semantic guard.
+
+After verifying the active session identity:
+
+1. Read the current phase using `harness_status`.
+2. If phase is 0 and status is RUNNING, call:
+   - `harness_call`
+   - `operation`: `advance`
+   - `arguments`: `{}`
+3. Require a PASS result with phase 1.
+4. Verify the new phase using `harness_status`.
+5. Only then execute Phase 1 and register
+   `github_issue_observation`.
+
+If the current phase is already 1 and the session identity
+matches the active workflow, continue without advancing.
+
+Never advance automatically from phase 1 or later.
+Subsequent phase transitions require their mandatory
+evidence and guardrails.
+
+If the workflow is BLOCKED, inconsistent, or belongs
+to another session, return BLOCK.
+
+Never use `record_external` or `record_static` to
+bypass the initial phase transition.
+
+Never invoke `advance` speculatively or multiple
+times to reach a desired phase.
+
 Use `harness_call` for all supported controller operations,
 including `invoke`, `record_external`, `record_static`,
 `decide_guard`, `advance`, `notify`, and `snapshot`.
