@@ -62,6 +62,130 @@ class ValidateBaseTests(unittest.TestCase):
         self.temp.cleanup()
         self.remote_temp.cleanup()
 
+    def test_phase3_through_workflow_controller(self):
+        from contextlib import chdir
+
+        harness_dir = str(SCRIPT.parent)
+        sys.path.insert(0, harness_dir)
+
+        try:
+            from workflow_controller import (
+                WorkflowController,
+                perform,
+            )
+
+            issue = 198
+            branch_name = f"test/{issue}-controller"
+
+            # Existing fixture policy.json would make
+            # the temporary Git working tree dirty.
+            self.policy_path.unlink()
+
+            controller = WorkflowController(
+                issue=issue,
+                repository=self.repo,
+                workflow_id="integration-test",
+            )
+            controller.phase = 3
+
+            def invoke(operation, arguments):
+                return perform(controller, {
+                    "operation": "invoke",
+                    "arguments": {
+                        "operation": operation,
+                        "arguments": arguments,
+                    },
+                })
+
+            with chdir(self.repo):
+                inspection = invoke(
+                    "git_policy.inspect",
+                    {"issue": issue},
+                )["branch_evidence"]
+
+                self.assertEqual(
+                    inspection["status"], "complete"
+                )
+
+                candidate = inspection["base_candidate"]
+
+                policy = {
+                    "policy": "standard-main",
+                    "base_branch": "main",
+                    "base_ref": candidate["base_ref"],
+                    "base_remote_ref": candidate["base_remote_ref"],
+                    "base_sha": candidate[
+                        "base_remote_sha_latest"
+                    ],
+                    "pr_target": "main",
+                    "pr_target_ref": "refs/heads/main",
+                }
+
+                validation = invoke(
+                    "git_policy.validate_base",
+                    {
+                        "issue": issue,
+                        "policy_path": policy,
+                    },
+                )["base_validation_evidence"]
+
+                self.assertEqual(
+                    validation["status"],
+                    "PASS",
+                    validation["errors"],
+                )
+
+                # Verify automatic canonical base registration.
+                canonical = controller.evidence.get(
+                    "canonical_base", "static"
+                )
+
+                self.assertEqual(
+                    canonical["payload"]["base_sha"],
+                    policy["base_sha"],
+                )
+
+                preparation = invoke(
+                    "git_policy.prepare_branch",
+                    {
+                        "issue": issue,
+                        "branch_name": branch_name,
+                        "policy_path": policy,
+                        "expected_head": inspection["git"]["head"],
+                        "expected_branch": inspection["git"][
+                            "active_branch"
+                        ],
+                    },
+                )["branch_preparation_evidence"]
+
+                self.assertEqual(
+                    preparation["status"],
+                    "PASS",
+                    preparation["errors"],
+                )
+
+                branch_check = invoke(
+                    "git_policy.check_branch",
+                    {
+                        "issue": issue,
+                        "branch_name": branch_name,
+                        "policy_path": policy,
+                    },
+                )["branch_check_evidence"]
+
+                self.assertEqual(
+                    branch_check["status"],
+                    "PASS",
+                    branch_check["errors"],
+                )
+
+                self.assertEqual(
+                    controller.status, "RUNNING"
+                )
+
+        finally:
+            sys.path.remove(harness_dir)
+
     def git(self, *args, cwd=None):
         return subprocess.run(
             ["git", *args],
@@ -108,6 +232,101 @@ class ValidateBaseTests(unittest.TestCase):
             evidence["base_sha"],
             self.base_sha,
         )
+
+    def test_phase3_with_in_memory_policy(self):
+        import importlib.util
+
+        issue = 197
+        branch_name = f"test/{issue}-memory-policy"
+
+        spec = importlib.util.spec_from_file_location(
+            "git_policy_integration", SCRIPT
+        )
+        module = importlib.util.module_from_spec(spec)
+
+        # git_policy imports evidence_manager from its directory.
+        sys.path.insert(0, str(SCRIPT.parent))
+
+        try:
+            spec.loader.exec_module(module)
+
+            os.chdir(self.repo)
+            self.policy_path.unlink()
+            # The policy is constructed dynamically from
+            # the current repository's verified remote SHA.
+            inspection = module.inspect(issue=issue)[
+                "branch_evidence"
+            ]
+
+            self.assertEqual(
+                inspection["status"], "complete"
+            )
+
+            candidate = inspection["base_candidate"]
+
+            policy = {
+                "policy": "standard-main",
+                "base_branch": "main",
+                "base_ref": candidate["base_ref"],
+                "base_remote_ref": candidate["base_remote_ref"],
+                "base_sha": candidate[
+                    "base_remote_sha_latest"
+                ],
+                "pr_target": "main",
+                "pr_target_ref": "refs/heads/main",
+            }
+
+            # Validate without creating policy.json.
+            validation = module.validate_base(
+                issue=issue,
+                policy_path=policy,
+            )["base_validation_evidence"]
+
+            self.assertEqual(
+                validation["status"],
+                "PASS",
+                validation["errors"],
+            )
+
+            # Create an Issue branch only in the temp repo.
+            preparation = module.prepare_branch(
+                issue=issue,
+                branch_name=branch_name,
+                policy_path=policy,
+                expected_head=inspection["git"]["head"],
+                expected_branch=inspection["git"][
+                    "active_branch"
+                ],
+            )["branch_preparation_evidence"]
+
+            self.assertEqual(
+                preparation["status"],
+                "PASS",
+                preparation["errors"],
+            )
+
+            # Verify the newly created branch.
+            branch_check = module.check_branch(
+                issue=issue,
+                branch_name=branch_name,
+                policy_path=policy,
+            )["branch_check_evidence"]
+
+            self.assertEqual(
+                branch_check["status"],
+                "PASS",
+                branch_check["errors"],
+            )
+
+            self.assertEqual(
+                self.git("branch", "--show-current")
+                .stdout.strip(),
+                branch_name,
+            )
+
+        finally:
+            os.chdir(self.previous_directory)
+            sys.path.remove(str(SCRIPT.parent))
 
     def test_invalid_base_sha(self):
         self.policy["base_sha"] = "0" * 40
