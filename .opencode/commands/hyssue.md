@@ -629,8 +629,23 @@ Stop if validation fails or evidence is incomplete.
 
 ### 3.4. Validate and Prepare Issue Branch
 
-Invoke `git_policy.prepare_branch` through `harness_call`
-using the active WorkflowController.
+Select exactly one execution path based on
+the verified result of `git_policy.inspect`:
+
+- New Issue branch:
+  invoke `git_policy.prepare_branch` through
+  `harness_call`.
+
+- Existing Issue branch:
+  follow `Existing Issue Branch Recovery`.
+  Do not invoke `git_policy.prepare_branch`.
+
+Both paths must use the same canonical base policy
+and complete the Branch Guard before Phase 4.
+
+For the new-branch path, invoke
+`git_policy.prepare_branch` using the active
+WorkflowController.
 
 Arguments:
 
@@ -750,6 +765,35 @@ The harness must distinguish between:
 
 A successful Git inspection alone does not authorize
 branch creation or switching.
+
+### Existing Issue Branch Recovery
+
+When `git_policy.inspect` identifies an existing
+Issue-specific branch:
+
+1. Never call `git_policy.prepare_branch` automatically.
+2. Verify that exactly one Issue branch exists and
+   that it is the active branch.
+3. Resolve and validate the canonical base policy.
+4. Invoke `git_policy.check_branch` with the verified
+   branch name and canonical policy.
+5. Require `branch_check_evidence.status == PASS`.
+6. Inspect all preexisting working-tree changes.
+7. Determine whether each change belongs to the
+   current Issue and can safely remain in place.
+8. If any change is unrelated, ambiguous, or unsafe,
+   return BLOCK.
+9. Apply Branch Guard using the current evidence.
+10. Advance only when the controller authorizes it.
+
+An existing valid Issue branch must be reused,
+not recreated.
+
+Never delete, stash, reset, rebase, overwrite or
+automatically stage preexisting work.
+
+A successful technical branch check does not
+automatically approve local changes.
 
 ### 3.6. Blocking Policy
 
