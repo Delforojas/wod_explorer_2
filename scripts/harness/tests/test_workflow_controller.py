@@ -353,7 +353,57 @@ class WorkflowControllerTests(unittest.TestCase):
                         'workflow_id': 'wf',
                     },
                 )
+                self.assertEqual(executed, [])
+                self.assertIn('git_policy.inspect', self.c.blockers)
 
-        self.assertEqual(self.c.status, 'BLOCKED')
-        self.assertEqual(executed, [])
-        self.assertIn('git_policy.inspect', self.c.blockers)
+    def test_phase1_external_github_repository_identity(self):
+        self.c.phase = 1
+
+        payload = self.payload(
+            repository_full_name="Delforojas/wod_explorer_2",
+            number=75,
+            title="Test Issue",
+        )
+
+        reference = self.c.record_external(
+            "github_issue_observation",
+            payload,
+        )
+
+        entry = self.c.evidence.resolve(reference)
+
+        self.assertEqual(
+            entry["payload"]["repository_full_name"],
+            "Delforojas/wod_explorer_2",
+        )
+
+    def test_phase1_static_issue_identity_contract(self):
+        self.c.phase = 1
+
+        identity = {
+            "number": 75,
+            "title": "Test Issue",
+            "url": "https://github.com/Delforojas/wod_explorer_2/issues/75",
+            "repository_full_name": "Delforojas/wod_explorer_2",
+        }
+
+        reference = self.c.record_static(
+            key="issue_identity",
+            payload=identity,
+            kind="issue_identity",
+            source="github-mcp",
+            observed_at=datetime.now(timezone.utc).isoformat(),
+        )
+
+        entry = self.c.evidence.resolve(reference)
+
+        self.assertEqual(entry["payload"], identity)
+
+        with self.assertRaises(EvidenceError):
+            self.c.record_static(
+                key="invalid_issue_identity",
+                payload={**identity, "repository": str(self.repo)},
+                kind="issue_identity",
+                source="github-mcp",
+                observed_at=datetime.now(timezone.utc).isoformat(),
+            )

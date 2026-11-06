@@ -166,6 +166,89 @@ Invalidate only the affected static entries when scope, specifications, decision
 
 Invalidate the affected mutable entries after any Git, remote, GitHub, PR, or working-tree mutation and re-observe them at the next security boundary.
 
+Busca ### 0.6 Blocking Policy y, justo antes, pega este bloque:
+
+### 0.5.1 Evidence Registration Contract
+
+All evidence registrations must use the exact
+WorkflowController method signatures.
+
+#### External observations
+
+For Phase 1, register the GitHub Issue observation
+through `harness_call`:
+
+- `operation`: `record_external`
+- `arguments.key`: `github_issue_observation`
+- `arguments.payload`: verified GitHub observation
+
+The observation payload must include:
+
+- `phase`: `1`
+- `issue`: current Issue number ($1)
+- `workflow_id`: current workflow identity
+- `source`: actual GitHub MCP source
+- `status`: verified observation status
+- `observed_at`: timezone-aware ISO 8601 timestamp
+
+Repository identity rules:
+
+- `repository`, when present, must be the exact
+  absolute local repository path from the active
+  controller session.
+- `repository_full_name` represents the GitHub
+  repository identity (owner/repository).
+- Never place `owner/repository` or a GitHub URL
+  in `payload.repository`.
+- Never invent repository paths or identifiers.
+- If the local path is unnecessary, omit
+  `payload.repository`; the controller already
+  owns the repository scope.
+
+#### Static evidence
+
+Register historical Issue identity through
+`record_static`:
+
+- `operation`: `record_static`
+- `arguments.key`: `issue_identity`
+- `arguments.kind`: `issue_identity`
+- `arguments.payload`: only the following fields:
+  - `number`
+  - `title`
+  - `url`
+  - `repository_full_name`
+- `arguments.source`: actual verified source
+- `arguments.observed_at`: timezone-aware ISO 8601
+- `arguments.status`: `PASS` only when verified
+
+Do not include `issue`, `workflow_id`, `repository`,
+`phase`, `source`, `status`, or `observed_at`
+inside a static evidence payload.
+
+These metadata values belong to the controller,
+session, or separate method arguments.
+
+For `approved_scope`, use only the allowed payload
+fields: `description`, `acceptance_criteria`,
+`constraints`, and `approved_by`.
+
+Never fabricate approval or acceptance criteria.
+
+Static payload fields must conform to
+`STATIC_FIELDS` in `evidence_manager.py`.
+
+Never turn mutable GitHub observations into
+static evidence.
+
+#### General rules
+
+- Apply the same contract to any Issue number.
+- Never hardcode Issue IDs, session IDs, or SHAs.
+- Pass only supported method arguments.
+- Treat registration errors as BLOCK.
+- Do not bypass evidence validation.
+
 ### 0.6 Blocking Policy
 
 If a mandatory guardrail fails, essential information is missing, an execution error occurs, or an operation requires authorization:
@@ -224,6 +307,30 @@ Use the verified owner and repository name when
 calling the GitHub MCP.
 
 If repository identity cannot be verified, return BLOCK.
+
+### Phase 1 Evidence Registration
+
+After retrieving and verifying the GitHub Issue:
+
+1. Register `github_issue_observation` through
+   `record_external` using the current phase and
+   verified GitHub MCP evidence.
+
+2. Register `issue_identity` through `record_static`
+   using only the approved static fields.
+
+3. Register `approved_scope` only when its content
+   and approval have been explicitly established.
+   Never infer approval from Issue existence.
+
+4. Use the returned evidence references when
+   evaluating the Issue Guard.
+
+5. Continue only when the Issue Guard returns PASS
+   and WorkflowController authorizes advancement.
+
+Never pass a GitHub repository identifier as the
+local repository path.
 
 ## 2. Analyze Relevant Context
 
