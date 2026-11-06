@@ -407,3 +407,13 @@ class WorkflowControllerTests(unittest.TestCase):
                 source="github-mcp",
                 observed_at=datetime.now(timezone.utc).isoformat(),
             )
+    def test_initial_transition_from_phase_zero_to_one(self):
+        self.assertEqual(self.c.phase, 0)
+        self.assertEqual(self.c.status, "RUNNING")
+
+        result = self.c.advance()
+
+        self.assertEqual(result["status"], "PASS")
+        self.assertEqual(result["phase"], 1)
+        self.assertEqual(self.c.phase, 1)
+        self.assertEqual(self.c.status, "RUNNING")

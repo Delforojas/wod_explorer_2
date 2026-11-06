@@ -224,22 +224,16 @@ The observation payload must include:
 - `issue`: current Issue number ($1)
 - `workflow_id`: current workflow identity
 - `source`: actual GitHub MCP source
-- `status`: verified observation status
+- `status`: `PASS` only when the GitHub MCP observation
+  has been successfully retrieved and validated.
 - `observed_at`: timezone-aware ISO 8601 timestamp
 
-Repository identity rules:
+Validation rules:
 
-- `repository`, when present, must be the exact
-  absolute local repository path from the active
-  controller session.
-- `repository_full_name` represents the GitHub
-  repository identity (owner/repository).
-- Never place `owner/repository` or a GitHub URL
-  in `payload.repository`.
-- Never invent repository paths or identifiers.
-- If the local path is unnecessary, omit
-  `payload.repository`; the controller already
-  owns the repository scope.
+- Do not use `verified`, `success`, `complete`, or other
+  descriptive statuses in place of `PASS`.
+- If retrieval or validation fails, return BLOCK.
+- Never label unverified evidence as PASS.
 
 #### Static evidence
 
