@@ -271,6 +271,45 @@ Static payload fields must conform to
 Never turn mutable GitHub observations into
 static evidence.
 
+#### SDD Static References
+
+When registering `sdd_refs` through `record_static`,
+use the following contract:
+
+- `arguments.kind`: `sdd_refs`
+- `arguments.payload` may contain only:
+  - `folder`
+  - `files`
+  - `revisions`
+
+The `revisions` field must contain only verified,
+immutable content identifiers, such as SHA-256
+hashes of the SDD files.
+
+Never include mutable Git state in the payload,
+including nested objects:
+
+- `branch`
+- `head`
+- `head_sha`
+- `active_branch`
+- `working_tree`
+- `staging_state`
+- `git_state`
+
+Do not copy entire outputs from `git_policy.inspect`
+or `sdd_manager.inspect` into static evidence.
+
+Extract only verified historical references.
+
+If immutable revisions cannot be established,
+do not invent them or substitute mutable Git values.
+
+Keep mutable Git observations in their corresponding
+mutable evidence records.
+
+Never bypass EvidenceManager validation.
+
 #### General rules
 
 - Apply the same contract to any Issue number.
