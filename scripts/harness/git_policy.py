@@ -660,7 +660,7 @@ def list_range_commits(
 @managed_operation
 def validate_base(
     issue: int,
-    policy_path: str,
+    policy_path: str | dict[str, Any],
 ) -> dict[str, Any]:
     """
     Validate a previously selected canonical base.
@@ -1008,7 +1008,7 @@ def read_repository_state() -> dict[str, Any]:
 def prepare_branch(
     issue: int,
     branch_name: str,
-    policy_path: str,
+    policy_path: str | dict[str, Any],
     expected_head: str,
     expected_branch: str,
 ) -> dict[str, Any]:
@@ -1342,7 +1342,7 @@ def read_approved_commits(
 def check_branch(
     issue: int,
     branch_name: str,
-    policy_path: str,
+    policy_path: str | dict[str, Any],
     approved_commits_path: str | None = None,
 ) -> dict[str, Any]:
     """

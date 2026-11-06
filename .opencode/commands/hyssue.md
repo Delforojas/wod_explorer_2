@@ -268,20 +268,19 @@ active WorkflowController using `harness_call`.
 
 Use this invocation structure:
 
-```json
-{
-  "operation": "invoke",
-  "arguments": {
-    "operation": "git_policy.inspect",
-    "arguments": {
-      "issue": 184
-    }
-  }
-}
-```
+Use this invocation structure through `harness_call`:
 
-The Issue number is dynamic. Replace `184` with the current
-Issue number ($1).
+- `operation`: `invoke`
+- `arguments.operation`: `git_policy.inspect`
+- `arguments.arguments.issue`: current Issue number ($1)
+
+Resolve `$1` to the actual Issue number before invoking
+the tool. Pass it as an integer, never as a string.
+
+Never hardcode an Issue number.
+
+Do not forward `workflow_id` to `git_policy.inspect`.
+The active WorkflowController owns the session identity.
 
 Permitted arguments by operation:
 
@@ -359,6 +358,44 @@ For `approved-dependency`:
 
 Stop if the policy cannot be determined safely.
 
+#### Canonical Base Policy Contract
+
+The Issue number must always come from the current
+command argument ($1). Never hardcode an Issue number.
+
+After `git_policy.inspect`, construct one canonical
+policy object using the verified Git observations.
+
+For `standard-main`, use:
+
+- `policy`: `standard-main`
+- `base_branch`: `main`
+- `base_ref`: `origin/main`
+- `base_remote_ref`: `refs/heads/main`
+- `base_sha`: `branch_evidence.base_candidate.base_remote_sha_latest`
+- `pr_target`: `main`
+- `pr_target_ref`: `refs/heads/main`
+
+The `base_sha` must be a verified full commit SHA.
+Never invent, approximate or reuse a stale SHA.
+
+Reuse the same canonical policy object throughout
+the workflow, including commit and final validation.
+
+Pass it as the mandatory `policy_path` argument to
+`git_policy.validate_base`,
+`git_policy.prepare_branch` and
+`git_policy.check_branch`.
+
+For `approved-dependency`, require verified dependency
+evidence and explicit user authorization, including
+the approved commit manifest.
+
+If required policy evidence is absent, contradictory
+or invalidated, stop with BLOCK.
+
+A policy object is not itself authorization to mutate Git.
+
 ### 3.3. Validate Canonical Base
 
 Invoke `git_policy.validate_base` through `harness_call`
@@ -367,7 +404,7 @@ using the active WorkflowController.
 Arguments:
 
 - `issue`: current Issue number ($1).
-- `policy_path`: only when required by the validated contract.
+- `policy_path`: required canonical policy object from Phase 3.2.
 
 Use the base policy selected in Phase 3.2 and the
 verified evidence from Phase 3.1.
@@ -379,8 +416,11 @@ evidence is missing, stop immediately.
 
 The local harness must:
 
-- Refresh only the approved remote-tracking reference.
-- Verify the exact remote SHA using `git ls-remote`.
+- Never fetch, reset, rebase or modify remote-tracking
+  references during canonical base validation.
+- Verify the exact remote SHA using read-only Git queries.
+- Require the local base reference to match the approved
+  exact SHA; otherwise return BLOCK.
 - Verify the corresponding local tracking SHA.
 - Reject missing or conflicting remote references.
 - Validate dependency evidence when applicable.
@@ -420,9 +460,9 @@ Arguments:
 
 - `issue`: current Issue number ($1).
 - `branch_name`: proposed Issue-specific branch.
-- `policy_path`: only when required.
-- `expected_head`: verified HEAD, when required.
-- `expected_branch`: verified active branch, when required.
+- `policy_path`: required canonical policy object from Phase 3.2.
+- `expected_head`: branch_evidence.git.head from Phase 3.1.
+- `expected_branch`: branch_evidence.git.active_branch from Phase 3.1.
 
 Use the canonical base and authorization evidence
 validated in previous steps.
@@ -490,7 +530,7 @@ Arguments:
 
 - `issue`: current Issue number ($1).
 - `branch_name`: validated Issue-specific branch.
-- `policy_path`: only when required.
+- `policy_path`: required canonical policy object from Phase 3.2.
 - `approved_commits_path`: only when required by the
   verified branch-validation contract.
 
