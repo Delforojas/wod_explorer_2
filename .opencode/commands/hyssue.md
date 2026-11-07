@@ -497,6 +497,31 @@ Only after gathering the necessary context, load and apply:
 
 Continue only when the Context Guard returns `PASS`.
 
+### Context Guard Source — Mandatory
+
+The Context Guard source is exactly:
+
+`.opencode/commands/guardarails/context.md`
+
+When calling `decide_guard` in phase 2:
+
+- `name`: `context`
+- `status`: `PASS` only after validating the context
+- `source`: `.opencode/commands/guardarails/context.md`
+- `references`: complete current-session evidence references
+- `reason`: non-empty justification based on verified context
+
+The source path must match exactly, including lowercase letters.
+
+Never use `CONTEXT.md` as the Context Guard source.
+
+Context documents and guardrail sources are different.
+Reading a context document does not change the required
+guardrail source.
+
+If the required guardrail file is unavailable,
+return BLOCK. Never substitute another file.
+
 ## 3. Prepare the Working Branch — Hybrid
 
 This phase is mandatory before modifying any project file.
