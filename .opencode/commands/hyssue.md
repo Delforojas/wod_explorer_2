@@ -112,6 +112,44 @@ creating unrelated standalone controller sessions.
 Do not launch `workflow_controller.py --serve` directly when
 the `harness` MCP server is available.
 
+### Guard Decision Contract — Mandatory
+
+All guard decisions must use the exact
+WorkflowController.decide_guard signature:
+
+`decide_guard(name, status, source, references, reason)`
+
+Invoke through `harness_call` with:
+
+- `operation`: `decide_guard`
+- `arguments.name`: guard name for the active phase
+- `arguments.status`: `PASS`, `BLOCK`, `FAIL`, or `NEEDS_APPROVAL`
+- `arguments.source`: exact guardrail Markdown path
+- `arguments.references`: complete current session evidence references
+- `arguments.reason`: non-empty justification based on verified evidence
+
+All five arguments are mandatory.
+
+For Issue Guard, use:
+
+- `name`: `issue`
+- `source`: `.opencode/commands/guardarails/issue.md`
+
+Set `status` to `PASS` only after evaluating the
+Issue Guard rules against verified Issue evidence.
+
+Do not omit or invent arguments.
+Do not reconstruct or shorten evidence references.
+Do not treat successful evidence registration
+as automatic guard approval.
+
+If the required evidence or a defensible guard decision
+is unavailable, return BLOCK.
+
+Register real GitHub MCP observations and semantic guard
+decisions with their sources and current evidence references.
+Do not execute Markdown as code or invent guard results.
+
 Register real GitHub MCP observations and semantic guard
 decisions with their sources and current evidence references.
 Do not execute Markdown as code or invent guard results.
@@ -376,7 +414,6 @@ Use the verified owner and repository name when
 calling the GitHub MCP.
 
 If repository identity cannot be verified, return BLOCK.
-
 
 ### Phase 1 Evidence Registration
 
