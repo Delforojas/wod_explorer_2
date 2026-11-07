@@ -219,5 +219,42 @@ class HarnessSessionIntegrationTests(unittest.TestCase):
         diagnostic_manifests = list((self.root/'logs').glob('verification-*/source-manifest.json'))
         self.assertEqual(len(diagnostic_manifests),1)
         self.assertEqual(list(self.root.rglob('*.json')),diagnostic_manifests,
-                         'Only the runner diagnostic manifest may be materialized')
+                        'Only the runner diagnostic manifest may be materialized')
         self.assertNotIn('pre_stage_evidence',json.dumps(c.export_static(authorized=True)))
+
+    def test_phase2_context_evidence_allows_advancement(self):
+        from hashlib import sha256
+
+        context_file = self.repo / "AGENTS.md"
+        context_file.write_text("# Project rules\n")
+
+        controller = WorkflowController(75, self.repo, "phase2-test")
+        controller.phase = 2
+
+        with chdir(self.repo):
+            reference = controller.record_static(
+                key="context",
+                kind="context_item",
+                payload={
+                    "path": "AGENTS.md",
+                    "sha256": sha256(context_file.read_bytes()).hexdigest(),
+                    "applicability": "applicable",
+                    "reason": "Project rules relevant to Issue 75",
+                },
+                source="AGENTS.md",
+                observed_at=datetime.now(timezone.utc).isoformat(),
+                status="PASS",
+            )
+
+            controller.decide_guard(
+                name="context",
+                status="PASS",
+                source=".opencode/commands/guardarails/context.md",
+                references=[reference],
+                reason="Relevant project context has been verified",
+            )
+
+            result = controller.advance()
+
+            self.assertEqual(result["status"], "PASS", result)
+            self.assertEqual(result["phase"], 3)

@@ -522,6 +522,43 @@ guardrail source.
 If the required guardrail file is unavailable,
 return BLOCK. Never substitute another file.
 
+
+### Mandatory Context Evidence — Phase 2
+
+Before advancing from Phase 2, register the mandatory
+static evidence required by WorkflowController:
+
+- `operation`: `record_static`
+- `arguments.key`: `context`
+- `arguments.kind`: `context_item`
+- `arguments.payload`: verified context item
+- `arguments.source`: actual context source
+- `arguments.observed_at`: actual ISO 8601 timestamp
+- `arguments.status`: `PASS` only when verified
+
+The payload must follow STATIC_FIELDS['context_item']:
+
+- `path`
+- `sha256`
+- `revision`
+- `applicability`
+- `reason`
+
+Use only verified values. Do not invent hashes,
+revisions, paths or applicability decisions.
+
+The key `context` is mandatory for Phase 2 advancement.
+Additional context items may use separate keys.
+
+Include the complete current-session reference for
+`context` when evaluating the Context Guard.
+
+The Context Guard returning PASS does not replace
+the mandatory static evidence.
+
+Never advance to Phase 3 without a valid
+static evidence entry with key `context`.
+
 ## 3. Prepare the Working Branch — Hybrid
 
 This phase is mandatory before modifying any project file.
