@@ -171,6 +171,22 @@ class WorkflowController:
             self.evidence.get('canonical_base', 'static')
         if operation == 'sdd_manager.prepare':
             self.evidence.get('sdd_inspection_evidence')
+
+            if 'evidence_path' in arguments:
+                raise EvidenceError(
+                    'sdd_manager.prepare: evidence_path is controller-managed'
+                )
+
+            arguments = {
+                **arguments,
+                'evidence_path': {
+                    'evidence_ref': self.evidence.reference(
+                        'sdd_inspection_evidence',
+                        'mutable'
+                    )
+                }
+            }
+
         if operation == 'verification_runner.run_checks':
             if arguments.get('phase', 7) != self.phase:
                 raise EvidenceError('Runner phase does not match the workflow')
@@ -237,7 +253,7 @@ class WorkflowController:
         if (self.commit_step >= 3 or self.commit_created or self.commit_outcome_unknown) and target <= 10:
             raise EvidenceError('A real commit already exists; automatic commit/history replay is forbidden')
         self.history.append({'phase': self.phase, 'status': 'REVALIDATION_REQUESTED',
-                             'target': target, 'reason': reason})
+                        'target': target, 'reason': reason})
         self.guards = {key: value for key, value in self.guards.items() if value['phase'] < target}
         if target <= 10:
             self.commit_step = 0

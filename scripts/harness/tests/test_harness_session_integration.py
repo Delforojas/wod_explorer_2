@@ -77,6 +77,55 @@ class HarnessSessionIntegrationTests(unittest.TestCase):
         self.assertIn('sdd',summary['static'])
         self.assertNotIn('mutable',summary)
 
+    def test_phase4_prepare_reuses_existing_sdd_with_managed_evidence(self):
+        # Preparar un SDD existente en el repositorio temporal.
+        folder = self.repo / 'specs/075-feature'
+        self.files(folder)
+
+        controller = WorkflowController(75, self.repo, 'phase4-test')
+        controller.phase = 4
+
+        before = self.snapshot()
+
+        with chdir(self.repo):
+            # 1. Inspección real a través del controlador.
+            inspection = controller.invoke(
+                'sdd_manager.inspect',
+                {'issue': 75}
+            )['sdd_inspection_evidence']
+
+            self.assertEqual(inspection['status'], 'PASS', inspection)
+
+            # 2. Preparar sin pasar evidence_path.
+            preparation = controller.invoke(
+                'sdd_manager.prepare',
+                {'issue': 75}
+            )['sdd_preparation_evidence']
+
+            self.assertEqual(preparation['status'], 'PASS', preparation)
+
+            # 3. El resultado debe preservar el SDD existente.
+            self.assertEqual(preparation['created_paths'], [])
+
+            for filename in ('spec.md', 'plan.md', 'tasks.md'):
+                self.assertIn(
+                    f'specs/075-feature/{filename}',
+                    preparation['preserved_files']
+                )
+
+            # 4. Prohibir rutas de evidencia proporcionadas externamente.
+            with self.assertRaises(EvidenceError):
+                controller.invoke(
+                    'sdd_manager.prepare',
+                    {
+                        'issue': 75,
+                        'evidence_path': '/tmp/untrusted-evidence.json'
+                    }
+                )
+
+        # 5. Ningún archivo existente se ha modificado.
+        self.assertEqual(before, self.snapshot())
+
     def test_runner_registers_exact_executed_report_in_same_session(self):
         (self.repo/'check.py').write_text('print("ok")\n')
         registry = self.root/'registry.json'
