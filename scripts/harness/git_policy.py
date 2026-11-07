@@ -945,12 +945,43 @@ def _validate_base(issue, policy_path, *, historical=False):
     # 7. Final result
     # --------------------------------------------------------
 
+
+        # --------------------------------------------------------
+    # 7. Final result
+    # --------------------------------------------------------
+
     evidence["status"] = (
         "PASS" if not errors else "BLOCK"
     )
 
-    return {"base_validation_evidence": evidence}
+    if evidence["status"] == "PASS":
+        evidence.update({
+            "base_branch": (
+                "main"
+                if policy_type == "standard-main"
+                else policy.get("base_branch")
+            ),
+            "base_ref": base_ref,
+            "base_remote_ref": base_remote_ref,
+            "pr_target": pr_target,
+            "pr_target_ref": pr_target_ref,
+        })
 
+        # Only initial validation establishes historical
+        # remote SHA observations.
+        if not historical:
+            evidence["base_remote_sha_initial"] = remote_base_sha
+            evidence["pr_target_sha_initial"] = target_sha
+
+        if policy_type == "approved-dependency":
+            evidence["dependency_approval"] = policy[
+                "dependency_approval"
+            ]
+            evidence["dependency_commits"] = policy[
+                "dependency_commits"
+            ]
+
+    return {"base_validation_evidence": evidence}
 # ============================================================
 # PHASE 3 — PREPARE BRANCH
 # ============================================================

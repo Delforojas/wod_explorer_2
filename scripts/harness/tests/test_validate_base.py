@@ -182,7 +182,64 @@ class ValidateBaseTests(unittest.TestCase):
                 self.assertEqual(
                     controller.status, "RUNNING"
                 )
+                # Verify mandatory canonical base fields.
+                canonical = controller.evidence.get(
+                    "canonical_base", "static"
+                )["payload"]
 
+                required_fields = (
+                    "policy",
+                    "base_branch",
+                    "base_ref",
+                    "base_remote_ref",
+                    "base_sha",
+                    "pr_target",
+                    "pr_target_ref",
+                    "base_remote_sha_initial",
+                )
+
+                for field in required_fields:
+                    with self.subTest(field=field):
+                        self.assertTrue(
+                            canonical.get(field),
+                            f"Missing canonical field: {field}",
+                        )
+
+                self.assertEqual(
+                    canonical["base_remote_sha_initial"],
+                    policy["base_sha"],
+                )
+
+                # The Branch Guard must reference both
+                # mandatory evidence entries.
+                references = [
+                    controller.evidence.reference(
+                        "canonical_base", "static"
+                    ),
+                    controller.evidence.reference(
+                        "branch_check_evidence", "mutable"
+                    ),
+                ]
+
+                guard = controller.decide_guard(
+                    name="branch",
+                    status="PASS",
+                    source=".opencode/commands/guardarails/branch.md",
+                    references=references,
+                    reason="Verified canonical base and Issue branch",
+                )
+
+                self.assertEqual(guard["status"], "PASS")
+
+                # The real regression check: Phase 3 -> Phase 4.
+                result = controller.advance()
+
+                self.assertEqual(
+                    result["status"], "PASS", result
+                )
+                self.assertEqual(result["phase"], 4)
+                self.assertEqual(controller.phase, 4)
+                self.assertEqual(controller.status, "RUNNING")
         finally:
             sys.path.remove(harness_dir)
 
@@ -399,6 +456,103 @@ class ValidateBaseTests(unittest.TestCase):
         process, evidence = self.validate()
 
         self.assertEqual(evidence["status"], "BLOCK")
+
+    def test_phase3_reuses_existing_issue_branch(self):
+        from contextlib import chdir
+
+        sys.path.insert(0, str(SCRIPT.parent))
+
+        try:
+            from workflow_controller import WorkflowController, perform
+
+            issue = 199
+            branch_name = f"test/{issue}-existing"
+
+            # Prepare an existing branch before starting
+            # the controller session.
+            self.git("switch", "-c", branch_name)
+            self.policy_path.unlink()
+
+            controller = WorkflowController(
+                issue=issue,
+                repository=self.repo,
+                workflow_id="reuse-integration-test",
+            )
+            controller.phase = 3
+
+            with chdir(self.repo):
+                def invoke(operation, arguments):
+                    return perform(controller, {
+                        "operation": "invoke",
+                        "arguments": {
+                            "operation": operation,
+                            "arguments": arguments,
+                        },
+                    })
+
+                inspection = invoke(
+                    "git_policy.inspect",
+                    {"issue": issue},
+                )["branch_evidence"]
+
+                self.assertEqual(inspection["status"], "complete")
+
+                candidate = inspection["base_candidate"]
+                policy = {
+                    "policy": "standard-main",
+                    "base_branch": "main",
+                    "base_ref": candidate["base_ref"],
+                    "base_remote_ref": candidate["base_remote_ref"],
+                    "base_sha": candidate["base_remote_sha_latest"],
+                    "pr_target": "main",
+                    "pr_target_ref": "refs/heads/main",
+                }
+
+                validation = invoke(
+                    "git_policy.validate_base",
+                    {"issue": issue, "policy_path": policy},
+                )["base_validation_evidence"]
+
+                self.assertEqual(validation["status"], "PASS")
+
+                branch_check = invoke(
+                    "git_policy.check_branch",
+                    {
+                        "issue": issue,
+                        "branch_name": branch_name,
+                        "policy_path": policy,
+                    },
+                )["branch_check_evidence"]
+
+                self.assertEqual(
+                    branch_check["status"], "PASS",
+                    branch_check["errors"],
+                )
+
+                references = [
+                    controller.evidence.reference(
+                        "canonical_base", "static"
+                    ),
+                    controller.evidence.reference(
+                        "branch_check_evidence", "mutable"
+                    ),
+                ]
+
+                controller.decide_guard(
+                    name="branch",
+                    status="PASS",
+                    source=".opencode/commands/guardarails/branch.md",
+                    references=references,
+                    reason="Existing Issue branch verified",
+                )
+
+                result = controller.advance()
+
+                self.assertEqual(result["status"], "PASS", result)
+                self.assertEqual(result["phase"], 4)
+
+        finally:
+            sys.path.remove(str(SCRIPT.parent))
 
 
 if __name__ == "__main__":

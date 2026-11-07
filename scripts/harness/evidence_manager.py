@@ -333,17 +333,53 @@ def register_result(result, session):
         if key == 'branch_evidence' and payload.get('git'):
             observed = payload['git']
             local = {name: deepcopy(observed[name]) for name in
-                     ('repository_root', 'active_branch', 'head', 'changes', 'staged', 'unstaged',
-                      'untracked', 'working_tree_clean', 'unstaged_diff', 'staged_diff') if name in observed}
+                    ('repository_root', 'active_branch', 'head', 'changes', 'staged', 'unstaged',
+                    'untracked', 'working_tree_clean', 'unstaged_diff', 'staged_diff') if name in observed}
             projected = {'source': deepcopy(source), 'phase': payload['phase'],
-                         'observed_at': payload['observed_at'], 'status': payload['status'], 'git': local}
+                        'observed_at': payload['observed_at'], 'status': payload['status'], 'git': local}
             references.append(session.record('working_tree_observation', projected,
-                              topics=['working_tree', 'index', 'head', 'branch']))
+                            topics=['working_tree', 'index', 'head', 'branch']))
         if key == 'base_validation_evidence' and payload.get('status') == 'PASS':
-            fields = {field: payload[field] for field in STATIC_FIELDS['canonical_base'] if field in payload and payload[field] is not None}
-            references.append(session.record('canonical_base', fields, category='static', kind='canonical_base',
-                source=source, phase=payload['phase'], status='PASS', observed_at=payload['observed_at'],
-                topics=['scope', 'instructions', 'dependencies']))
+            fields = {
+                field: payload[field]
+                for field in STATIC_FIELDS['canonical_base']
+                if field in payload and payload[field] is not None
+            }
+
+            required = (
+                'policy',
+                'base_branch',
+                'base_ref',
+                'base_remote_ref',
+                'base_sha',
+                'pr_target',
+                'pr_target_ref',
+                'base_remote_sha_initial',
+            )
+
+            if any(not fields.get(name) for name in required):
+                raise EvidenceError(
+                    'Validated canonical base lacks required historical fields'
+                )
+
+            if fields['base_remote_sha_initial'].lower() != fields['base_sha'].lower():
+                raise EvidenceError(
+                    'Initial remote SHA differs from approved historical base'
+                )
+
+            references.append(
+                session.record(
+                    'canonical_base',
+                    fields,
+                    category='static',
+                    kind='canonical_base',
+                    source=source,
+                    phase=payload['phase'],
+                    status='PASS',
+                    observed_at=payload['observed_at'],
+                    topics=['scope', 'instructions', 'dependencies'],
+                )
+            )
         if key == 'commit_check_evidence' and payload.get('status') == 'PASS':
             fields = {'sha': payload['commit_sha'], 'message': payload['message'], 'branch': payload['branch'],
                       'base_sha': payload['base_sha'], 'manifest': payload['commit_paths']}
