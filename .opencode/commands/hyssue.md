@@ -377,6 +377,7 @@ calling the GitHub MCP.
 
 If repository identity cannot be verified, return BLOCK.
 
+
 ### Phase 1 Evidence Registration
 
 After retrieving and verifying the GitHub Issue:
@@ -392,11 +393,42 @@ After retrieving and verifying the GitHub Issue:
    and approval have been explicitly established.
    Never infer approval from Issue existence.
 
-4. Use the returned evidence references when
-   evaluating the Issue Guard.
+4. Collect the complete evidence references returned
+   by the active WorkflowController session.
 
-5. Continue only when the Issue Guard returns PASS
+5. Evaluate the Issue Guard using those exact
+   references, without reconstructing or modifying them.
+
+6. Continue only when the Issue Guard returns PASS
    and WorkflowController authorizes advancement.
+
+#### Evidence Reference Integrity — Mandatory
+
+Evidence references are opaque, session-scoped objects.
+
+Every reference must preserve these seven fields:
+
+- `key`
+- `category`
+- `version`
+- `sha256`
+- `issue`
+- `repository`
+- `workflow_id`
+
+When calling `decide_guard`:
+
+- Copy each reference exactly as returned by
+  `record_external`, `record_static`, or `invoke`.
+- Preserve all fields and their original values.
+- Never shorten or reconstruct references.
+- Never reuse references from an earlier workflow.
+- Never invent missing reference fields.
+- Use only references belonging to the current
+  WorkflowController session.
+
+If a complete, current reference is unavailable,
+return BLOCK. Do not fabricate a replacement.
 
 Never pass a GitHub repository identifier as the
 local repository path.
