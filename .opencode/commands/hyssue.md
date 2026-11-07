@@ -522,7 +522,6 @@ guardrail source.
 If the required guardrail file is unavailable,
 return BLOCK. Never substitute another file.
 
-
 ### Mandatory Context Evidence — Phase 2
 
 Before advancing from Phase 2, register the mandatory
@@ -1271,6 +1270,52 @@ load and execute:
 
 Always apply the original Verification Guard.
 
+### Verification Runner MCP Contract — Mandatory
+
+All verification operations must be invoked through
+`harness_call` using `operation: "invoke"`.
+
+#### Discover verification checks
+
+Operation: `verification_runner.discover`
+
+Accepted arguments:
+
+- `repo_root` (optional)
+- `registry_path` (optional)
+
+Never pass `issue`, `workflow_id`, `phase`,
+or other unsupported arguments to `discover`.
+
+#### Execute verification checks
+
+Operation: `verification_runner.run_checks`
+
+Required arguments:
+
+- `issue`
+- `workflow_id`
+- `selected`
+- `selection_path`
+
+Optional arguments:
+
+- `repo_root`
+- `registry_path`
+- `log_dir`
+- `phase`
+- `review_path`
+
+Use only verified check IDs and an approved selection.
+
+In Phase 7, use `phase: 7`.
+In Phase 8, explicitly use `phase: 8`.
+
+Never copy arguments from one operation to another.
+Never invent or omit mandatory arguments.
+
+All evidence must remain managed by the active
+WorkflowController session.
 Never skip mandatory checks to reduce token usage.
 
 ## 8. Resolve Failures — Hybrid
