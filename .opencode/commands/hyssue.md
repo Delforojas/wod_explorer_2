@@ -1010,19 +1010,54 @@ Stop if the SDD state cannot be determined safely.
 
 ### 4.2. Prepare SDD Structure
 
-Execute the validated local operation:
+Before preparing an SDD, inspect the result from
+`sdd_manager.inspect` for the active Issue.
 
-`python3 scripts/harness/sdd_manager.py prepare --issue $1`
+#### Existing SDD
+
+If an SDD already exists:
+
+- Reuse it according to the SDD Manager contract.
+- Preserve existing files and approved content.
+- Never create duplicate SDD directories.
+- Stop if its identity or structure is ambiguous.
+
+#### New SDD — Explicit Slug Approval
+
+If no SDD exists:
+
+1. Propose a descriptive slug derived from the Issue.
+2. Request explicit approval from the user.
+3. Do not infer approval from the Issue title, AI output,
+   or an automatically generated value.
+4. Validate the approved slug against the actual
+   SDD Manager interface.
+5. Execute preparation only with the approved slug.
+6. If approval is absent, return BLOCK.
+
+For a newly created SDD, execute:
+
+`python3 scripts/harness/sdd_manager.py prepare --issue $1 --slug <approved-slug>`
+
+When the harness MCP session is active, invoke the
+corresponding supported operation through `harness_call`.
+Do not create an unrelated controller session.
 
 The local harness must:
 
 - Create or safely reuse the Issue-specific SDD directory.
 - Use `specs/<three-digit-issue-number>-<slug>/`.
-- Create missing required files without overwriting existing work.
+- Create missing required files without overwriting work.
 - Never create duplicate SDD directories.
-- Rename an invalid directory only when the operation is safe
-  and its intended destination has been verified.
+- Rename an invalid directory only when safe and approved.
 - Stop when existing work or approved decisions could be lost.
+
+If the manager rejects the arguments or requires an
+authorization that is missing, return BLOCK with the
+actual cause.
+
+Never bypass the SDD Guard or manually create the SDD
+to avoid a blocked preparation.
 
 ### 4.3. Generate or Complete SDD Content
 
