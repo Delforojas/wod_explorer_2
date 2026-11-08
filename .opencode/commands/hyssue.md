@@ -112,6 +112,26 @@ creating unrelated standalone controller sessions.
 Do not launch `workflow_controller.py --serve` directly when
 the `harness` MCP server is available.
 
+### Mandatory Guardrail File Resolution
+
+Before evaluating any mandatory guardrail:
+
+1. Resolve its exact path relative to the verified
+   repository root.
+2. For a known guardrail path, use direct file reading.
+   Do not require a successful glob search first.
+3. Never treat a glob result of "No files found" as
+   conclusive evidence that a known guardrail is missing.
+4. If direct reading fails, verify whether the cause is:
+   - File does not exist.
+   - Access or permission denied.
+   - Tool or execution environment error.
+5. If the required guardrail remains unreadable, return
+   BLOCK with the actual verified cause.
+
+Never mark a guardrail PASS without reading and
+evaluating its actual contents.
+
 ### Guard Decision Contract — Mandatory
 
 All guard decisions must use the exact
