@@ -47,6 +47,21 @@ SDD para reconstruir los mismos datos. Si hace falta una observación nueva, el
 workflow debe detenerse, ejecutar de nuevo el hook y volver a cargar este
 guardrail.
 
+### Adopción explícita de cambios preexistentes
+
+Una ruta con procedencia `preexisting-path` permanece protegida por defecto.
+Solo puede incluirse si `preexisting_adoption_evidence` vigente la enumera como
+archivo completo y se vincula a esta misma observación de pre-stage, Issue,
+workflow, repositorio, rama y HEAD. La evidencia debe provenir de un recibo
+externo verificable con emisor, identidad autenticada, emisión y expiración;
+un campo como `approved_by` no es autorización.
+
+No aceptes directorios, comodines, hunks parciales, rutas excluidas
+(`__pycache__/`, `*.pyc`, `audit/`, `opencode.json`) ni archivos cuyo diff
+completo mezcle trabajo ajeno a la Issue. La justificación humana se aplica al
+archivo entero. Si contenido, modo o diff cambian después de autorizarse, la
+adopción queda invalidada y el guardrail devuelve `BLOCK`.
+
 ## Condiciones para continuar
 
 El guardrail devuelve `PASS` únicamente si, usando la observación válida y el
@@ -83,6 +98,8 @@ Devuelve `BLOCK` si:
   pertenecen a la Issue;
 - `opencode.json` u otro cambio preexistente aparecería en staging sin una
   autorización explícita de alcance y una resolución previa del conflicto;
+- una adopción no tiene recibo externo verificable, está caducada, pertenece a
+  otra sesión o no coincide byte a byte con el archivo completo revisado;
 - no puede justificarse alguno de los cambios que sería necesario incluir;
 - separar los cambios podría afectar trabajo ajeno o preexistente;
 - el estado SDD observado muestra una sincronización pendiente o no permite
