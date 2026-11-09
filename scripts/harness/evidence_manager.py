@@ -57,6 +57,8 @@ OBSERVATION_TOPICS = {
     'branch_preparation_evidence': {'branch', 'head', 'scope'},
     'branch_check_evidence': {'git', 'branch', 'head', 'working_tree', 'scope'},
     'pre_stage_evidence': {'pre_stage', 'scope'},
+    'preexisting_adoption_proposal': {'pre_stage', 'scope'},
+    'preexisting_adoption_evidence': {'pre_stage', 'scope'},
     'staging_preparation_evidence': {'index', 'scope'},
     'pre_commit_evidence': {'pre_commit', 'scope'},
     'commit_creation_evidence': {'scope'},

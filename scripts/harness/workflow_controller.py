@@ -40,7 +40,8 @@ ALLOWED = {
     4: {'sdd_manager.inspect', 'sdd_manager.prepare'}, 5: {'sdd_manager.inspect'}, 6: {'sdd_manager.inspect'},
     7: {'sdd_manager.inspect', 'verification_runner.discover', 'verification_runner.run_checks'},
     8: {'verification_runner.discover', 'verification_runner.run_checks', 'sdd_manager.inspect'},
-    9: {'git_policy.review_changes'},
+    9: {'git_policy.review_changes', 'git_policy.propose_preexisting_adoption',
+        'git_policy.validate_preexisting_adoption'},
     10: {'git_policy.prepare_staging', 'git_policy.pre_commit_check', 'git_policy.create_commit', 'git_policy.check_commit'},
     11: {'git_policy.post_check_commit'}, 13: {'git_policy.final_check', 'sdd_manager.inspect'},
 }

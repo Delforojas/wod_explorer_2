@@ -1513,6 +1513,24 @@ The AI must:
 - Confirm final SDD synchronization.
 - Reject uncertain or unsafe inclusion.
 
+#### Adopción de cambios preexistentes
+
+Cuando una ruta `preexisting-path` sea necesaria para la Issue, primero invoca
+`git_policy.propose_preexisting_adoption` en fase 9 con la evidencia vigente.
+La propuesta es solo lectura y no determina pertenencia funcional.
+
+Una persona debe aprobar un manifiesto exacto de archivos completos mediante
+un sistema externo configurado como verificador de procedencia. El manifiesto
+debe enlazar Issue, workflow, repositorio, rama, HEAD, baseline,
+`pre_stage_evidence`, modo, hash de contenido, hash del diff completo y una
+justificación por archivo. El harness nunca genera ese recibo.
+
+Después, invoca `git_policy.validate_preexisting_adoption`. Solo las rutas
+exactas de una evidencia vigente pueden ser consideradas por este guardrail.
+Cambios de bytes, modo, diff, ruta, sesión, HEAD o expiración obligan a
+bloquear y obtener una nueva autorización. Nunca apruebes glob, directorios,
+hunks parciales ni `__pycache__/`, `*.pyc`, `audit/` u `opencode.json`.
+
 ### 9.3. Result
 
 Continue to Phase 10 only when the
@@ -1570,6 +1588,8 @@ The local harness must:
 - Stage only approved Issue changes.
 - Preserve unrelated staged and unstaged work.
 - Never stage protected paths without explicit approval.
+- Para rutas `preexisting-path`, exigir la evidencia de adopción validada y
+  revalidarla inmediatamente antes de publicar el índice privado.
 - Reject ambiguous or inseparable mixed changes.
 - Never use indiscriminate `git add .`.
 - Stop safely if the approved state has changed.
