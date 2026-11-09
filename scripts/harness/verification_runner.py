@@ -340,8 +340,10 @@ def run_checks(issue, workflow_id, selected, selection_path, repo_root=None,
                 or approval['workflow_id'] != workflow_id or approval['repository'] != str(root)
                 or approval['phase'] != phase or approval['checks'] != selected
                 or approval['catalog_sha256'] != digest(checks)
-                or approval['source_fingerprint'] != initial['sha256']
-                or approval['tasks_completed'] is not True or approval['applicability_complete'] is not True
+                 or approval['source_fingerprint'] != initial['sha256']
+                 or approval['implementation_tasks_completed'] is not True
+                 or not isinstance(approval.get('tasks_completed'), bool)
+                 or approval['applicability_complete'] is not True
                 or not isinstance(applicable, list) or len(set(applicable)) != len(applicable)
                 or not set(selected) <= set(applicable) or not set(applicable) <= definitions.keys()
                 or (phase == 7 and selected != applicable)
@@ -361,7 +363,9 @@ def run_checks(issue, workflow_id, selected, selection_path, repo_root=None,
         manifest_path = logs / 'source-manifest.json'
         if fingerprint(root, manifest_path) != initial:
             raise VerificationError('Source changed while recording the execution manifest')
-        e.update(repository=str(root), source_fingerprint=initial, catalog_sha256=digest(checks), log_directory=str(logs),
+        e.update(repository=str(root), source_fingerprint=initial, catalog_sha256=digest(checks),
+                 implementation_tasks_completed=approval['implementation_tasks_completed'],
+                 tasks_completed=approval['tasks_completed'], log_directory=str(logs),
                  source_manifest={'path': str(manifest_path), 'sha256': file_digest(manifest_path)})
         blocked = False
         for identifier in selected:

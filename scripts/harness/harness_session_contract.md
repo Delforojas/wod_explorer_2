@@ -159,6 +159,12 @@ Operaciones del protocolo (argumentos dentro de `arguments`):
   esa fase se vuelven a exigir. Si ya existe un commit o su resultado es incierto,
   no permite volver a crear otro. Las fases posteriores al commit sí pueden
   revalidarse sin repetirlo.
+- `recover(operation)`: elimina el bloqueo técnico de una operación de la fase
+  activa solo después de que la misma operación se haya repetido oficialmente
+  con evidencia vigente `PASS` o `complete`. Conserva ambas evidencias y añade
+  un evento `RECOVERED`; no avanza de fase ni aprueba guardrails. Rechaza la
+  recuperación cuando queda otro bloqueo activo, una decisión de guard no
+  aprobada, una acción prohibida, un handoff cerrado o incertidumbre de commit.
 - `advance()`: comprueba las evidencias y el guardrail obligatorios de la fase;
   consume referencias exactas y avanza solo si todo pasa. Una operación local
   fallida debe resolverse con evidencia nueva, no con un `PASS` manual.
@@ -175,9 +181,9 @@ Operaciones del protocolo (argumentos dentro de `arguments`):
 | 3 | Política histórica completa + check-branch + Branch Guard |
 | 4 | Validación SDD + SDD Guard |
 | 5 | SDD vigente + Planning Guard |
-| 6 | Implementación completa + tareas realmente completadas + Implementation Guard |
-| 7 | Verificaciones completas + Verification Guard |
-| 8 | Repair Guard previo, reparación y verificaciones + Verification Guard |
+| 6 | Implementación completa + todas las tareas sin anotación (fase 6) completadas + Implementation Guard |
+| 7 | SDD revalidado, verificaciones completas y todas las tareas `[phase:7]` completadas + Verification Guard |
+| 8 | Repair Guard previo, reparación, SDD revalidado, verificaciones y todas las tareas obligatorias completadas + Verification Guard |
 | 9 | Única pre_stage_evidence + verificaciones vigentes + Change Review Guard |
 | 10 | prepare-staging → pre-commit-check → create-commit → check-commit + Commit Guard |
 | 11 | Única post_commit_evidence + Post-Commit Guard |
@@ -191,6 +197,12 @@ La fase 8 es condicional: sin fallos se registra `NOT_APPLICABLE`, nunca un
 presentan como observaciones actuales. Un guardrail posterior exige nuevamente
 las referencias que necesita y bloquea si han cambiado.
 
+Las tareas sin anotación pertenecen a fase 6. La única anotación admitida es
+`[phase:7]`; anotaciones desconocidas, repetidas o mal formadas bloquean la
+validación SDD. La evidencia distingue `implementation_tasks_completed` de
+`tasks_completed`: la segunda no puede declararse completa hasta que la tarea
+de verificación correspondiente y el SDD actualizado hayan sido revalidados.
+
 Tras la fase 15 el estado es `AWAITING_MANUAL_VALIDATION`. El controlador no
 reabre esa entrega aprobándose de nuevo un guardrail, no aprueba la validación
 manual, no ejecuta `/finish-issue`, no publica ni cierra la Issue.
@@ -199,6 +211,10 @@ Las decisiones semánticas y lecturas MCP siguen correspondiendo al workflow.
 El historial de este controlador solo contiene sus acciones observadas; no se
 puede presentar como auditoría completa de acciones externas para afirmar que
 no hubo push. El contrato de `final-check` sigue exigiendo esa evidencia fiable.
+
+Cada reevaluación de un guard conserva una entrada inmutable en
+`guard_history`, incluso cuando reemplaza la decisión activa del mismo guard.
+Las referencias y razones del `BLOCK` original no se eliminan.
 
 ## Pruebas y limitaciones conocidas
 

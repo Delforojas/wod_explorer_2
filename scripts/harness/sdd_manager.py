@@ -72,6 +72,16 @@ def meaningful(line):
                 and not re.fullmatch(r"<[^>]*>", line))
 
 
+def task_phase(text):
+    """Return the workflow phase encoded by an optional task annotation."""
+    markers = re.findall(r"\[\s*phase\b[^\]]*\]", text, flags=re.IGNORECASE)
+    if not markers:
+        return 6, True, text
+    if markers != ["[phase:7]"]:
+        return None, False, text
+    return 7, True, text.replace("[phase:7]", "", 1).lstrip()
+
+
 def markdown_content(raw):
     """Extract observable sections/checklists, ignoring code fences and comments."""
     sections = []
@@ -120,10 +130,13 @@ def markdown_content(raw):
         task = re.match(r"^\s*(?:[-*+]|\d+[.)])\s+\[([^\]]*)\]\s*(.*)$", line)
         if task:
             state, text = task.groups()
-            tasks.append({"line": number, "raw": original, "marker": state, "text": text,
-                          "status": "completed" if state in ("x", "X") else
-                                    "pending" if state == " " else "invalid",
-                          "concrete_text_present": meaningful(text)})
+            phase, annotation_valid, task_text = task_phase(text)
+            status = "completed" if state in ("x", "X") else "pending" if state == " " else "invalid"
+            if not annotation_valid:
+                status = "invalid"
+            tasks.append({"line": number, "raw": original, "marker": state, "text": task_text,
+                           "phase": phase, "phase_annotation_valid": annotation_valid, "status": status,
+                           "concrete_text_present": meaningful(task_text)})
     # A parent section may carry its content in subsections.
     for index, section in enumerate(sections):
         lines = list(section["content"])
@@ -273,9 +286,11 @@ def structural_errors(snapshot, validate=False, require_completed=False):
 
 
 @managed_operation
-def inspect(issue, repo_root=None, validate=False, require_completed=False):
+def inspect(issue, repo_root=None, validate=False, require_completed=False, phase=4):
+    if phase not in (4, 5, 6, 7, 8, 13):
+        raise SDDError("Unsupported workflow phase for SDD inspection")
     operation = "validate" if validate else "inspect"
-    e = {"source": f"scripts/harness/sdd_manager.py {operation}", "phase": 4,
+    e = {"source": f"scripts/harness/sdd_manager.py {operation}", "phase": phase,
          "issue": issue, "observed_at": datetime.now(timezone.utc).isoformat(),
          "repository": None, "status": "BLOCK", "collection_status": "incomplete",
          "errors": [], "snapshot": None, "snapshot_sha256": None,
@@ -400,6 +415,7 @@ def main():
         subparser = operations.add_parser(operation)
         subparser.add_argument("--issue", type=int, required=True)
         subparser.add_argument("--repo-root", default=None)
+        subparser.add_argument("--phase", type=int, default=4)
         if operation == "prepare":
             subparser.add_argument("--evidence-json", required=True)
             subparser.add_argument("--slug", default=None)
@@ -412,7 +428,7 @@ def main():
         result = prepare(args.issue, args.evidence_json, args.slug, args.repo_root)
     else:
         result = inspect(args.issue, args.repo_root, args.operation == "validate",
-                         getattr(args, "require_completed", False))
+                         getattr(args, "require_completed", False), args.phase)
     print(json.dumps(result, ensure_ascii=True, indent=2))
     return 0 if next(iter(result.values()))["status"] == "PASS" else 1
 

@@ -109,7 +109,7 @@ def harness_call(
 
     Valid operations:
     snapshot, advance, record_external, record_static,
-    decide_guard, notify, invoke, enter_repair,
+    decide_guard, notify, invoke, enter_repair, recover,
     export_static, revisit_phase.
 
     Controller guardrails and phase restrictions remain authoritative.

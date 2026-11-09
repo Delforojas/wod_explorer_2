@@ -27,8 +27,8 @@ REQUIRED = {
     3: [('static', 'canonical_base'), ('mutable', 'branch_check_evidence')],
     4: [('mutable', 'sdd_validation_evidence')], 5: [('mutable', 'sdd_validation_evidence')],
     6: [('mutable', 'implementation_evidence'), ('mutable', 'sdd_validation_evidence')],
-    7: [('mutable', 'verification_evidence')],
-    8: [('mutable', 'repair_evidence'), ('mutable', 'verification_evidence')],
+    7: [('mutable', 'sdd_validation_evidence'), ('mutable', 'verification_evidence')],
+    8: [('mutable', 'repair_evidence'), ('mutable', 'sdd_validation_evidence'), ('mutable', 'verification_evidence')],
     9: [('mutable', 'pre_stage_evidence'), ('mutable', 'verification_evidence')],
     10: [('mutable', 'commit_creation_evidence'), ('mutable', 'commit_check_evidence')],
     11: [('mutable', 'post_commit_evidence')], 12: [('mutable', 'github_documentation_evidence')],
@@ -38,7 +38,7 @@ REQUIRED = {
 ALLOWED = {
     3: {'git_policy.inspect', 'git_policy.validate_base', 'git_policy.prepare_branch', 'git_policy.check_branch'},
     4: {'sdd_manager.inspect', 'sdd_manager.prepare'}, 5: {'sdd_manager.inspect'}, 6: {'sdd_manager.inspect'},
-    7: {'verification_runner.discover', 'verification_runner.run_checks'},
+    7: {'sdd_manager.inspect', 'verification_runner.discover', 'verification_runner.run_checks'},
     8: {'verification_runner.discover', 'verification_runner.run_checks', 'sdd_manager.inspect'},
     9: {'git_policy.review_changes', 'git_policy.propose_preexisting_adoption',
         'git_policy.validate_preexisting_adoption'},
@@ -60,6 +60,7 @@ class WorkflowController:
         self.phase = 0
         self.status = 'RUNNING'
         self.guards = {}
+        self.guard_history = []
         self.history = []
         self.commit_step = 0
         self.commit_created = False
@@ -73,6 +74,7 @@ class WorkflowController:
         return {'workflow': {'issue': self.evidence.issue, 'repository': self.evidence.repository,
                 'workflow_id': self.evidence.workflow_id, 'phase': self.phase, 'status': self.status,
                 'history': deepcopy(self.history), 'guards': deepcopy(self.guards),
+                'guard_history': deepcopy(self.guard_history),
                 'commit_step': self.commit_step, 'commit_created': self.commit_created,
                 'commit_outcome_unknown': self.commit_outcome_unknown, 'repair_cycle': self.repair_cycle, 'blockers': deepcopy(self.blockers),
                 'manual_validation': 'pending', 'finish_issue': 'not_executed_by_controller'},
@@ -100,7 +102,8 @@ class WorkflowController:
     def record_static(self, key, payload, kind, source, observed_at, status='PASS', paths=None):
         allowed = {1: {'issue_identity', 'approved_scope'}, 2: {'context_item', 'decisions', 'dependencies'},
                    3: {'canonical_base'}, 4: {'sdd_refs'}, 5: {'sdd_refs', 'decisions'},
-                   7: {'verification_history'}, 8: {'verification_history'}, 10: {'accepted_commit'}}
+                   7: {'verification_history', 'preexisting_failure_waiver'},
+                   8: {'verification_history', 'preexisting_failure_waiver'}, 10: {'accepted_commit'}}
         if kind not in allowed.get(self.phase, set()):
             raise EvidenceError('Static evidence is not allowed at this phase')
         topics = {'context_item': ['instructions'], 'sdd_refs': ['sdd', 'scope'],
@@ -118,13 +121,61 @@ class WorkflowController:
         if (status not in ('PASS', 'BLOCK', 'FAIL', 'NEEDS_APPROVAL') or not reason.strip()
                 or source != '.opencode/commands/guardarails/' + name + '.md' or not references):
             raise EvidenceError('Guard decision requires exact source, reason and evidence references')
+        failed_verification = None
         for reference in references:
-            self.evidence.resolve(reference, require_verified=status == 'PASS' and name != 'repair')
-        self.guards[(str(self.phase) + ':' + name)] = {
+            entry = self.evidence.resolve(reference, require_verified=not (
+                name == 'repair' or (status == 'PASS' and name == 'verification'
+                                     and reference.get('key') == 'verification_evidence')))
+            if name == 'verification' and reference.get('key') == 'verification_evidence' and entry['status'] == 'FAIL':
+                failed_verification = reference
+        if status == 'PASS' and name == 'verification' and failed_verification:
+            waiver = next((ref for ref in references if ref.get('key') == 'preexisting_failure_waiver'
+                           and ref.get('category') == 'static'), None)
+            if not waiver:
+                raise EvidenceError('A failed verification requires a scoped preexisting-failure waiver')
+            data = self.evidence.resolve(waiver)['payload']
+            if data.get('verification_sha256') != failed_verification.get('sha256'):
+                raise EvidenceError('Waiver does not bind the observed verification failure')
+            if datetime.fromisoformat(data['expires_at']) <= datetime.now(timezone.utc):
+                raise EvidenceError('Preexisting-failure waiver has expired')
+        decision = {
             'name': name, 'status': status, 'source': source, 'reason': reason,
             'references': deepcopy(references), 'phase': self.phase}
-        self.status = 'RUNNING' if status == 'PASS' else 'BLOCKED'
-        return deepcopy(self.guards[str(self.phase) + ':' + name])
+        key = str(self.phase) + ':' + name
+        self.guards[key] = decision
+        self.guard_history.append({'key': key, **deepcopy(decision)})
+        self.status = 'RUNNING' if status == 'PASS' and self._can_resume_running() else 'BLOCKED'
+        return deepcopy(decision)
+
+    def _can_resume_running(self):
+        if self.forbidden_action or self.handed_off or self.commit_outcome_unknown:
+            return False
+        if any(blocker['phase'] == self.phase for blocker in self.blockers.values()):
+            return False
+        return not any(guard['phase'] == self.phase and guard['status'] != 'PASS'
+                       for guard in self.guards.values())
+
+    def recover(self, operation):
+        """Resolve one retried technical block without advancing a workflow phase."""
+        blocker = self.blockers.get(operation)
+        if not blocker or blocker.get('phase') != self.phase:
+            raise EvidenceError('No recoverable technical block exists for this operation')
+        reference = blocker.get('resolved_reference')
+        if not reference:
+            raise EvidenceError('A successful official rerun is required before recovery')
+        entry = self.evidence.resolve(reference)
+        if entry['status'] not in ('PASS', 'complete'):
+            raise EvidenceError('Recovery requires a passing rerun observation')
+        self.blockers.pop(operation)
+        if not self._can_resume_running():
+            self.blockers[operation] = blocker
+            raise EvidenceError('Other active blocks or safety conditions prevent recovery')
+        self.status = 'RUNNING'
+        event = {'phase': self.phase, 'status': 'RECOVERED', 'operation': operation,
+                 'blocked_reference': blocker.get('blocked_reference'),
+                 'resolved_reference': deepcopy(reference)}
+        self.history.append(event)
+        return {'status': 'PASS', 'phase': self.phase, 'recovered_operation': operation}
 
     def _guard(self, name):
         guard = self.guards.get(str(self.phase) + ':' + name)
@@ -187,6 +238,12 @@ class WorkflowController:
                     )
                 }
             }
+        if operation == 'sdd_manager.inspect':
+            arguments['phase'] = self.phase
+            if self.phase >= 5:
+                arguments['validate'] = True
+            if self.phase in (7, 8, 13):
+                arguments['require_completed'] = True
 
         if operation == 'verification_runner.run_checks':
             if arguments.get('phase', 7) != self.phase:
@@ -216,8 +273,12 @@ class WorkflowController:
             self.blockers[operation] = {'phase': self.phase, 'status': 'ERROR', 'error': str(error)}
             self.history.append({'phase': self.phase, 'operation': operation, 'status': 'ERROR', 'error': str(error)})
             raise
-        primary = next(iter(result.values()))
+        primary_key = next(iter(result))
+        primary = result[primary_key]
         status = primary.get('status')
+        reference = None
+        if status not in ('PASS', 'complete') or self.blockers.get(operation):
+            reference = self.evidence.reference(primary_key)
         if operation == 'git_policy.create_commit':
             if primary.get('commit_created') is True:
                 self.commit_created = True
@@ -226,9 +287,12 @@ class WorkflowController:
         self.history.append({'phase': self.phase, 'operation': operation, 'status': status})
         if status not in ('PASS', 'complete'):
             self.status = 'BLOCKED'
-            self.blockers[operation] = {'phase': self.phase, 'status': status}
+            self.blockers[operation] = {'phase': self.phase, 'status': status,
+                                        'blocked_reference': reference}
         else:
-            self.blockers.pop(operation, None)
+            blocker = self.blockers.get(operation)
+            if blocker and blocker.get('phase') == self.phase:
+                blocker['resolved_reference'] = reference
             if operation in COMMIT_STEPS:
                 self.commit_step += 1
         return result
@@ -325,8 +389,20 @@ class WorkflowController:
                 implemented = self.evidence.get('implementation_evidence')['payload']
                 sdd = self.evidence.get('sdd_validation_evidence')['payload']
                 tasks = sdd['snapshot']['directories'][0]['files']['tasks.md']['tasks']
-                if implemented.get('tasks_completed') is not True or not tasks or any(t['status'] != 'completed' for t in tasks):
-                    raise EvidenceError('Implementation/tasks are not complete')
+                implementation_tasks = [task for task in tasks if task.get('phase', 6) == 6]
+                if (implemented.get('implementation_tasks_completed') is not True
+                        or not implementation_tasks
+                        or any(task['status'] != 'completed' for task in implementation_tasks)):
+                    raise EvidenceError('Implementation tasks are not complete')
+            if self.phase in (7, 8):
+                sdd = self.evidence.get('sdd_validation_evidence')['payload']
+                tasks = sdd['snapshot']['directories'][0]['files']['tasks.md']['tasks']
+                verification = self.evidence.get('verification_evidence')['payload']
+                if (verification.get('implementation_tasks_completed') is not True
+                        or verification.get('tasks_completed') is not True
+                        or not tasks
+                        or any(task['status'] != 'completed' for task in tasks)):
+                    raise EvidenceError('Verification tasks are not complete')
             if self.phase == 8 and self.repair_cycle < 1:
                 raise EvidenceError('Repair has not been explicitly authorized')
             if self.phase == 10 and self.commit_step != len(COMMIT_STEPS):
@@ -368,6 +444,7 @@ def perform(controller, action):
         'enter_repair',
         'export_static',
         'revisit_phase',
+        'recover',
     }
 
     if operation not in allowed:

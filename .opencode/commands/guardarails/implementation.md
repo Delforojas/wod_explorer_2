@@ -8,6 +8,11 @@ Debe mantenerse la trazabilidad:
 
 `GitHub Issue → spec.md → plan.md → tasks.md → implementación`
 
+Las pruebas específicas de la implementación pueden ejecutarse en esta fase;
+la selección y evaluación de verificaciones integrales pertenece a la fase 7.
+Un fallo integral observado aquí no se declara `PASS` ni se oculta: se conserva
+para la ruta de verificación y waiver aplicable.
+
 ## Condiciones para continuar
 
 El guardrail se considera superado mientras:

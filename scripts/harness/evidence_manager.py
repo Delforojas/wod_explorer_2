@@ -30,6 +30,9 @@ STATIC_FIELDS = {
     'context_item': {'path', 'sha256', 'revision', 'applicability', 'reason'},
     'sdd_refs': {'folder', 'files', 'revisions'},
     'verification_history': {'checks', 'source_fingerprint', 'content_sha256', 'logs', 'results'},
+    'preexisting_failure_waiver': {'verification_sha256', 'check_id', 'diagnostic_sha256',
+                                   'base_sha', 'branch_sha', 'diff_sha256', 'base_reproduction',
+                                   'branch_reproduction', 'approved_by', 'reason', 'expires_at'},
     'accepted_commit': {'sha', 'message', 'branch', 'base_sha', 'commits', 'manifest'},
     'canonical_base': {'policy', 'base_branch', 'base_ref', 'base_remote_ref', 'base_sha',
                        'pr_target', 'pr_target_ref', 'base_remote_sha_initial', 'pr_target_sha_initial',
@@ -169,6 +172,13 @@ class EvidenceManager:
                 if previous:
                     data = {**previous['payload'], **data}
                 self._base_sha = sha
+            if kind == 'preexisting_failure_waiver':
+                required = STATIC_FIELDS[kind]
+                if set(data) != required or not all(data.values()):
+                    raise EvidenceError('Preexisting-failure waiver is incomplete')
+                expiry = datetime.fromisoformat(data['expires_at'])
+                if expiry.tzinfo is None:
+                    raise EvidenceError('Preexisting-failure waiver expiry requires a timezone')
         store = self.static if category == 'static' else self.mutable
         # A byte-identical valid observation is reused, without minting a new version.
         previous = store.get(key)

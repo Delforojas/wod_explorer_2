@@ -1,7 +1,9 @@
 # Verification Runner — fases 7 y 8
 
 Operaciones: `discover` (auxiliar, solo lectura) y `run` (ejecución controlada).
-El workflow determina la aplicabilidad y completa las tasks antes de ejecutar.
+El workflow determina la aplicabilidad. En fase 7 ejecuta las verificaciones
+después de completar las tareas de implementación; las tareas `[phase:7]` se
+completan solo después de que el resultado y sus diagnósticos sean revisados.
 El runner no decide alcance, no repara código ni aplica el Verification Guard.
 
 ## Catálogo
@@ -81,13 +83,17 @@ checks: <lista ordenada exacta de --checks>
 applicable_checks: <inventario completo aprobado>
 catalog_sha256: <verification_catalog.catalog_sha256>
 source_fingerprint: <verification_catalog.source_fingerprint.sha256>
-tasks_completed: true
+implementation_tasks_completed: true
+tasks_completed: false | true
 applicability_complete: true
 rerun_reason: <obligatorio en fase 8>
 ```
 
-El workflow conserva la procedencia de estas decisiones: los hashes no son
-firmas ni sustituyen la aprobación de aplicabilidad o terminación real de tasks.
+`implementation_tasks_completed` certifica exclusivamente las tareas sin
+anotación (fase 6). `tasks_completed` puede ser `false` al iniciar la fase 7 y
+solo pasa a `true` tras completar las tareas `[phase:7]` y revalidar el SDD. El
+workflow conserva la procedencia de estas decisiones: los hashes no son firmas
+ni sustituyen la aprobación de aplicabilidad o terminación real de tasks.
 Guarda recibos/registros temporales fuera del árbol fuente para no invalidar la
 huella que acaba de aprobar. Una selección vacía, duplicada, desconocida,
 incompleta, de otra sesión o desactualizada nunca ejecuta comandos.
@@ -166,3 +172,11 @@ controlados. El caso npm emplea un ejecutable simulado: no instala ni ejecuta
 checks reales de frontend/backend. Se verifican logs binarios completos,
 revisiones, fallos, timeouts, procesos hijos, detección de cambios y cobertura
 parcial. Los casos sin efectos esperados comparan todos los bytes del repositorio.
+# Fallos preexistentes
+
+Un resultado no cero siempre permanece como `FAIL`. Puede clasificarse como
+`PREEXISTING_FAILURE` únicamente fuera del runner, con una reproducción del
+mismo check sobre la base aprobada y la rama, el mismo comando y entorno,
+diagnóstico y diff comparables, y un waiver humano vigente que enlace la huella
+exacta de `verification_evidence`. El waiver no convierte el resultado en
+`PASS`, no cubre checks incompletos y caduca al cambiar la evidencia enlazada.
