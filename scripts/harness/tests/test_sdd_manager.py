@@ -157,6 +157,24 @@ class SDDManagerTests(unittest.TestCase):
         self.folder()
         self.assertEqual(self.call('validate', '--require-completed')['status'], 'BLOCK')
 
+    def test_phase7_task_is_classified_separately(self):
+        self.folder(tasks='- [x] Implement the feature\n- [ ] [phase:7] Run the official harness test\n')
+        e = self.call('validate')
+        tasks = e['snapshot']['directories'][0]['files']['tasks.md']['tasks']
+        self.assertEqual([task['phase'] for task in tasks], [6, 7])
+        self.assertEqual(tasks[1]['text'], 'Run the official harness test')
+        self.assertEqual(self.call('validate', '--require-completed')['status'], 'BLOCK')
+
+    def test_unknown_or_malformed_phase_annotation_blocks(self):
+        for annotation in ('[phase:8]', '[phase:7] [phase:7]', '[phase]', '[phase:07]', '[Phase:7]', '[phase :7]'):
+            with self.subTest(annotation=annotation):
+                self.folder(tasks=f'- [x] {annotation} Verify the result\n')
+                self.assertEqual(self.call('validate')['status'], 'BLOCK')
+                for folder in (self.repo / 'specs').iterdir():
+                    for file in folder.iterdir():
+                        file.unlink()
+                    folder.rmdir()
+
     def test_invalid_task_marker_blocks(self):
         self.folder(tasks='- [?] Unknown state\n')
         self.assertEqual(self.call('validate')['status'], 'BLOCK')

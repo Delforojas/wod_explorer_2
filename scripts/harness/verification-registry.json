@@ -1,0 +1,11 @@
+{
+  "checks": [
+    {
+      "id": "harness.test",
+      "command": ["./scripts/harness/run-harness-tests.sh"],
+      "cwd": ".",
+      "sources": ["scripts/harness/run-harness-tests.sh"],
+      "timeout_seconds": 900
+    }
+  ]
+}
