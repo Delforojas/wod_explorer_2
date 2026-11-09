@@ -19,6 +19,7 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import subprocess
 import sys
 
@@ -343,6 +344,99 @@ def protected_changes(
         })
 
     return protected
+
+
+ADOPTION_EXCLUDED_NAMES = {"opencode.json"}
+
+
+def canonical_digest(value: Any) -> str:
+    """Hash canonical JSON used to bind approval-chain records."""
+    return hashlib.sha256(json.dumps(
+        value, sort_keys=True, separators=(",", ":"),
+        ensure_ascii=True,
+    ).encode()).hexdigest()
+
+
+def adoption_path_allowed(path: str) -> bool:
+    """Keep generated and harness-sensitive paths outside adoption by default."""
+    parts = Path(path).parts
+    return (
+        bool(path)
+        and not Path(path).is_absolute()
+        and not any(part in ("", ".", "..", ".git", "__pycache__", "audit") for part in parts)
+        and not path.endswith(".pyc")
+        and Path(path).name not in ADOPTION_EXCLUDED_NAMES
+    )
+
+
+def file_mode_and_sha(root: Path, path: str) -> tuple[str, str | None]:
+    """Return whole-file Git mode and content digest without following escapes."""
+    file = root / path
+    if not file.parent.resolve().is_relative_to(root):
+        raise GitError("Adoption path escapes repository")
+    if not file.exists() and not file.is_symlink():
+        return "0", None
+    if file.is_symlink():
+        data = os.fsencode(os.readlink(file))
+        return "120000", hashlib.sha256(data).hexdigest()
+    if not file.is_file():
+        raise GitError("Adoption requires a complete file, not a directory")
+    data = file.read_bytes()
+    mode = "100755" if file.stat().st_mode & 0o111 else "100644"
+    return mode, hashlib.sha256(data).hexdigest()
+
+
+def complete_path_diff(root: Path, path: str) -> bytes:
+    """Fingerprint the complete net patch for one path, including untracked files."""
+    file = root / path
+    if file.exists() or file.is_symlink():
+        tracked = run_git("-C", str(root), "ls-files", "--error-unmatch", "--", path, check=False)
+        if tracked.returncode != 0:
+            result = run_git("-C", str(root), "diff", "--no-index", "--binary", "--full-index",
+                             "--no-ext-diff", "--no-textconv", "--", "/dev/null", path, check=False)
+            if result.returncode not in (0, 1):
+                raise GitError(decode(result.stderr).strip())
+            return result.stdout
+    return run_git("-C", str(root), "diff", "HEAD", "--binary", "--full-index",
+                   "--no-ext-diff", "--no-textconv", "--no-relative", "--", path).stdout
+
+
+def verify_external_adoption_receipt(authorization: dict[str, Any]) -> dict[str, Any]:
+    """Ask a configured trust boundary to verify human authorization provenance.
+
+    The harness never mints receipts. The verifier receives the exact canonical
+    authorization object on stdin and must bind its response to that digest.
+    """
+    command = os.environ.get("HYSSUE_ADOPTION_VERIFIER")
+    if not command:
+        raise GitError("No external adoption verifier is configured")
+    raw = json.dumps(authorization, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+    try:
+        process = subprocess.run(shlex.split(command), input=raw, capture_output=True, timeout=20)
+    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+        raise GitError(f"External adoption verifier failed: {error}") from error
+    if process.returncode:
+        raise GitError("External adoption verifier rejected the receipt")
+    try:
+        receipt = json.loads(decode(process.stdout))
+    except ValueError as error:
+        raise GitError("External adoption verifier returned invalid JSON") from error
+    required = {"verified", "issuer", "subject", "issued_at", "expires_at", "authorization_sha256"}
+    if not isinstance(receipt, dict) or set(receipt) != required or receipt.get("verified") is not True:
+        raise GitError("External adoption receipt is incomplete")
+    if not all(isinstance(receipt[field], str) and receipt[field].strip()
+               for field in ("issuer", "subject", "issued_at", "expires_at", "authorization_sha256")):
+        raise GitError("External adoption receipt lacks identity or provenance")
+    try:
+        expires = datetime.fromisoformat(receipt["expires_at"])
+        issued = datetime.fromisoformat(receipt["issued_at"])
+    except ValueError as error:
+        raise GitError("External adoption receipt has invalid timestamps") from error
+    if issued.tzinfo is None or expires.tzinfo is None or issued > expires or expires <= datetime.now(timezone.utc):
+        raise GitError("External adoption receipt is expired or temporally invalid")
+    if receipt["authorization_sha256"] != hashlib.sha256(raw).hexdigest():
+        raise GitError("External adoption receipt does not bind this authorization")
+    return receipt
 
 
 @managed_operation
@@ -1807,7 +1901,119 @@ def review_changes(
 
 
 @managed_operation
-def prepare_staging(issue: int, evidence_path: str, approval_path: str) -> dict[str, Any]:
+def propose_preexisting_adoption(issue: int, evidence_path: str | dict[str, Any],
+                                 workflow_id: str) -> dict[str, Any]:
+    """Propose exact whole-file candidates; this never approves or writes Git."""
+    evidence = {
+        "source": "scripts/harness/git_policy.py propose-preexisting-adoption",
+        "phase": 9, "issue": issue, "workflow_id": workflow_id,
+        "observed_at": datetime.now(timezone.utc).isoformat(), "status": "BLOCK",
+        "candidates": [], "excluded": [], "errors": [],
+        "invalidated_by": ["file-edit-create-delete-rename", "staging-change",
+                           "branch-head-history-change", "issue-scope-decision-context-change"],
+    }
+    try:
+        prior = read_json(evidence_path)["pre_stage_evidence"]
+        root = Path(git_text("rev-parse", "--show-toplevel")).resolve()
+        if (prior.get("status") != "PASS" or prior.get("collection_status") != "complete"
+                or prior.get("issue") != issue or prior.get("repository", {}).get("root") != str(root)):
+            raise GitError("A current complete pre-stage observation is required")
+        baseline = prior.get("baseline")
+        if not isinstance(baseline, dict) or baseline.get("status") != "complete":
+            raise GitError("A complete historical baseline is required")
+        evidence.update(repository=str(root), branch=prior["branch"], head_sha=prior["head_sha"],
+                        pre_stage_evidence_sha256=canonical_digest(prior),
+                        baseline_sha256=canonical_digest(baseline))
+        for item in prior["protected_paths"]:
+            if item.get("provenance") != "preexisting-path":
+                continue
+            path = item.get("path")
+            if not isinstance(path, str) or not adoption_path_allowed(path):
+                evidence["excluded"].append({"path": path, "reason": "default-exclusion"})
+                continue
+            mode, content_sha256 = file_mode_and_sha(root, path)
+            evidence["candidates"].append({
+                "path": path, "mode": mode, "content_sha256": content_sha256,
+                "diff_sha256": hashlib.sha256(complete_path_diff(root, path)).hexdigest(),
+                "baseline_sha256": evidence["baseline_sha256"], "git_status": {
+                    "index_status": item.get("index_status"), "worktree_status": item.get("worktree_status"),
+                    "original_path": item.get("original_path"),
+                }, "classification": "preexisting-path",
+            })
+        evidence["status"] = "PASS"
+    except (GitError, OSError, ValueError, KeyError, TypeError) as error:
+        evidence["errors"].append(str(error))
+    return {"preexisting_adoption_proposal": evidence}
+
+
+@managed_operation
+def validate_preexisting_adoption(issue: int, workflow_id: str,
+                                  evidence_path: str | dict[str, Any],
+                                  proposal_path: str | dict[str, Any],
+                                  authorization_path: str | dict[str, Any]) -> dict[str, Any]:
+    """Validate externally verified, exact-file human adoption authorization."""
+    result = {
+        "source": "scripts/harness/git_policy.py validate-preexisting-adoption",
+        "phase": 9, "issue": issue, "workflow_id": workflow_id,
+        "observed_at": datetime.now(timezone.utc).isoformat(), "status": "BLOCK",
+        "adopted_paths": [], "errors": [],
+        "invalidated_by": ["file-edit-create-delete-rename", "staging-change",
+                           "branch-head-history-change", "issue-scope-decision-context-change"],
+    }
+    try:
+        prior = read_json(evidence_path)["pre_stage_evidence"]
+        proposal = read_json(proposal_path)["preexisting_adoption_proposal"]
+        authorization = read_json(authorization_path)
+        root = Path(git_text("rev-parse", "--show-toplevel")).resolve()
+        if (prior.get("status") != "PASS" or prior.get("collection_status") != "complete"
+                or proposal.get("status") != "PASS" or prior.get("issue") != issue
+                or proposal.get("issue") != issue or proposal.get("workflow_id") != workflow_id
+                or proposal.get("repository") != str(root)):
+            raise GitError("Pre-stage evidence or proposal belongs to another session")
+        current = review_changes(issue, *(prior["sdd"][name]["path"] for name in ("spec", "plan", "tasks")),
+                                 prior["source"].get("baseline"))["pre_stage_evidence"]
+        for field in ("status", "collection_status", "repository", "branch", "head_sha",
+                      "git_state", "sdd", "protected_paths", "baseline"):
+            if current.get(field) != prior.get(field):
+                raise GitError(f"Pre-stage evidence has been invalidated: {field}")
+        required = {"issue", "workflow_id", "repository", "branch", "head_sha", "baseline_sha256",
+                    "pre_stage_evidence_sha256", "manifest"}
+        if not isinstance(authorization, dict) or set(authorization) != required:
+            raise GitError("Authorization must be an exact adoption manifest")
+        if (authorization["issue"] != issue or authorization["workflow_id"] != workflow_id
+                or authorization["repository"] != str(root) or authorization["branch"] != prior["branch"]
+                or authorization["head_sha"] != prior["head_sha"]
+                or authorization["baseline_sha256"] != proposal["baseline_sha256"]
+                or authorization["pre_stage_evidence_sha256"] != proposal["pre_stage_evidence_sha256"]):
+            raise GitError("Authorization identity does not match the current review")
+        receipt = verify_external_adoption_receipt(authorization)
+        proposed = {item["path"]: item for item in proposal["candidates"]}
+        manifest = authorization["manifest"]
+        if not isinstance(manifest, list) or not manifest:
+            raise GitError("Authorization manifest must list exact whole files")
+        for entry in manifest:
+            if (not isinstance(entry, dict) or set(entry) != {"path", "mode", "content_sha256", "diff_sha256", "justification"}
+                    or not isinstance(entry.get("justification"), str) or not entry["justification"].strip()
+                    or entry.get("path") not in proposed or not adoption_path_allowed(entry["path"])):
+                raise GitError("Authorization contains an invalid, unproposed or excluded path")
+            candidate = proposed[entry["path"]]
+            if any(entry[field] != candidate[field] for field in ("mode", "content_sha256", "diff_sha256")):
+                raise GitError("Authorization hashes do not match the whole-file proposal")
+            result["adopted_paths"].append({**candidate, "justification": entry["justification"]})
+        if len({entry["path"] for entry in manifest}) != len(manifest):
+            raise GitError("Authorization manifest contains duplicate paths")
+        result.update(status="PASS", repository=str(root), branch=prior["branch"], head_sha=prior["head_sha"],
+                      baseline_sha256=proposal["baseline_sha256"],
+                      pre_stage_evidence_sha256=proposal["pre_stage_evidence_sha256"], receipt=receipt,
+                      authorization_sha256=canonical_digest(authorization), authorization=authorization)
+    except (GitError, OSError, ValueError, KeyError, TypeError) as error:
+        result["errors"].append(str(error))
+    return {"preexisting_adoption_evidence": result}
+
+
+@managed_operation
+def prepare_staging(issue: int, evidence_path: str, approval_path: str,
+                    adoption_path: str | dict[str, Any] | None = None) -> dict[str, Any]:
     """Stage whole files using an explicit change-review approval.
 
     Approval JSON: {status: PASS, issue, evidence_sha256, manifest: [
@@ -1845,21 +2051,39 @@ def prepare_staging(issue: int, evidence_path: str, approval_path: str) -> dict[
         if not isinstance(manifest, list) or not manifest:
             raise GitError("A nonempty whole-file manifest is required")
         entries = {}
+        adopted = {}
+        if adoption_path is not None:
+            adoption = read_json(adoption_path)["preexisting_adoption_evidence"]
+            if (adoption.get("status") != "PASS" or adoption.get("issue") != issue
+                    or adoption.get("repository") != str(root)
+                    or adoption.get("branch") != prior["branch"] or adoption.get("head_sha") != prior["head_sha"]
+                    or adoption.get("pre_stage_evidence_sha256") != digest):
+                raise GitError("Preexisting adoption evidence does not match current staging review")
+            # The receipt is checked again immediately before publishing the private index.
+            receipt = verify_external_adoption_receipt(adoption.get("authorization", {}))
+            if receipt != adoption.get("receipt"):
+                raise GitError("Preexisting adoption provenance changed")
+            adopted = {entry["path"]: entry for entry in adoption.get("adopted_paths", [])}
         protected = {p for c in prior["protected_paths"]
-                     if c.get("special_protection") or c.get("provenance") != "unknown"
-                     for p in (c.get("path"), c.get("original_path")) if p}
+                      if c.get("special_protection") or c.get("provenance") != "unknown"
+                      for p in (c.get("path"), c.get("original_path")) if p}
         changed = {p for c in prior["git_state"]["changes"]
                    for p in (c["path"], c["original_path"]) if p}
         for entry in manifest:
             path = entry["path"]
             if (not isinstance(path, str) or not path or "\0" in path
                     or Path(path).is_absolute() or any(x.lower() in ("", ".", "..", ".git") for x in path.split("/"))
-                    or path in entries or path not in changed or path in protected
+                    or path in entries or path not in changed or (path in protected and path not in adopted)
                     or Path(path).name == "opencode.json"):
                 raise GitError(f"Invalid, protected or duplicate manifest path: {path!r}")
             if entry["mode"] not in ("0", "100644", "100755", "120000"):
                 raise GitError("Only regular files, symlinks and deletions are supported")
             entries[path] = entry
+            if path in adopted:
+                adopted_entry = adopted[path]
+                if (entry.get("mode") != adopted_entry.get("mode")
+                        or entry.get("sha256") != adopted_entry.get("content_sha256")):
+                    raise GitError("Staging manifest differs from the adopted whole file")
         for c in prior["git_state"]["changes"]:
             if c["original_path"] and ({c["path"], c["original_path"]} & entries.keys()):
                 if not {c["path"], c["original_path"]} <= entries.keys():
@@ -1899,6 +2123,12 @@ def prepare_staging(issue: int, evidence_path: str, approval_path: str) -> dict[
                 if mode != entry["mode"] or hashlib.sha256(data).hexdigest() != entry["sha256"]:
                     raise GitError(f"Approved content changed: {path}")
                 payloads[path] = data
+            if path in adopted:
+                current_diff = hashlib.sha256(complete_path_diff(root, path)).hexdigest()
+                if (entry["mode"] != adopted[path]["mode"]
+                        or entry["sha256"] != adopted[path]["content_sha256"]
+                        or current_diff != adopted[path]["diff_sha256"]):
+                    raise GitError("Adopted file changed after human authorization")
             if path in staged_paths:
                 existing = run_git("-C", str(root), "ls-files", "--stage", "-z", "--", ":(literal)" + path).stdout
                 if payloads[path] is None:
@@ -3002,10 +3232,27 @@ def main() -> int:
     review_parser.add_argument("--baseline-json", default=None,
                                help="Previously collected phase-3 inspect JSON")
 
+    proposal_parser = operations.add_parser(
+        "propose-preexisting-adoption", help="Read-only proposal for protected preexisting files"
+    )
+    proposal_parser.add_argument("--issue", type=int, required=True)
+    proposal_parser.add_argument("--evidence-json", required=True)
+    proposal_parser.add_argument("--workflow-id", required=True)
+
+    adoption_parser = operations.add_parser(
+        "validate-preexisting-adoption", help="Validate externally verified exact-file adoption"
+    )
+    adoption_parser.add_argument("--issue", type=int, required=True)
+    adoption_parser.add_argument("--workflow-id", required=True)
+    adoption_parser.add_argument("--evidence-json", required=True)
+    adoption_parser.add_argument("--proposal-json", required=True)
+    adoption_parser.add_argument("--authorization-json", required=True)
+
     staging_parser = operations.add_parser("prepare-staging", help="Stage an explicitly approved whole-file manifest")
     staging_parser.add_argument("--issue", type=int, required=True)
     staging_parser.add_argument("--evidence-json", required=True)
     staging_parser.add_argument("--approval-json", required=True)
+    staging_parser.add_argument("--adoption-json", default=None)
 
     precommit_parser = operations.add_parser("pre-commit-check", help="Read-only final commit readiness check")
     precommit_parser.add_argument("--issue", type=int, required=True)
@@ -3113,8 +3360,21 @@ def main() -> int:
         print(json.dumps(result, ensure_ascii=True, indent=2))
         return 0 if result["pre_stage_evidence"]["status"] == "PASS" else 1
 
+    if arguments.operation == "propose-preexisting-adoption":
+        result = propose_preexisting_adoption(arguments.issue, arguments.evidence_json, arguments.workflow_id)
+        print(json.dumps(result, ensure_ascii=True, indent=2))
+        return 0 if result["preexisting_adoption_proposal"]["status"] == "PASS" else 1
+
+    if arguments.operation == "validate-preexisting-adoption":
+        result = validate_preexisting_adoption(arguments.issue, arguments.workflow_id,
+                                               arguments.evidence_json, arguments.proposal_json,
+                                               arguments.authorization_json)
+        print(json.dumps(result, ensure_ascii=True, indent=2))
+        return 0 if result["preexisting_adoption_evidence"]["status"] == "PASS" else 1
+
     if arguments.operation == "prepare-staging":
-        result = prepare_staging(arguments.issue, arguments.evidence_json, arguments.approval_json)
+        result = prepare_staging(arguments.issue, arguments.evidence_json, arguments.approval_json,
+                                 arguments.adoption_json)
         print(json.dumps(result, ensure_ascii=True, indent=2))
         return 0 if result["staging_preparation_evidence"]["status"] == "PASS" else 1
 
@@ -3157,4 +3417,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
