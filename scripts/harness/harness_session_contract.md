@@ -11,7 +11,41 @@ Una sesión está identificada por Issue, repositorio y `workflow_id`. El ID deb
 ser único para la ejecución. Los registros guardan fuente, fase, estado, hora,
 versión, hash, dependencias, rutas y condiciones de invalidación. El manager no
 hace consultas Git/GitHub ni escribe archivos de evidencia. La sesión desaparece
-al terminar su proceso.
+al terminar su proceso si no existe un snapshot autorizado.
+
+## Persistencia y reinicio
+
+El MCP puede crear un snapshot explícito mediante `harness_snapshot`. Requiere
+que el proceso reciba `HARNESS_SNAPSHOT_HMAC_KEY` desde una fuente protegida
+externa al repositorio; debe contener al menos 32 bytes y nunca se escribe ni se
+deriva automáticamente. El archivo se guarda en `.harness-snapshots/` bajo la
+raíz del repositorio, con directorio `0700`, archivo `0600`, escritura temporal
+seguida de reemplazo atómico y autenticación HMAC-SHA-256 del payload canónico.
+Cada snapshot tiene un identificador hexadecimal único y la retención conserva
+los cinco más recientes de esa sesión, sin eliminar snapshots de otras sesiones.
+
+El snapshot contiene el estado completo del controlador y del ledger, pero se
+rechaza si incluye campos sensibles conocidos (`secret`, `token`, `password`,
+`authorization`, `cookie` o `credential`). No sustituye `export_static`, que
+sigue siendo solo un resumen histórico.
+
+Después de detener o reiniciar el proceso MCP, `harness_restore(issue,
+workflow_id, snapshot_id)` puede restaurar solamente el snapshot explícitamente
+seleccionado para esa identidad. La restauración requiere que no haya una sesión
+activa y verifica esquema, HMAC, identidad, permisos, runtime y contexto Git
+(HEAD, rama y manifiesto de estado), además de la estructura completa del
+ledger, eventos, versiones, referencias de guard y su historia. Un snapshot
+rechazado nunca instala ni altera una sesión. `SNAPSHOT_WRITTEN` forma parte del
+estado persistido. Una restauración válida conserva el historial, añade un evento
+`RESTORED`, invalida todas las observaciones mutables y elimina aprobaciones de
+guards activas; las fases, gates y bloqueadores se deben revalidar oficialmente.
+
+Al cargar el MCP se calcula un fingerprint de los módulos relevantes del harness.
+`harness_status` expone el fingerprint cargado, el observado en disco y su
+coincidencia. Cuando difieren, se bloquean las operaciones mutables, incluidas
+las que generarían nueva evidencia; permanecen disponibles diagnóstico,
+`snapshot()` y `export_static` para salida segura. Reiniciar el MCP con el código
+vigente es necesario antes de continuar operaciones mutables.
 
 - `static`: identidad/alcance aprobados, decisiones, dependencias, referencias de
   contexto/SDD, verificaciones históricas y commit/rango aceptados.
