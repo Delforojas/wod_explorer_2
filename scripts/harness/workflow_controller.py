@@ -242,7 +242,7 @@ class WorkflowController:
             arguments['phase'] = self.phase
             if self.phase >= 5:
                 arguments['validate'] = True
-            if self.phase in (7, 8, 13):
+            if self.phase in (8, 13):
                 arguments['require_completed'] = True
 
         if operation == 'verification_runner.run_checks':

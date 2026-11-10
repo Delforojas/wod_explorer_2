@@ -200,6 +200,35 @@ class WorkflowControllerTests(unittest.TestCase):
         self.guard()
         self.assertEqual(self.c.advance()['status'], 'BLOCK')
 
+    def test_phase7_inspection_allows_pending_verification_task(self):
+        self.c.phase = 7
+        snapshot = {'directories': [{'files': {'tasks.md': {'tasks': [
+            {'status': 'completed', 'phase': 6}, {'status': 'pending', 'phase': 7}]}}}]}
+        self.record('sdd_validation_evidence', snapshot=snapshot)
+        observed = {}
+
+        @managed_operation
+        def inspect(issue, phase, validate, require_completed=False):
+            observed.update(phase=phase, validate=validate,
+                            require_completed=require_completed)
+            return {'sdd_validation_evidence': self.payload(
+                snapshot=snapshot,
+            )}
+
+        with patch('workflow_controller.importlib.import_module',
+                   return_value=SimpleNamespace(inspect=inspect)), chdir(self.repo):
+            self.c.invoke('sdd_manager.inspect', {'issue': 75})
+
+        self.assertEqual(observed, {
+            'phase': 7,
+            'validate': True,
+            'require_completed': False,
+        })
+        self.record('verification_evidence', implementation_tasks_completed=True,
+                    tasks_completed=False)
+        self.guard()
+        self.assertEqual(self.c.advance()['status'], 'BLOCK')
+
     def test_guard_can_be_replaced_only_with_current_evidence(self):
         self.c.phase = 1
         ref = self.record('github_issue_observation')
