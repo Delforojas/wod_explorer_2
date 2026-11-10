@@ -80,6 +80,120 @@ class WorkflowController:
                 'manual_validation': 'pending', 'finish_issue': 'not_executed_by_controller'},
                 **self.evidence.snapshot()}
 
+    def persistent_state(self):
+        """Serialize controller state for the authenticated snapshot layer."""
+        return {
+            'phase': self.phase,
+            'status': self.status,
+            'guards': deepcopy(self.guards),
+            'guard_history': deepcopy(self.guard_history),
+            'history': deepcopy(self.history),
+            'commit_step': self.commit_step,
+            'commit_created': self.commit_created,
+            'commit_outcome_unknown': self.commit_outcome_unknown,
+            'repair_cycle': self.repair_cycle,
+            'forbidden_action': self.forbidden_action,
+            'handed_off': self.handed_off,
+            'blockers': deepcopy(self.blockers),
+            'evidence': self.evidence.persistent_state(),
+        }
+
+    @classmethod
+    def from_persistent_state(cls, state):
+        """Restore a controller without granting freshness to old observations."""
+        required = {'phase', 'status', 'guards', 'guard_history', 'history',
+                    'commit_step', 'commit_created', 'commit_outcome_unknown',
+                    'repair_cycle', 'forbidden_action', 'handed_off', 'blockers',
+                    'evidence'}
+        if not isinstance(state, dict) or set(state) != required:
+            raise EvidenceError('Invalid persisted controller schema')
+        evidence = EvidenceManager.from_persistent_state(state['evidence'])
+        controller = cls.__new__(cls)
+        controller.evidence = evidence
+        controller.phase = state['phase']
+        controller.status = state['status']
+        controller.guards = deepcopy(state['guards'])
+        controller.guard_history = deepcopy(state['guard_history'])
+        controller.history = deepcopy(state['history'])
+        controller.commit_step = state['commit_step']
+        controller.commit_created = state['commit_created']
+        controller.commit_outcome_unknown = state['commit_outcome_unknown']
+        controller.repair_cycle = state['repair_cycle']
+        controller.forbidden_action = state['forbidden_action']
+        controller.handed_off = state['handed_off']
+        controller.blockers = deepcopy(state['blockers'])
+        if (not isinstance(controller.phase, int) or controller.phase < 0 or controller.phase > 15
+                or controller.status not in ('RUNNING', 'BLOCKED', 'AWAITING_MANUAL_VALIDATION')
+                or not isinstance(controller.guards, dict) or not isinstance(controller.guard_history, list)
+                or not isinstance(controller.history, list) or not isinstance(controller.blockers, dict)
+                or not isinstance(controller.commit_step, int) or controller.commit_step < 0
+                or not isinstance(controller.repair_cycle, int) or controller.repair_cycle < 0
+                or not all(isinstance(value, bool) for value in (
+                    controller.commit_created, controller.commit_outcome_unknown,
+                    controller.forbidden_action, controller.handed_off))):
+            raise EvidenceError('Persisted controller state is invalid')
+
+        references = {}
+        for category, records in (('static', evidence.static), ('mutable', evidence.mutable)):
+            for key, entry in records.items():
+                references[(category, key, entry['version'], entry['sha256'])] = entry
+        for version_key, records in evidence.superseded.items():
+            category, key = version_key.split(':', 1)
+            for entry in records:
+                references[(category, key, entry['version'], entry['sha256'])] = entry
+
+        def validate_reference(reference):
+            fields = {'key', 'category', 'version', 'sha256', 'issue', 'repository', 'workflow_id'}
+            if not isinstance(reference, dict) or set(reference) != fields:
+                raise EvidenceError('Persisted guard reference is malformed')
+            if (reference['issue'] != evidence.issue or reference['repository'] != evidence.repository
+                    or reference['workflow_id'] != evidence.workflow_id):
+                raise EvidenceError('Persisted guard reference has another session identity')
+            identity = (reference['category'], reference['key'], reference['version'], reference['sha256'])
+            if identity not in references:
+                raise EvidenceError('Persisted guard reference does not match evidence')
+
+        def validate_guard(guard):
+            required_guard = {'name', 'status', 'source', 'reason', 'references', 'phase'}
+            if (not isinstance(guard, dict) or set(guard) != required_guard
+                    or guard['status'] not in ('PASS', 'BLOCK', 'FAIL', 'NEEDS_APPROVAL')
+                    or not isinstance(guard['phase'], int) or not isinstance(guard['name'], str)
+                    or not isinstance(guard['source'], str) or not isinstance(guard['reason'], str)
+                    or not isinstance(guard['references'], list)):
+                raise EvidenceError('Persisted guard is invalid')
+            for reference in guard['references']:
+                validate_reference(reference)
+
+        for key, guard in controller.guards.items():
+            validate_guard(guard)
+            if key != f"{guard['phase']}:{guard['name']}":
+                raise EvidenceError('Persisted guard key is invalid')
+        for item in controller.guard_history:
+            if not isinstance(item, dict) or 'key' not in item:
+                raise EvidenceError('Persisted guard history is invalid')
+            guard = {key: value for key, value in item.items() if key != 'key'}
+            validate_guard(guard)
+            if item['key'] != f"{guard['phase']}:{guard['name']}":
+                raise EvidenceError('Persisted guard history key is invalid')
+        for item in controller.history:
+            if not isinstance(item, dict) or not isinstance(item.get('phase'), int) or not item.get('status'):
+                raise EvidenceError('Persisted controller history is invalid')
+        for operation, blocker in controller.blockers.items():
+            if (not isinstance(operation, str) or not isinstance(blocker, dict)
+                    or not isinstance(blocker.get('phase'), int)
+                    or not isinstance(blocker.get('status'), str)):
+                raise EvidenceError('Persisted controller blocker is invalid')
+        return controller
+
+    def restored(self, source):
+        """Record the process boundary and require fresh mutable observations."""
+        affected = self.evidence.invalidate_mutable_for_restore(source)
+        self.history.append({'phase': self.phase, 'status': 'RESTORED',
+                             'source': source, 'invalidated': affected})
+        self.guards = {}
+        self.status = 'RUNNING' if not self.handed_off and not self.forbidden_action else 'BLOCKED'
+        return affected
+
     def record_external(self, key, payload, *, topics=None):
         if key not in EXTERNAL or payload.get('phase') != self.phase:
             raise EvidenceError('External evidence is not allowed for this phase/key')

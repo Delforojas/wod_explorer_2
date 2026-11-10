@@ -267,10 +267,159 @@ class EvidenceManager:
                             'observed_at': event_time, 'affected': affected})
         return affected
 
+    def invalidate_mutable_for_restore(self, source):
+        """Invalidate every mutable observation after a process boundary."""
+        if not source:
+            raise EvidenceError('A restoration source is required')
+        observed_at = timestamp()
+        affected = []
+        for key, entry in self.mutable.items():
+            if not entry['valid']:
+                continue
+            entry['valid'] = False
+            entry['invalidated_by'].append({
+                'event': 'session-restore',
+                'source': source,
+                'paths': [],
+                'observed_at': observed_at,
+            })
+            affected.append('mutable:' + key)
+        self.events.append({
+            'event': 'session-restore',
+            'source': source,
+            'paths': [],
+            'observed_at': observed_at,
+            'affected': affected,
+        })
+        return affected
+
     def snapshot(self):
         return {'issue_evidence': {'issue': self.issue, 'repository': self.repository,
                                   'workflow_id': self.workflow_id, 'static': deepcopy(self.static),
                                   'mutable': deepcopy(self.mutable), 'superseded': deepcopy(self.superseded), 'events': deepcopy(self.events)}}
+
+    def persistent_state(self):
+        """Return the complete ledger state for an authenticated snapshot."""
+        return {
+            'issue': self.issue,
+            'repository': self.repository,
+            'workflow_id': self.workflow_id,
+            'static': deepcopy(self.static),
+            'mutable': deepcopy(self.mutable),
+            'superseded': deepcopy(self.superseded),
+            'events': deepcopy(self.events),
+            'versions': deepcopy(self._versions),
+            'base_sha': self._base_sha,
+        }
+
+    @classmethod
+    def from_persistent_state(cls, state):
+        """Recreate a ledger only after validating its immutable envelopes."""
+        required = {'issue', 'repository', 'workflow_id', 'static', 'mutable',
+                    'superseded', 'events', 'versions', 'base_sha'}
+        if not isinstance(state, dict) or set(state) != required:
+            raise EvidenceError('Invalid persisted evidence schema')
+        manager = cls(state['issue'], state['repository'], state['workflow_id'])
+        for attribute in ('static', 'mutable', 'superseded', 'versions'):
+            value = state[attribute]
+            if not isinstance(value, dict):
+                raise EvidenceError('Invalid persisted evidence collection')
+        if not isinstance(state['events'], list):
+            raise EvidenceError('Invalid persisted evidence events')
+
+        entries = {}
+        versions = {}
+
+        def validate_entry(key, category, entry):
+            required_entry = {'key', 'category', 'kind', 'payload', 'source', 'phase', 'status',
+                              'observed_at', 'registered_at', 'version', 'sha256', 'valid',
+                              'verified', 'topics', 'paths', 'invalidated_by'}
+            if not isinstance(entry, dict) or not required_entry.issubset(entry):
+                raise EvidenceError('Persisted evidence record is incomplete')
+            if entry['key'] != key or entry['category'] != category:
+                raise EvidenceError('Persisted evidence identity is inconsistent')
+            if not isinstance(entry['payload'], dict) or entry['sha256'] != digest(entry['payload']):
+                raise EvidenceError('Persisted evidence digest is invalid')
+            if (not isinstance(entry['version'], int) or entry['version'] < 1
+                    or not isinstance(entry['phase'], int) or not isinstance(entry['status'], str)
+                    or not isinstance(entry['source'], str) or not entry['source']
+                    or not isinstance(entry['valid'], bool) or not isinstance(entry['verified'], bool)
+                    or not isinstance(entry['topics'], list) or not isinstance(entry['paths'], list)
+                    or not all(isinstance(topic, str) for topic in entry['topics'])
+                    or not all(isinstance(path, str) for path in entry['paths'])
+                    or not isinstance(entry['invalidated_by'], list)):
+                raise EvidenceError('Persisted evidence metadata is invalid')
+            try:
+                datetime.fromisoformat(entry['observed_at'])
+                datetime.fromisoformat(entry['registered_at'])
+            except (TypeError, ValueError) as error:
+                raise EvidenceError('Persisted evidence timestamp is invalid') from error
+            if category == 'static':
+                kind = entry['kind']
+                payload = entry['payload']
+                if kind not in STATIC_FIELDS or set(payload) - STATIC_FIELDS[kind]:
+                    raise EvidenceError('Persisted static evidence is invalid')
+                check_static_values(payload)
+            for invalidation in entry['invalidated_by']:
+                required_invalidation = {'event', 'source', 'paths', 'observed_at'}
+                if (not isinstance(invalidation, dict) or set(invalidation) != required_invalidation
+                        or not isinstance(invalidation['event'], str)
+                        or not isinstance(invalidation['source'], str)
+                        or not isinstance(invalidation['paths'], list)):
+                    raise EvidenceError('Persisted evidence invalidation is invalid')
+                try:
+                    datetime.fromisoformat(invalidation['observed_at'])
+                except (TypeError, ValueError) as error:
+                    raise EvidenceError('Persisted evidence invalidation timestamp is invalid') from error
+            identity = (category, key, entry['version'], entry['sha256'])
+            if identity in entries:
+                raise EvidenceError('Persisted evidence version is duplicated')
+            entries[identity] = entry
+            versions.setdefault(category + ':' + key, []).append(entry['version'])
+
+        for category, records in (('static', state['static']), ('mutable', state['mutable'])):
+            for key, entry in records.items():
+                validate_entry(key, category, entry)
+        for version_key, records in state['superseded'].items():
+            if not isinstance(version_key, str) or ':' not in version_key or not isinstance(records, list):
+                raise EvidenceError('Persisted superseded evidence is invalid')
+            category, key = version_key.split(':', 1)
+            if category not in ('static', 'mutable') or not key:
+                raise EvidenceError('Persisted superseded evidence identity is invalid')
+            for entry in records:
+                validate_entry(key, category, entry)
+
+        expected_version_keys = set(versions)
+        if set(state['versions']) != expected_version_keys:
+            raise EvidenceError('Persisted evidence version ledger is inconsistent')
+        for version_key, observed_versions in versions.items():
+            if state['versions'][version_key] != max(observed_versions):
+                raise EvidenceError('Persisted evidence version counter is inconsistent')
+        for event in state['events']:
+            required_event = {'event', 'source', 'paths', 'observed_at', 'affected'}
+            if (not isinstance(event, dict) or set(event) != required_event
+                    or not isinstance(event['event'], str) or not isinstance(event['source'], str)
+                    or not isinstance(event['paths'], list) or not isinstance(event['affected'], list)):
+                raise EvidenceError('Persisted evidence event is invalid')
+            try:
+                datetime.fromisoformat(event['observed_at'])
+            except (TypeError, ValueError) as error:
+                raise EvidenceError('Persisted evidence event timestamp is invalid') from error
+            for affected in event['affected']:
+                if not isinstance(affected, str) or affected not in versions:
+                    raise EvidenceError('Persisted evidence event target is invalid')
+
+        manager.static = deepcopy(state['static'])
+        manager.mutable = deepcopy(state['mutable'])
+        manager.superseded = deepcopy(state['superseded'])
+        manager.events = deepcopy(state['events'])
+        manager._versions = deepcopy(state['versions'])
+        manager._base_sha = state['base_sha']
+        if manager._base_sha is not None:
+            base = manager.static.get('canonical_base')
+            if not base or base.get('payload', {}).get('base_sha') != manager._base_sha:
+                raise EvidenceError('Persisted canonical base is inconsistent')
+        return manager
 
     def export_static(self, *, authorized=False):
         if authorized is not True or self.repository is None:
