@@ -11,41 +11,7 @@ Una sesión está identificada por Issue, repositorio y `workflow_id`. El ID deb
 ser único para la ejecución. Los registros guardan fuente, fase, estado, hora,
 versión, hash, dependencias, rutas y condiciones de invalidación. El manager no
 hace consultas Git/GitHub ni escribe archivos de evidencia. La sesión desaparece
-al terminar su proceso si no existe un snapshot autorizado.
-
-## Persistencia y reinicio
-
-El MCP puede crear un snapshot explícito mediante `harness_snapshot`. Requiere
-que el proceso reciba `HARNESS_SNAPSHOT_HMAC_KEY` desde una fuente protegida
-externa al repositorio; debe contener al menos 32 bytes y nunca se escribe ni se
-deriva automáticamente. El archivo se guarda en `.harness-snapshots/` bajo la
-raíz del repositorio, con directorio `0700`, archivo `0600`, escritura temporal
-seguida de reemplazo atómico y autenticación HMAC-SHA-256 del payload canónico.
-Cada snapshot tiene un identificador hexadecimal único y la retención conserva
-los cinco más recientes de esa sesión, sin eliminar snapshots de otras sesiones.
-
-El snapshot contiene el estado completo del controlador y del ledger, pero se
-rechaza si incluye campos sensibles conocidos (`secret`, `token`, `password`,
-`authorization`, `cookie` o `credential`). No sustituye `export_static`, que
-sigue siendo solo un resumen histórico.
-
-Después de detener o reiniciar el proceso MCP, `harness_restore(issue,
-workflow_id, snapshot_id)` puede restaurar solamente el snapshot explícitamente
-seleccionado para esa identidad. La restauración requiere que no haya una sesión
-activa y verifica esquema, HMAC, identidad, permisos, runtime y contexto Git
-(HEAD, rama y manifiesto de estado), además de la estructura completa del
-ledger, eventos, versiones, referencias de guard y su historia. Un snapshot
-rechazado nunca instala ni altera una sesión. `SNAPSHOT_WRITTEN` forma parte del
-estado persistido. Una restauración válida conserva el historial, añade un evento
-`RESTORED`, invalida todas las observaciones mutables y elimina aprobaciones de
-guards activas; las fases, gates y bloqueadores se deben revalidar oficialmente.
-
-Al cargar el MCP se calcula un fingerprint de los módulos relevantes del harness.
-`harness_status` expone el fingerprint cargado, el observado en disco y su
-coincidencia. Cuando difieren, se bloquean las operaciones mutables, incluidas
-las que generarían nueva evidencia; permanecen disponibles diagnóstico,
-`snapshot()` y `export_static` para salida segura. Reiniciar el MCP con el código
-vigente es necesario antes de continuar operaciones mutables.
+al terminar su proceso.
 
 - `static`: identidad/alcance aprobados, decisiones, dependencias, referencias de
   contexto/SDD, verificaciones históricas y commit/rango aceptados.
@@ -193,12 +159,6 @@ Operaciones del protocolo (argumentos dentro de `arguments`):
   esa fase se vuelven a exigir. Si ya existe un commit o su resultado es incierto,
   no permite volver a crear otro. Las fases posteriores al commit sí pueden
   revalidarse sin repetirlo.
-- `recover(operation)`: elimina el bloqueo técnico de una operación de la fase
-  activa solo después de que la misma operación se haya repetido oficialmente
-  con evidencia vigente `PASS` o `complete`. Conserva ambas evidencias y añade
-  un evento `RECOVERED`; no avanza de fase ni aprueba guardrails. Rechaza la
-  recuperación cuando queda otro bloqueo activo, una decisión de guard no
-  aprobada, una acción prohibida, un handoff cerrado o incertidumbre de commit.
 - `advance()`: comprueba las evidencias y el guardrail obligatorios de la fase;
   consume referencias exactas y avanza solo si todo pasa. Una operación local
   fallida debe resolverse con evidencia nueva, no con un `PASS` manual.
@@ -215,9 +175,9 @@ Operaciones del protocolo (argumentos dentro de `arguments`):
 | 3 | Política histórica completa + check-branch + Branch Guard |
 | 4 | Validación SDD + SDD Guard |
 | 5 | SDD vigente + Planning Guard |
-| 6 | Implementación completa + todas las tareas sin anotación (fase 6) completadas + Implementation Guard |
-| 7 | SDD revalidado, verificaciones completas y todas las tareas `[phase:7]` completadas + Verification Guard |
-| 8 | Repair Guard previo, reparación, SDD revalidado, verificaciones y todas las tareas obligatorias completadas + Verification Guard |
+| 6 | Implementación completa + tareas realmente completadas + Implementation Guard |
+| 7 | Verificaciones completas + Verification Guard |
+| 8 | Repair Guard previo, reparación y verificaciones + Verification Guard |
 | 9 | Única pre_stage_evidence + verificaciones vigentes + Change Review Guard |
 | 10 | prepare-staging → pre-commit-check → create-commit → check-commit + Commit Guard |
 | 11 | Única post_commit_evidence + Post-Commit Guard |
@@ -231,12 +191,6 @@ La fase 8 es condicional: sin fallos se registra `NOT_APPLICABLE`, nunca un
 presentan como observaciones actuales. Un guardrail posterior exige nuevamente
 las referencias que necesita y bloquea si han cambiado.
 
-Las tareas sin anotación pertenecen a fase 6. La única anotación admitida es
-`[phase:7]`; anotaciones desconocidas, repetidas o mal formadas bloquean la
-validación SDD. La evidencia distingue `implementation_tasks_completed` de
-`tasks_completed`: la segunda no puede declararse completa hasta que la tarea
-de verificación correspondiente y el SDD actualizado hayan sido revalidados.
-
 Tras la fase 15 el estado es `AWAITING_MANUAL_VALIDATION`. El controlador no
 reabre esa entrega aprobándose de nuevo un guardrail, no aprueba la validación
 manual, no ejecuta `/finish-issue`, no publica ni cierra la Issue.
@@ -245,10 +199,6 @@ Las decisiones semánticas y lecturas MCP siguen correspondiendo al workflow.
 El historial de este controlador solo contiene sus acciones observadas; no se
 puede presentar como auditoría completa de acciones externas para afirmar que
 no hubo push. El contrato de `final-check` sigue exigiendo esa evidencia fiable.
-
-Cada reevaluación de un guard conserva una entrada inmutable en
-`guard_history`, incluso cuando reemplaza la decisión activa del mismo guard.
-Las referencias y razones del `BLOCK` original no se eliminan.
 
 ## Pruebas y limitaciones conocidas
 

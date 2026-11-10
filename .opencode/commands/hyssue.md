@@ -99,7 +99,7 @@ times to reach a desired phase.
 
 Use `harness_call` for all supported controller operations,
 including `invoke`, `record_external`, `record_static`,
-`decide_guard`, `advance`, `notify`, `recover`, and `snapshot`.
+`decide_guard`, `advance`, `notify`, and `snapshot`.
 
 The controller invokes supported local functions and records
 their returned evidence through `evidence_manager.py`.

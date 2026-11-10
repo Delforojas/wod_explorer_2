@@ -64,8 +64,7 @@ class VerificationRunnerTests(unittest.TestCase):
                     'checks': checks, 'applicable_checks': applicable or checks,
                     'catalog_sha256': discovered['catalog_sha256'],
                     'source_fingerprint': discovered['source_fingerprint']['sha256'],
-                    'implementation_tasks_completed': True, 'tasks_completed': False,
-                    'applicability_complete': True, 'rerun_reason': 'Approved affected checks'}
+                    'tasks_completed': True, 'applicability_complete': True, 'rerun_reason': 'Approved affected checks'}
         self.selection.write_text(json.dumps(approval))
         return discovered, approval
 
@@ -248,10 +247,10 @@ class VerificationRunnerTests(unittest.TestCase):
         self.approve(['unit'])
         self.assertEqual(self.run_checks(['unit'])['status'], 'PASS')
 
-    def test_implementation_tasks_must_authorize_checks(self):
+    def test_unfinished_tasks_cannot_authorize_checks(self):
         self.add('unit', 'print("ok")\n')
         _, approval = self.approve(['unit'])
-        approval['implementation_tasks_completed'] = False
+        approval['tasks_completed'] = False
         self.selection.write_text(json.dumps(approval))
         self.assertEqual(self.run_checks(['unit'])['status'], 'INCOMPLETE')
 

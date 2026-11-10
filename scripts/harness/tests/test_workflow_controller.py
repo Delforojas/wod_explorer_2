@@ -34,12 +34,6 @@ class WorkflowControllerTests(unittest.TestCase):
     def record(self, key, status='PASS', **extra):
         if key in ('pre_stage_evidence', 'final_check_evidence') and 'verification_evidence' not in self.c.evidence.mutable:
             self.c.evidence.record('verification_evidence', self.payload('PASS'))
-        if key == 'verification_evidence' and self.c.phase in (7, 8):
-            if 'sdd_validation_evidence' not in self.c.evidence.mutable:
-                self.record('sdd_validation_evidence', snapshot={'directories': [{'files': {'tasks.md': {
-                    'tasks': [{'status': 'completed', 'phase': 6}, {'status': 'completed', 'phase': 7}]}}}]})
-            extra.setdefault('implementation_tasks_completed', True)
-            extra.setdefault('tasks_completed', True)
         return self.c.evidence.record(key, self.payload(status, **extra))
 
     def guard(self, name=None, status='PASS', references=None):
@@ -56,10 +50,9 @@ class WorkflowControllerTests(unittest.TestCase):
                         'pr_target_ref':'refs/heads/main','base_remote_sha_initial':'a'*40} if key == 'canonical_base' else {'path': 'AGENTS.md', 'sha256': 'a'}
                 self.c.record_static(key, data, 'canonical_base' if key == 'canonical_base' else 'context_item', 'approved context', observed_at=datetime.now(timezone.utc).isoformat())
             elif key == 'sdd_validation_evidence':
-                self.record(key, snapshot={'directories': [{'files': {'tasks.md': {'tasks': [
-                    {'status': 'completed', 'phase': 6}, {'status': 'completed', 'phase': 7}]}}}]})
+                self.record(key, snapshot={'directories': [{'files': {'tasks.md': {'tasks': [{'status': 'completed'}]}}}]})
             elif key == 'implementation_evidence':
-                self.record(key, implementation_tasks_completed=True, tasks_completed=False)
+                self.record(key, tasks_completed=True)
             elif key == 'manual_validation_plan':
                 self.record(key, manual_status='pending', checks=[{'status': 'pending'}])
             else:
@@ -186,46 +179,8 @@ class WorkflowControllerTests(unittest.TestCase):
 
     def test_incomplete_task_state_prevents_implementation_completion(self):
         self.c.phase = 6
-        self.record('implementation_evidence', implementation_tasks_completed=True, tasks_completed=False)
-        self.record('sdd_validation_evidence', snapshot={'directories': [{'files': {'tasks.md': {'tasks': [
-            {'status': 'completed', 'phase': 6}, {'status': 'pending', 'phase': 7}]}}}]})
-        self.guard()
-        self.assertEqual(self.c.advance()['phase'], 7)
-
-    def test_phase7_rejects_incomplete_verification_task(self):
-        self.c.phase = 7
-        self.record('sdd_validation_evidence', snapshot={'directories': [{'files': {'tasks.md': {'tasks': [
-            {'status': 'completed', 'phase': 6}, {'status': 'pending', 'phase': 7}]}}}]})
-        self.record('verification_evidence', implementation_tasks_completed=True, tasks_completed=False)
-        self.guard()
-        self.assertEqual(self.c.advance()['status'], 'BLOCK')
-
-    def test_phase7_inspection_allows_pending_verification_task(self):
-        self.c.phase = 7
-        snapshot = {'directories': [{'files': {'tasks.md': {'tasks': [
-            {'status': 'completed', 'phase': 6}, {'status': 'pending', 'phase': 7}]}}}]}
-        self.record('sdd_validation_evidence', snapshot=snapshot)
-        observed = {}
-
-        @managed_operation
-        def inspect(issue, phase, validate, require_completed=False):
-            observed.update(phase=phase, validate=validate,
-                            require_completed=require_completed)
-            return {'sdd_validation_evidence': self.payload(
-                snapshot=snapshot,
-            )}
-
-        with patch('workflow_controller.importlib.import_module',
-                   return_value=SimpleNamespace(inspect=inspect)), chdir(self.repo):
-            self.c.invoke('sdd_manager.inspect', {'issue': 75})
-
-        self.assertEqual(observed, {
-            'phase': 7,
-            'validate': True,
-            'require_completed': False,
-        })
-        self.record('verification_evidence', implementation_tasks_completed=True,
-                    tasks_completed=False)
+        self.record('implementation_evidence', tasks_completed=True)
+        self.record('sdd_validation_evidence', snapshot={'directories': [{'files': {'tasks.md': {'tasks': [{'status': 'pending'}]}}}]})
         self.guard()
         self.assertEqual(self.c.advance()['status'], 'BLOCK')
 
@@ -236,61 +191,6 @@ class WorkflowControllerTests(unittest.TestCase):
         self.assertEqual(self.c.advance()['status'], 'BLOCK')
         self.guard(references=[ref])
         self.assertEqual(self.c.advance()['phase'], 2)
-
-    def test_recovery_preserves_failed_operation_and_stays_in_phase(self):
-        self.c.phase = 4
-        self.record('sdd_inspection_evidence')
-        responses = iter(('BLOCK', 'PASS'))
-
-        @managed_operation
-        def prepare(issue, evidence_path):
-            return {'sdd_preparation_evidence': self.payload(next(responses))}
-
-        with patch('workflow_controller.importlib.import_module', return_value=SimpleNamespace(prepare=prepare)), chdir(self.repo):
-            self.c.invoke('sdd_manager.prepare', {'issue': 75})
-            failed = self.c.evidence.reference('sdd_preparation_evidence')
-            self.assertEqual(self.c.status, 'BLOCKED')
-            self.c.invoke('sdd_manager.prepare', {'issue': 75})
-            self.assertEqual(self.c.status, 'BLOCKED')
-            recovered = self.c.recover('sdd_manager.prepare')
-
-        self.assertEqual(recovered['phase'], 4)
-        self.assertEqual(self.c.status, 'RUNNING')
-        self.assertEqual(self.c.history[-1]['status'], 'RECOVERED')
-        self.assertEqual(self.c.history[-1]['blocked_reference'], failed)
-        self.assertEqual(len(self.c.evidence.superseded['mutable:sdd_preparation_evidence']), 1)
-
-    def test_recovery_rejects_when_another_block_is_active(self):
-        self.c.phase = 4
-        self.c.blockers = {
-            'sdd_manager.prepare': {'phase': 4, 'status': 'BLOCK',
-                'resolved_reference': self.record('sdd_inspection_evidence')},
-            'other': {'phase': 4, 'status': 'BLOCK'},
-        }
-        with self.assertRaisesRegex(EvidenceError, 'Other active blocks'):
-            self.c.recover('sdd_manager.prepare')
-        self.assertEqual(self.c.status, 'RUNNING')
-
-    def test_guard_history_keeps_replaced_decisions(self):
-        self.c.phase = 1
-        ref = self.record('github_issue_observation')
-        self.guard(status='BLOCK', references=[ref])
-        self.guard(references=[ref])
-        self.assertEqual([item['status'] for item in self.c.guard_history], ['BLOCK', 'PASS'])
-
-    def test_verification_waiver_keeps_failed_check_and_requires_exact_binding(self):
-        self.c.phase = 7
-        failed = self.record('verification_evidence', 'FAIL')
-        waiver = self.c.record_static('preexisting_failure_waiver', {
-            'verification_sha256': failed['sha256'], 'check_id': 'frontend.test',
-            'diagnostic_sha256': 'a' * 64, 'base_sha': 'b' * 40, 'branch_sha': 'c' * 40,
-            'diff_sha256': 'd' * 64, 'base_reproduction': 'same command failed',
-            'branch_reproduction': 'same command failed', 'approved_by': 'reviewer',
-            'reason': 'Observed on approved base', 'expires_at': '2099-01-01T00:00:00+00:00',
-        }, 'preexisting_failure_waiver', 'approved waiver', datetime.now(timezone.utc).isoformat())
-        self.guard('verification', references=[failed, waiver])
-        self.assertEqual(self.c.guards['7:verification']['status'], 'PASS')
-        self.assertEqual(self.c.evidence.get('verification_evidence', require_verified=False)['status'], 'FAIL')
 
     def test_handoff_is_manual_pending_not_issue_completion(self):
         self.c.phase = 15
