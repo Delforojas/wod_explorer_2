@@ -1166,9 +1166,13 @@ def prepare_branch(
         "requested_branch": branch_name,
         "previous_branch": None,
         "previous_head": None,
+        "previous_tree": None,
+        "previous_index_matches_head": None,
         "approved_base_sha": None,
         "result_branch": None,
         "result_head": None,
+        "result_tree": None,
+        "result_index_matches_head": None,
         "checks": {},
         "errors": [],
     }
@@ -1251,6 +1255,10 @@ def prepare_branch(
 
     evidence["previous_branch"] = state["active_branch"]
     evidence["previous_head"] = state["head"]
+    evidence["previous_tree"] = git_optional("rev-parse", "HEAD^{tree}")
+    evidence["previous_index_matches_head"] = (
+        run_git("diff-index", "--cached", "--quiet", "HEAD", "--", check=False).returncode == 0
+    )
 
     checks["expected_branch_matches"] = (
         state["active_branch"] == expected_branch
@@ -1393,6 +1401,10 @@ def prepare_branch(
     )
     evidence["result_head"] = (
         final_state["head"]
+    )
+    evidence["result_tree"] = git_optional("rev-parse", "HEAD^{tree}")
+    evidence["result_index_matches_head"] = (
+        run_git("diff-index", "--cached", "--quiet", "HEAD", "--", check=False).returncode == 0
     )
 
     checks["correct_branch_active"] = (

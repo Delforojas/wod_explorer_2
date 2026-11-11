@@ -66,6 +66,7 @@ OBSERVATION_TOPICS = {
     'sdd_validation_evidence': {'sdd', 'scope'},
     'sdd_preparation_evidence': {'sdd', 'scope'},
     'verification_evidence': {'verification', 'scope', 'dependencies'},
+    'final_verification_evidence': {'verification', 'final', 'scope'},
 }
 PROHIBITED_STATIC_KEYS = {'pre_stage_evidence', 'post_commit_evidence', 'git_state', 'working_tree',
                           'staging_state', 'active_branch', 'head', 'head_sha', 'mutable',
@@ -216,6 +217,9 @@ class EvidenceManager:
         return deepcopy(entry)
 
     def get_historical(self, reference):
+        required = {'key', 'category', 'version', 'sha256', 'issue', 'repository', 'workflow_id'}
+        if not isinstance(reference, dict) or set(reference) != required:
+            raise EvidenceError('Historical evidence reference is incomplete or malformed')
         if (reference.get('issue') != self.issue or reference.get('workflow_id') != self.workflow_id
                 or reference.get('repository') != self.repository):
             raise EvidenceError('Historical reference belongs to another session')
@@ -225,7 +229,8 @@ class EvidenceManager:
         current = (self.static if category == 'static' else self.mutable).get(key)
         candidates = ([current] if current else []) + self.superseded.get(category + ':' + key, [])
         for entry in candidates:
-            if entry['version'] == reference.get('version') and entry['sha256'] == reference.get('sha256'):
+            if (entry['version'] == reference.get('version') and entry['sha256'] == reference.get('sha256')
+                    and entry['sha256'] == digest(entry['payload'])):
                 return {'historical': True, 'current': False, 'entry': deepcopy(entry)}
         raise EvidenceError('Historical evidence version is unavailable')
 
@@ -318,7 +323,15 @@ def register_result(result, session):
         source = payload.get('source')
         if key == 'branch_preparation_evidence' and (payload.get('result_branch') is not None or payload.get('branch_mutation_attempted') is True):
             session.invalidate('branch-change', source=source)
-            if payload.get('status') != 'PASS' or payload.get('expected_head') != payload.get('result_head'):
+            content_preserved = (
+                payload.get('status') == 'PASS'
+                and payload.get('previous_head') == payload.get('result_head')
+                and payload.get('previous_tree') == payload.get('result_tree')
+                and payload.get('previous_index_matches_head') is True
+                and payload.get('result_index_matches_head') is True
+                and payload.get('checks', {}).get('working_tree_preserved') is True
+            )
+            if not content_preserved:
                 session.invalidate('file-change', source=source)
         elif key == 'staging_preparation_evidence' and payload.get('status') == 'PASS':
             session.invalidate('staging-change', source=source)

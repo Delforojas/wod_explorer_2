@@ -26,9 +26,11 @@ cobertura semántica ni aplicabilidad de verificaciones.
 La evidencia de GitHub debe obtenerse mediante el MCP de GitHub inmediatamente
 para esta entrega y normalizarse al contrato siguiente. El comando **no llama
 al MCP**, no vuelve a publicar comentarios y no usa `gh` como alternativa.
-Los módulos `workflow_controller.py`, `sdd_manager.py`, `verification_runner.py`
-y `evidence_manager.py` estaban vacíos al añadir esta operación: este contrato
-no presupone que ya produzcan o recolecten estos datos automáticamente.
+`workflow_controller.py` conserva el estado de fase y referencias de evidencia
+en memoria; `sdd_manager.py` observa la estructura SDD; `verification_runner.py`
+conserva resultados y huellas de fuente; y `evidence_manager.py` valida el
+ledger versionado. Ninguno de ellos sustituye la evidencia semántica, de GitHub
+o de auditoría externa exigida por este contrato.
 
 Git local no demuestra que no hubo push. Esa condición exige un registro de
 acciones fiable que cubra todo el workflow, incluidas acciones externas al

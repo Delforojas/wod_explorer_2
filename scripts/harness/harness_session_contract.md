@@ -209,5 +209,6 @@ sin consultas redundantes ni escrituras en el repositorio de trabajo real.
 Una secuencia completa con recibos sintéticos prueba el estado final; no afirma
 haber implementado una Issue real o aplicado sus guardrails semánticos.
 
-El defecto conocido de `git_policy.py check-branch` al avanzar `origin/main`
-permanece: el controlador conserva ese bloqueo y no lo convierte en éxito.
+`git_policy.py check-branch` conserva la base histórica aprobada y permite que
+`origin/main` avance únicamente cuando sigue siendo descendiente verificable de
+esa base. Un rewind, una divergencia o un objeto remoto no disponible bloquean.

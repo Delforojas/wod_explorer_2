@@ -32,7 +32,7 @@ REQUIRED = {
     9: [('mutable', 'pre_stage_evidence'), ('mutable', 'verification_evidence')],
     10: [('mutable', 'commit_creation_evidence'), ('mutable', 'commit_check_evidence')],
     11: [('mutable', 'post_commit_evidence')], 12: [('mutable', 'github_documentation_evidence')],
-    13: [('mutable', 'final_check_evidence'), ('mutable', 'verification_evidence')], 14: [('mutable', 'manual_validation_plan')],
+    13: [('mutable', 'final_check_evidence'), ('mutable', 'verification_evidence'), ('mutable', 'final_verification_evidence')], 14: [('mutable', 'manual_validation_plan')],
     15: [('mutable', 'final_check_evidence'), ('mutable', 'manual_validation_plan')],
 }
 ALLOWED = {
@@ -43,7 +43,7 @@ ALLOWED = {
     9: {'git_policy.review_changes', 'git_policy.propose_preexisting_adoption',
         'git_policy.validate_preexisting_adoption'},
     10: {'git_policy.prepare_staging', 'git_policy.pre_commit_check', 'git_policy.create_commit', 'git_policy.check_commit'},
-    11: {'git_policy.post_check_commit'}, 13: {'git_policy.final_check', 'sdd_manager.inspect'},
+    11: {'git_policy.post_check_commit'}, 13: {'git_policy.final_check', 'sdd_manager.inspect', 'verification_runner.project_final'},
 }
 EXTERNAL = {'github_issue_observation', 'implementation_evidence', 'repair_evidence',
             'github_documentation_evidence', 'manual_validation_plan'}
