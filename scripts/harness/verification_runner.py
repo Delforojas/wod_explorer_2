@@ -316,6 +316,46 @@ def execute(root, check, logs):
     return e
 
 
+def build_selection(catalog_evidence, *, issue, workflow_id, phase, selected, applicable_checks,
+                    tasks_completed, applicability_complete, rerun_reason=None):
+    """Official producer of the exact object run_checks' selection_path validates.
+
+    catalog_evidence must be the {'verification_catalog': {...}} result of a
+    discover() call observed in the same session. Applicability and task
+    completion are never inferred; they must arrive as explicit True values.
+    """
+    if not isinstance(catalog_evidence, dict) or 'verification_catalog' not in catalog_evidence:
+        raise VerificationError('build_selection requires a discover() result')
+    source = catalog_evidence['verification_catalog']
+    if source.get('status') != 'PASS':
+        raise VerificationError('Cannot select checks from an incomplete catalog observation')
+    known = {c['id'] for c in source['checks']}
+    if (not isinstance(issue, int) or issue < 1 or not isinstance(workflow_id, str) or not workflow_id.strip()
+            or phase not in (7, 8)
+            or not isinstance(selected, list) or not selected or len(set(selected)) != len(selected)
+            or not isinstance(applicable_checks, list) or not applicable_checks
+            or len(set(applicable_checks)) != len(applicable_checks)
+            or not set(selected) <= set(applicable_checks) or not set(applicable_checks) <= known):
+        raise VerificationError('Invalid, unknown or mismatched check selection')
+    if phase == 7 and set(selected) != set(applicable_checks):
+        raise VerificationError('Phase 7 requires selecting every applicable check')
+    if phase == 8 and (not isinstance(rerun_reason, str) or not rerun_reason.strip()):
+        raise VerificationError('Phase 8 reruns require a non-empty rerun_reason')
+    if tasks_completed is not True or applicability_complete is not True:
+        raise VerificationError('Task completion and applicability review must be explicit, not inferred')
+    selection = {
+        'status': 'APPROVED', 'source': 'scripts/harness/verification_runner.py build_selection',
+        'issue': issue, 'workflow_id': workflow_id, 'repository': source['repository'], 'phase': phase,
+        'checks': list(selected), 'applicable_checks': list(selected) if phase == 7 else list(applicable_checks),
+        'catalog_sha256': source['catalog_sha256'], 'source_fingerprint': source['source_fingerprint']['sha256'],
+        'tasks_completed': True, 'applicability_complete': True,
+    }
+    if phase == 8:
+        selection['rerun_reason'] = rerun_reason
+    return {'selection_approval': {'status': 'PASS', 'source': selection['source'], 'observed_at': now(),
+                                   'selection': selection}}
+
+
 @managed_operation
 def run_checks(issue, workflow_id, selected, selection_path, repo_root=None,
                registry_path=None, log_dir=None, phase=7, review_path=None):

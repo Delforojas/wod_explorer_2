@@ -1,6 +1,11 @@
 # SDD Manager — contrato de fase 4
 
-Operaciones implementadas: `inspect`, `prepare`, `validate`.
+Operaciones de módulo implementadas: `inspect`, `prepare`. `validate` es
+exclusivamente una sub-orden del CLI (`sdd_manager.py validate`); internamente
+llama a `inspect(issue, repo_root, validate=True, require_completed=...)`. No
+existe una función de módulo `validate` ni una operación MCP
+`sdd_manager.validate`: la vía MCP (`harness_call`) siempre usa
+`sdd_manager.inspect` con `arguments.validate`/`arguments.require_completed`.
 La estructura es técnica; el SDD Guard y el Planning Guard conservan todas las
 responsabilidades semánticas. Ninguna operación escribe Git, modifica staging,
 crea commits, consulta GitHub ni marca tareas como completadas.
@@ -64,6 +69,10 @@ huella final y necesidad de validación posterior.
 python3 scripts/harness/sdd_manager.py validate --issue 75
 python3 scripts/harness/sdd_manager.py validate --issue 75 --require-completed
 ```
+
+Equivalente MCP (no existe una operación `sdd_manager.validate`):
+`sdd_manager.inspect` con `issue`, `validate: true` y, cuando aplique,
+`require_completed: true`.
 
 Devuelve `sdd_validation_evidence`, `PASS` o `BLOCK` y errores concretos.
 Comprueba una única carpeta `specs/075-<slug>/`, los tres archivos regulares

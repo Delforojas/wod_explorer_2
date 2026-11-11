@@ -38,8 +38,9 @@ REQUIRED = {
 ALLOWED = {
     3: {'git_policy.inspect', 'git_policy.validate_base', 'git_policy.prepare_branch', 'git_policy.check_branch'},
     4: {'sdd_manager.inspect', 'sdd_manager.prepare'}, 5: {'sdd_manager.inspect'}, 6: {'sdd_manager.inspect'},
-    7: {'verification_runner.discover', 'verification_runner.run_checks'},
-    8: {'verification_runner.discover', 'verification_runner.run_checks', 'sdd_manager.inspect'},
+    7: {'verification_runner.discover', 'verification_runner.build_selection', 'verification_runner.run_checks'},
+    8: {'verification_runner.discover', 'verification_runner.build_selection', 'verification_runner.run_checks',
+        'sdd_manager.inspect'},
     9: {'git_policy.review_changes', 'git_policy.propose_preexisting_adoption',
         'git_policy.validate_preexisting_adoption'},
     10: {'git_policy.prepare_staging', 'git_policy.pre_commit_check', 'git_policy.create_commit', 'git_policy.check_commit'},
