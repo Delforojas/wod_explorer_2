@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "database": {
+      "command": "/opt/homebrew/bin/mysql-mcp-server",
+      "env": {
+        "MYSQL_DSN": "${MYSQL_DSN}"
+      }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_TOKEN}",
+        "X-MCP-Toolsets": "repos,issues,labels,pull_requests,git,actions,projects,notifications,users"
+      }
+    },
+    "harness": {
+      "command": "./.venv/bin/python",
+      "args": ["scripts/harness/harness_mcp.py"]
+    },
+    "21st": {
+      "type": "http",
+      "url": "https://21st.dev/api/mcp",
+      "headers": {
+        "x-api-key": "${TWENTYFIRST_API_KEY}"
+      }
+    }
+  }
+}
