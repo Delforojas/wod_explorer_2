@@ -17,7 +17,7 @@ if not (HARNESS / 'workflow_controller.py').exists():
 sys.path.insert(0, str(HARNESS))
 sys.dont_write_bytecode = True
 from workflow_controller import WorkflowController, GUARDS, REQUIRED, perform
-from evidence_manager import EvidenceError, managed_operation
+from evidence_manager import EvidenceError, EvidenceValidationError, managed_operation
 
 
 class WorkflowControllerTests(unittest.TestCase):
@@ -407,6 +407,60 @@ class WorkflowControllerTests(unittest.TestCase):
                 source="github-mcp",
                 observed_at=datetime.now(timezone.utc).isoformat(),
             )
+
+    def test_record_static_kind_not_allowed_at_phase_is_recoverable(self):
+        self.c.phase = 1
+        self.c.status = 'RUNNING'
+
+        with self.assertRaisesRegex(EvidenceValidationError, 'Allowed kinds at this phase'):
+            self.c.record_static(
+                key='context',
+                payload={'path': 'AGENTS.md', 'sha256': 'a'},
+                kind='context_item',
+                source='approved context',
+                observed_at=datetime.now(timezone.utc).isoformat(),
+            )
+
+        self.assertEqual(self.c.phase, 1)
+        self.assertEqual(self.c.status, 'RUNNING')
+
+        reference = self.c.record_static(
+            key='issue_identity',
+            payload={'number': 75, 'title': 'Test Issue', 'url': 'https://github.com/x/y/issues/75',
+                     'repository_full_name': 'x/y'},
+            kind='issue_identity',
+            source='github-mcp',
+            observed_at=datetime.now(timezone.utc).isoformat(),
+        )
+        self.assertEqual(self.c.evidence.resolve(reference)['payload']['number'], 75)
+
+    def test_record_static_unsupported_fields_is_recoverable(self):
+        self.c.phase = 1
+        self.c.status = 'RUNNING'
+
+        with self.assertRaisesRegex(EvidenceValidationError, 'unsupported fields'):
+            self.c.record_static(
+                key='approved_scope',
+                payload={'description': 'Fix validation errors', 'acceptance_criteria': [], 'constraints': [],
+                          'approved_by': 'user'},
+                kind='issue_identity',
+                source='github-mcp',
+                observed_at=datetime.now(timezone.utc).isoformat(),
+            )
+
+        self.assertEqual(self.c.phase, 1)
+        self.assertEqual(self.c.status, 'RUNNING')
+
+        reference = self.c.record_static(
+            key='approved_scope',
+            payload={'description': 'Fix validation errors', 'acceptance_criteria': [], 'constraints': [],
+                      'approved_by': 'user'},
+            kind='approved_scope',
+            source='github-mcp',
+            observed_at=datetime.now(timezone.utc).isoformat(),
+        )
+        self.assertEqual(self.c.evidence.resolve(reference)['payload']['approved_by'], 'user')
+
     def test_initial_transition_from_phase_zero_to_one(self):
         self.assertEqual(self.c.phase, 0)
         self.assertEqual(self.c.status, "RUNNING")

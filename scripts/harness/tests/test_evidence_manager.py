@@ -14,7 +14,9 @@ if not (HARNESS / 'evidence_manager.py').exists():
     HARNESS = Path(__file__).parent
 sys.path.insert(0, str(HARNESS))
 sys.dont_write_bytecode = True
-from evidence_manager import EvidenceManager, EvidenceError, using_evidence, managed_operation, register_result
+from evidence_manager import (
+    EvidenceManager, EvidenceError, EvidenceValidationError, using_evidence, managed_operation, register_result,
+)
 
 
 class EvidenceManagerTests(unittest.TestCase):
@@ -141,6 +143,18 @@ class EvidenceManagerTests(unittest.TestCase):
     def test_unknown_static_fields_are_rejected(self):
         with self.assertRaises(EvidenceError):
             self.static(data={'base_sha': 'a' * 40, 'head_sha': 'b' * 40})
+
+    def test_unknown_static_kind_is_a_non_fatal_validation_error(self):
+        with self.assertRaisesRegex(EvidenceValidationError, 'Unknown static evidence kind'):
+            self.static(kind='not_a_real_kind', data={'number': 1})
+
+    def test_unsupported_static_fields_for_a_known_kind_is_a_non_fatal_validation_error(self):
+        with self.assertRaisesRegex(EvidenceValidationError, 'unsupported fields'):
+            self.static(kind='issue_identity', data={'number': 1, 'title': 't', 'description': 'extra'})
+
+    def test_static_validation_error_lists_allowed_fields(self):
+        with self.assertRaisesRegex(EvidenceValidationError, 'number, repository_full_name, title, url'):
+            self.static(kind='issue_identity', data={'number': 1, 'description': 'extra'})
 
     def test_scope_change_invalidates_affected_static_entry(self):
         reference = self.static('scope', 'approved_scope', {'description': 'approved'}, topics=['scope'])
