@@ -15,7 +15,7 @@ from pathlib import Path
 import sys
 
 sys.dont_write_bytecode = True
-from evidence_manager import EvidenceManager, EvidenceError, using_evidence, register_result
+from evidence_manager import EvidenceManager, EvidenceError, EvidenceValidationError, using_evidence, register_result
 
 
 GUARDS = {1: 'issue', 2: 'context', 3: 'branch', 4: 'sdd', 5: 'planning',
@@ -102,8 +102,12 @@ class WorkflowController:
         allowed = {1: {'issue_identity', 'approved_scope'}, 2: {'context_item', 'decisions', 'dependencies'},
                    3: {'canonical_base'}, 4: {'sdd_refs'}, 5: {'sdd_refs', 'decisions'},
                    7: {'verification_history'}, 8: {'verification_history'}, 10: {'accepted_commit'}}
-        if kind not in allowed.get(self.phase, set()):
-            raise EvidenceError('Static evidence is not allowed at this phase')
+        allowed_kinds = allowed.get(self.phase, set())
+        if kind not in allowed_kinds:
+            raise EvidenceValidationError(
+                'Static evidence kind ' + repr(kind) + ' is not allowed at phase ' + str(self.phase)
+                + '. Allowed kinds at this phase: '
+                + (', '.join(sorted(allowed_kinds)) if allowed_kinds else 'none'))
         topics = {'context_item': ['instructions'], 'sdd_refs': ['sdd', 'scope'],
                   'verification_history': ['verification', 'scope', 'dependencies'],
                   'canonical_base': ['scope', 'instructions', 'dependencies']}.get(kind, ['scope'])

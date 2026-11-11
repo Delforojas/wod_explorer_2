@@ -19,7 +19,7 @@ REPOSITORY_ROOT = HARNESS_DIR.parent.parent.resolve()
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(HARNESS_DIR))
 
-from evidence_manager import EvidenceError
+from evidence_manager import EvidenceError, EvidenceValidationError
 from workflow_controller import WorkflowController, perform
 
 mcp = FastMCP("wod-harness")
@@ -113,6 +113,10 @@ def harness_call(
     export_static, revisit_phase.
 
     Controller guardrails and phase restrictions remain authoritative.
+    A call-construction validation error (e.g. an unknown/disallowed
+    record_static kind or unsupported fields) rejects only this call and
+    leaves workflow_status unchanged; real guard/integrity failures still
+    set it to BLOCKED.
     """
     try:
         controller = _current_controller()
@@ -157,7 +161,7 @@ def harness_call(
         IndexError,
         OSError,
     ) as exc:
-        if _controller is not None:
+        if _controller is not None and not isinstance(exc, EvidenceValidationError):
             _controller.status = "BLOCKED"
 
         return {

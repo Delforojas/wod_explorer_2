@@ -22,6 +22,10 @@ class EvidenceError(ValueError):
     pass
 
 
+class EvidenceValidationError(EvidenceError):
+    """Rejects a malformed call without mutating workflow state; never a guard/integrity failure."""
+
+
 STATIC_FIELDS = {
     'issue_identity': {'number', 'title', 'url', 'repository_full_name'},
     'approved_scope': {'description', 'acceptance_criteria', 'constraints', 'approved_by'},
@@ -144,8 +148,16 @@ class EvidenceManager:
         data = deepcopy(payload)
         if category == 'static':
             check_static_values(data)
-            if kind not in STATIC_FIELDS or set(data) - STATIC_FIELDS[kind]:
-                raise EvidenceError('Static evidence has unknown or mutable fields')
+            if kind not in STATIC_FIELDS:
+                raise EvidenceValidationError(
+                    'Unknown static evidence kind: ' + repr(kind)
+                    + '. Known kinds: ' + ', '.join(sorted(STATIC_FIELDS)))
+            unsupported = sorted(set(data) - STATIC_FIELDS[kind])
+            if unsupported:
+                raise EvidenceValidationError(
+                    'Static evidence kind ' + repr(kind) + ' received unsupported fields: '
+                    + ', '.join(unsupported) + '. Allowed fields for ' + repr(kind) + ': '
+                    + ', '.join(sorted(STATIC_FIELDS[kind])))
             if key in OBSERVATION_TOPICS:
                 raise EvidenceError('Observations cannot be converted to persistent static data')
             if status not in ('PASS', 'complete'):

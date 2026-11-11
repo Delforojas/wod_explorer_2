@@ -379,6 +379,99 @@ mutable evidence records.
 
 Never bypass EvidenceManager validation.
 
+#### Literal `record_static` Call Examples — Mandatory
+
+Each static evidence kind requires its own exact `kind` value and is
+only accepted at specific phases. Use these complete, literal
+`harness_call` examples as the authoritative contract; replace only
+the illustrative values with verified data for the active Issue.
+
+Example — `issue_identity` (Phase 1):
+
+- `operation`: `record_static`
+- `arguments.key`: `issue_identity`
+- `arguments.kind`: `issue_identity`
+- `arguments.payload`: `{"number": $1, "title": "<verified Issue title>", "url": "https://github.com/<owner>/<repo>/issues/$1", "repository_full_name": "<owner>/<repo>"}`
+- `arguments.source`: `github-mcp`
+- `arguments.observed_at`: `<timezone-aware ISO 8601 timestamp of the GitHub MCP read>`
+- `arguments.status`: `PASS`
+
+Example — `approved_scope` (Phase 1):
+
+- `operation`: `record_static`
+- `arguments.key`: `approved_scope`
+- `arguments.kind`: `approved_scope`
+- `arguments.payload`: `{"description": "<verified Issue objective>", "acceptance_criteria": ["<verified criterion 1>", "<verified criterion 2>"], "constraints": ["<verified constraint>"], "approved_by": "github-issue-#$1"}`
+- `arguments.source`: `github-mcp`
+- `arguments.observed_at`: `<timezone-aware ISO 8601 timestamp>`
+- `arguments.status`: `PASS`
+
+Example — `context_item` (Phase 2):
+
+- `operation`: `record_static`
+- `arguments.key`: `context`
+- `arguments.kind`: `context_item`
+- `arguments.payload`: `{"path": "AGENTS.md", "sha256": "<verified SHA-256 of the actual file content>", "revision": "<verified Git revision or commit SHA>", "applicability": "applicable", "reason": "<verified reason the file governs this task>"}`
+- `arguments.source`: `local-file-read`
+- `arguments.observed_at`: `<timezone-aware ISO 8601 timestamp>`
+- `arguments.status`: `PASS`
+
+Example — `decisions` (Phase 2 or Phase 5 only):
+
+- `operation`: `record_static`
+- `arguments.key`: `decisions`
+- `arguments.kind`: `decisions`
+- `arguments.payload`: `{"items": [{"decision": "<verified decision>", "rationale": "<verified rationale>"}], "approved_by": "<verified approver or source>"}`
+- `arguments.source`: `<actual verified source of the decision>`
+- `arguments.observed_at`: `<timezone-aware ISO 8601 timestamp>`
+- `arguments.status`: `PASS`
+
+Example — `dependencies` (Phase 2 only):
+
+- `operation`: `record_static`
+- `arguments.key`: `dependencies`
+- `arguments.kind`: `dependencies`
+- `arguments.payload`: `{"items": [{"dependency": "<verified dependency Issue or component>", "status": "<verified status>"}], "approved_by": "<verified approver or source>"}`
+- `arguments.source`: `<actual verified source of the dependency>`
+- `arguments.observed_at`: `<timezone-aware ISO 8601 timestamp>`
+- `arguments.status`: `PASS`
+
+Example — `sdd_refs` (Phase 4 or Phase 5 only):
+
+- `operation`: `record_static`
+- `arguments.key`: `sdd`
+- `arguments.kind`: `sdd_refs`
+- `arguments.payload`: `{"folder": "specs/$1-<slug>", "files": {"spec.md": "<verified SHA-256>", "plan.md": "<verified SHA-256>", "tasks.md": "<verified SHA-256>"}, "revisions": {"spec.md": "<verified revision>", "plan.md": "<verified revision>", "tasks.md": "<verified revision>"}}`
+- `arguments.source`: `sdd_manager.inspect`
+- `arguments.observed_at`: `<timezone-aware ISO 8601 timestamp>`
+- `arguments.status`: `PASS`
+
+`canonical_base` (Phase 3), `verification_history` (Phase 7 or 8), and
+`accepted_commit` (Phase 10) are the remaining `record_static` kinds.
+The controller projects them automatically from already-verified
+session evidence — `canonical_base` from a successful
+`git_policy.validate_base`, `verification_history` when `advance`
+leaves Phase 7/8, and `accepted_commit` when `advance` leaves Phase
+11. Never call `record_static` with these kinds using fabricated or
+manually re-derived values; let the controller's own projection stand.
+
+#### Recovering From a Validation Error — Mandatory
+
+A `record_static` call rejected because its `kind` is unknown or not
+allowed at the active phase, or because its payload has fields
+unsupported by `STATIC_FIELDS` for that `kind`, is a call-construction
+error, not a guard or integrity failure. The workflow's phase and
+status remain unchanged; the error message lists the kinds allowed at
+the active phase or the fields allowed for the given kind. Read the
+message, correct the call, and retry it in the same phase. Never
+restart the MCP session, and never treat this as a reason to abandon
+the workflow.
+
+`BLOCKED` is reserved for real guard failures, forbidden actions, and
+integrity violations: a failed local operation, a stale or invalid
+evidence reference, a mismatched Issue/workflow/repository identity,
+or an exception raised by the invoked function itself.
+
 #### General rules
 
 - Apply the same contract to any Issue number.
