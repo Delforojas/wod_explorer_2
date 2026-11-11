@@ -1,5 +1,17 @@
 # Spec — Resolver bloqueos de integración MCP y evidencias en `/hyssue` (fases 4–15)
 
+## Decisión adicional autorizada durante `/finish-issue`
+
+Durante `/finish-issue 205`, otra sesión concurrente sobre este mismo
+repositorio añadió un commit (`8230b08`, "chore(claude): añadir comandos de
+proyecto para Claude Code", que trackea `.claude/commands/`) directamente
+sobre esta rama, encima del commit original de esta Issue (`1da5802`). Al
+detectarlo, se preguntó explícitamente al usuario cómo proceder; el usuario
+autorizó expresamente incluir ese commit en el PR de la Issue #205, aun sin
+pertenecer al SDD original. Esta sección documenta esa decisión explícita
+para mantener la trazabilidad; no amplía retroactivamente el alcance
+funcional descrito abajo, que sigue reflejando el trabajo original de #205.
+
 ## Objetivo
 
 Corregir las incompatibilidades reales entre `.opencode/commands/hyssue.md` y la
