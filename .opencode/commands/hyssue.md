@@ -1700,7 +1700,7 @@ This phase requires Commit Guard PASS.
 
 When implemented and tested, execute:
 
-`python3 scripts/harness/git_policy.py post-commit-check --issue $1`
+`python3 scripts/harness/git_policy.py post-check-commit --issue $1`
 
 Provide the canonical historical base policy, exact base SHA,
 expected branch, commit SHA and commit message previously

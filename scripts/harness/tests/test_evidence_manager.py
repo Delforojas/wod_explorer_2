@@ -244,3 +244,47 @@ class EvidenceManagerTests(unittest.TestCase):
         self.assertEqual(historical['pre_commit_evidence'], first)
         self.assertFalse(self.session.get_historical(ref)['current'])
         self.assertNotIn('superseded', self.session.export_static(authorized=True))
+
+    def test_historical_reference_rejects_extra_or_tampered_fields(self):
+        first = self.payload()
+        reference = self.session.record('pre_commit_evidence', first)
+        self.session.record('pre_commit_evidence', self.payload())
+        for changed in (
+            {**reference, 'extra': 'untrusted'},
+            {**reference, 'sha256': '0' * 64},
+            {**reference, 'version': reference['version'] + 1},
+        ):
+            with self.assertRaises(EvidenceError):
+                self.session.get_historical(changed)
+
+    def test_historical_reference_rejects_corrupted_ledger_payload(self):
+        reference = self.session.record('pre_commit_evidence', self.payload())
+        self.session.record('pre_commit_evidence', self.payload())
+        self.session.superseded['mutable:pre_commit_evidence'][0]['payload']['status'] = 'FAIL'
+        with self.assertRaises(EvidenceError):
+            self.session.get_historical(reference)
+
+    def test_successful_same_content_branch_preparation_preserves_context(self):
+        context = self.static('context', 'context_item', {'path': 'AGENTS.md', 'sha256': 'a'}, topics=['instructions'])
+        result = {'branch_preparation_evidence': self.payload(phase=3)}
+        result['branch_preparation_evidence'].update(
+            branch_mutation_attempted=True, result_branch='feat/075-test',
+            previous_head='a' * 40, result_head='a' * 40,
+            previous_tree='b' * 40, result_tree='b' * 40,
+            previous_index_matches_head=True, result_index_matches_head=True,
+            checks={'working_tree_preserved': True},
+        )
+        register_result(result, self.session)
+        self.session.resolve(context)
+
+    def test_branch_preparation_without_content_proof_invalidates_context(self):
+        context = self.static('context', 'context_item', {'path': 'AGENTS.md', 'sha256': 'a'}, topics=['instructions'])
+        result = {'branch_preparation_evidence': self.payload(phase=3)}
+        result['branch_preparation_evidence'].update(
+            branch_mutation_attempted=True, result_branch='feat/075-test',
+            previous_head='a' * 40, result_head='a' * 40,
+            checks={'working_tree_preserved': True},
+        )
+        register_result(result, self.session)
+        with self.assertRaises(EvidenceError):
+            self.session.resolve(context)

@@ -411,6 +411,79 @@ def run_checks(issue, workflow_id, selected, selection_path, repo_root=None,
     return {'verification_evidence': e}
 
 
+def _tree_files(root, tree_sha):
+    output = git(root, 'ls-tree', '-r', '-z', tree_sha)
+    result = {}
+    for record in output.split(b'\0'):
+        if not record:
+            continue
+        metadata, raw_path = record.split(b'\t', 1)
+        mode, kind, _ = os.fsdecode(metadata).split()
+        if kind != 'blob':
+            raise VerificationError('Commit tree contains a non-blob entry')
+        path = os.fsdecode(raw_path)
+        result[path] = {'mode': mode, 'sha256': hashlib.sha256(git(root, 'show', f'{tree_sha}:{path}')).hexdigest()}
+    return result
+
+
+@managed_operation
+def project_final(issue, workflow_id, verification_path, post_path, sdd_path, repo_root=None):
+    """Bind a completed phase-7/8 run to the immutable committed tree.
+
+    This creates new evidence; it never rewrites the runner reports captured
+    before the controlled commit.
+    """
+    e = {'source': 'scripts/harness/verification_runner.py project-final', 'phase': 13,
+         'issue': issue, 'workflow_id': workflow_id, 'observed_at': now(), 'status': 'BLOCK',
+         'errors': [], 'invalidated_by': ['head-or-tree-change', 'sdd-change', 'verification-change'],
+         'reports': []}
+    try:
+        verification = read_json(verification_path).get('verification_evidence', read_json(verification_path))
+        post = read_json(post_path).get('post_commit_evidence', read_json(post_path))
+        sdd = read_json(sdd_path)
+        root = root_path(repo_root)
+        if (verification['status'] != 'PASS' or verification['issue'] != issue
+                or verification['workflow_id'] != workflow_id or verification['repository'] != str(root)
+                or post['status'] != 'complete' or post['issue'] != issue
+                or post['workflow_id'] != workflow_id or post['repository'] != str(root)):
+            raise VerificationError('Verification or post-commit evidence is incomplete or belongs to another workflow')
+        manifest_info = verification['source_manifest']
+        manifest_path = Path(manifest_info['path']).resolve()
+        if not manifest_path.is_file() or file_digest(manifest_path) != manifest_info['sha256']:
+            raise VerificationError('Verification source manifest is missing or has changed')
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        if digest(manifest) != verification['source_fingerprint']['sha256']:
+            raise VerificationError('Verification source manifest does not match its fingerprint')
+        head = os.fsdecode(git(root, 'rev-parse', '--verify', 'HEAD^{commit}')).strip()
+        tree = os.fsdecode(git(root, 'rev-parse', '--verify', 'HEAD^{tree}')).strip()
+        if head != post['head'] or head != post['last_commit']['sha']:
+            raise VerificationError('Current HEAD differs from post-commit evidence')
+        tree_files = _tree_files(root, tree)
+        manifest_files = manifest.get('files')
+        if not isinstance(manifest_files, dict) or set(tree_files) != set(manifest_files):
+            raise VerificationError('Committed tree does not match the verified source inventory')
+        for path, expected in manifest_files.items():
+            if not expected.get('exists') or tree_files[path]['sha256'] != expected.get('sha256'):
+                raise VerificationError('Committed tree content differs from verified source: ' + path)
+        files = {}
+        for name in ('spec.md', 'plan.md', 'tasks.md'):
+            value = sdd.get('files', {}).get(name)
+            if not isinstance(value, str) or len(value) != 64:
+                raise VerificationError('SDD hashes are incomplete')
+            files[name] = value
+        if not all(report.get('status') == 'PASS' and report.get('exit_code') == 0 and report.get('evidence_valid') is True
+                   for report in verification['reports']):
+            raise VerificationError('Verification reports are not complete passing evidence')
+        e.update(status='PASS', repository=str(root), head_sha=head, tree_sha=tree, sdd_files=files,
+                 verification_evidence_sha256=digest(verification), post_commit_evidence_sha256=digest(post),
+                 source_manifest_sha256=manifest_info['sha256'],
+                 reports=[{'id': report['id'], 'command': report['command'], 'status': report['status'],
+                           'exit_code': report['exit_code'], 'tree_sha': tree} for report in verification['reports']])
+    except (VerificationError, OSError, ValueError, KeyError, TypeError, subprocess.TimeoutExpired) as error:
+        e['errors'].append(str(error))
+    return {'final_verification_evidence': e}
+
+
 def main():
     parser = argparse.ArgumentParser(description='Controlled project verification runner')
     operations = parser.add_subparsers(dest='operation', required=True)
