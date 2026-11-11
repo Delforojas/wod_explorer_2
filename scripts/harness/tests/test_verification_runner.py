@@ -12,6 +12,11 @@ SCRIPT = Path(__file__).resolve().parents[1] / 'verification_runner.py'
 if not SCRIPT.exists():
     SCRIPT = Path(__file__).with_name('verification_runner.py')
 
+HARNESS = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(HARNESS))
+import verification_runner
+from verification_runner import VerificationError
+
 
 class VerificationRunnerTests(unittest.TestCase):
     def setUp(self):
@@ -349,3 +354,92 @@ class VerificationRunnerTests(unittest.TestCase):
         e = self.run_checks(['git.whitespace'])
         self.assertEqual(e['status'], 'PASS', e)
         self.assertIn('diff.autoRefreshIndex=false', e['reports'][0]['command'])
+
+
+class BuildSelectionTests(unittest.TestCase):
+    """build_selection is the official producer of run_checks' selection_path."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name).resolve()
+        self.repo = self.root / 'repo'
+        self.repo.mkdir()
+        env = {**os.environ, 'GIT_OPTIONAL_LOCKS': '0'}
+        for args in (['init', '-b', 'fix/205-build-selection'], ['config', 'user.name', 'Test'],
+                     ['config', 'user.email', 'test@example.invalid']):
+            subprocess.run(['git', *args], cwd=self.repo, check=True, capture_output=True, env=env)
+        (self.repo / 'source.txt').write_text('initial')
+        subprocess.run(['git', 'add', 'source.txt'], cwd=self.repo, check=True, capture_output=True, env=env)
+        subprocess.run(['git', 'commit', '-m', 'Initial'], cwd=self.repo, check=True, capture_output=True, env=env)
+        self.single_check_registry = {'checks': [
+            {'id': 'git.diff-check', 'command': ['git', 'diff', '--check'], 'cwd': '.', 'sources': ['source.txt']},
+        ]}
+        self.catalog = verification_runner.discover(str(self.repo), self.single_check_registry)
+        self.assertEqual(self.catalog['verification_catalog']['status'], 'PASS')
+
+    def build(self, **overrides):
+        kwargs = dict(catalog_evidence=self.catalog, issue=205, workflow_id='test-workflow', phase=7,
+                      selected=['git.diff-check'], applicable_checks=['git.diff-check'],
+                      tasks_completed=True, applicability_complete=True)
+        kwargs.update(overrides)
+        return verification_runner.build_selection(**kwargs)
+
+    def test_builds_valid_phase_7_selection(self):
+        source = self.catalog['verification_catalog']
+        result = self.build()
+        approval = result['selection_approval']
+        self.assertEqual(approval['status'], 'PASS')
+        selection = approval['selection']
+        self.assertEqual(selection['status'], 'APPROVED')
+        self.assertEqual(selection['issue'], 205)
+        self.assertEqual(selection['checks'], ['git.diff-check'])
+        self.assertEqual(selection['applicable_checks'], ['git.diff-check'])
+        self.assertEqual(selection['catalog_sha256'], source['catalog_sha256'])
+        self.assertEqual(selection['source_fingerprint'], source['source_fingerprint']['sha256'])
+        self.assertNotIn('rerun_reason', selection)
+
+    def test_builds_valid_phase_8_selection_with_rerun_reason(self):
+        result = self.build(phase=8, rerun_reason='Affected by a later source change')
+        selection = result['selection_approval']['selection']
+        self.assertEqual(selection['phase'], 8)
+        self.assertEqual(selection['rerun_reason'], 'Affected by a later source change')
+
+    def test_rejects_incomplete_catalog_observation(self):
+        incomplete = {'verification_catalog': {**self.catalog['verification_catalog'], 'status': 'INCOMPLETE'}}
+        with self.assertRaises(VerificationError):
+            self.build(catalog_evidence=incomplete)
+
+    def test_rejects_invalid_issue_and_workflow_id(self):
+        with self.assertRaises(VerificationError):
+            self.build(issue=0)
+        with self.assertRaises(VerificationError):
+            self.build(workflow_id='   ')
+
+    def test_rejects_unknown_check_id(self):
+        with self.assertRaises(VerificationError):
+            self.build(selected=['unknown.check'], applicable_checks=['unknown.check'])
+
+    def test_rejects_duplicate_selected_checks(self):
+        with self.assertRaises(VerificationError):
+            self.build(selected=['git.diff-check', 'git.diff-check'])
+
+    def test_phase_7_rejects_partial_selection(self):
+        registry = {'checks': [*self.single_check_registry['checks'],
+                               {'id': 'git.diff-check-2', 'command': ['git', 'diff', '--check'], 'cwd': '.',
+                                'sources': ['source.txt']}]}
+        catalog = verification_runner.discover(str(self.repo), registry)
+        with self.assertRaises(VerificationError):
+            self.build(catalog_evidence=catalog, applicable_checks=['git.diff-check', 'git.diff-check-2'])
+
+    def test_phase_8_requires_non_empty_rerun_reason(self):
+        with self.assertRaises(VerificationError):
+            self.build(phase=8)
+        with self.assertRaises(VerificationError):
+            self.build(phase=8, rerun_reason='   ')
+
+    def test_requires_explicit_task_completion_and_applicability(self):
+        with self.assertRaises(VerificationError):
+            self.build(tasks_completed=False)
+        with self.assertRaises(VerificationError):
+            self.build(applicability_complete=False)

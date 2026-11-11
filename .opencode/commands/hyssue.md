@@ -45,6 +45,17 @@ implementation of the coordinator never authorizes bypassing a guard.
 Use the local `harness` MCP server to maintain one in-memory
 `WorkflowController` instance throughout the development workflow.
 
+Environment precondition: the `harness` MCP server runs with the
+Python interpreter declared for it in `opencode.json`
+(`./.venv/bin/python scripts/harness/harness_mcp.py`), which must have
+the `mcp` package installed. If the active agent host has no
+equivalent MCP server configured for `harness`, the three tools below
+are not available at all. Verify their availability before relying on
+`harness_call`; if unavailable, return BLOCK with that exact cause.
+Never degrade to inventing evidence, hand-written JSON files, or a
+standalone `workflow_controller.py` session to work around a missing
+MCP server.
+
 The MCP server exposes three tools:
 
 - `harness_status`: inspect the current controller session.
@@ -375,6 +386,40 @@ Never bypass EvidenceManager validation.
 - Pass only supported method arguments.
 - Treat registration errors as BLOCK.
 - Do not bypass evidence validation.
+
+### 0.5.2 In-Memory Evidence References — Mandatory
+
+Every `*_path` argument accepted by `git_policy.py` or
+`verification_runner.py` operations (for example `selection_path`,
+`baseline_path`, `evidence_path`, `approval_path`, `policy_path`,
+`manifest_path`, `authorization_path`, `message_path`, `guard_path`,
+`context_path`, `post_path`, `review_path`) is read through
+`evidence_manager.read_json`, which accepts exactly one of:
+
+- An inline JSON-compatible object or list, passed directly as the
+  argument value.
+- A session reference: `{"evidence_ref": <reference>}`, optionally with
+  `"historical": true` or `"unwrap": true`, resolved against the active
+  `WorkflowController` session. Use the exact reference returned by the
+  operation that produced the evidence (`record_external`,
+  `record_static`, or a prior `invoke` result).
+- A legacy file path string, kept only for backward compatibility.
+
+Never write a protected or session-scoped observation to an intermediate
+file on disk to satisfy one of these arguments. Construct the inline
+object or the `evidence_ref` from verified current-session evidence only.
+
+The exact exception is `git_policy.review_changes`'s `spec_path`,
+`plan_path`, and `tasks_path`: these are real repository-relative file
+paths to the SDD documents themselves (not evidence references), because
+the SDD files are real deliverables, not session evidence. Its
+`baseline_path` follows the general rule above.
+
+A function invoked through `harness_call` with `operation: "invoke"`
+never requires a JSON file to exist on disk; a `TypeError` from argument
+binding or a `VerificationError`/`GitError` from the function itself means
+the constructed object was incomplete or stale, not that a file is
+missing.
 
 ### 0.6 Blocking Policy
 
@@ -1084,9 +1129,28 @@ Never invent requirements or overwrite approved decisions.
 
 ### 4.4. Validate SDD Structure
 
-Execute:
+Local CLI reference:
 
 `python3 scripts/harness/sdd_manager.py validate --issue $1`
+
+`validate` is a CLI-only convenience subcommand. There is no
+module-level `sdd_manager.validate` function and no MCP operation
+by that name.
+
+When the harness MCP session is active, invoke through `harness_call`:
+
+- `operation`: `invoke`
+- `arguments.operation`: `sdd_manager.inspect`
+- `arguments.arguments.issue`: current Issue number ($1)
+- `arguments.arguments.validate`: `true`
+- `arguments.arguments.require_completed`: `true` only when the
+  active phase requires completed tasks.
+
+This is the exact equivalence: `sdd_manager.py validate --issue $1`
+calls `inspect(issue, repo_root, validate=True, require_completed=...)`
+internally. Never invoke `sdd_manager.validate` through `harness_call`;
+`ALLOWED` for phase 4 only permits `sdd_manager.inspect` and
+`sdd_manager.prepare`, and no such function exists on the module.
 
 The local harness must:
 
@@ -1342,6 +1406,43 @@ Accepted arguments:
 Never pass `issue`, `workflow_id`, `phase`,
 or other unsupported arguments to `discover`.
 
+For a documental Issue that needs only `git diff --check`, pass
+`registry_path` as an inline object:
+`{"checks": [{"id": "<check-id>", "command": ["git", "diff", "--check"],
+"cwd": ".", "sources": [<real repository-relative paths of the active
+SDD files, e.g. the folder's spec.md/plan.md/tasks.md>]}]}`. `sources`
+must name real files; never invent a source that does not exist.
+
+#### Build the check selection — Mandatory producer
+
+Operation: `verification_runner.build_selection`
+
+This is the only authorized way to construct `selection_path`. Never
+hand-assemble that object from `discover`'s fields.
+
+Required arguments:
+
+- `catalog_evidence`: the complete `{"verification_catalog": {...}}`
+  result of the `discover` call just observed in this session, passed
+  inline or as `{"evidence_ref": ...}`.
+- `issue`, `workflow_id`, `phase`
+- `selected`: the exact check IDs about to run.
+- `applicable_checks`: the complete applicability decision for this
+  phase. In phase 7 it must equal `selected` as a set; the operation
+  then fixes the stored list to match `selected` exactly. In phase 8 it
+  may be a superset identifying every check still considered
+  applicable.
+- `tasks_completed`, `applicability_complete`: `true` only when the AI
+  has explicitly confirmed each condition. Never pass `true` by default.
+- `rerun_reason`: required in phase 8; omit in phase 7.
+
+The result is `{"selection_approval": {"status": "PASS", ...,
+"selection": {...}}}`. Pass the nested `selection` object inline as
+`run_checks`' `selection_path` on the next call. A `VerificationError`
+here (unknown check, incomplete catalog, partial phase-7 selection,
+missing `rerun_reason`, etc.) means the selection must be corrected and
+rebuilt, never assembled manually to work around the error.
+
 #### Execute verification checks
 
 Operation: `verification_runner.run_checks`
@@ -1351,7 +1452,8 @@ Required arguments:
 - `issue`
 - `workflow_id`
 - `selected`
-- `selection_path`
+- `selection_path`: the `selection` object returned by
+  `verification_runner.build_selection`, passed inline.
 
 Optional arguments:
 
@@ -1397,6 +1499,14 @@ The AI must:
 - Preserve approved requirements and architecture.
 - Never weaken tests or verification rules.
 - Never expand Issue scope.
+
+An argument-binding or invocation error while calling a Phase 7
+operation (for example a malformed `selection_path`, before
+`run_checks` ever registers `verification_evidence`) is a Phase 7
+blocker to correct and retry. It is never a valid entry into
+`enter_repair`, which requires a real registered `verification_evidence`
+with status `FAIL` or `INCOMPLETE`. Never call `enter_repair` to work
+around an invocation mistake.
 
 ### 8.2. Re-run Affected Checks — Python
 
@@ -1472,9 +1582,22 @@ At this point:
 
 ### 9.1. Collect Pre-Stage Evidence — Python
 
-When implemented and tested, execute:
+Local CLI reference:
 
 `python3 scripts/harness/git_policy.py review-changes --issue $1`
+
+Through `harness_call`, invoke `git_policy.review_changes` with its four
+real arguments:
+
+- `issue`: current Issue number ($1).
+- `spec_path`, `plan_path`, `tasks_path`: the real repository-relative
+  paths of the active SDD, derived from the folder approved in Phase 4
+  (for example `specs/205-<slug>/spec.md`). These are real file paths,
+  not evidence references — the SDD documents are real deliverables.
+- `baseline_path` (optional): `{"evidence_ref": <reference to the
+  Phase 3 branch_evidence>}`, following the general in-memory evidence
+  reference rule in §0.5.2. Without it, provenance is explicitly
+  unknown and every local change is protected.
 
 The local harness must:
 
@@ -1581,6 +1704,9 @@ When implemented and tested, execute:
 
 Pass the approved manifest and required verified
 preconditions through the implemented CLI contract.
+Through `harness_call`, every `*_path` argument here follows the
+general in-memory evidence reference rule in §0.5.2: an inline object
+or `{"evidence_ref": ...}`, never a manually created file.
 
 The local harness must:
 
@@ -1704,7 +1830,9 @@ When implemented and tested, execute:
 
 Provide the canonical historical base policy, exact base SHA,
 expected branch, commit SHA and commit message previously
-validated by the workflow.
+validated by the workflow. Through `harness_call`, every `*_path`
+argument here follows the general in-memory evidence reference rule
+in §0.5.2.
 
 The local harness must:
 
@@ -1869,6 +1997,9 @@ When implemented and tested, execute:
 
 `python3 scripts/harness/git_policy.py final-check --issue $1`
 
+Through `harness_call`, `post_path` and `context_path` follow the
+general in-memory evidence reference rule in §0.5.2.
+
 The local harness must:
 
 - Verify the expected Issue branch is active.
@@ -1938,6 +2069,16 @@ Confirm:
 Continue to Phase 14 only when every mandatory
 condition is supported by valid evidence and
 the Final Workflow Guard returns PASS.
+
+#### Acknowledged Limit — Phases 12, 14 and 15
+
+A real semantic execution of Phases 12, 14 and 15 requires an actual
+GitHub publication/read receipt and a complete external audit of
+workflow actions (including provable absence of any push) that the
+local controller cannot fabricate or infer, as already documented in
+`docs/hyssue-audit-202.md`. Treat this as an acknowledged, pending
+limit: never declare full end-to-end success across Phases 0–15
+without that external evidence, and never simulate it.
 
 ### Blocking Policy
 

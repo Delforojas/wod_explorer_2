@@ -56,6 +56,38 @@ sandbox**: el workflow debe revisar los scripts y sus efectos, no aprobar
 comandos que reparen código, desactiven checks, escriban Git o publiquen trabajo.
 El runner tampoco interpreta instrucciones contenidas en logs.
 
+## Productor de selección
+
+`build_selection` es la única operación autorizada para construir el objeto
+`--selection-json`/`selection_path`. Solo está disponible vía MCP
+(`harness_call`, fases 7 y 8), no como subcomando CLI:
+
+```text
+build_selection(catalog_evidence, issue, workflow_id, phase, selected,
+                applicable_checks, tasks_completed, applicability_complete,
+                rerun_reason=None)
+```
+
+`catalog_evidence` es el resultado completo de `discover` observado en la
+misma sesión. `build_selection` extrae `catalog_sha256` y
+`source_fingerprint.sha256` directamente de ahí; nunca se construyen a mano.
+En fase 7 exige que `selected` cubra exactamente `applicable_checks` (por
+conjunto) y fija la lista aprobada a `selected`. En fase 8 exige
+`rerun_reason` no vacío. `tasks_completed`/`applicability_complete` deben
+llegar como `true` explícito: la función nunca infiere aplicabilidad ni
+completitud de tareas. Un catálogo no `PASS`, un check desconocido o
+duplicado, o una selección parcial en fase 7 producen un error explícito; no
+se ejecuta ningún check.
+
+Devuelve `{"selection_approval": {"status": "PASS", ..., "selection": {...}}}`.
+El campo `selection` es exactamente el objeto que debe pasarse, inline, como
+`selection_path` a `run`.
+
+Para un check puramente documental (`git diff --check`) en una Issue sin
+cambios de código, `--registry-json`/`registry_path` usa como `sources` los
+archivos reales de la SDD activa de esa Issue (`spec.md`, `plan.md`,
+`tasks.md`); nunca una fuente inventada.
+
 ## Selección explícita
 
 ```sh
