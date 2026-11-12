@@ -1018,6 +1018,29 @@ Do not pass `workflow_id` or unsupported arguments.
 Continue to Phase 4 only when the complete Branch Guard
 returns PASS.
 
+#### Branch Guard Evidence Contract
+
+For a newly prepared Issue branch, decide Branch Guard only
+with evidence that remains valid after `git_policy.prepare_branch`:
+
+- `canonical_base`.
+- `branch_preparation_evidence`.
+- `branch_check_evidence`.
+
+`prepare_branch` changes the active branch. Consequently,
+the Phase 3.1 `branch_evidence` and its derived
+`working_tree_observation` are historical after preparation
+and must not be passed to `decide_guard`. The fresh
+`branch_check_evidence` is the authoritative current
+observation of the Issue branch.
+
+The controller requires `canonical_base` and
+`branch_check_evidence` to advance Phase 3. Include
+`branch_preparation_evidence` so Branch Guard also binds the
+verified mutation and preservation checks. Never include an
+invalidated evidence reference merely because it was used as
+an input to preparation.
+
 The local harness must verify:
 
 - The Issue-specific branch exists.
