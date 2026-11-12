@@ -46,8 +46,6 @@ file, and decide the next step.
 
 Invoke each subagent with: phase, mode, Issue number, and state file path.
 For phases 5b and 8, also pass the `failures` of the last reviewer (5b) or
-verifier (8) contract. For phase 7 after a repair, also pass the previous
-`failures` so the verifier re-runs those checks first.
 If a subagent is not defined, treat the phase as `BLOCKED`.
 
 ## After Each Contract
@@ -77,7 +75,9 @@ If a subagent is not defined, treat the phase as `BLOCKED`.
 
 ## Final Response
 
-Only after phases 14–15 return `PASS`: set `status = DONE` and present the handoff block of the last contract (summary, then manual_validation). It must include the heading ### Validaciones manuales pendientes with an unchecked checklist.
+Only after phases 14–15 return `PASS`: set `status = DONE` and present the
+handoff from the last contract. It must include the heading
+`### Validaciones manuales pendientes` with an unchecked checklist.
 
 After the user approves manual validation, the next command is
 `/finish-issue $1`. Never run it from `/cissue`.
