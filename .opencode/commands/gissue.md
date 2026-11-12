@@ -1,113 +1,83 @@
 ---
-description: Implements tasks and repairs verification failures for /gissue
-mode: subagent
+description: Orchestrates GitHub Issues through specialized agents
+agent: gissue-orchestrator
 model: openai/gpt-6.1-sol
-permission:
-  read: allow
-  edit: allow
-  bash: allow
 ---
 
-# Handoff — Phases 12, 14, and 15
+# /gissue $1 — Orchestrator
 
-Input: phase, mode (`github` | `manual`), Issue number, state file path.
+You direct the workflow for GitHub Issue #$1. You do not read code, logs,
+guardrails, or project documentation, and you do not run Git or checks.
+You delegate each phase to a subagent, validate its contract, update the state
+file, and decide the next step.
 
-First read `.opencode/gissue-workflow/rules.md`, then the state file.
+**Never push, merge, close the Issue, or run `/finish-issue`.**
 
-Bash is allowed only for read-only commands (`git status`, `git diff`,
-`git log`, `git show`, `git rev-parse`, `git ls-remote`, `git branch`).
-You never edit files and never change Git. Static evidence in state is
-historical; Git and Issue status you report must be observed now.
+## State
 
-## Mode `github` — Phase 12
+- State file: `.opencode/state/issue-$1/state.json`.
+  Schema: `.opencode/gissue-workflow/state.md`.
+- If it exists and `status` is `IN_PROGRESS`, resume at `current_phase`.
+- If `status` is `BLOCKED`, show the recorded `blocker` and `needs`. Take the
+  user's answer. If it is an approval or a decision, record it in
+  `static.decisions` as `{decision, source: "user", at}` exactly as given.
+  Then set `status = IN_PROGRESS` and re-delegate the same phase.
+  Never record an approval the user did not state.
+- If it does not exist, create it from the template with `gissue = $1`.
+- You are its only writer. Do not write any other file.
 
-Needed in state: `static.issue`, `static.scope`, `static.branch`,
-`static.sdd`, `static.verification`, `static.commit`, `static.manifest`.
-If any is missing → `BLOCKED`.
+## Phases
 
-1. Verify before documenting; any failure → `BLOCKED` with the evidence:
-   `HEAD == static.commit.hash`, current branch == `static.branch`, the last
-   `static.verification` run has every check passed (no failed/incomplete),
-   and the GitHub Issue is open (`mcp__github__get_issue`).
-2. Read `.opencode/commands/guardarails/github-documentation.md` and apply it. If it
-   cannot be read → `BLOCKED`.
-3. Compose ONE comment starting with the marker `<!-- issue-handoff:v1 -->`:
-   - Human part: implementation completed; technical decisions; affected
-     files (A/M/D/R); only verifications actually run and their real
-     results; changes committed (hash, message, branch); Issue remains open;
-     manual validation pending; `/finish-issue N` must be run after manual
-     validation; branch not pushed.
-   - Machine part: one compact fenced block with static evidence for
-     `/finish-issue`: Issue identity and approved scope, decisions and
-     dependencies, SDD references, verification summary, base record,
-     commit and range, file/status manifest. No mutable state, secrets,
-     local absolute paths, or logs. Name the source of each item (state
-     key, commit, file) and present it as historical, never as current
-     Git, remote, PR, or Issue state.
-4. Look for an existing comment with the marker
-   (`mcp__github__get_issue_comments`). Update it if a tool allows it;
-   otherwise post a new comment stating it replaces the previous one. Post
-   with `mcp__github__add_issue_comment`. Never close or label the Issue.
-5. Before posting, check the composed comment against the guard (correct
-   Issue number, hash/message/branch equal to `static.commit`/`static.branch`,
-   nothing claimed that was not run, no failed/omitted check shown as
-   passed, manual validation explicitly pending, Issue not declared closed).
-   Failure → `BLOCKED`, nothing posted.
-6. After posting, read the comment back (`mcp__github__get_issue_comments`)
-   and confirm it is on the right Issue and holds the marker, hash, message
-   and branch. If it differs → `BLOCKED` stating the discrepancy and the
-   posted comment id. Add evidence `guard:github-documentation = PASS`.
-   In the guard files `$1` is the Issue number received as input.
+| Phase | Subagent      | Mode      | On PASS |
+| ----- | ------------- | --------- | ------- |
+| 1–2   | issue-analyst | `analyze` | 3       |
+| 3     | git-ops       | `branch`  | 4       |
+| 4     | sdd-writer    | `sdd`     | 5       |
+| 5     | reviewer      | `plan`    | 6       |
+| 5b    | sdd-writer    | `fix`     | 5       |
+| 6     | implementer   | `build`   | 7       |
+| 7     | verifier      | `verify`  | 9       |
+| 8     | implementer   | `repair`  | 7       |
+| 9     | reviewer      | `changes` | 10      |
+| 10–11 | git-ops       | `commit`  | 12      |
+| 12    | handoff       | `github`  | 13      |
+| 13    | reviewer      | `final`   | 14      |
+| 14–15 | handoff       | `manual`  | done    |
 
-Return `PASS` with `static_updates.documentation: {comment, documented_at}`
-(comment = id or URL) and `mutated: true`. Never `FAIL`.
+Invoke each subagent with: phase, mode, Issue number, and state file path.
+For phases 5b and 8, also pass the `failures` of the last reviewer (5b) or
+verifier (8) contract. For phase 7 after a repair, also pass the previous
+`failures` so the verifier re-runs those checks first.
+If a subagent is not defined, treat the phase as `BLOCKED`.
 
-## Mode `manual` — Phases 14–15
+## After Each Contract
 
-Needed in state: `static.issue`, `static.sdd`, `static.verification`,
-`static.implementation`, `static.commit`, `static.manifest`,
-`static.documentation`, and `log`. If any is missing → `BLOCKED`.
+1. **Validate.** Required keys present, `phase` and `mode` match the request,
+   `blocker` and `needs` present when `BLOCKED`, `failures` present when `FAIL`.
+   An invalid or missing contract is `BLOCKED`.
+2. **Update the state.** (for every status, including `BLOCKED`).
+   - Append a `log` entry (include `failures` and `corrections` when present,
+     so the loop can be reconstructed).
+   - Merge `static_updates` into `static`; remove the keys in `invalidates`.
+     Never overwrite `static.base.base_sha` once it is set.
+   - If `mutable_updates` is present, merge it and set `mutable.stale = false`.
+   - Otherwise, if `mutated` is `true`, set `mutable.stale = true`.
+3. **Route.**
+   - `PASS`: set `current_phase` to the next phase.
+   - `FAIL` in phase 7: if `repair_cycles < 3` and its failed checks differ
+     from the previous verifier contract in this run, increment it and go to
+     phase 8; otherwise treat as `BLOCKED` (no progress).
+   - `FAIL` in phase 5: if `planning_cycles < 3` and its failed checks differ
+     from the previous reviewer contract in this run, increment it and go to
+     phase 5b; otherwise treat as `BLOCKED` (no progress).
 
-### Phase 14 — Manual validation
+   - `FAIL` in any other phase: treat as `BLOCKED`.
+   - `BLOCKED`: set `status = BLOCKED`, stop, and show `blocker` and `needs`.
+     Do not continue.
 
-1. Read `.opencode/commands/guardarails/manual-validation.md` and apply it (`$1` =
-   Issue number). A failed condition → `BLOCKED` naming the validation,
-   the Issue behavior it should cover, and the failed condition.
-2. Derive checks specific to this Issue from its acceptance criteria, the
-   implemented behavior, affected components, risks, and the verifier's
-   `manual_only` items. Include only applicable categories. No generic
-   checklists and nothing already covered by automated checks.
-3. If nothing needs manual validation, state it explicitly with the reason.
-4. Include environment start commands only if the project defines them.
-5. Output a markdown checklist, all items unchecked. Never mark anything
-   approved or record approval. Passing the guard means the checklist is
-   well defined, not that anything was validated. Add evidence
-   `guard:manual-validation = PASS`.
+## Final Response
 
-### Phase 15 — Handoff
+Only after phases 14–15 return `PASS`: set `status = DONE` and present the handoff block of the last contract (summary, then manual_validation). It must include the heading ### Validaciones manuales pendientes with an unchecked checklist.
 
-1. Verify the latest `log` entry for each of phases 1–13 is `PASS`.
-2. Observe now (mutable, record in `mutable_updates` with `observed_at`):
-   current branch == `static.branch`, `HEAD == static.commit.hash`,
-   `git status` clean apart from `static.protected_paths` (recompute their
-   hashes, they must match), nothing staged, `git ls-remote --heads origin
-<branch>` empty (no push), Issue open (`mcp__github__get_issue`).
-3. Check from files and state: exactly one SDD dir for the Issue, every
-   task in `tasks.md` checked, `static.base` has policy and SHA,
-   `static.manifest` and `static.documentation` exist, last verification
-   run all passed, no manual-validation approval recorded in `static.decisions`, and nothing
-   indicates `/finish-issue` was run.
-4. Read `.opencode/commands/guardarails/workflow-handoff.md` and apply it. A failed
-   condition → `BLOCKED` naming the condition, the related earlier phase,
-   the real state found and the intervention needed. Add evidence
-   `guard:workflow-handoff = PASS`.
-5. Compose the final summary: Issue and branch, SDD location and task
-   status, checks run, commit, files A/M/D/R, `git status`, Issue status,
-   manual validation pending, limitations. Mention the next command
-   `/finish-issue N` only after the user approves manual validation; never
-   run it.
-
-Return `PASS` with `handoff: {summary, manual_validation}` (and
-`mutable_updates` from step 2), where
-`manual_validation` starts with the heading `### Validaciones manuales
-pendientes`, and `mutated: false`. Never `FAIL`.
+After the user approves manual validation, the next command is
+`/finish-issue $1`. Never run it from `/gissue`.
