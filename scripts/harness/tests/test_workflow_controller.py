@@ -18,6 +18,7 @@ sys.path.insert(0, str(HARNESS))
 sys.dont_write_bytecode = True
 from workflow_controller import WorkflowController, GUARDS, REQUIRED, perform
 from evidence_manager import EvidenceError, EvidenceValidationError, managed_operation
+import git_policy
 
 
 class WorkflowControllerTests(unittest.TestCase):
@@ -299,6 +300,101 @@ class WorkflowControllerTests(unittest.TestCase):
         result = self.c.advance()
         self.assertEqual(result['status'], 'BLOCK')
         self.assertIn('incomplete', result['errors'][0])
+
+    def test_phase3_branch_guard_uses_post_preparation_evidence(self):
+        project = self.repo / 'project'
+        remote = self.repo / 'remote.git'
+        project.mkdir()
+        subprocess.run(['git', 'init', '--bare', str(remote)], capture_output=True, check=True)
+        subprocess.run(['git', 'init', '-b', 'main'], cwd=project, capture_output=True, check=True)
+        subprocess.run(['git', 'config', 'user.email', 'test@example.invalid'], cwd=project, capture_output=True, check=True)
+        subprocess.run(['git', 'config', 'user.name', 'Test'], cwd=project, capture_output=True, check=True)
+        (project / 'README.md').write_text('Initial\n', encoding='utf-8')
+        subprocess.run(['git', 'add', 'README.md'], cwd=project, capture_output=True, check=True)
+        subprocess.run(['git', 'commit', '-m', 'Initial'], cwd=project, capture_output=True, check=True)
+        subprocess.run(['git', 'remote', 'add', 'origin', str(remote)], cwd=project, capture_output=True, check=True)
+        subprocess.run(['git', 'push', '-u', 'origin', 'main'], cwd=project, capture_output=True, check=True)
+
+        controller = WorkflowController(75, project, 'phase3-workflow')
+        controller.phase = 3
+        base_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=project, text=True).strip()
+        policy = {
+            'policy': 'standard-main',
+            'base_branch': 'main',
+            'base_ref': 'origin/main',
+            'base_remote_ref': 'refs/heads/main',
+            'base_sha': base_sha,
+            'pr_target': 'main',
+            'pr_target_ref': 'refs/heads/main',
+        }
+        branch_name = 'docs/075-phase3-evidence'
+
+        with chdir(project):
+            inspection = controller.invoke('git_policy.inspect', {'issue': 75})
+            self.assertEqual(inspection['branch_evidence']['status'], 'complete')
+            stale_branch_reference = controller.evidence.reference('branch_evidence')
+
+            validation = controller.invoke('git_policy.validate_base', {'issue': 75, 'policy_path': policy})
+            self.assertEqual(validation['base_validation_evidence']['status'], 'PASS')
+
+            preparation = controller.invoke(
+                'git_policy.prepare_branch',
+                {
+                    'issue': 75,
+                    'branch_name': branch_name,
+                    'policy_path': policy,
+                    'expected_head': base_sha,
+                    'expected_branch': 'main',
+                },
+            )
+            self.assertEqual(preparation['branch_preparation_evidence']['status'], 'PASS')
+            self.assertEqual(preparation['branch_preparation_evidence']['previous_head'], base_sha)
+            self.assertEqual(preparation['branch_preparation_evidence']['result_head'], base_sha)
+            with self.assertRaisesRegex(EvidenceError, 'invalidated: branch_evidence'):
+                controller.evidence.resolve(stale_branch_reference)
+
+            branch_check = controller.invoke(
+                'git_policy.check_branch',
+                {'issue': 75, 'branch_name': branch_name, 'policy_path': policy},
+            )
+            self.assertEqual(branch_check['branch_check_evidence']['status'], 'PASS')
+
+            valid_references = [
+                controller.evidence.reference('canonical_base', 'static'),
+                controller.evidence.reference('branch_preparation_evidence'),
+                controller.evidence.reference('branch_check_evidence'),
+            ]
+            controller.decide_guard(
+                'branch',
+                'PASS',
+                '.opencode/commands/guardarails/branch.md',
+                valid_references,
+                'The Issue branch was prepared and checked with current evidence.',
+            )
+            self.assertEqual(controller.advance()['phase'], 4)
+
+        stale_controller = WorkflowController(75, project, 'phase3-stale-reference')
+        stale_controller.phase = 3
+        stale_controller.evidence.record('branch_evidence', {
+            'source': 'test-observer',
+            'phase': 3,
+            'issue': 75,
+            'repository': str(project),
+            'workflow_id': 'phase3-stale-reference',
+            'status': 'complete',
+            'observed_at': datetime.now(timezone.utc).isoformat(),
+            'git': {'repository_root': str(project)},
+        })
+        stale_reference = stale_controller.evidence.reference('branch_evidence')
+        stale_controller.evidence.invalidate('branch-change', source='test branch switch')
+        with self.assertRaisesRegex(EvidenceError, 'invalidated: branch_evidence'):
+            stale_controller.decide_guard(
+                'branch',
+                'PASS',
+                '.opencode/commands/guardarails/branch.md',
+                [stale_reference],
+                'This must reject stale evidence.',
+            )
 
     def test_new_source_changes_require_fresh_verification_before_staging(self):
         self.c.phase = 9

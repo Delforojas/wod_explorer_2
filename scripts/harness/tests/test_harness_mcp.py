@@ -214,4 +214,44 @@ class HarnessMCPTests(unittest.TestCase):
 
         self.assertEqual(response["status"], "BLOCK")
         self.assertEqual(response["workflow_status"], "BLOCKED")
+
+    def test_stale_branch_evidence_blocks_branch_guard(self):
+        controller = WorkflowController(
+            issue=75,
+            repository=harness_mcp.REPOSITORY_ROOT,
+            workflow_id="mcp-stale-branch-evidence",
+        )
+        controller.phase = 3
+        payload = {
+            "source": "test-observer",
+            "phase": 3,
+            "issue": 75,
+            "repository": str(harness_mcp.REPOSITORY_ROOT),
+            "workflow_id": "mcp-stale-branch-evidence",
+            "status": "complete",
+            "observed_at": datetime.now(timezone.utc).isoformat(),
+            "git": {"repository_root": str(harness_mcp.REPOSITORY_ROOT)},
+        }
+        controller.evidence.record("branch_evidence", payload)
+        reference = controller.evidence.reference("branch_evidence")
+        controller.evidence.invalidate("branch-change", source="test branch switch")
+        harness_mcp._controller = controller
+
+        with patch.object(
+            harness_mcp.Path, "cwd", return_value=harness_mcp.REPOSITORY_ROOT
+        ):
+            response = harness_mcp.harness_call(
+                operation="decide_guard",
+                arguments={
+                    "name": "branch",
+                    "status": "PASS",
+                    "source": ".opencode/commands/guardarails/branch.md",
+                    "references": [reference],
+                    "reason": "Stale pre-switch branch evidence must be rejected.",
+                },
+            )
+
+        self.assertEqual(response["status"], "BLOCK")
+        self.assertEqual(response["workflow_status"], "BLOCKED")
+        self.assertIn("invalidated: branch_evidence", response["error"])
         self.assertEqual(controller.status, "BLOCKED")
