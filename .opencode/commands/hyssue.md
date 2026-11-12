@@ -1279,6 +1279,25 @@ The local harness must:
 Structural PASS does not imply functional or
 architectural approval.
 
+### 4.4.1. Evidence Lifecycle for SDD Guard
+
+Follow this exact sequence for SDD evidence:
+
+1. Invoke `sdd_manager.inspect` to observe the initial SDD state.
+2. Invoke `sdd_manager.prepare` only when the observed state and approved slug permit it.
+3. Complete `spec.md`, `plan.md`, and `tasks.md` with approved content.
+4. Invoke `sdd_manager.inspect` with `validate: true` to obtain the current
+   `sdd_validation_evidence`.
+5. Evaluate `decide_guard("sdd")` using only the current references required
+   by `WorkflowController.REQUIRED[4]`: `sdd_validation_evidence`.
+6. Invoke `advance()` only after SDD Guard returns `PASS`.
+
+When `sdd_manager.prepare` creates paths, it emits an `sdd-change` event.
+The initial `sdd_inspection_evidence` then describes a historical pre-prepare
+state and is invalidated. Never include that invalidated reference in SDD Guard
+or in any later guard decision. Additional references may be included only when
+they are still current and required by the active guard contract.
+
 ### 4.5. Apply SDD Guard
 
 Load and apply:
