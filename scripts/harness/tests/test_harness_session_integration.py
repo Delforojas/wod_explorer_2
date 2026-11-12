@@ -126,6 +126,86 @@ class HarnessSessionIntegrationTests(unittest.TestCase):
         # 5. Ningún archivo existente se ha modificado.
         self.assertEqual(before, self.snapshot())
 
+    def test_phase4_new_sdd_uses_fresh_validation_to_advance(self):
+        controller = WorkflowController(75, self.repo, 'phase4-new-sdd')
+        controller.phase = 4
+
+        with chdir(self.repo):
+            inspection = controller.invoke(
+                'sdd_manager.inspect',
+                {'issue': 75},
+            )['sdd_inspection_evidence']
+            inspection_ref = controller.evidence.reference('sdd_inspection_evidence')
+            self.assertEqual(inspection['sdd_state'], 'missing')
+
+            preparation = controller.invoke(
+                'sdd_manager.prepare',
+                {'issue': 75, 'slug': 'feature'},
+            )['sdd_preparation_evidence']
+            self.assertEqual(preparation['status'], 'PASS', preparation)
+
+            self.files(self.repo / 'specs/075-feature')
+            validation = controller.invoke(
+                'sdd_manager.inspect',
+                {'issue': 75, 'validate': True},
+            )['sdd_validation_evidence']
+            validation_ref = controller.evidence.reference('sdd_validation_evidence')
+            self.assertEqual(validation['status'], 'PASS', validation)
+
+            with self.assertRaises(EvidenceError):
+                controller.decide_guard(
+                    'sdd',
+                    'PASS',
+                    '.opencode/commands/guardarails/sdd.md',
+                    [inspection_ref],
+                    'The initial inspection is no longer current',
+                )
+
+            controller.decide_guard(
+                'sdd',
+                'PASS',
+                '.opencode/commands/guardarails/sdd.md',
+                [validation_ref],
+                'The current SDD validation passed',
+            )
+            result = controller.advance()
+
+        self.assertEqual(result['status'], 'PASS', result)
+        self.assertEqual(result['phase'], 5, result)
+
+    def test_phase4_existing_sdd_uses_fresh_validation_after_prepare(self):
+        self.files(self.repo / 'specs/075-feature')
+        controller = WorkflowController(75, self.repo, 'phase4-existing-sdd')
+        controller.phase = 4
+
+        with chdir(self.repo):
+            controller.invoke('sdd_manager.inspect', {'issue': 75})
+            preparation = controller.invoke(
+                'sdd_manager.prepare',
+                {'issue': 75},
+            )['sdd_preparation_evidence']
+            self.assertEqual(preparation['status'], 'PASS', preparation)
+            self.assertEqual(preparation['created_paths'], [])
+
+            validation = controller.invoke(
+                'sdd_manager.inspect',
+                {'issue': 75, 'validate': True},
+            )['sdd_validation_evidence']
+            validation_ref = controller.evidence.reference('sdd_validation_evidence')
+            self.assertEqual(validation['status'], 'PASS', validation)
+
+            controller.decide_guard(
+                'sdd',
+                'PASS',
+                '.opencode/commands/guardarails/sdd.md',
+                [validation_ref],
+                'Fresh validation confirms the reused SDD',
+            )
+            result = controller.advance()
+
+        self.assertEqual(result['status'], 'PASS', result)
+        self.assertEqual(result['phase'], 5, result)
+
     def test_runner_registers_exact_executed_report_in_same_session(self):
         (self.repo/'check.py').write_text('print("ok")\n')
         registry = self.root/'registry.json'
