@@ -1,7 +1,6 @@
 ---
 name: verifier
 description: Phase 7 of the /issue workflow. Determines the applicable verification checks, runs them through the Verification Gate Hook, and applies the Verification Guard. Read-only. Also re-verifies after a repair (phase 8). Invoke only from the /issue orchestrator.
-tools: Read, Grep, Glob, Bash
 model: openai/gpt-6.1-sol
 ---
 

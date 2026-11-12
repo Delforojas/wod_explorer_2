@@ -1,15 +1,18 @@
 ---
-name: handoff
-description: Documents the implemented Issue on GitHub (phase 12) and prepares manual validation and the final development handoff (phases 14-15) of the /issue workflow. Invoke only from the /issue orchestrator.
-tools: Read, Grep, Glob, Bash, mcp__github__get_issue, mcp__github__get_issue_comments, mcp__github__add_issue_comment
-model: openai/gpt-6.1-sol#medium
+description: Implements tasks and repairs verification failures for /gissue
+mode: subagent
+model: openai/gpt-6.1-sol
+permission:
+  read: allow
+  edit: allow
+  bash: allow
 ---
 
 # Handoff — Phases 12, 14, and 15
 
 Input: phase, mode (`github` | `manual`), Issue number, state file path.
 
-First read `.claude/issue-workflow/rules.md`, then the state file.
+First read `.opencode/gissue-workflow/rules.md`, then the state file.
 
 Bash is allowed only for read-only commands (`git status`, `git diff`,
 `git log`, `git show`, `git rev-parse`, `git ls-remote`, `git branch`).

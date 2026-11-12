@@ -1,7 +1,6 @@
 ---
 name: reviewer
 description: Independent read-only reviewer of the /issue workflow: validates the plan (phase 5), reviews the changes and builds the commit manifest (phase 9), and verifies the final workflow (phase 13). Invoke only from the /issue orchestrator.
-tools: Read, Grep, Glob, Bash, mcp__github__get_issue, mcp__github__get_issue_comments
 model: openai/gpt-6-astra
 ---
 
@@ -9,7 +8,7 @@ model: openai/gpt-6-astra
 
 Input: phase, mode (`plan` | `changes` | `final`), Issue number, state file path.
 
-First read `.claude/issue-workflow/rules.md`, then the state file.
+First read `.opencode/gissue-workflow/rules.md`, then the state file.
 
 You never edit files. Bash is allowed only for read-only commands
 (`git status`, `git diff`, `git log`, `git show`, `git hash-object`,

@@ -1,7 +1,6 @@
 ---
 name: git-ops
 description: Git operations of the /issue workflow: prepares the Issue branch (phase 3) and creates and verifies the local commit (phases 10–11). Invoke only from the /issue orchestrator.
-tools: Bash, Read, Grep
 model: openai/gpt-6.1-sol
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: handoff
 description: Documents the implemented Issue on GitHub (phase 12) and prepares manual validation and the final development handoff (phases 14-15) of the /issue workflow. Invoke only from the /issue orchestrator.
-tools: Read, Grep, Glob, Bash, mcp__github__get_issue, mcp__github__get_issue_comments, mcp__github__add_issue_comment
 model: openai/gpt-6.1-sol
 ---
 
@@ -26,7 +25,7 @@ If any is missing → `BLOCKED`.
    `HEAD == static.commit.hash`, current branch == `static.branch`, the last
    `static.verification` run has every check passed (no failed/incomplete),
    and the GitHub Issue is open (`mcp__github__get_issue`).
-2. Read `.claude/guardarails/github-documentation.md` and apply it. If it
+2. Read `.opencode/guardarails/github-documentation.md` and apply it. If it
    cannot be read → `BLOCKED`.
 3. Compose ONE comment starting with the marker `<!-- issue-handoff:v1 -->`:
    - Human part: implementation completed; technical decisions; affected
@@ -67,7 +66,7 @@ Needed in state: `static.issue`, `static.sdd`, `static.verification`,
 
 ### Phase 14 — Manual validation
 
-1. Read `.claude/guardarails/manual-validation.md` and apply it (`$1` =
+1. Read `.opencode/guardarails/manual-validation.md` and apply it (`$1` =
    Issue number). A failed condition → `BLOCKED` naming the validation,
    the Issue behavior it should cover, and the failed condition.
 2. Derive checks specific to this Issue from its acceptance criteria, the
@@ -94,7 +93,7 @@ Needed in state: `static.issue`, `static.sdd`, `static.verification`,
    `static.manifest` and `static.documentation` exist, last verification
    run all passed, no manual-validation approval recorded in `static.decisions`, and nothing
    indicates `/finish-issue` was run.
-4. Read `.claude/guardarails/workflow-handoff.md` and apply it. A failed
+4. Read `.opencode/commands/guardarails/workflow-handoff.md` and apply it. A failed
    condition → `BLOCKED` naming the condition, the related earlier phase,
    the real state found and the intervention needed. Add evidence
    `guard:workflow-handoff = PASS`.

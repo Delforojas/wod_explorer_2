@@ -1,7 +1,6 @@
 ---
 name: sdd-writer
 description: Phase 4 of /issue (create or complete the SDD) and phase 5b (apply the minimal fixes the reviewer found in the plan). Invoke only from the /issue orchestrator.
-tools: Read, Write, Edit, Grep, Glob, Bash
 model: openai/gpt-6.1-sol
 ---
 

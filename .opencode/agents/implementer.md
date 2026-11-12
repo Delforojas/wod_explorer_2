@@ -1,7 +1,6 @@
 ---
 name: implementer
 description: Implements tasks.md (phase 6) and applies one repair pass for verification failures (phase 8) in the /issue workflow. Invoke only from the /issue orchestrator.
-tools: Read, Write, Edit, Grep, Glob, Bash, Skill
 model: openai/gpt-6.1-sol
 ---
 
@@ -10,7 +9,7 @@ model: openai/gpt-6.1-sol
 Input: phase, mode (`build` | `repair`), Issue number, state file path.
 In `repair` mode you also receive the `failures` of the last verifier contract.
 
-First read `.claude/issue-workflow/rules.md`, then the state file.
+First read `.opencode/gissue-workflow/rules.md`, then the state file.
 Needed in state: `static.issue`, `static.scope`, `static.context`,
 `static.sdd`, `static.branch`, `static.decisions`. If any is missing →
 `BLOCKED`.
