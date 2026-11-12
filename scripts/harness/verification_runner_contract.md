@@ -176,8 +176,11 @@ conservan en el reporte; los diagnósticos originales no se borran.
 ## Validez y preservación
 
 La huella incluye HEAD, rama, índice lógico y archivos trackeados/no ignorados,
-con contenido, modo, identidad y mtime. `source-manifest.json` guarda ese
-inventario fuera del repositorio. Los artefactos generados ya ignorados, como
+con contenido, modo, identidad y mtime. Para cada archivo regular tambien
+incluye `git_blob_oid`, calculado con `git hash-object --stdin --path=<ruta>`:
+Git aplica asi los atributos y filtros de check-in, incluidos `eol=crlf` y
+`eol=lf`. `source-manifest.json` guarda ese inventario fuera del repositorio.
+Los artefactos generados ya ignorados, como
 `dist/` y `target/`, no invalidan la fuente; no se añaden excepciones de código.
 Si un check cambia fuente, índice, HEAD, rama o definición, se invalida la
 evidencia y no se ejecutan más checks contra ese estado sin una nueva selección.
@@ -189,7 +192,11 @@ no certifica esos recursos externos. `content_sha256` permite comparar contenido
 sin atribuir los resultados a un commit futuro que todavía no existe.
 El adaptador hacia `final-check` debe demostrar que el contenido verificado
 corresponde al árbol candidato; no basta con copiar un nuevo `tree_sha` a un
-informe antiguo. Se preserva el contexto de cambios locales ajenos.
+informe antiguo. `project_final` compara `git_blob_oid` con el OID del blob del
+árbol confirmado, por lo que no mezcla bytes de checkout con bytes del objeto
+Git. Si no existe esa evidencia canonica para un archivo regular, o Git no
+puede producirla durante la verificacion, la validacion bloquea de forma
+explicita. Se preserva el contexto de cambios locales ajenos.
 
 ## Pruebas
 
