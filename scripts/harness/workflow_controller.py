@@ -16,6 +16,7 @@ import sys
 
 sys.dont_write_bytecode = True
 from evidence_manager import EvidenceManager, EvidenceError, EvidenceValidationError, using_evidence, register_result
+from existing_content_validation import NOT_APPLICABLE_PHASES, validate_not_applicable_manifest
 
 
 GUARDS = {1: 'issue', 2: 'context', 3: 'branch', 4: 'sdd', 5: 'planning',
@@ -47,10 +48,11 @@ ALLOWED = {
     11: {'git_policy.post_check_commit'}, 13: {'git_policy.final_check', 'sdd_manager.inspect', 'verification_runner.project_final'},
 }
 EXTERNAL = {'github_issue_observation', 'implementation_evidence', 'repair_evidence',
-            'github_documentation_evidence', 'manual_validation_plan'}
+             'github_documentation_evidence', 'manual_validation_plan', 'no_change_documentation_evidence'}
 COMMIT_STEPS = ['git_policy.prepare_staging', 'git_policy.pre_commit_check',
                 'git_policy.create_commit', 'git_policy.check_commit']
 COMMIT_INPUTS = ['pre_stage_evidence', 'staging_preparation_evidence', 'pre_commit_evidence', 'commit_creation_evidence']
+EXISTING_CONTENT_PROFILE = 'existing-content-validation'
 
 
 class WorkflowController:
@@ -69,6 +71,9 @@ class WorkflowController:
         self.forbidden_action = False
         self.handed_off = False
         self.blockers = {}
+        self.profile = 'ordinary'
+        self.profile_authorization = None
+        self.outcome = None
 
     def snapshot(self):
         return {'workflow': {'issue': self.evidence.issue, 'repository': self.evidence.repository,
@@ -76,27 +81,65 @@ class WorkflowController:
                 'history': deepcopy(self.history), 'guards': deepcopy(self.guards),
                 'commit_step': self.commit_step, 'commit_created': self.commit_created,
                 'commit_outcome_unknown': self.commit_outcome_unknown, 'repair_cycle': self.repair_cycle, 'blockers': deepcopy(self.blockers),
-                'manual_validation': 'pending', 'finish_issue': 'not_executed_by_controller'},
+                'manual_validation': 'pending', 'finish_issue': 'not_executed_by_controller',
+                'profile': self.profile, 'profile_authorization': deepcopy(self.profile_authorization),
+                'outcome': self.outcome},
                 **self.evidence.snapshot()}
+
+    def select_profile(self, profile, authorization):
+        """Select the opt-in no-change route before the workflow begins."""
+        if self.phase != 0 or self.history or self.profile != 'ordinary':
+            raise EvidenceError('Profile selection is allowed only before the workflow starts')
+        if profile != EXISTING_CONTENT_PROFILE or not isinstance(authorization, dict):
+            raise EvidenceError('Unknown or unauthorized workflow profile')
+        if (authorization.get('profile') != profile or authorization.get('authorized') is not True
+                or authorization.get('source') != 'user' or not str(authorization.get('reason', '')).strip()):
+            raise EvidenceError('Existing-content validation requires explicit authorization and reason')
+        self.profile = profile
+        self.profile_authorization = deepcopy(authorization)
+        return {'status': 'PASS', 'profile': profile}
 
     def record_external(self, key, payload, *, topics=None):
         if key not in EXTERNAL or payload.get('phase') != self.phase:
             raise EvidenceError('External evidence is not allowed for this phase/key')
-        expected = {1: 'github_issue_observation', 6: 'implementation_evidence', 8: 'repair_evidence',
-                    12: 'github_documentation_evidence', 14: 'manual_validation_plan'}
-        if expected.get(self.phase) != key:
+        expected = {1: {'github_issue_observation'}, 6: {'implementation_evidence'}, 8: {'repair_evidence'},
+                    12: {'github_documentation_evidence'}, 14: {'manual_validation_plan', 'no_change_documentation_evidence'}}
+        if key not in expected.get(self.phase, set()):
             raise EvidenceError('Cannot inject evidence for a future or unrelated phase')
         if key == 'manual_validation_plan':
             if payload.get('manual_status') != 'pending' or not payload.get('checks') or any(
                 check.get('status') != 'pending' for check in payload['checks']
             ):
                 raise EvidenceError('Manual validation must remain pending')
+        if key == 'no_change_documentation_evidence':
+            required = {'outcome': 'NO_CHANGES', 'issue_state': 'open', 'manual_validation': 'pending'}
+            if any(payload.get(field) != value for field, value in required.items()) or payload.get('branch') is not None \
+                    or payload.get('commit') is not None or payload.get('publication') is not None \
+                    or not isinstance(payload.get('summary'), str) or not payload['summary'].strip():
+                raise EvidenceError('No-change documentation must truthfully report an open Issue, pending manual validation, and no branch, commit, or publication')
         default_topics = {'github_issue_observation': ['github', 'scope'],
                           'github_documentation_evidence': ['github', 'final', 'scope'],
                           'implementation_evidence': ['working_tree', 'scope'],
-                          'repair_evidence': ['working_tree', 'scope'],
-                          'manual_validation_plan': ['scope']}
+                           'repair_evidence': ['working_tree', 'scope'],
+                           'manual_validation_plan': ['scope'],
+                           'no_change_documentation_evidence': ['final', 'github', 'scope']}
         return self.evidence.record(key, payload, topics=sorted(set(default_topics[key]) | set(topics or [])))
+
+    def record_not_applicable_manifest(self, manifest):
+        """Bind every skipped profile operation to already-current evidence before routing."""
+        if self.profile != EXISTING_CONTENT_PROFILE or self.phase != 2:
+            raise EvidenceError('Non-applicability manifests are only allowed for the selected profile at phase 2')
+        valid, error = validate_not_applicable_manifest(manifest)
+        if not valid:
+            raise EvidenceError(error or 'Invalid non-applicability manifest')
+        for item in manifest:
+            for reference in item['evidence']:
+                self.evidence.resolve(reference, require_verified=True)
+        payload = {'source': 'workflow-controller', 'phase': 2, 'issue': self.evidence.issue,
+                   'repository': self.evidence.repository, 'workflow_id': self.evidence.workflow_id,
+                   'status': 'PASS', 'observed_at': datetime.now(timezone.utc).isoformat(), 'manifest': deepcopy(manifest)}
+        return self.evidence.record('existing_content_not_applicable_manifest', payload,
+                                    topics=['existing-content', 'scope'])
 
     def record_static(self, key, payload, kind, source, observed_at, status='PASS', paths=None):
         allowed = {1: {'issue_identity', 'approved_scope'}, 2: {'context_item', 'decisions', 'dependencies'},
@@ -118,7 +161,8 @@ class WorkflowController:
     def decide_guard(self, name, status, source, references, reason):
         if self.forbidden_action or self.handed_off:
             raise EvidenceError('The development session is closed or contains a forbidden action')
-        if name != GUARDS.get(self.phase) and not (name == 'repair' and self.phase in (7, 8)):
+        expected_guard = 'existing-content-validation' if self.profile == EXISTING_CONTENT_PROFILE and self.phase == 13 else GUARDS.get(self.phase)
+        if name != expected_guard and not (name == 'repair' and self.phase in (7, 8)):
             raise EvidenceError('Guard does not belong to the active phase')
         if (status not in ('PASS', 'BLOCK', 'FAIL', 'NEEDS_APPROVAL') or not reason.strip()
                 or source != '.opencode/commands/guardarails/' + name + '.md' or not references):
@@ -156,7 +200,13 @@ class WorkflowController:
         operation = operation.replace('-', '_')
         if self.forbidden_action or self.handed_off:
             raise EvidenceError('Development workflow cannot continue')
-        if operation not in ALLOWED.get(self.phase, set()):
+        allowed = set(ALLOWED.get(self.phase, set()))
+        if self.profile == EXISTING_CONTENT_PROFILE:
+            allowed = {
+                7: {'verification_runner.discover', 'verification_runner.build_selection', 'verification_runner.run_checks'},
+                13: {'existing_content_validation.snapshot', 'existing_content_validation.validate'},
+            }.get(self.phase, set())
+        if operation not in allowed:
             raise EvidenceError('Operation is not allowed in the active phase')
         if Path.cwd().resolve() != Path(self.evidence.repository):
             raise EvidenceError('Invoke local harness operations from the session repository root')
@@ -200,6 +250,14 @@ class WorkflowController:
                 previous = self.evidence.mutable.get('verification_evidence')
                 if previous and previous['valid'] and previous['status'] == 'FAIL':
                     raise EvidenceError('Failed verification requires the approved phase-8 repair route')
+        if operation == 'existing_content_validation.validate':
+            if 'baseline' in arguments or 'verification' in arguments:
+                raise EvidenceError('Existing-content baseline and verification evidence are controller-managed')
+            arguments = {
+                **arguments,
+                'baseline': self.evidence.get('existing_content_baseline')['payload'],
+                'verification': self.evidence.get('verification_evidence')['payload'],
+            }
         module, function = operation.split('.', 1)
         try:
             target = getattr(importlib.import_module(module), function)
@@ -310,12 +368,24 @@ class WorkflowController:
                 raise EvidenceError('Workflow cannot advance from a blocked or closed session')
             if any(blocker['phase'] == self.phase for blocker in self.blockers.values()):
                 raise EvidenceError('A failed local operation must be resolved by a successful rerun')
+            phase_required = REQUIRED.get(self.phase, [])
+            if self.profile == EXISTING_CONTENT_PROFILE and self.phase == 2:
+                phase_required = [*phase_required, ('mutable', 'existing_content_not_applicable_manifest')]
+            if self.profile == EXISTING_CONTENT_PROFILE and self.phase in (13, 14, 15):
+                phase_required = [('mutable', 'existing_content_validation_evidence'), ('mutable', 'verification_evidence')]
+                if self.phase == 13:
+                    phase_required.insert(0, ('mutable', 'existing_content_baseline'))
+                if self.phase == 14:
+                    phase_required += [('mutable', 'manual_validation_plan'), ('mutable', 'no_change_documentation_evidence')]
+                if self.phase == 15:
+                    phase_required += [('mutable', 'manual_validation_plan'), ('mutable', 'no_change_documentation_evidence')]
             required = []
-            for category, key in REQUIRED.get(self.phase, []):
+            for category, key in phase_required:
                 self.evidence.get(key, category)
                 required.append(self.evidence.reference(key, category))
             if self.phase:
-                guard = self._guard(GUARDS[self.phase])
+                guard_name = 'existing-content-validation' if self.profile == EXISTING_CONTENT_PROFILE and self.phase == 13 else GUARDS[self.phase]
+                guard = self._guard(guard_name)
                 if any(reference not in guard['references'] for reference in required):
                     raise EvidenceError('Guard does not bind every mandatory current evidence entry')
             if self.phase == 3:
@@ -336,10 +406,22 @@ class WorkflowController:
                 raise EvidenceError('Repair has not been explicitly authorized')
             if self.phase == 10 and self.commit_step != len(COMMIT_STEPS):
                 raise EvidenceError('The complete controlled commit sequence is required')
-            if self.phase:
+            if self.phase and not (self.profile == EXISTING_CONTENT_PROFILE and self.phase == 13):
                 self._capture_verified_history(guard)
             self.history.append({'phase': self.phase, 'status': 'PASS', 'evidence': required})
-            if self.phase == 7:
+            if self.profile == EXISTING_CONTENT_PROFILE and self.phase == 2:
+                manifest = self.evidence.get('existing_content_not_applicable_manifest')['payload']['manifest']
+                for item in sorted(manifest, key=lambda entry: entry['phase']):
+                    self.history.append({'phase': item['phase'], 'status': 'NOT_APPLICABLE',
+                                         'operation': item['operation'], 'authorization_source': item['authorization_source'],
+                                         'reason': item['reason'], 'evidence': deepcopy(item['evidence'])})
+                self.phase = 7
+            elif self.profile == EXISTING_CONTENT_PROFILE and self.phase == 7:
+                self.phase = 13
+            elif self.profile == EXISTING_CONTENT_PROFILE and self.phase == 13:
+                self.outcome = 'NO_CHANGES'
+                self.phase = 14
+            elif self.phase == 7:
                 self.history.append({'phase': 8, 'status': 'NOT_APPLICABLE', 'reason': 'All applicable verifications passed'})
                 self.phase = 9
             elif self.phase == 15:
@@ -373,6 +455,8 @@ def perform(controller, action):
         'enter_repair',
         'export_static',
         'revisit_phase',
+        'select_profile',
+        'record_not_applicable_manifest',
     }
 
     if operation not in allowed:

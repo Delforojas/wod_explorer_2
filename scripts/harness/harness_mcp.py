@@ -108,7 +108,7 @@ def harness_call(
     """Run a supported WorkflowController operation.
 
     Valid operations:
-    snapshot, advance, record_external, record_static,
+    snapshot, advance, select_profile, record_external, record_static,
     decide_guard, notify, invoke, enter_repair,
     export_static, revisit_phase.
 

@@ -13,10 +13,13 @@ Path: `.opencode/state/gissue-<N>/state.json` (gitignored).
 
 ```json
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "issue": 0,
   "run_id": null,
   "workflow": "gissue",
+  "profile": "ordinary",
+  "profile_authorization": null,
+  "outcome": null,
   "status": "IN_PROGRESS",
   "current_phase": 1,
 
@@ -44,7 +47,8 @@ Path: `.opencode/state/gissue-<N>/state.json` (gitignored).
     "implementation": [],
     "commit": {},
     "manifest": [],
-    "documentation": {}
+    "documentation": {},
+    "existing_content_validation": {}
   },
 
   "mutable": {
@@ -72,6 +76,12 @@ Path: `.opencode/state/gissue-<N>/state.json` (gitignored).
 and preserved when resuming the same execution.
 
 `workflow`: workflow identifier (`gissue`).
+
+`profile`: `ordinary` by default. `existing-content-validation` is accepted
+only when `profile_authorization` records `source: user`, an explicit selection,
+an authorization flag, and a reason before phase 1. `outcome` is `NO_CHANGES`
+only after the profile's local controller evidence passes; it never invents a
+branch, commit, publication, or Issue closure.
 
 `status`: `IN_PROGRESS`, `BLOCKED`, or `DONE`.
 
@@ -195,7 +205,19 @@ Entries are reused across phases until explicitly invalidated.
   its URL or ID and observation date.
 
   Phase 13 verifies the recorded documentation against
-  the actual GitHub result.
+   the actual GitHub result.
+
+- `existing_content_validation`: when the explicit profile is selected, stores
+  the baseline reference, criterion-to-evidence matrix, independent semantic
+  review, and each guarded `NOT_APPLICABLE` operation. Every entry has
+  authorization, reason, evidence, and `required_check: false`. Failed,
+  inaccessible, or incomplete checks are never non-applicable.
+
+  The manifest covers phases 3-6 and 8-12 before routing. Phase 7 is retained
+  for real applicable verification evidence, including `git diff --check`.
+  Phases 14-15 additionally store a truthful no-change documentation receipt
+  with an open Issue, pending manual validation, and null branch/commit/
+  publication fields.
 
 ### Mutable
 

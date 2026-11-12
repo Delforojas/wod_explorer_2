@@ -24,6 +24,22 @@ mutable_updates:         # optional: values re-observed now, with observed_at
   <key>: <value>
 mutated: false           # true if this phase changed Git, GitHub, or the working tree
 
+outcome: NO_CHANGES      # existing-content-validation phase 13 only; requires controller evidence
+not_applicable:          # optional, profile route only
+  - operation: <operation>
+    authorized: true
+    required_check: false
+    reason: <why it does not apply>
+    evidence: [<current evidence reference>]
+
+no_change_documentation: # handoff phases only; no remote publication is implied
+  outcome: NO_CHANGES
+  issue_state: open
+  manual_validation: pending
+  branch: null
+  commit: null
+  publication: null
+
 files:                   # optional: files this phase created, modified, deleted, or renamed
   - path: <path>
     change: A | M | D | R

@@ -4,7 +4,7 @@ agent: build
 model: openai/gpt-6.1-sol
 ---
 
-# /gissue $1 — Orchestrator
+# /gissue $1 [existing-content-validation] — Orchestrator
 
 You orchestrate GitHub Issue #$1.
 
@@ -41,6 +41,10 @@ workflow state file defined in the State section.
   Then set `status = IN_PROGRESS` and re-delegate the same phase.
   Never record an approval the user did not state.
 - If it does not exist, create it from the template with `issue = $1`.
+- The optional `existing-content-validation` profile is disabled by default.
+  Select it only after the user explicitly authorizes it with a reason; record
+  that exact authorization in `profile_authorization` before phase 1. Otherwise
+  use `ordinary`.
 - The orchestrator is the only writer of `state.json`
   until a validated State Manager is available.
 - Subagents must never modify canonical workflow state.
@@ -62,6 +66,22 @@ workflow state file defined in the State section.
 | 12    | handoff       | `github`  | 13      |
 | 13    | reviewer      | `final`   | 14      |
 | 14–15 | handoff       | `manual`  | done    |
+
+For `existing-content-validation`, phases 1-2 remain required. Before leaving
+phase 2, validate and bind a complete manifest for phases 3-6 and 8-12; each
+entry must carry its phase, operation, explicit user authorization, reason,
+current evidence reference, and `required_check: false`. Record those exact
+entries as `NOT_APPLICABLE`, then route to phase 7. Phase 7 is never
+non-applicable: it runs every applicable check, including `git diff --check`,
+and binds the real runner evidence to the verification guard. Only individual
+checks proven genuinely non-applicable may be documented in the runner's
+applicability evidence. Phase 13 requires the current baseline, verification
+evidence, criterion coverage, and independent semantic review. Phases 14-15
+also require truthful `NO_CHANGES` documentation evidence: Issue open, manual
+validation pending, and no invented branch, commit, or publication. A mutation,
+revert, protected-path change, attributable commit, failed check, or missing
+evidence is `BLOCKED`. The ordinary table and its branch, SDD, manifest,
+verification, and real-commit path remain unchanged.
 
 Invoke each subagent with: phase, mode, Issue number, and state file path.
 For phases 5b and 8, also pass the `failures` of the last reviewer (5b) or

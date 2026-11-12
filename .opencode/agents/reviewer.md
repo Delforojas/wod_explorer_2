@@ -102,6 +102,15 @@ Contract:
 
 ## Mode `final` — Phase 13
 
+When `profile` is `existing-content-validation`, do not apply the ordinary
+commit/manifest requirements below. Read the profile authorization and run the
+local `existing_content_validation` baseline/validation controls. Independently
+review every acceptance criterion against its current cited evidence. Require
+the phase 7 runner evidence for every applicable check, including `git diff
+--check`; verification itself cannot be `NOT_APPLICABLE`. Return `PASS` only
+when the controller evidence reports `NO_CHANGES`; otherwise return `BLOCKED`.
+Do not create or claim a branch, commit, manifest, or publication.
+
 Needed in state: `static.issue`, `static.sdd`, `static.branch`,
 `static.base`, `static.verification`, `static.commit`, `static.manifest`,
 `static.protected_paths`, `static.documentation`.

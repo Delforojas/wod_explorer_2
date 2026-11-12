@@ -107,6 +107,26 @@ Desde la raíz del repositorio:
 python3 scripts/harness/workflow_controller.py --serve
 ```
 
+## Perfil de contenido existente
+
+El perfil `existing-content-validation` se selecciona antes de la fase 1 con
+una autorización explícita y razón. Está desactivado por defecto. Antes de
+salir de fase 2, un manifiesto completo y resuelto contra el ledger documenta
+las fases 3-6 y 8-12 como `NOT_APPLICABLE`, con autorización de usuario,
+razón, evidencia y `required_check: false`. La fase 7 no se omite: ejecuta los
+checks aplicables, incluido `git diff --check`, y una evidencia fallida,
+incompleta o inaccesible bloquea.
+
+En fase 13, `existing_content_validation.snapshot` captura HEAD, árbol, índice,
+working tree, reflog y hashes de rutas protegidas. `validate` exige que esa
+línea base siga idéntica, cobertura actual de cada criterio y una revisión
+semántica independiente. También rechaza operaciones atribuibles prohibidas.
+El único resultado positivo es `NO_CHANGES`; no crea rama ni commit, no publica
+ni cierra la Issue. Las fases 14-15 exigen un recibo de documentación honesto:
+Issue abierta, validación manual pendiente y rama/commit/publicación nulos. El
+perfil ordinario conserva todas las fases y controles de branch, SDD, manifest,
+verificación y commit.
+
 Entrada/salida JSON por líneas. La primera solicitud es:
 
 ```json

@@ -40,11 +40,11 @@ STATIC_FIELDS = {
                        'dependency_approval', 'dependency_commits'},
 }
 EVENT_TOPICS = {
-    'file-change': {'instructions', 'working_tree', 'pre_stage', 'pre_commit', 'post_commit', 'final', 'verification', 'sdd'},
+    'file-change': {'instructions', 'working_tree', 'pre_stage', 'pre_commit', 'post_commit', 'final', 'verification', 'sdd', 'existing-content'},
     'sdd-change': {'instructions', 'working_tree', 'sdd', 'pre_stage', 'pre_commit', 'post_commit', 'final', 'verification'},
     'staging-change': {'index', 'git', 'pre_stage', 'pre_commit', 'post_commit', 'final'},
     'branch-change': {'branch', 'head', 'git', 'working_tree', 'index', 'pre_stage', 'pre_commit', 'post_commit', 'final'},
-    'history-change': {'head', 'git', 'index', 'pre_stage', 'pre_commit', 'post_commit', 'final'},
+    'history-change': {'head', 'git', 'index', 'pre_stage', 'pre_commit', 'post_commit', 'final', 'existing-content'},
     'remote-change': {'remote', 'post_commit', 'final'},
     'github-change': {'github', 'final'},
     'pr-change': {'pr', 'final'},
@@ -71,6 +71,9 @@ OBSERVATION_TOPICS = {
     'sdd_preparation_evidence': {'sdd', 'scope'},
     'verification_evidence': {'verification', 'scope', 'dependencies'},
     'final_verification_evidence': {'verification', 'final', 'scope'},
+    'existing_content_baseline': {'existing-content', 'working_tree', 'index', 'head', 'branch', 'scope'},
+    'existing_content_not_applicable_manifest': {'existing-content', 'scope'},
+    'existing_content_validation_evidence': {'existing-content', 'working_tree', 'index', 'head', 'branch', 'scope'},
 }
 PROHIBITED_STATIC_KEYS = {'pre_stage_evidence', 'post_commit_evidence', 'git_state', 'working_tree',
                           'staging_state', 'active_branch', 'head', 'head_sha', 'mutable',

@@ -22,6 +22,13 @@ former monolithic `/gissue` command.
 - Never discard, overwrite, stash, or include unrelated work.
 - Never push, merge, rebase, force-push, or rewrite Git history.
 - Never weaken verification or security controls to reduce token usage.
+- `existing-content-validation` is disabled unless the state records explicit
+  user authorization. It is a read-only route and may conclude `NO_CHANGES`
+  only from current controller evidence: baseline, clean index/tree, protected
+  hashes, criterion coverage, and an independent semantic review.
+- Applicable automated checks remain required in this profile. The verification
+  runner must execute them, including `git diff --check`; only an individual
+  genuinely non-applicable check may have an authorized evidence-bound record.
 
 ## Evidence
 
@@ -40,6 +47,9 @@ former monolithic `/gissue` command.
   orchestrator can route it to its repair step. Fill `failures`.
 - `BLOCKED`: a mandatory guard failed, essential information is missing, or an
   operation requires authorization.
+- `NOT_APPLICABLE`: only a profile-authorized operation with a reason and
+  evidence, recorded with `required_check: false`. It never converts a failed,
+  inaccessible, or incomplete check into a pass.
 
 Before returning `BLOCKED`:
 

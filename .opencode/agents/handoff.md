@@ -60,6 +60,13 @@ Return `PASS` with `static_updates.documentation: {comment, documented_at}`
 
 ## Mode `manual` — Phases 14–15
 
+For `existing-content-validation`, base the checklist and final handoff on the
+validated `NO_CHANGES` evidence instead of an invented SDD, branch, commit,
+manifest, or GitHub comment. Record truthful no-change documentation evidence:
+Issue open, manual validation pending, and `branch`, `commit`, and
+`publication` null. State that the Issue remains open and manual validation is
+pending.
+
 Needed in state: `static.issue`, `static.sdd`, `static.verification`,
 `static.implementation`, `static.commit`, `static.manifest`,
 `static.documentation`, and `log`. If any is missing → `BLOCKED`.
