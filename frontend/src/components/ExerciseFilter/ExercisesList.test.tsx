@@ -110,4 +110,28 @@ describe("ExercisesList", () => {
     expect(search).toHaveProperty("value", "");
     expect(document.activeElement).toBe(search);
   });
+
+  it("ignores leading and trailing spaces in the search without altering the typed text", () => {
+    renderInteractiveExercisesList();
+
+    const search = screen.getByLabelText("Buscar ejercicios");
+
+    fireEvent.change(search, { target: { value: "  sentadilla  " } });
+
+    expect(search).toHaveProperty("value", "  sentadilla  ");
+    expect(screen.getByText("Sentadilla")).toBeTruthy();
+    expect(screen.queryByText("Peso muerto")).toBeNull();
+  });
+
+  it("treats a search made only of spaces as an empty search", () => {
+    renderInteractiveExercisesList();
+
+    const search = screen.getByLabelText("Buscar ejercicios");
+
+    fireEvent.change(search, { target: { value: "   " } });
+
+    expect(search).toHaveProperty("value", "   ");
+    expect(screen.getByText("Sentadilla")).toBeTruthy();
+    expect(screen.getByText("Peso muerto")).toBeTruthy();
+  });
 });
