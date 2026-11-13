@@ -1,5 +1,5 @@
 ---
-description: Implements a prepared GitHub Issue through SDD, implementation, verification, and change review (phases 4–9 only)
+description: Implements a prepared GitHub Issue through phases 4–9
 ---
 
 # Dev Issue Workflow

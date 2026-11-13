@@ -1,5 +1,6 @@
 ---
-description: Verify and close a completed GitHub Issue using the local Python script
+description: Verify and close Issue
+agent: git-local
 ---
 
 # Close Issue Workflow

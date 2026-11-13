@@ -1,5 +1,6 @@
 ---
-description: Merge and publish a completed GitHub Issue using the local Python harness
+description: Merge and publish Issue
+agent: git-local
 ---
 
 # Merge Issue Workflow
