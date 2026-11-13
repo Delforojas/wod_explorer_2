@@ -20,7 +20,7 @@
       "type": "local",
       "command": ["./.venv/bin/python", "scripts/harness/harness_mcp.py"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000000
     },
     "21st": {
       "type": "remote",
