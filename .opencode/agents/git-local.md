@@ -1,6 +1,7 @@
 ---
 description: Ejecuta workflows Git mediante scripts Python locales
 mode: primary
+model: lmstudio/google/gemma-4-e2b
 
 permissions:
   - action: "*"

@@ -65,5 +65,14 @@
         }
       }
     }
+  },
+  "agent": {
+    "git-local": {
+      "model": "lmstudio/google/gemma-4-e2b",
+      "tools": {
+        "*": false,
+        "bash": true
+      }
+    }
   }
 }
