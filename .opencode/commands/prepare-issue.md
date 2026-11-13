@@ -1,5 +1,6 @@
 ---
-description: Prepare a GitHub Issue locally using Git and GitHub CLI
+description: Prepare GitHub Issue locally
+agent: git-local
 ---
 
 # Prepare Issue
