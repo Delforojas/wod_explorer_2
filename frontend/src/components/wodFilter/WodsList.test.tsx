@@ -155,14 +155,54 @@ describe("WodsList", () => {
     expect(markup).toContain('aria-pressed="true">HYBRID</button>');
     expect(markup).toContain("Hybrid Circuit");
     expect(markup).not.toContain("Morning Engine");
-    expect(markup).toContain("1 de 4 entrenamientos");
+    expect(markup).toContain("1 de 4 WODs");
   });
 
   it("uses Todos when the category URL parameter is invalid", () => {
     const markup = renderWodsList(false, "/wods?category=STRENGTH");
 
     expect(markup).toContain('aria-pressed="true">Todos</button>');
-    expect(markup).toContain("4 entrenamientos disponibles");
+    expect(markup).toContain("4 WODs disponibles");
     expect(markup).toContain("Strength Builder");
+  });
+
+  it("shows a singular count when exactly one WOD is available", () => {
+    const markup = renderToStaticMarkup(
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: false,
+          username: null,
+          signIn: () => undefined,
+          signOut: () => undefined,
+        }}
+      >
+        <MemoryRouter initialEntries={["/wods"]}>
+          <WodsList wods={[wods[0]]} onSelectWod={() => undefined} />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+
+    expect(markup).toContain("1 WOD disponible");
+    expect(markup).not.toContain("1 WODs");
+  });
+
+  it("shows a zero count without hiding the empty state when a search has no matches", () => {
+    const markup = renderToStaticMarkup(
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: false,
+          username: null,
+          signIn: () => undefined,
+          signOut: () => undefined,
+        }}
+      >
+        <MemoryRouter initialEntries={["/wods?category=HYBRID"]}>
+          <WodsList wods={[wods[0]]} onSelectWod={() => undefined} />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+
+    expect(markup).toContain("0 de 1 WOD");
+    expect(markup).toContain("No se encontraron WODs");
   });
 });
