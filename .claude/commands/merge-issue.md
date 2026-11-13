@@ -1,5 +1,6 @@
 ---
 description: Merge and publish a completed Issue with explicit user confirmation
+agent: git-local
 ---
 
 # Merge Issue Workflow
