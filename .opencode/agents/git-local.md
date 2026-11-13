@@ -1,7 +1,7 @@
 ---
 description: Ejecuta workflows Git mediante scripts Python locales
 mode: primary
-model: ollama/qwen3.5:4b
+
 permissions:
   - action: "*"
     resource: "*"
