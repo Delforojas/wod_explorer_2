@@ -17,6 +17,10 @@ function formatWodType(type: WodAggregateResponse["version"]["type"]) {
   return type === "FOR_TIME" ? "For Time" : type === "AMRAP" ? "AMRAP" : "EMOM";
 }
 
+function pluralizeWod(count: number) {
+  return `${count} WOD${count === 1 ? "" : "s"}`;
+}
+
 function getWodCategoryBadge(category: WodAggregateResponse["category"]) {
   if (category === "HYBRID") {
     return { label: "HYBRID", tone: "hybrid" };
@@ -136,10 +140,12 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
 
         {/* CONTADOR */}
 
-        <p className="wod-count">
+        <p className="wod-count" role="status" aria-live="polite">
           {hasActiveFilters
-            ? `${filteredWods.length} de ${wods.length} entrenamientos`
-            : `${wods.length} entrenamientos disponibles`}
+            ? `${filteredWods.length} de ${pluralizeWod(wods.length)}`
+            : `${pluralizeWod(wods.length)} disponible${
+                wods.length === 1 ? "" : "s"
+              }`}
         </p>
 
         {/* LISTADO */}
