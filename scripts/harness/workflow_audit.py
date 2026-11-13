@@ -34,11 +34,13 @@ def validate_action_log(value, workflow_id):
     events = value['events']
     if not isinstance(events, list) or not events or [item.get('sequence') for item in events] != list(range(1, len(events) + 1)):
         raise AuditError('Action audit sequence is incomplete')
-    allowed = {'issue-start', 'inspect', 'validate-base', 'prepare-branch', 'check-branch', 'sdd', 'planning',
+    allowed = {'issue-start', 'advance', 'record-external', 'record-static', 'decide-guard', 'notify',
+               'snapshot', 'export-static', 'revisit-phase', 'enter-repair', 'inspect', 'validate-base',
+               'prepare-branch', 'check-branch', 'sdd', 'planning',
                'implementation', 'verification', 'review-changes', 'change-review', 'prepare-staging',
                'pre-commit-check', 'create-commit', 'check-commit', 'commit-guard', 'post-check-commit',
                'post-commit-guard', 'github-read', 'github-documentation', 'github-documentation-guard',
-               'manual-validation-plan', 'final-check', 'handoff-guard'}
+               'manual-validation-plan', 'remote-refs-check', 'final-check', 'handoff-guard'}
     if events[0].get('operation') != 'issue-start' or any(item.get('operation') not in allowed for item in events):
         raise AuditError('Action audit contains an unverified external operation')
     if any(item['operation'] in {'push', 'finish-issue', 'manual-approve'} for item in events):

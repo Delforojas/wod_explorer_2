@@ -30,9 +30,18 @@
 5. Alta, reproducible: la fase 13 requería `tree_sha` y hashes SDD, pero el runner solo producía una huella anterior al commit. `verification_runner.project_final` conserva los informes originales y produce evidencia nueva únicamente cuando el manifiesto externo, el árbol confirmado y la observación post-commit coinciden.
 6. Media: el contrato exigía observaciones GitHub y una auditoría completa sin disponer de validadores locales de esquema. `workflow_audit.py` normaliza la forma de esas entradas y rechaza secuencias incompletas, operaciones externas no clasificadas y acciones prohibidas; no certifica la procedencia de un caller.
 
-## Límite pendiente
+## Registro de acciones y límite residual
 
-Una ejecución semántica real de las 15 fases requiere recibos actuales de GitHub y una auditoría externa de acciones completas, que el controlador no puede fabricar ni inferir. La validación de este límite se mantiene pendiente y no se interpreta como PASS automático.
+El controlador mantiene en memoria un registro secuencial de cada llamada
+`harness_call`, iniciado con `issue-start`. El modelo no dispone de una
+operación para crear ni modificar los eventos. Antes de `final-check`, el
+controlador compara las referencias `origin` observadas al inicio y al final;
+un cambio bloquea la sesión como posible push.
+
+La comparación no demuestra la autoría del cambio, no cubre referencias que no
+se observaron y no prueba acciones externas al proceso. Cuando esa observación
+no está disponible, el workflow debe detenerse en fase 13 y entregar un
+handoff manual que indique el límite, sin fabricar evidencia ni marcar PASS.
 
 La ejecución real de `/hyssue 201` permanece pendiente hasta que esta corrección esté integrada en `main`: la Issue #201 exige partir de `main` limpio y no puede validar legítimamente una corrección no integrada desde este árbol con cambios de #202.
 

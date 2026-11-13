@@ -141,6 +141,13 @@ class FinalCheckTests(unittest.TestCase):
         self.context.pop('github')
         self.assertEqual(self.final()['status'], 'FAIL')
 
+    def test_diagnostic_inventory_lists_checks_and_failures_for_missing_audit(self):
+        self.context.pop('actions')
+        evidence = self.final()
+        self.assertTrue(evidence['checks'])
+        self.assertTrue(evidence['failures'])
+        self.assertEqual(evidence['failures'][0]['condition'], "'actions'")
+
     def test_no_push_cannot_be_inferred_from_git(self):
         self.context.pop('actions')
         self.assertEqual(self.final()['status'], 'FAIL')
