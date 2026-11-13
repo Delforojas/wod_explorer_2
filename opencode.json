@@ -45,6 +45,9 @@
           "limit": {
             "context": 16384,
             "output": 2048
+          },
+          "body": {
+            "reasoning_effort": "none"
           }
         }
       }
