@@ -54,7 +54,15 @@
   text-transform: uppercase;
 }
 
+.wod-detail-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-3) var(--space-4);
+}
+
 .wod-detail-header h1 {
+  flex: 1 1 280px;
   margin: 0;
   color: #ffffff;
   font-family: var(--font-display);
@@ -63,6 +71,28 @@
   line-height: 0.98;
   letter-spacing: -0.06em;
   overflow-wrap: anywhere;
+}
+
+.wod-detail-copy {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--detail-border);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wod-detail-copy-feedback {
+  margin: var(--space-2) 0 0;
+  color: var(--detail-orange-light);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .wod-detail-description {
@@ -229,6 +259,7 @@
 }
 
 .wod-detail-back:focus-visible,
+.wod-detail-copy:focus-visible,
 .wod-detail-register:focus-visible {
   outline: 2px solid var(--detail-orange);
   outline-offset: 4px;
@@ -236,6 +267,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .wod-detail-back,
+  .wod-detail-copy,
   .wod-detail-register {
     transition:
       border-color 0.2s ease,
@@ -244,6 +276,7 @@
   }
 
   .wod-detail-back:hover,
+  .wod-detail-copy:hover,
   .wod-detail-register:hover {
     border-color: var(--detail-orange);
     background: rgba(255, 107, 0, 0.18);
@@ -275,10 +308,15 @@
   .wod-detail-register {
     align-self: stretch;
   }
+
+  .wod-detail-copy {
+    flex-basis: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .wod-detail-back,
+  .wod-detail-copy,
   .wod-detail-register {
     transition: none;
   }

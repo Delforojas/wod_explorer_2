@@ -1,8 +1,12 @@
+// @vitest-environment jsdom
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import WodDetail from "../wodFilter/WodDetail";
+import WodDetailLayout from "./WodDetail";
+import PublicWodDetail from "../wodFilter/WodDetail";
 import type { WodAggregateResponse } from "../../types/Wod";
 import MyWodDetail from "../../views/my-wods/components/MyWodDetail";
 
@@ -79,9 +83,13 @@ describe("shared WOD detail presentation", () => {
     authState.isAuthenticated = false;
   });
 
+  afterEach(() => {
+    cleanup();
+  });
+
   it("hides the public registration CTA for visitors", () => {
     const markup = renderDetail(
-      <WodDetail selectedWod={publicWod} onBack={() => undefined} />,
+      <PublicWodDetail selectedWod={publicWod} onBack={() => undefined} />,
     );
 
     expect(markup).toContain("Engine Builder");
@@ -101,7 +109,7 @@ describe("shared WOD detail presentation", () => {
     authState.isAuthenticated = true;
 
     const markup = renderDetail(
-      <WodDetail selectedWod={publicWod} onBack={() => undefined} />,
+      <PublicWodDetail selectedWod={publicWod} onBack={() => undefined} />,
     );
 
     expect(markup).toContain("Registrar resultado");
@@ -158,7 +166,7 @@ describe("shared WOD detail presentation", () => {
     };
 
     const markup = renderDetail(
-      <WodDetail selectedWod={cindy} onBack={() => undefined} />,
+      <PublicWodDetail selectedWod={cindy} onBack={() => undefined} />,
     );
 
     expect(markup).toContain("Cindy");
@@ -191,7 +199,7 @@ describe("shared WOD detail presentation", () => {
     };
 
     const markup = renderDetail(
-      <WodDetail selectedWod={emom} onBack={() => undefined} />,
+      <PublicWodDetail selectedWod={emom} onBack={() => undefined} />,
     );
 
     expect(markup).toContain("EMOM");
@@ -241,7 +249,7 @@ describe("shared WOD detail presentation", () => {
     };
 
     const markup = renderDetail(
-      <WodDetail selectedWod={mixedWork} onBack={() => undefined} />,
+      <PublicWodDetail selectedWod={mixedWork} onBack={() => undefined} />,
     );
 
     expect(markup).toContain('class="wod-detail-primary">50 m</span>');
@@ -255,5 +263,65 @@ describe("shared WOD detail presentation", () => {
     expect(markup.match(/>50 m</g)).toHaveLength(1);
     expect(markup.match(/>20 cal</g)).toHaveLength(1);
     expect(markup.match(/>60 s</g)).toHaveLength(1);
+  });
+
+  it("copies only the visible WOD name and confirms after the operation completes", async () => {
+    let resolveCopy: (() => void) | undefined;
+    const writeText = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveCopy = resolve;
+        }),
+    );
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+
+    render(
+      <WodDetailLayout
+        selectedWod={publicWod}
+        onBack={() => undefined}
+        eyebrow="WOD"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Copiar nombre" }));
+
+    expect(writeText).toHaveBeenCalledWith("Engine Builder");
+    expect(screen.queryByText("Copiado")).toBeNull();
+
+    resolveCopy?.();
+
+    expect((await screen.findByText("Copiado")).getAttribute("role")).toBe("status");
+  });
+
+  it("shows a failure message when copying the WOD name is rejected", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("Denied"));
+
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    });
+
+    render(
+      <WodDetailLayout
+        selectedWod={publicWod}
+        onBack={() => undefined}
+        eyebrow="WOD"
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Copiar nombre" }));
+
+    const feedback = await screen.findByText("No se pudo copiar el nombre.");
+
+    expect(feedback.getAttribute("role")).toBe("status");
+    expect(screen.queryByText("Copiado")).toBeNull();
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith("Engine Builder");
+    });
   });
 });

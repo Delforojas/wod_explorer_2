@@ -297,9 +297,11 @@ describe("useMyWods update", () => {
       );
     });
 
-    expect(hook.wods).toEqual([updatedWod]);
-    expect(hook.editingWod).toBeNull();
-    expect(hook.submitting).toBe(false);
+    await waitFor(() => {
+      expect(hook.wods).toEqual([updatedWod]);
+      expect(hook.editingWod).toBeNull();
+      expect(hook.submitting).toBe(false);
+    });
   });
 
   it("keeps the edit state and reports an error when the update fails", async () => {
