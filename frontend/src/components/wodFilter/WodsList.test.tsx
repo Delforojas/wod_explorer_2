@@ -1,6 +1,9 @@
+// @vitest-environment jsdom
+
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { AuthContext } from "../../auth/sessionContext";
 import type { WodAggregateResponse } from "../../types/Wod";
@@ -102,7 +105,26 @@ function renderWodsList(isAuthenticated: boolean, initialEntry = "/wods") {
   );
 }
 
+function renderInteractiveWodsList(initialEntry: string) {
+  return render(
+    <AuthContext.Provider
+      value={{
+        isAuthenticated: false,
+        username: null,
+        signIn: () => undefined,
+        signOut: () => undefined,
+      }}
+    >
+      <MemoryRouter initialEntries={[initialEntry]}>
+        <WodsList wods={wods} onSelectWod={() => undefined} />
+      </MemoryRouter>
+    </AuthContext.Provider>,
+  );
+}
+
 describe("WodsList", () => {
+  afterEach(cleanup);
+
   it("keeps public browsing available without exposing registration", () => {
     const markup = renderWodsList(false);
     const morningEngineMarkup = markup.slice(markup.indexOf("Morning Engine"));
@@ -237,5 +259,33 @@ describe("WodsList", () => {
     expect(markup).toContain(
       '<div class="wod-empty-state" role="status" aria-live="polite">',
     );
+  });
+
+  it("clears a search with Escape while preserving the selected category and focus", () => {
+    renderInteractiveWodsList("/wods?category=CROSSTRAINING");
+
+    const search = screen.getByLabelText("Buscar WODs");
+    search.focus();
+    fireEvent.change(search, { target: { value: "morning" } });
+
+    expect(screen.getByText("Morning Engine")).toBeTruthy();
+    expect(screen.queryByText("Hybrid Circuit")).toBeNull();
+
+    fireEvent.keyDown(search, { key: "Escape" });
+
+    expect(search).toHaveProperty("value", "");
+    expect(document.activeElement).toBe(search);
+    expect(
+      screen
+        .getByRole("button", { name: "CROSSTRAINING" })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(screen.getByText("Morning Engine")).toBeTruthy();
+    expect(screen.queryByText("Hybrid Circuit")).toBeNull();
+
+    fireEvent.keyDown(search, { key: "Escape" });
+
+    expect(search).toHaveProperty("value", "");
+    expect(document.activeElement).toBe(search);
   });
 });
