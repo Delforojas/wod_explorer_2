@@ -140,7 +140,7 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
 
         {/* CONTADOR */}
 
-        <p className="wod-count">
+        <p className="wod-count" role="status" aria-live="polite">
           {hasActiveFilters
             ? `${filteredWods.length} de ${pluralizeWod(wods.length)}`
             : `${pluralizeWod(wods.length)} disponible${

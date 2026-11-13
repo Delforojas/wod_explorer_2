@@ -205,4 +205,37 @@ describe("WodsList", () => {
     expect(markup).toContain("0 de 1 WOD");
     expect(markup).toContain("No se encontraron WODs");
   });
+
+  it("exposes the counter as an accessible status region", () => {
+    const markup = renderWodsList(false);
+
+    expect(markup).toContain(
+      '<p class="wod-count" role="status" aria-live="polite">',
+    );
+    expect(markup).toContain("4 WODs disponibles");
+  });
+
+  it("keeps the counter's status region separate from the empty state region when there are no matches", () => {
+    const markup = renderToStaticMarkup(
+      <AuthContext.Provider
+        value={{
+          isAuthenticated: false,
+          username: null,
+          signIn: () => undefined,
+          signOut: () => undefined,
+        }}
+      >
+        <MemoryRouter initialEntries={["/wods?category=HYBRID"]}>
+          <WodsList wods={[wods[0]]} onSelectWod={() => undefined} />
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+
+    expect(markup).toContain(
+      '<p class="wod-count" role="status" aria-live="polite">0 de 1 WOD</p>',
+    );
+    expect(markup).toContain(
+      '<div class="wod-empty-state" role="status" aria-live="polite">',
+    );
+  });
 });
