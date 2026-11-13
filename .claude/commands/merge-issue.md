@@ -1,108 +1,173 @@
 ---
-description: Merge and publish Issue
-agent: git-local
+description: Merge and publish a completed Issue with explicit user confirmation
 ---
 
 # Merge Issue Workflow
 
-Merge GitHub Issue **#$1** into `main` using the local Python script.
+Integrate GitHub Issue **#$1** into `main` and publish it.
 
-This command performs only the final integration of an already committed Issue.
+This command must ask for explicit user confirmation before
+the merge and before the push.
 
-Do not implement code, modify application files, create SDDs, stage changes, create development commits, or close GitHub Issues.
+Do not use `scripts/merge_issue.py` in this workflow,
+because its interactive input() calls are not supported
+by the current OpenCode shell execution environment.
 
 ## 1. Execution Rules
 
-- Follow the applicable `AGENTS.md` instructions.
-- Use the existing local script `scripts/merge_issue.py`.
-- Do not duplicate its Git operations manually.
-- Never bypass a BLOCK or failed Git command.
-- Do not force Git operations.
-- Never discard local changes.
-- Do not invent verification results.
-- Keep context and token consumption minimal.
+- Follow applicable AGENTS.md rules.
+- Never force push.
+- Never reset or discard changes.
+- Never bypass failed checks.
+- Never approve operations on behalf of the user.
+- Never execute merges or pushes without explicit confirmation.
+- Do not stage files or create development commits.
+- Do not close the GitHub Issue.
+- Stop on unexpected Git states.
 
-## 2. Verify Preconditions
+## 2. Verify Repository State
 
-Before executing the script, check:
-
-- Issue number is valid.
-- `scripts/merge_issue.py` exists.
-- `/dev-issue $1` completed with `READY_FOR_STAGING`.
-- The Issue has a committed implementation.
-- No unresolved Git conflicts exist.
-- No merge or rebase is pending.
-
-If preparation cannot be verified, report BLOCKED.
-
-Do not automatically repeat development or verification phases.
-
-## 3. Execute Local Merge Script
-
-Run exactly:
+Run read-only commands:
 
 ```bash
-python3 scripts/merge_issue.py $1
-```
-
-The Python script is responsible for:
-
-1. Detecting the current branch.
-2. Identifying the Issue branch.
-3. Checking Git status.
-4. Switching to `main`.
-5. Updating `main` with `git pull --ff-only origin main`.
-6. Checking whether the Issue is already merged.
-7. Showing pending commits.
-8. Requesting explicit confirmation before the merge.
-9. Executing `git merge --no-ff --no-edit`.
-10. Showing Git status and recent commits.
-11. Requesting explicit confirmation before push.
-12. Executing `git push origin main` once.
-
-Do not independently run these Git commands.
-
-If the script requests user input, preserve the interactive confirmation process.
-
-If the execution environment cannot support interactive input, STOP and instruct the user to run `missue $1` directly in the terminal.
-
-Never automatically answer confirmation prompts.
-
-## 4. Handle Failures
-
-If the script returns an error:
-
-- Stop immediately.
-- Preserve the current repository state.
-- Report the exact error.
-- Do not retry merges automatically.
-- Do not run `git reset --hard`, force push, rebase or conflict resolution without authorization.
-
-A failed merge must never be reported as successful.
-
-## 5. Final Verification
-
-After the script reports success, run read-only checks:
-
-```bash
-git branch --show-current
 git status
-git log --oneline -3
+git branch --show-current
+git branch --list
 ```
 
 Verify:
 
-- Active branch is `main`.
-- Issue branch was integrated.
-- No merge operation remains pending.
-- The push was successfully completed.
-- No unrelated work was discarded.
+- No unresolved conflicts exist.
+- No merge or rebase is pending.
+- The Issue has a dedicated committed branch.
+- No unrelated tracked or staged changes exist.
+- The branch is not ambiguous.
 
-Do not interpret `MERGED_LOCALLY` as `MERGE_PUBLISHED`.
+If any validation fails, STOP.
+
+## 3. Identify Issue Branch
+
+Find the local branch associated with Issue #$1.
+
+Use:
+
+```bash
+git for-each-ref --format='%(refname:short)' refs/heads/
+```
+
+Require exactly one branch whose name matches:
+
+`<prefix>/$1-<slug>`
+
+Do not guess branch names.
+
+If multiple branches match, STOP.
+
+Record the actual branch name and HEAD SHA.
+
+## 4. Update Main
+
+Show the current branch and ask:
+
+"Voy a cambiar a main y actualizarla desde origin/main. ¿Autorizas esta operación?"
+
+Continue only after explicit confirmation.
+
+Execute:
+
+```bash
+git switch main
+git pull --ff-only origin main
+```
+
+If either command fails, STOP.
+
+## 5. Review Pending Integration
+
+Run:
+
+```bash
+git status
+git log --oneline main..<issue-branch>
+git diff --stat main...<issue-branch>
+```
+
+Verify that the Issue branch has commits to integrate.
+
+Check whether it is already merged:
+
+```bash
+git merge-base --is-ancestor <issue-branch> main
+```
+
+If already merged, do not repeat the merge.
+
+If not merged, show the actual commits and changed files.
+
+Ask:
+
+"¿Autorizas integrar la rama <issue-branch> en main?"
+
+Continue only after explicit confirmation.
+
+## 6. Execute Merge
+
+Run:
+
+```bash
+git merge --no-ff --no-edit <issue-branch>
+```
+
+If conflicts occur, STOP and preserve Git state.
+
+Do not automatically resolve conflicts.
+
+After a successful merge, verify:
+
+```bash
+git status
+git log --oneline -3
+```
+
+## 7. Confirm Publication
+
+Before pushing, check:
+
+```bash
+git status
+git log --oneline origin/main..main
+```
+
+Show every commit that would be published.
+
+Ask:
+
+"Estos son los commits pendientes de publicar en GitHub. ¿Autorizas git push origin main?"
+
+Continue only after explicit confirmation.
+
+## 8. Publish Main
+
+Execute:
+
+```bash
+git push origin main
+```
+
+Then verify:
+
+```bash
+git fetch origin main
+git status
+git rev-parse main
+git rev-parse origin/main
+```
+
+Require `main` and `origin/main` to have the same commit SHA.
 
 ## Final Output
 
-If the script reports successful integration and publication:
+When all checks pass:
 
 MERGE_PUBLISHED
 
@@ -110,17 +175,16 @@ Report:
 
 - Issue number.
 - Integrated branch.
-- Merge commit hash.
-- Target branch: main.
-- Push status.
-- Remaining local files or warnings.
+- Merge commit.
+- Published commits.
+- Remote synchronization status.
 
-If the merge completed but the push was not performed:
+If the merge completed without push:
 
 MERGED_LOCALLY
 
-If any mandatory condition fails:
+If any required operation fails:
 
 BLOCKED
 
-Do not delete branches or close GitHub Issues.
+Never delete branches or close GitHub Issues.
