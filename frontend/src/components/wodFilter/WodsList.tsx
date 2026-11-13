@@ -21,6 +21,10 @@ function pluralizeWod(count: number) {
   return `${count} WOD${count === 1 ? "" : "s"}`;
 }
 
+function pluralizeCharacterCount(count: number) {
+  return count === 1 ? "1 carácter" : `${count} caracteres`;
+}
+
 function getWodCategoryBadge(category: WodAggregateResponse["category"]) {
   if (category === "HYBRID") {
     return { label: "HYBRID", tone: "hybrid" };
@@ -117,6 +121,12 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
               </button>
             )}
           </div>
+
+          {search.length > 0 && (
+            <p className="wod-search-char-count">
+              {pluralizeCharacterCount(search.length)}
+            </p>
+          )}
         </div>
 
         <div

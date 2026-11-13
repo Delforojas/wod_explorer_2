@@ -390,6 +390,16 @@
   }
 }
 
+.wod-search-char-count {
+  align-self: flex-end;
+  margin: 0;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  color: var(--color-text-muted);
+}
+
 /* RESPONSIVE */
 
 @media (min-width: 600px) {

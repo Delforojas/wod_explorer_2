@@ -318,4 +318,52 @@ describe("WodsList", () => {
     expect(screen.getByText("Morning Engine")).toBeTruthy();
     expect(screen.getByText("1 de 4 WODs")).toBeTruthy();
   });
+
+  it("shows a pluralized character count while typing a search", () => {
+    renderInteractiveWodsList("/wods");
+
+    const search = screen.getByLabelText("Buscar WODs");
+
+    fireEvent.change(search, { target: { value: "Fran" } });
+
+    expect(screen.getByText("4 caracteres")).toBeTruthy();
+  });
+
+  it("shows the singular character count for a single character", () => {
+    renderInteractiveWodsList("/wods");
+
+    const search = screen.getByLabelText("Buscar WODs");
+
+    fireEvent.change(search, { target: { value: "F" } });
+
+    expect(screen.getByText("1 carácter")).toBeTruthy();
+  });
+
+  it("hides the character count when the search is empty", () => {
+    renderInteractiveWodsList("/wods");
+
+    expect(screen.queryByText(/carácter/)).toBeNull();
+
+    const search = screen.getByLabelText("Buscar WODs");
+
+    fireEvent.change(search, { target: { value: "Fran" } });
+    expect(screen.getByText("4 caracteres")).toBeTruthy();
+
+    fireEvent.change(search, { target: { value: "" } });
+    expect(screen.queryByText(/carácter/)).toBeNull();
+  });
+
+  it("clears the character count along with the search on Escape", () => {
+    renderInteractiveWodsList("/wods");
+
+    const search = screen.getByLabelText("Buscar WODs");
+
+    fireEvent.change(search, { target: { value: "Fran" } });
+    expect(screen.getByText("4 caracteres")).toBeTruthy();
+
+    fireEvent.keyDown(search, { key: "Escape" });
+
+    expect(search).toHaveProperty("value", "");
+    expect(screen.queryByText(/carácter/)).toBeNull();
+  });
 });
