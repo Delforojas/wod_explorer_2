@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import type { WodAggregateResponse } from "../../types/Wod";
@@ -54,8 +55,47 @@ function WodDetail({
   description,
   registrationHref,
 }: WodDetailLayoutProps) {
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const feedbackTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (feedbackTimer.current !== null) {
+        window.clearTimeout(feedbackTimer.current);
+      }
+    };
+  }, []);
+
   if (!selectedWod) {
     return null;
+  }
+
+  const wodName = selectedWod.name;
+
+  function showCopyFeedback(message: string): void {
+    if (feedbackTimer.current !== null) {
+      window.clearTimeout(feedbackTimer.current);
+    }
+
+    setCopyFeedback(message);
+    feedbackTimer.current = window.setTimeout(() => {
+      setCopyFeedback(null);
+      feedbackTimer.current = null;
+    }, 3000);
+  }
+
+  async function handleCopyName(): Promise<void> {
+    if (!navigator.clipboard?.writeText) {
+      showCopyFeedback("No se pudo copiar el nombre.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(wodName);
+      showCopyFeedback("Copiado");
+    } catch {
+      showCopyFeedback("No se pudo copiar el nombre.");
+    }
   }
 
   return (
@@ -67,7 +107,22 @@ function WodDetail({
 
         <header className="wod-detail-header">
           <p className="wod-detail-eyebrow">{eyebrow}</p>
-          <h1>{selectedWod.name}</h1>
+          <div className="wod-detail-title-row">
+            <h1>{wodName}</h1>
+            <button
+              className="wod-detail-copy"
+              type="button"
+              onClick={handleCopyName}
+            >
+              Copiar nombre
+            </button>
+          </div>
+
+          {copyFeedback && (
+            <p className="wod-detail-copy-feedback" role="status">
+              {copyFeedback}
+            </p>
+          )}
 
           {description && (
             <p className="wod-detail-description">{description}</p>
