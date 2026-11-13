@@ -96,6 +96,11 @@ function WodsList({ wods, onSelectWod }: WodsListProps) {
               placeholder="Buscar WOD..."
               value={search}
               onChange={(event) => setSearch(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape" && search.length > 0) {
+                  setSearch("");
+                }
+              }}
               autoComplete="off"
             />
 
