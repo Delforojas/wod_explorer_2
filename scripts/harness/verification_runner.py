@@ -44,9 +44,9 @@ def file_digest(path):
     return hasher.hexdigest()
 
 
-def git(root, *args):
+def git(root, *args, input_data=None):
     env = {**os.environ, 'GIT_OPTIONAL_LOCKS': '0', 'GIT_TERMINAL_PROMPT': '0'}
-    process = subprocess.run(['git', '-C', str(root), *args], capture_output=True, env=env, timeout=20)
+    process = subprocess.run(['git', '-C', str(root), *args], input=input_data, capture_output=True, env=env, timeout=20)
     if process.returncode:
         raise VerificationError('Cannot observe Git: ' + ' '.join(args))
     return process.stdout
@@ -64,6 +64,14 @@ def local_path(root, relative):
     if not path.resolve().is_relative_to(root):
         raise VerificationError('Path escapes the repository: ' + relative)
     return path
+
+
+def canonical_blob_oid(root, relative, data):
+    """Return Git's filtered blob identity for working-tree bytes at relative."""
+    value = git(root, 'hash-object', '--stdin', '--path=' + relative, input_data=data).strip()
+    if not re.fullmatch(rb'[0-9a-f]{40}(?:[0-9a-f]{24})?', value):
+        raise VerificationError('Git returned an invalid filtered blob identity: ' + relative)
+    return os.fsdecode(value)
 
 
 def fingerprint(root, manifest_path=None):
@@ -92,8 +100,11 @@ def fingerprint(root, manifest_path=None):
                 raise VerificationError('Source changed during observation: ' + relative)
         else:
             raise VerificationError('Cannot fingerprint source/submodule: ' + relative)
-        files[relative] = {'exists': True, 'mode': mode, 'sha256': hashlib.sha256(data).hexdigest(),
-                           'mtime_ns': info.st_mtime_ns, 'identity': [info.st_dev, info.st_ino]}
+        record = {'exists': True, 'mode': mode, 'sha256': hashlib.sha256(data).hexdigest(),
+                  'mtime_ns': info.st_mtime_ns, 'identity': [info.st_dev, info.st_ino]}
+        if mode != 'symlink':
+            record['git_blob_oid'] = canonical_blob_oid(root, relative, data)
+        files[relative] = record
     snapshot = {'head_sha': head, 'branch': branch, 'index_sha256': hashlib.sha256(index).hexdigest(), 'files': files}
     if manifest_path is not None:
         with manifest_path.open('x', encoding='utf-8') as stream:
@@ -458,11 +469,12 @@ def _tree_files(root, tree_sha):
         if not record:
             continue
         metadata, raw_path = record.split(b'\t', 1)
-        mode, kind, _ = os.fsdecode(metadata).split()
+        mode, kind, object_id = os.fsdecode(metadata).split()
         if kind != 'blob':
             raise VerificationError('Commit tree contains a non-blob entry')
         path = os.fsdecode(raw_path)
-        result[path] = {'mode': mode, 'sha256': hashlib.sha256(git(root, 'show', f'{tree_sha}:{path}')).hexdigest()}
+        result[path] = {'mode': mode, 'object_id': object_id,
+                        'sha256': hashlib.sha256(git(root, 'show', f'{tree_sha}:{path}')).hexdigest()}
     return result
 
 
@@ -503,7 +515,13 @@ def project_final(issue, workflow_id, verification_path, post_path, sdd_path, re
         if not isinstance(manifest_files, dict) or set(tree_files) != set(manifest_files):
             raise VerificationError('Committed tree does not match the verified source inventory')
         for path, expected in manifest_files.items():
-            if not expected.get('exists') or tree_files[path]['sha256'] != expected.get('sha256'):
+            if not expected.get('exists'):
+                raise VerificationError('Committed tree content differs from verified source: ' + path)
+            if expected.get('mode') != 'symlink' and not isinstance(expected.get('git_blob_oid'), str):
+                raise VerificationError('Verified source lacks canonical Git content evidence: ' + path)
+            actual = tree_files[path]['object_id'] if expected.get('mode') != 'symlink' else tree_files[path]['sha256']
+            expected_content = expected.get('git_blob_oid') if expected.get('mode') != 'symlink' else expected.get('sha256')
+            if actual != expected_content:
                 raise VerificationError('Committed tree content differs from verified source: ' + path)
         files = {}
         for name in ('spec.md', 'plan.md', 'tasks.md'):
