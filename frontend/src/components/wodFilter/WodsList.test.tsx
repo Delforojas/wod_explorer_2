@@ -288,4 +288,34 @@ describe("WodsList", () => {
     expect(search).toHaveProperty("value", "");
     expect(document.activeElement).toBe(search);
   });
+
+  it("ignores leading and trailing spaces in the search without altering the typed text", () => {
+    renderInteractiveWodsList("/wods?category=CROSSTRAINING");
+
+    const search = screen.getByLabelText("Buscar WODs");
+
+    fireEvent.change(search, { target: { value: "  morning  " } });
+
+    expect(search).toHaveProperty("value", "  morning  ");
+    expect(
+      screen
+        .getByRole("button", { name: "CROSSTRAINING" })
+        .getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(screen.getByText("Morning Engine")).toBeTruthy();
+    expect(screen.queryByText("Hybrid Circuit")).toBeNull();
+    expect(screen.getByText("1 de 4 WODs")).toBeTruthy();
+  });
+
+  it("treats a search made only of spaces as an empty search", () => {
+    renderInteractiveWodsList("/wods?category=CROSSTRAINING");
+
+    const search = screen.getByLabelText("Buscar WODs");
+
+    fireEvent.change(search, { target: { value: "   " } });
+
+    expect(search).toHaveProperty("value", "   ");
+    expect(screen.getByText("Morning Engine")).toBeTruthy();
+    expect(screen.getByText("1 de 4 WODs")).toBeTruthy();
+  });
 });
