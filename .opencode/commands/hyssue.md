@@ -2103,10 +2103,11 @@ The local harness must:
 - Return structured current Git evidence.
 - Never modify Git, staging, files or history.
 
-The local Git check cannot independently establish
-that no push occurred throughout the workflow.
-
-Require reliable workflow action evidence for that claim.
+The controller records every `harness_call` in a private in-memory action log
+that starts with `issue-start`; the model cannot create or modify its events.
+It also compares observed `origin` refs at session start and before
+`final-check`. A changed or unavailable observation blocks the phase; it never
+counts as proof that no push happened.
 
 ### 13.3. SDD and Verification Evidence
 
@@ -2165,13 +2166,12 @@ the Final Workflow Guard returns PASS.
 
 #### Acknowledged Limit — Phases 12, 14 and 15
 
-A real semantic execution of Phases 12, 14 and 15 requires an actual
-GitHub publication/read receipt and a complete external audit of
-workflow actions (including provable absence of any push) that the
-local controller cannot fabricate or infer, as already documented in
-`docs/hyssue-audit-202.md`. Treat this as an acknowledged, pending
-limit: never declare full end-to-end success across Phases 0–15
-without that external evidence, and never simulate it.
+A real semantic execution still requires actual GitHub publication/read
+receipts. The generated action log and observed remote refs do not prove
+authorship, actions outside the process or unobserved references. If phase 13
+cannot establish the required evidence, stop and provide a manual handoff that
+names the failed condition and this limit; never fabricate evidence, advance to
+manual approval, push or execute `/finish-issue`.
 
 ### Blocking Policy
 

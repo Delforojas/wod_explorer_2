@@ -32,9 +32,14 @@ conserva resultados y huellas de fuente; y `evidence_manager.py` valida el
 ledger versionado. Ninguno de ellos sustituye la evidencia semántica, de GitHub
 o de auditoría externa exigida por este contrato.
 
-Git local no demuestra que no hubo push. Esa condición exige un registro de
-acciones fiable que cubra todo el workflow, incluidas acciones externas al
-harness. Una declaración aislada `pushed=false` no es suficiente.
+Git local no demuestra que no hubo push. El controlador genera en memoria el
+registro de acciones de cada llamada `harness_call`, comenzando con
+`issue-start`; el modelo no tiene ninguna operación para escribirlo ni editarlo.
+Al iniciar y antes de `final-check`, el controlador compara las referencias
+remotas `origin` para detectar cambios observables durante la sesión. Esa
+comparación no atribuye el cambio a un actor concreto ni cubre referencias no
+observadas o acciones fuera de la sesión; un resultado no observable queda
+como límite y no se simula como ausencia de push.
 Los JSON y sus hashes son referencias de integridad, **no firmas ni pruebas de
 autenticidad**: el workflow debe conservar su procedencia y completitud. Una
 cadena con datos desconocidos, incompletos o invalidados devuelve `FAIL`.
@@ -109,7 +114,10 @@ ensure_ascii=True).encode()`. Los de archivos se calculan sobre sus bytes.
   `create-commit` satisfactorio con `commit_sha` y `github-documentation`
   satisfactorio con `comment_id`. Cualquier `push`, `finish-issue` o
   `manual-approve` bloquea, al igual que una operación sin clasificar. Las demás
-  operaciones admitidas son los nombres canónicos del harness, `sdd`,
+  operaciones admitidas incluyen las llamadas de control `advance`,
+  `record-external`, `record-static`, `decide-guard`, `notify`, `snapshot`,
+  `export-static`, `revisit-phase` y `enter-repair`, además de los nombres
+  canónicos del harness, `sdd`,
   `planning`, `implementation`, `verification`, `change-review`, `commit-guard`,
   `post-commit-guard`, `github-read`, `github-documentation-guard`,
   `manual-validation-plan`, `handoff-guard`.

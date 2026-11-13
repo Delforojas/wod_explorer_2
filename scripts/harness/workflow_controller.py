@@ -12,10 +12,12 @@ import importlib
 import inspect
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 sys.dont_write_bytecode = True
-from evidence_manager import EvidenceManager, EvidenceError, EvidenceValidationError, using_evidence, register_result
+from evidence_manager import EvidenceManager, EvidenceError, EvidenceValidationError, read_json, using_evidence, register_result
+from workflow_audit import AuditError, validate_action_log
 
 
 GUARDS = {1: 'issue', 2: 'context', 3: 'branch', 4: 'sdd', 5: 'planning',
@@ -53,6 +55,64 @@ COMMIT_STEPS = ['git_policy.prepare_staging', 'git_policy.pre_commit_check',
 COMMIT_INPUTS = ['pre_stage_evidence', 'staging_preparation_evidence', 'pre_commit_evidence', 'commit_creation_evidence']
 
 
+class ActionAudit:
+    """Controller-owned action history; callers can only receive copies."""
+
+    def __init__(self, workflow_id):
+        self.workflow_id = workflow_id
+        self.events = []
+        self.record('issue-start', 'PASS')
+        self.initial_remote_refs = self._remote_refs()
+
+    @staticmethod
+    def _remote_refs():
+        try:
+            result = subprocess.run(
+                ['git', 'ls-remote', '--heads', 'origin'], capture_output=True,
+                text=True, timeout=20, check=False,
+            )
+        except OSError:
+            return None
+        if result.returncode:
+            return None
+        return tuple(sorted(line for line in result.stdout.splitlines() if line.strip()))
+
+    def record(self, operation, status, **details):
+        event = {'sequence': len(self.events) + 1, 'operation': operation, 'status': status}
+        event.update({key: value for key, value in details.items() if value is not None})
+        self.events.append(event)
+
+    def check_remote_refs(self):
+        current = self._remote_refs()
+        unchanged = self.initial_remote_refs is not None and current == self.initial_remote_refs
+        self.record('remote-refs-check', 'PASS' if unchanged else 'BLOCK', remote_refs_unchanged=unchanged)
+        return unchanged
+
+    def payload(self):
+        value = {'source': 'workflow-action-log', 'complete': True,
+                 'coverage': 'entire-workflow', 'workflow_id': self.workflow_id,
+                 'events': deepcopy(self.events)}
+        validate_action_log(value, self.workflow_id)
+        return value
+
+
+def audit_operation(operation, arguments):
+    if operation != 'invoke':
+        return operation.replace('_', '-')
+    invoked = arguments.get('operation', '')
+    names = {
+        'git_policy.inspect': 'inspect', 'git_policy.validate_base': 'validate-base',
+        'git_policy.prepare_branch': 'prepare-branch', 'git_policy.check_branch': 'check-branch',
+        'sdd_manager.inspect': 'sdd', 'sdd_manager.prepare': 'sdd',
+        'verification_runner.discover': 'verification', 'verification_runner.build_selection': 'verification',
+        'verification_runner.run_checks': 'verification', 'git_policy.review_changes': 'review-changes',
+        'git_policy.prepare_staging': 'prepare-staging', 'git_policy.pre_commit_check': 'pre-commit-check',
+        'git_policy.create_commit': 'create-commit', 'git_policy.check_commit': 'check-commit',
+        'git_policy.post_check_commit': 'post-check-commit', 'git_policy.final_check': 'final-check',
+    }
+    return names.get(invoked, invoked.replace('_', '-'))
+
+
 class WorkflowController:
     def __init__(self, issue, repository, workflow_id):
         self.evidence = EvidenceManager(issue, repository, workflow_id)
@@ -69,6 +129,7 @@ class WorkflowController:
         self.forbidden_action = False
         self.handed_off = False
         self.blockers = {}
+        self.actions = ActionAudit(workflow_id)
 
     def snapshot(self):
         return {'workflow': {'issue': self.evidence.issue, 'repository': self.evidence.repository,
@@ -76,8 +137,9 @@ class WorkflowController:
                 'history': deepcopy(self.history), 'guards': deepcopy(self.guards),
                 'commit_step': self.commit_step, 'commit_created': self.commit_created,
                 'commit_outcome_unknown': self.commit_outcome_unknown, 'repair_cycle': self.repair_cycle, 'blockers': deepcopy(self.blockers),
-                'manual_validation': 'pending', 'finish_issue': 'not_executed_by_controller'},
-                **self.evidence.snapshot()}
+                 'manual_validation': 'pending', 'finish_issue': 'not_executed_by_controller'},
+                 'actions': self.actions.payload(),
+                 **self.evidence.snapshot()}
 
     def record_external(self, key, payload, *, topics=None):
         if key not in EXTERNAL or payload.get('phase') != self.phase:
@@ -161,6 +223,11 @@ class WorkflowController:
         if Path.cwd().resolve() != Path(self.evidence.repository):
             raise EvidenceError('Invoke local harness operations from the session repository root')
         arguments = deepcopy(arguments)
+        if operation == 'git_policy.final_check':
+            self.actions.check_remote_refs()
+            context = read_json(arguments['context_path'])
+            context['actions'] = self.actions.payload()
+            arguments['context_path'] = context
         if 'issue' in arguments and arguments['issue'] != self.evidence.issue:
             raise EvidenceError('Operation belongs to another Issue')
         if 'workflow_id' in arguments and arguments['workflow_id'] != self.evidence.workflow_id:
@@ -361,7 +428,9 @@ def perform(controller, action):
     operation = action['operation']
 
     if operation == 'snapshot':
-        return controller.snapshot()
+        result = controller.snapshot()
+        controller.actions.record('snapshot', 'PASS')
+        return result
 
     allowed = {
         'advance',
@@ -395,7 +464,22 @@ def perform(controller, action):
             f'{operation}: invalid arguments: {error}'
         ) from error
 
-    return method(**arguments)
+    operation_name = audit_operation(operation, arguments)
+    try:
+        result = method(**arguments)
+    except Exception:
+        controller.actions.record(operation_name, 'BLOCK')
+        raise
+    details = {}
+    if operation == 'invoke' and arguments.get('operation') == 'git_policy.create_commit':
+        creation = result.get('commit_creation_evidence', {})
+        details['commit_sha'] = creation.get('commit_sha') if creation.get('status') == 'PASS' else None
+    if operation == 'record_external' and arguments.get('key') == 'github_documentation_evidence':
+        payload = arguments.get('payload', {})
+        details['comment_id'] = payload.get('comment_id') if payload.get('status') == 'PASS' else None
+    status = result.get('status', 'PASS') if isinstance(result, dict) else 'PASS'
+    controller.actions.record(operation_name, status, **details)
+    return result
 
 
 def serve():

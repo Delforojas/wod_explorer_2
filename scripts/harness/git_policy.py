@@ -46,6 +46,7 @@ class GitError(Exception):
 
 sys.dont_write_bytecode = True
 from evidence_manager import managed_operation, read_json, read_message_bytes
+from workflow_audit import AuditError, validate_action_log
 
 def run_git(
     *arguments: str,
@@ -3107,6 +3108,10 @@ def final_check(issue: int, post_path: str, context_path: str,
                 and summary["range"] == post["range"], "documented_static_evidence_is_complete_and_historical")
         phase = "13.5: workflow actions and manual handoff"
         audit = context["actions"]
+        try:
+            validate_action_log(audit, workflow_id)
+        except (AuditError, ValueError):
+            require(False, "complete_workflow_action_evidence")
         require(audit["source"] == "workflow-action-log" and audit["complete"] is True
                 and audit["coverage"] == "entire-workflow" and audit["workflow_id"] == workflow_id,
                 "complete_workflow_action_evidence")
@@ -3116,11 +3121,12 @@ def final_check(issue: int, post_path: str, context_path: str,
         require(not any(event["operation"] in ("push", "finish-issue", "manual-approve") for event in events),
                 "no_push_finish_or_manual_approval_in_workflow")
         audited_operations = {
-            "issue-start", "inspect", "validate-base", "prepare-branch", "check-branch",
+            "issue-start", "advance", "record-external", "record-static", "decide-guard", "notify",
+            "snapshot", "export-static", "revisit-phase", "enter-repair", "inspect", "validate-base", "prepare-branch", "check-branch",
             "sdd", "planning", "implementation", "verification", "review-changes", "change-review",
             "prepare-staging", "pre-commit-check", "create-commit", "check-commit", "commit-guard",
             "post-check-commit", "post-commit-guard", "github-read", "github-documentation",
-            "github-documentation-guard", "manual-validation-plan", "final-check", "handoff-guard",
+            "github-documentation-guard", "manual-validation-plan", "remote-refs-check", "final-check", "handoff-guard",
         }
         require(all(event["operation"] in audited_operations for event in events),
                 "no_unclassified_workflow_actions")

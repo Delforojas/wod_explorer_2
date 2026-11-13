@@ -5,10 +5,12 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 HARNESS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HARNESS))
 from workflow_audit import AuditError, normalize_github_observation, validate_action_log
+from workflow_controller import ActionAudit
 import verification_runner
 
 
@@ -30,6 +32,19 @@ class WorkflowAuditTests(unittest.TestCase):
                  'events': [{'sequence': 1, 'operation': 'issue-start'}, {'sequence': 2, 'operation': 'push'}]}
         with self.assertRaises(AuditError):
             validate_action_log(value, 'wf')
+
+    def test_controller_owned_audit_starts_with_a_continuous_valid_log(self):
+        audit = ActionAudit('wf')
+        audit.record('advance', 'PASS')
+        audit.record('create-commit', 'PASS', commit_sha='a' * 40)
+        audit.record('github-documentation', 'PASS', comment_id=123)
+        self.assertEqual(validate_action_log(audit.payload(), 'wf')['workflow_id'], 'wf')
+
+    def test_remote_reference_check_blocks_when_the_observation_changes(self):
+        with mock.patch.object(ActionAudit, '_remote_refs', side_effect=[('a refs/heads/main',), ('b refs/heads/main',)]):
+            audit = ActionAudit('wf')
+            self.assertFalse(audit.check_remote_refs())
+        self.assertEqual(audit.payload()['events'][-1]['remote_refs_unchanged'], False)
 
     def test_final_projection_binds_runner_manifest_to_committed_tree(self):
         with tempfile.TemporaryDirectory() as temp:
