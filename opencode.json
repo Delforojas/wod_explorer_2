@@ -59,7 +59,7 @@
         "google/gemma-4-e2b": {
           "name": "Gemma 4 E2B Local",
           "limit": {
-            "context": 8192,
+            "context": 14007,
             "output": 2048
           }
         }
