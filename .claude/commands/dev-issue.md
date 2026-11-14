@@ -1,7 +1,6 @@
 ---
 description: Implements a prepared GitHub Issue through SDD, implementation, verification, and change review (phases 4–9 only)
-agent: build
-model: openai/gpt-5.6
+model: sonnet
 ---
 
 # Dev Issue Workflow

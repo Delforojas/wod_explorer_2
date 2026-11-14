@@ -28,6 +28,10 @@ git diff --cached
 
 Verify:
 
+- Modified and untracked files are expected in this workflow.
+- Their presence must not cause BLOCKED.
+- Only unresolved Git conflicts, invalid branches or
+  pending Git operations may block repository verification.
 - The current branch belongs to Issue #$1.
 - The current branch is not main or master.
 - No merge or rebase is in progress.
@@ -69,8 +73,6 @@ Continue to the next workflow step.
 
 ## 3. Select Issue Files
 
-Identify the files approved by the Change Review Guard.
-
 Show:
 
 - Files belonging to the Issue.
@@ -82,11 +84,22 @@ Never use `git add .` or `git add -A`.
 
 Never stage unrelated files.
 
-Ask the user to explicitly approve the file selection.
+Ask the user to specify the exact files to include.
+
+Do not select files automatically.
+
+Wait for the user's selection.
+
+Once the user has selected the files, continue to Step 4.
+
+Never restart repository verification because files are untracked.
 
 ## 4. Stage Approved Files
 
-After confirmation, execute:
+After the user explicitly selects the files in Step 3,
+treat that selection as authorization to stage exactly those files.
+
+Execute:
 
 ```bash
 git add -- <approved-files>
@@ -103,6 +116,12 @@ git diff --cached
 If staged content includes unrelated changes, STOP.
 
 Do not automatically discard or restore user changes.
+
+Do not return to Step 1.
+
+Do not execute prepare-issue verification rules.
+
+Run git add only with the approved files.
 
 ## 5. Create Commit
 
