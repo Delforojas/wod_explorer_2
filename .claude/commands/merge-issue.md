@@ -1,80 +1,87 @@
 ---
-description: Merge and publish a completed Issue with explicit user confirmation
+description: Review, merge and publish approved Issue changes
 agent: git-local
 ---
 
-# Merge Issue Workflow
+# Merge Issue
 
 Integrate GitHub Issue **#$1** into `main` and publish it.
 
-This command must ask for explicit user confirmation before
-the merge and before the push.
+This command performs only Git review, merge and push operations.
 
-Do not use `scripts/merge_issue.py` in this workflow,
-because its interactive input() calls are not supported
-by the current OpenCode shell execution environment.
+Do not implement code, modify source files, stage files, create development commits, create branches or close GitHub Issues.
 
-## 1. Execution Rules
+Do not execute `scripts/merge_issue.py` or `scripts/close_issue.py`.
 
-- Follow applicable AGENTS.md rules.
-- Never force push.
-- Never reset or discard changes.
-- Never bypass failed checks.
-- Never approve operations on behalf of the user.
-- Never execute merges or pushes without explicit confirmation.
-- Do not stage files or create development commits.
-- Do not close the GitHub Issue.
-- Stop on unexpected Git states.
+## 1. Verify Repository State
 
-## 2. Verify Repository State
-
-Run read-only commands:
+Execute:
 
 ```bash
 git status
 git branch --show-current
+git ls-files -u
 git branch --list
 ```
 
 Verify:
 
+- No merge, rebase or cherry-pick is in progress.
 - No unresolved conflicts exist.
-- No merge or rebase is pending.
-- The Issue has a dedicated committed branch.
 - No unrelated tracked or staged changes exist.
-- The branch is not ambiguous.
+- The Issue has a dedicated local branch.
+- The Issue branch is not ambiguous.
 
-If any validation fails, STOP.
+If any condition fails, STOP and report BLOCKED.
 
-## 3. Identify Issue Branch
+## 2. Identify Issue Branch
 
-Find the local branch associated with Issue #$1.
-
-Use:
+Execute:
 
 ```bash
 git for-each-ref --format='%(refname:short)' refs/heads/
 ```
 
-Require exactly one branch whose name matches:
+Find exactly one local branch matching:
 
 `<prefix>/$1-<slug>`
 
-Do not guess branch names.
+Do not create, rename or guess branches.
 
-If multiple branches match, STOP.
+If no branch exists or multiple branches match, STOP.
 
-Record the actual branch name and HEAD SHA.
+Record the exact branch name and its HEAD SHA.
 
-## 4. Update Main
+## 3. Verify Issue Changes
 
-Show the current branch and ask:
+Execute read-only Git commands using the actual branch name:
 
-"Voy a cambiar a main y actualizarla desde origin/main. ¿Autorizas esta operación?"
+```bash
+git log --oneline main..<issue-branch>
+git diff --name-only main...<issue-branch>
+git diff --stat main...<issue-branch>
+```
 
-Continue only after explicit confirmation.
+Verify:
 
-Execute:
+- The Issue branch contains commits to integrate.
+- The changed files correspond to Issue #$1.
+- No unrelated changes are included.
+- Manual validation has been explicitly approved by the user.
+
+If any verification fails, STOP.
+
+Show the pending commits and changed files.
+
+## 4. Prepare Main
+
+Ask the user:
+
+"¿Autorizas cambiar a main y actualizarla desde origin/main?"
+
+Wait for explicit confirmation.
+
+Only after confirmation execute:
 
 ```bash
 git switch main
@@ -83,109 +90,133 @@ git pull --ff-only origin main
 
 If either command fails, STOP.
 
-## 5. Review Pending Integration
-
-Run:
+Verify:
 
 ```bash
 git status
-git log --oneline main..<issue-branch>
-git diff --stat main...<issue-branch>
+git rev-parse main
+git rev-parse origin/main
 ```
 
-Verify that the Issue branch has commits to integrate.
+If `main` is not synchronized with `origin/main`, STOP.
 
-Check whether it is already merged:
+## 5. Confirm Merge
+
+Check whether the Issue branch is already integrated:
 
 ```bash
 git merge-base --is-ancestor <issue-branch> main
 ```
 
-If already merged, do not repeat the merge.
+If already integrated, do not repeat the merge.
 
-If not merged, show the actual commits and changed files.
+If not integrated, show the exact branch name and pending commits.
 
 Ask:
 
 "¿Autorizas integrar la rama <issue-branch> en main?"
 
-Continue only after explicit confirmation.
+Wait for explicit confirmation.
 
 ## 6. Execute Merge
 
-Run:
+Only after confirmation execute:
 
 ```bash
 git merge --no-ff --no-edit <issue-branch>
 ```
 
-If conflicts occur, STOP and preserve Git state.
+If Git reports conflicts or untracked files that would be overwritten, STOP.
 
-Do not automatically resolve conflicts.
+Never automatically remove, move, reset or restore files.
 
-After a successful merge, verify:
+After the merge execute:
+
+```bash
+git status
+git log --oneline -3
+git merge-base --is-ancestor <issue-branch> main
+```
+
+Require the Issue branch to be integrated into main.
+
+If verification fails, STOP.
+
+## 7. Review Publication
+
+Execute:
+
+```bash
+git status
+git log --oneline origin/main..main
+git diff --name-only origin/main..main
+git diff --stat origin/main..main
+```
+
+Show the exact commits and files pending publication.
+
+If unexpected commits or files appear, STOP.
+
+Ask:
+
+"¿Autorizas publicar estos commits en GitHub mediante git push origin main?"
+
+Wait for explicit confirmation.
+
+## 8. Execute Push
+
+Only after confirmation execute:
+
+```bash
+git push origin main
+```
+
+If push fails, STOP.
+
+Verify:
+
+```bash
+git fetch origin main
+git rev-parse main
+git rev-parse origin/main
+git merge-base --is-ancestor <issue-branch> origin/main
+```
+
+Require:
+
+- `main` and `origin/main` have identical SHA.
+- The Issue branch is integrated into `origin/main`.
+
+## 9. Final Verification
+
+Execute:
 
 ```bash
 git status
 git log --oneline -3
 ```
 
-## 7. Confirm Publication
-
-Before pushing, check:
-
-```bash
-git status
-git log --oneline origin/main..main
-```
-
-Show every commit that would be published.
-
-Ask:
-
-"Estos son los commits pendientes de publicar en GitHub. ¿Autorizas git push origin main?"
-
-Continue only after explicit confirmation.
-
-## 8. Publish Main
-
-Execute:
-
-```bash
-git push origin main
-```
-
-Then verify:
-
-```bash
-git fetch origin main
-git status
-git rev-parse main
-git rev-parse origin/main
-```
-
-Require `main` and `origin/main` to have the same commit SHA.
-
-## Final Output
-
-When all checks pass:
-
-MERGE_PUBLISHED
-
 Report:
 
 - Issue number.
 - Integrated branch.
-- Merge commit.
+- Merge commit SHA.
 - Published commits.
-- Remote synchronization status.
+- Remote synchronization.
+- Remaining uncommitted changes.
 
-If the merge completed without push:
+## Final State
+
+If merge and push succeed:
+
+MERGE_PUBLISHED
+
+If merge succeeds but push is not authorized:
 
 MERGED_LOCALLY
 
-If any required operation fails:
+If any verification fails:
 
 BLOCKED
 
-Never delete branches or close GitHub Issues.
+Never close the GitHub Issue automatically.

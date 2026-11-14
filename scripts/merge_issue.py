@@ -58,6 +58,7 @@ def validate_worktree():
 
 
 def validate_git_state():
+    
     git_dir = Path(output("rev-parse", "--absolute-git-dir"))
 
     for marker in ("MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"):
