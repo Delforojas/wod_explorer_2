@@ -25,6 +25,27 @@ Do not execute `scripts/close_issue.py` or any other Python script.
 - Never approve the closure on behalf of the user.
 - Stop immediately if a required verification fails.
 
+## Mandatory Real Tool Execution
+
+All Git and GitHub CLI commands MUST be executed
+using the actual bash tool.
+
+- Never simulate command execution or output.
+- Never assume Git or GitHub state.
+- Never invent branch names, commits, Issue states or SHAs.
+- Never use expected results as verification evidence.
+- Never use previous conversation text as current evidence.
+- Never proceed while a tool execution is pending.
+- Never execute scripts/close_issue.py or closeissue.
+
+A verification is valid only after the actual command
+has completed and its output and exit code have been checked.
+
+If bash or gh is unavailable, report BLOCKED and stop.
+
+Only an explicit user confirmation authorizes
+the GitHub Issue closure.
+
 ## 2. Validate Issue Number
 
 Verify that `$1` is a positive integer.
@@ -139,7 +160,21 @@ Require:
 - Issue exists.
 - Issue state is `OPEN`.
 
-If state is `CLOSED`, report ALREADY_CLOSED and stop.
+If the Issue state is CLOSED:
+
+- Report ALREADY_CLOSED.
+- Do not execute `gh issue close` again.
+- Skip closure authorization.
+- Continue directly to Step 11 for safe local cleanup.
+
+If the Issue state is OPEN:
+
+- Continue to Step 8.
+- Require explicit user authorization before closure.
+
+If GitHub verification fails or the state is unexpected:
+
+- Report BLOCKED and stop.
 
 If GitHub cannot be queried, report BLOCKED.
 
@@ -227,70 +262,53 @@ Rules:
 - Cleanup is the only permitted local file modification
   in this workflow.
 
-### 11.1. Check File Existence
+### 11.1. Verify and Clean Local Issue State
 
-Execute:
+Only after GitHub confirms Issue #$1 is CLOSED,
+check the exact local file:
 
-```bash
-test -e ".workflow/issues/$1.json"
-```
+`.workflow/issues/$1.json`
 
-If the file does not exist:
+Rules:
 
-Report CLEANUP_NOT_NEEDED.
+- Never use wildcards.
+- Never modify files belonging to other Issues.
+- Never delete tracked or staged files.
+- Never use git rm, git reset or git restore.
+- Never delete directories.
+- Never perform cleanup before confirmed closure.
 
-Do not execute deletion.
-
-### 11.2. Verify File Is Not Tracked
-
-If the file exists, execute:
-
-```bash
-git ls-files --error-unmatch -- ".workflow/issues/$1.json"
-```
-
-If the command exits with code 0:
-
-Report CLEANUP_BLOCKED.
-
-Do not delete the file.
-
-If the command exits with code 1, continue only if
-the failure indicates that the path is not tracked.
-
-If verification fails for another reason, report
-CLEANUP_BLOCKED.
-
-Also verify that the file has no staged changes.
-
-### 11.3. Delete Issue JSON
-
-Only when the file exists and is confirmed untracked:
+Execute using the actual bash tool:
 
 ```bash
-rm -- ".workflow/issues/$1.json"
+file=".workflow/issues/$1.json"
+
+if [ ! -e "$file" ]; then
+    echo "CLEANUP_NOT_NEEDED"
+elif git ls-files --error-unmatch -- "$file" \
+    >/dev/null 2>&1; then
+    echo "CLEANUP_BLOCKED: tracked file"
+elif [ -n "$(git ls-files --stage -- "$file")" ]; then
+    echo "CLEANUP_BLOCKED: staged file"
+elif [ ! -f "$file" ] || [ -L "$file" ]; then
+    echo "CLEANUP_BLOCKED: unexpected file type"
+else
+    rm -- "$file"
+
+    if [ ! -e "$file" ]; then
+        echo "CLEANUP_COMPLETED"
+    else
+        echo "CLEANUP_BLOCKED: deletion failed"
+    fi
+fi
 ```
 
-Never substitute a wildcard or another path.
+Interpret the actual output.
 
-### 11.4. Verify Cleanup
+Never report successful cleanup without real verification.
 
-Execute:
-
-```bash
-test ! -e ".workflow/issues/$1.json"
-```
-
-If verification succeeds:
-
-CLEANUP_COMPLETED
-
-Otherwise:
-
-CLEANUP_BLOCKED
-
-A cleanup failure must not change an already verified
-ISSUE_CLOSED result.
+A cleanup failure must not change an already
+verified ISSUE_CLOSED result.
 
 ## Final Output
 
