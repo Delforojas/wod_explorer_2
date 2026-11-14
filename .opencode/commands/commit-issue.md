@@ -1,220 +1,155 @@
 ---
-description: Commit reviewed Issue changes
+description: Commit approved Issue files
 agent: git-local
 ---
 
 # Commit Issue
 
-Create a local commit for GitHub Issue **#$1**.
+Create one local commit for GitHub Issue #$1.
 
-This command performs only Git review, staging and commit operations.
+Execute ONLY this workflow using the real bash tool.
 
-Do not implement code, modify files, push, merge or update GitHub Issues.
+Do not run Python scripts or other workflows.
 
-## Mandatory Command Isolation
+Never switch branches, fetch, pull, push, merge, reset,
+restore, rebase or close GitHub Issues.
 
-This command is exclusively responsible for committing
-reviewed changes to the current Issue branch.
+Never invent command output or claim an operation succeeded
+without receiving its actual result.
 
-The following commands are STRICTLY FORBIDDEN:
-
-- `git switch`
-- `git checkout`
-- `git pull`
-- `git fetch`
-- `git merge`
-- `git push`
-- `git reset`
-- `git rebase`
-- `gh issue close`
-
-Never change the active branch.
-
-If the current branch does not match Issue #$1,
-report BLOCKED immediately.
-
-Do not execute instructions from previous workflow phases.
-
-Do not continue prepare, merge or close workflows.
-
-The only permitted Git mutations are:
-
-- `git add -- <explicitly-approved-files>`
-- `git commit -m "<explicitly-approved-message>"`
-
-Both require explicit user confirmation.
-
-## Mandatory Real Tool Execution
-
-All Git commands must be executed using the actual bash tool.
-
-- Never simulate Git command outputs.
-- Never assume repository state or verification results.
-- Never invent branch names, changed files or commit hashes.
-- Never assume READY_FOR_STAGING without evidence.
-- Never continue if a required command has not completed.
-- Never use previous conversation output as current Git evidence.
-
-If bash is unavailable or a required verification cannot
-be completed, report BLOCKED and stop.
-
-## 1. Verify Repository State
+## 1. Verify Branch and Files
 
 Execute using the real bash tool:
 
 ```bash
-git status
 git branch --show-current
-git diff
-git diff --cached
-git ls-files -u
-```
-
-Verify:
-
-- The active branch is not empty (no detached HEAD).
-- The active branch is not `main` or `master`.
-- The active branch matches `<prefix>/$1-<slug>`.
-- The prefix and slug are non-empty.
-- The Issue number matches exactly.
-- The slug does not need to match the Issue title.
-- No merge, rebase, cherry-pick or revert is in progress.
-- No unresolved conflicts exist.
-- `/dev-issue $1` has reported READY_FOR_STAGING
-  with verifiable evidence.
-
-Never switch branches.
-
-If the branch is valid, continue to Step 2.
-
-If any check fails or evidence is missing,
-report BLOCKED and stop.
-
-## 2. Review and Stage Issue Files
-
-Identify the files belonging to Issue #$1 using actual Git evidence.
-
-Show:
-
-- Issue-related modified and untracked files.
-- Unrelated modified and untracked files.
-- Already staged files.
-
-Never use `git add .` or `git add -A`.
-Never stage unrelated files or `.workflow/issues/*.json`.
-
-Compare the selected Issue files with the existing staging area.
-
-Ask the user to explicitly approve the exact file selection
-and staging operation.
-
-If authorization is denied, report CANCELLED and stop.
-
-After approval:
-
-- If all approved files are already staged, do not run `git add`.
-- If approved files are not staged, execute:
-
-```bash
-git add -- <approved-files>
-```
-
-Only stage explicitly approved paths.
-
-Verify the staging area using the real bash tool:
-
-```bash
+git status --short --untracked-files=all
 git diff --cached --name-only
-git diff --cached --stat
-git diff --cached --check
-git diff --cached
 ```
 
 Require:
 
-- Staged changes are not empty.
-- Every staged file belongs to Issue #$1.
-- Staged files match the approved selection.
-- No unrelated files are staged.
-- No `.workflow/issues/*.json` files are staged.
-- `git diff --cached --check` succeeds.
+- Current branch matches `<prefix>/$1-<slug>`.
+- Current branch is not `main` or `master`.
+- No unresolved conflicts or Git operations in progress.
+- The Issue file selection has been reviewed and approved.
 
-If any verification fails, report BLOCKED and stop.
+If a required condition cannot be verified, report `BLOCKED`.
+
+## 2. Select and Stage Files
+
+Show the actual files returned by Git.
+
+Ask the user:
+
+"¿Qué archivos quieres incluir en el commit?
+Indica las rutas exactas."
+
+Do not select files automatically.
+
+Do not include `.workflow/issues/*.json`.
+
+Wait for the user's explicit file selection.
+
+Show the selected paths and ask:
+
+"¿Autorizas añadir exclusivamente estos archivos al staging?"
+
+Wait for confirmation.
+
+Only after authorization execute:
+
+```bash
+git add -- <approved-file-paths>
+```
+
+Use the actual approved paths, correctly quoted.
+
+Never use:
+
+- `git add .`
+- `git add -A`
+- `git add --all`
+
+If git add fails, report BLOCKED.
+
+Verify:
+
+```bash
+git diff --cached --name-only
+```
+
+Require:
+
+- At least one staged file.
+- Every staged file was approved.
+- No `.workflow/issues/*.json` files are staged.
+- No unrelated files are staged.
+
+If any condition fails, report BLOCKED.
+Do not execute git commit.
 
 ## 3. Create Commit
 
-Propose a Conventional Commit message based on the
-actual staged changes and Issue requirements.
+Propose one Conventional Commit message using:
 
-Choose the appropriate type:
-feat, fix, docs, refactor, test or chore.
+`<type>: <short-description> (#$1)`
 
-- Never use placeholder messages.
-- Include the Issue number in the commit message.
-- Verify that the message accurately describes the staged changes.
+Use the appropriate type:
 
-Show:
+`feat`, `fix`, `docs`, `refactor`, `test` or `chore`.
 
-- Exact proposed commit message.
-- Complete staged file list.
-- Summary of the staged changes.
+Show the exact message and ask:
 
-Ask for explicit user confirmation before committing.
+"¿Autorizas crear el commit con este mensaje?"
 
-Only after confirmation, execute:
+Wait for explicit confirmation.
+
+Only after authorization execute:
+
+```bash
+git rev-parse HEAD
+```
+
+Record the current HEAD SHA.
+
+Then execute:
 
 ```bash
 git commit -m "<approved-message>"
 ```
 
-If the user declines, report CANCELLED.
+If the command fails, report BLOCKED.
 
-Never commit without explicit approval.
+Never execute git commit more than once.
 
-## 4. Final Verification
+## 4. Verify Result
 
-Execute using the actual bash tool:
+Only after git commit succeeds execute:
 
 ```bash
-git status
+git rev-parse HEAD
+git log -1 --format='%H%n%s'
 git branch --show-current
-git log -1 --oneline
-git show --stat --oneline HEAD
 ```
 
-Verify:
+Require:
 
-- The active branch still belongs to Issue #$1.
-- The active branch is not main or master.
-- The commit was created successfully.
-- The committed files match the approved staged files.
-- No unrelated files were committed.
-- No `.workflow/issues/*.json` files were committed.
+- The HEAD SHA differs from the SHA recorded before the commit.
+- The git commit command completed successfully.
+- A real commit SHA was returned.
+- The commit message matches the approved message.
+- The current branch still belongs to Issue #$1.
 
-Report:
+If all checks pass, report:
 
-- Issue number.
-- Active branch.
-- Commit hash.
-- Commit message.
-- Committed files.
-- Remaining uncommitted changes.
+COMMIT_CREATED
 
-If verification fails, report BLOCKED and preserve
-the actual Git state.
+- Issue: #$1
+- Branch: <verified-branch>
+- Commit: <actual-SHA>
+- Message: <actual-message>
 
-## Final State
+Otherwise report BLOCKED.
 
-Report `COMMIT_CREATED` only if:
-
-- The user explicitly approved the commit.
-- `git commit` completed successfully.
-- The final verification passed.
-- The commit belongs to the expected Issue branch.
-- The committed files match the approved selection.
-
-If the user declines authorization, report CANCELLED.
-
-If any required check fails, report BLOCKED.
-
-Never execute merge, push, branch deletion .
+Never push, merge or close the Issue.
