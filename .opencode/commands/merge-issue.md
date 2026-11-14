@@ -1,125 +1,64 @@
+
 ---
 description: Review, merge and publish a completed Issue
 agent: git-local
 ---
 
-# Merge Issue Workflow
+# Merge Issue
 
-Integrate GitHub Issue **#$1** into `main` and publish it.
+Merge GitHub Issue #$1 into `main` and publish it.
 
-This command performs only Git verification, merge and push operations.
+Execute ONLY this workflow using the real bash tool.
 
-Do not execute `scripts/merge_issue.py` or other Python scripts.
+Do not execute Python scripts or other workflows.
 
-## 1. Execution Rules
+Never create or delete branches, stage files, create development
+commits, reset, restore, rebase, force push or close GitHub Issues.
 
-- Follow applicable `AGENTS.md` instructions.
-- Execute all Git commands using the real bash tool.
-- Never simulate command output or assume Git state.
-- Never invent branches, commits, SHAs or verification results.
-- Never bypass failed or incomplete checks.
-- Never force push, reset, restore or discard changes.
-- Never stage files or create development commits.
-- Never create, rename or delete branches.
-- Never close GitHub Issues.
-- Never execute prepare, development, commit or close workflows.
-- Never approve operations on behalf of the user.
-- Stop immediately when a required verification fails.
+Never invent command output, commit SHAs or verification results.
 
-The only permitted Git mutations are:
+Never execute a Git mutation without explicit user authorization.
 
-- `git switch main`
-- `git pull --ff-only origin main`
-- `git merge --no-ff --no-edit <issue-branch>`
-- `git push origin main`
-
-Each operation requires the corresponding explicit user authorization.
-
-`git fetch origin main` is permitted for remote verification.
-
-If bash is unavailable or verification cannot be completed, report `BLOCKED`.
-
-## 2. Validate Issue and Repository
-
-Verify that `$1` is a positive integer.
+## 1. Verify Repository
 
 Execute:
 
 ```bash
-git rev-parse --show-toplevel
 git branch --show-current
-git status --porcelain=v1 --untracked-files=all
+git status --short --untracked-files=all
 git ls-files -u
-git rev-parse --absolute-git-dir
 ```
 
 Require:
 
-- Execution from the repository root.
-- Current branch is not empty (no detached HEAD).
-- No unresolved conflicts.
-- No merge, rebase, cherry-pick or revert in progress.
-- No staged or unstaged tracked changes.
+- The working tree has no staged or unstaged tracked changes.
+- No unresolved conflicts or Git operations in progress.
 - No unrelated untracked files.
 
-Untracked `.workflow/issues/*.json` files may be ignored for the working-tree cleanliness check.
+Untracked `.workflow/issues/*.json` files may be ignored
+for the working-tree cleanliness check only.
 
-Never stage, delete or modify these files.
+Never stage, modify or delete these JSON files.
 
-### Pending Git Operation Check
+If verification fails, report `BLOCKED`.
 
-Execute using the real bash tool:
-
-```bash
-git_dir="$(git rev-parse --absolute-git-dir)" || exit 1
-
-for marker in MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD; do
-    if [ -e "$git_dir/$marker" ]; then
-        echo "BLOCKED: pending Git operation: $marker"
-        exit 1
-    fi
-done
-
-for directory in rebase-merge rebase-apply; do
-    if [ -d "$git_dir/$directory" ]; then
-        echo "BLOCKED: pending rebase"
-        exit 1
-    fi
-done
-```
-
-Require successful execution.
-
-If any required validation fails, report `BLOCKED` and stop.
-
-## 3. Identify Issue Branch
+## 2. Identify Issue Branch
 
 Execute:
 
 ```bash
-git for-each-ref --format='%(refname:short)' refs/heads/
+git branch --list "*/$1-*"
 ```
-
-Identify exactly one existing local branch matching:
-
-`<prefix>/$1-<slug>`
 
 Require:
 
-- Exactly one matching branch.
-- A non-empty prefix and slug.
-- The Issue number matches exactly.
+- Exactly one existing local Issue branch.
+- The branch matches `<prefix>/$1-<slug>`.
 - The branch is not `main` or `master`.
 
-The slug does not need to match the GitHub Issue title exactly.
+Record the exact branch name.
 
-Never propose or construct a new branch name.
-
-Never create a branch during this workflow.
-
-Never select between multiple matching branches automatically.
-
-Record the actual branch name and SHA:
+Execute:
 
 ```bash
 git rev-parse <issue-branch>
@@ -127,55 +66,23 @@ git rev-parse <issue-branch>
 
 Require a valid commit SHA.
 
-If the branch is missing, ambiguous or cannot be resolved, report `BLOCKED`.
+Never invent a branch name or select between multiple matches.
 
-## 4. Inspect Issue Changes
+If the branch is missing or ambiguous, report `BLOCKED`.
 
-Execute:
+## 3. Prepare Main
 
-```bash
-git log --oneline main..<issue-branch>
-git diff --name-status main...<issue-branch>
-git diff --stat main...<issue-branch>
-```
-
-Show:
-
-- Exact Issue branch.
-- Branch HEAD SHA.
-- Actual commits pending integration.
-- Changed files.
-- Change summary.
-
-Verify:
-
-- The commits belong to Issue #$1.
-- The changed files correspond to the Issue requirements.
-- No unrelated commits or files are included.
-- No `.workflow/issues/*.json` files are included in the integration.
-- Manual validation has been explicitly approved.
-
-Never assume manual validation passed.
-
-If evidence is missing or ambiguous, report `BLOCKED`.
-
-Do not modify the repository during this step.
-
-If there are no pending commits, do not assume the branch is already integrated. Continue only to the ancestry verification.
-
-## 5. Prepare Main
-
-Show the current branch and identified Issue branch.
+Show the identified Issue branch.
 
 Ask:
 
 "¿Autorizas cambiar a main y actualizarla desde origin/main?"
 
-STOP and wait for explicit user confirmation.
+Wait for explicit confirmation.
 
 If declined, report `CANCELLED`.
 
-After authorization execute:
+Only after authorization execute:
 
 ```bash
 git switch main
@@ -184,20 +91,25 @@ git pull --ff-only origin main
 
 If either command fails, report `BLOCKED`.
 
-Repeat the repository and pending Git operation checks from Step 2.
-
-Verify synchronization:
+Verify:
 
 ```bash
+git branch --show-current
+git status --short --untracked-files=all
 git rev-parse main
 git rev-parse origin/main
 ```
 
-Require identical SHA values.
+Require:
 
-If different, report `BLOCKED`.
+- Current branch is `main`.
+- No staged or unstaged tracked changes.
+- No unrelated untracked files.
+- `main` and `origin/main` have identical SHA values.
 
-## 6. Verify Integration State
+If verification fails, report `BLOCKED`.
+
+## 4. Verify Integration
 
 Execute:
 
@@ -205,91 +117,82 @@ Execute:
 git merge-base --is-ancestor <issue-branch> main
 ```
 
-Inspect the actual exit code:
+Interpret the actual exit code:
 
-- `0`: Branch already integrated locally.
-- `1`: Branch not yet integrated.
-- Any other code: `BLOCKED`.
+- `0`: The Issue branch is already integrated locally.
+- `1`: The Issue branch is not integrated.
+- Any other result: `BLOCKED`.
 
-### Already Integrated
+If the tool does not provide a reliable exit code,
+report `BLOCKED`.
 
-If exit code is `0`:
+If already integrated, skip Step 5 and continue to Step 6.
 
-- Do not execute another merge.
-- Continue to Step 8 to verify publication.
-- Do not report success before remote verification.
-
-### Integration Pending
-
-If exit code is `1`, execute:
+If not integrated, execute:
 
 ```bash
 git log --oneline main..<issue-branch>
 git diff --name-status main...<issue-branch>
+git diff --stat main...<issue-branch>
 ```
 
-Require actual pending commits.
+Show the actual pending commits and changed files.
 
-### Untracked File Collision Check
+Require:
 
-Execute:
+- At least one pending commit.
+- No `.workflow/issues/*.json` files included.
+- No unexpected files or commits.
+
+Also check for untracked files that would be overwritten:
 
 ```bash
 git ls-files --others --exclude-standard
 git diff --name-only --diff-filter=A main...<issue-branch>
 ```
 
-Compare the actual returned paths.
+Compare the resulting paths.
 
-If an untracked local path would be added by the Issue branch, report `BLOCKED`.
+If a collision is detected, report `BLOCKED`.
 
-This comparison is a preliminary check. Git may detect additional conflicts during the merge.
+Never move, remove or overwrite local files automatically.
 
-Never automatically move, delete or overwrite files.
-
-If verification cannot be completed reliably, report `BLOCKED`.
-
-### Merge Authorization
+## 5. Merge Issue
 
 Show:
 
-- Exact existing Issue branch.
+- Exact Issue branch.
 - Branch SHA.
 - Pending commits.
 - Changed files.
-- Collision-check result.
 
 Ask:
 
-"¿Autorizas integrar la rama <issue-branch> en main?"
+"¿Autorizas integrar esta rama en main?"
 
-STOP and wait for explicit user confirmation.
+Wait for explicit confirmation.
 
 If declined, report `CANCELLED`.
 
-Never request authorization if branch verification failed.
-
-## 7. Execute Merge
-
-Only when integration is required and explicitly authorized:
+Only after authorization execute:
 
 ```bash
 git merge --no-ff --no-edit <issue-branch>
 ```
 
-If Git reports conflicts or any error:
+If the merge fails or produces conflicts:
 
 - Report `BLOCKED`.
-- Preserve the actual Git state.
+- Preserve the current Git state.
 - Never resolve conflicts automatically.
-- Never reset, restore or abort automatically.
+- Never reset or abort the merge automatically.
 
 After a successful merge execute:
 
 ```bash
 git status
-git log --oneline -3
-git rev-parse HEAD
+git log -1 --oneline
+git rev-parse main
 git merge-base --is-ancestor <issue-branch> main
 ```
 
@@ -297,168 +200,127 @@ Require:
 
 - Merge command succeeded.
 - No unresolved Git operation.
-- The ancestry check returned exit code `0`.
-- The resulting main HEAD SHA was retrieved.
-- The resulting files and commits are consistent with the approved integration.
+- The Issue branch is integrated into main.
+- An actual main commit SHA was retrieved.
 
-Record the actual resulting main SHA.
+If verification fails, report `BLOCKED`.
 
-If any verification fails, report `BLOCKED`.
+## 6. Publish Main
 
-## 8. Review Publication
-
-Execute:
-
-```bash
-git status
-git log --oneline origin/main..main
-git diff --name-status origin/main..main
-git diff --stat origin/main..main
-git rev-parse main
-git rev-parse origin/main
-```
-
-Require:
-
-- No unresolved Git operation.
-- No staged or unstaged tracked changes.
-- The Issue branch is integrated into `main`.
-- All pending commits have been reviewed.
-- No unexpected files or commits are included.
-
-### Already Published
-
-If `main` and `origin/main` have identical SHAs, perform a fresh remote verification:
+First refresh the remote reference:
 
 ```bash
 git fetch origin main
 git rev-parse main
 git rev-parse origin/main
+```
+
+If fetch fails, report `BLOCKED`.
+
+### Already Published
+
+If `main` and `origin/main` have identical SHA values,
+execute:
+
+```bash
 git merge-base --is-ancestor <issue-branch> origin/main
 ```
 
-Require:
+Require exit code `0`.
 
-- Fetch succeeded.
-- Both SHAs are identical.
-- Remote ancestry check returned exit code `0`.
+If verified, report `ALREADY_PUBLISHED`.
 
-If all pass, report `ALREADY_PUBLISHED`.
+If not verified, report `BLOCKED`.
 
-Do not execute merge or push again.
-
-If the Issue branch is not integrated into `origin/main`, report `BLOCKED`.
+Do not execute another merge or push.
 
 ### Publication Pending
 
-If local `main` contains unpublished commits, show:
+If `main` and `origin/main` differ, execute:
 
-- Exact commits pending publication.
-- Changed files.
-- Current main SHA.
-- Current origin/main SHA.
+```bash
+git log --oneline origin/main..main
+git diff --name-status origin/main..main
+git diff --stat origin/main..main
+```
+
+Show the actual commits and changed files pending publication.
+
+Require:
+
+- The Issue branch is integrated into local `main`.
+- No unexpected files or commits.
+- The publication is a valid fast-forward from `origin/main`.
+
+If verification fails, report `BLOCKED`.
 
 Ask:
 
 "¿Autorizas publicar estos commits mediante git push origin main?"
 
-STOP and wait for explicit user confirmation.
+Wait for explicit confirmation.
 
 If declined, report `MERGED_LOCALLY`.
 
-## 9. Publish Main
-
-Only after explicit authorization execute:
+Only after authorization execute:
 
 ```bash
 git push origin main
 ```
 
-If the push fails, report `BLOCKED`.
+If push fails, report `BLOCKED`.
 
-After the push execute:
+Verify publication using actual Git output:
 
 ```bash
 git fetch origin main
 git rev-parse main
 git rev-parse origin/main
-git merge-base --is-ancestor <issue-branch> main
 git merge-base --is-ancestor <issue-branch> origin/main
-git status
+git status --short --untracked-files=all
 ```
 
 Require:
 
 - Push succeeded.
 - Fetch succeeded.
-- `main` and `origin/main` have identical SHAs.
-- Both ancestry checks returned exit code `0`.
+- `main` and `origin/main` have identical SHA values.
+- The Issue branch is integrated into `origin/main`.
 - No unresolved Git operation exists.
 
-Never assume publication succeeded based only on the push output.
+If any requirement fails, report `BLOCKED`.
 
-## 10. Mandatory Publication Evidence Gate
+Do not infer publication from the push output alone.
 
-Never report `MERGE_PUBLISHED` or `ALREADY_PUBLISHED` based on assumptions, expected output or previous conversation context.
-
-Successful publication requires ALL of the following evidence from actual Git tool executions:
-
-1. Exact Issue branch identified from local Git references.
-2. Issue branch SHA successfully retrieved.
-3. Issue branch integrated into local `main` (ancestry exit code `0`).
-4. Successful `git fetch origin main`.
-5. Issue branch integrated into `origin/main` (ancestry exit code `0`).
-6. Identical SHA values for `main` and `origin/main`.
-7. Actual final main SHA recorded.
-8. No unresolved Git operations.
-9. All required user authorizations obtained for operations executed in this workflow.
-
-If the branch was already published before this execution, report `ALREADY_PUBLISHED`.
-
-If this execution completed a required publication, report `MERGE_PUBLISHED`.
-
-If local integration is complete but publication remains pending, report `MERGED_LOCALLY`.
-
-If required evidence is missing, report `BLOCKED`.
-
-Never use any of the following as successful verification evidence:
-
-- "SHA not retrieved"
-- "Integration assumed"
-- "Published commits: N/A"
-- "Expected result"
-- "Already up to date" without ancestry verification.
-
-## 11. Final Output
+## 7. Final Output
 
 Report:
 
 - Issue number.
-- Exact Issue branch name.
+- Exact Issue branch.
 - Issue branch SHA.
 - Final main SHA.
 - Origin/main SHA.
-- Actual local ancestry verification.
-- Actual remote ancestry verification.
 - Merge commit SHA, if created.
 - Published commits, if any.
-- Changed files.
-- Remaining uncommitted changes.
 - Remote synchronization status.
 
-Final states:
+Allowed final states:
 
 **MERGE_PUBLISHED**
 
-The Issue integration was successfully published and verified on `origin/main`.
+The Issue was published during this workflow and
+its integration into `origin/main` was verified.
 
 **ALREADY_PUBLISHED**
 
-The Issue integration was already published before this execution and has been verified.
+The Issue was already published before this workflow
+and its integration into `origin/main` was verified.
 
 **MERGED_LOCALLY**
 
-The Issue is integrated into local `main`, but publication is pending.
+The Issue is integrated into local `main`,
+but publication is pending.
 
 **CANCELLED**
 
@@ -466,8 +328,19 @@ The user declined an operation.
 
 **BLOCKED**
 
-A required verification or operation failed.
+A required operation or verification failed.
 
-Never delete branches or close GitHub Issues.
+### Final Output Rule
+
+Never report `MERGE_PUBLISHED` or `ALREADY_PUBLISHED`
+without successful remote verification.
+
+The only successful published states are
+`MERGE_PUBLISHED` and `ALREADY_PUBLISHED`.
+
+Never report states belonging to other workflows.
+
+Never create commits outside the merge operation,
+delete branches or close GitHub Issues.
 
 Stop after reporting the verified final state.
