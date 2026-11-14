@@ -70,13 +70,11 @@ Require:
 - No merge, rebase, cherry-pick or revert in progress.
 - No unrelated tracked or staged changes.
 
-Untracked `.workflow/issues/*.json` files may be ignored
-for cleanliness checks.
+No staged or unstaged tracked changes are permitted.
 
-They must never be modified or staged during verification.
+Untracked `.workflow/issues/*.json` files do not block verification.
 
-The only permitted deletion is `.workflow/issues/$1.json`
-during Step 11, after confirmed GitHub closure.
+Never modify or delete local files in this workflow.
 
 If any requirement fails, report BLOCKED.
 
@@ -108,7 +106,7 @@ Do not attempt to resolve synchronization automatically.
 Execute:
 
 ```bash
-git for-each-ref --format='%(refname:short)' refs/heads/
+git branch --list "*/$1-*"
 ```
 
 Identify exactly one local branch matching:
@@ -164,8 +162,8 @@ If the Issue state is CLOSED:
 
 - Report ALREADY_CLOSED.
 - Do not execute `gh issue close` again.
-- Skip closure authorization.
-- Continue directly to Step 11 for safe local cleanup.
+- Do not request closure authorization.
+- Stop the workflow.
 
 If the Issue state is OPEN:
 
@@ -213,7 +211,13 @@ git merge-base --is-ancestor <issue-branch> origin/main
 gh issue view $1 --repo Delforojas/wod_explorer_2 --json state
 ```
 
-Require all previously verified conditions to remain valid.
+- Current branch is exactly main.
+- main and origin/main have identical SHA values.
+- Issue branch ancestry check returned exit code 0.
+- GitHub Issue state is still OPEN.
+- The user explicitly authorized closure.
+
+If any condition fails, report BLOCKED.
 
 If anything changed, report BLOCKED.
 
@@ -240,75 +244,6 @@ gh issue view $1 \
 Require state `CLOSED`.
 
 If the result cannot be verified, report INCOMPLETE.
-
-## 11. Cleanup Local Workflow State
-
-Only after GitHub confirms that Issue #$1 is CLOSED,
-clean up its local workflow state file.
-
-Target:
-
-`.workflow/issues/$1.json`
-
-Rules:
-
-- Delete only the JSON belonging to Issue #$1.
-- Never use wildcards for deletion.
-- Never delete JSON files belonging to other Issues.
-- Never delete the file before successful GitHub closure.
-- Never delete tracked or staged files.
-- Never modify Git history.
-- Never use `git rm`, `git reset` or `git restore`.
-- Cleanup is the only permitted local file modification
-  in this workflow.
-
-### 11.1. Verify and Clean Local Issue State
-
-Only after GitHub confirms Issue #$1 is CLOSED,
-check the exact local file:
-
-`.workflow/issues/$1.json`
-
-Rules:
-
-- Never use wildcards.
-- Never modify files belonging to other Issues.
-- Never delete tracked or staged files.
-- Never use git rm, git reset or git restore.
-- Never delete directories.
-- Never perform cleanup before confirmed closure.
-
-Execute using the actual bash tool:
-
-```bash
-file=".workflow/issues/$1.json"
-
-if [ ! -e "$file" ]; then
-    echo "CLEANUP_NOT_NEEDED"
-elif git ls-files --error-unmatch -- "$file" \
-    >/dev/null 2>&1; then
-    echo "CLEANUP_BLOCKED: tracked file"
-elif [ -n "$(git ls-files --stage -- "$file")" ]; then
-    echo "CLEANUP_BLOCKED: staged file"
-elif [ ! -f "$file" ] || [ -L "$file" ]; then
-    echo "CLEANUP_BLOCKED: unexpected file type"
-else
-    rm -- "$file"
-
-    if [ ! -e "$file" ]; then
-        echo "CLEANUP_COMPLETED"
-    else
-        echo "CLEANUP_BLOCKED: deletion failed"
-    fi
-fi
-```
-
-Interpret the actual output.
-
-Never report successful cleanup without real verification.
-
-A cleanup failure must not change an already
-verified ISSUE_CLOSED result.
 
 ## Final Output
 

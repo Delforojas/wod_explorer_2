@@ -1,155 +1,149 @@
 ---
-description: Commit approved Issue files
+description: Review, stage and commit approved Issue changes
 agent: git-local
 ---
 
 # Commit Issue
 
-Create one local commit for GitHub Issue #$1.
+Create a local commit for GitHub Issue **#$1**.
 
-Execute ONLY this workflow using the real bash tool.
+This command performs only Git review, staging and commit operations.
 
-Do not run Python scripts or other workflows.
+Do not implement code, modify application files,
+push, merge or update GitHub Issues.
 
-Never switch branches, fetch, pull, push, merge, reset,
-restore, rebase or close GitHub Issues.
+The only permitted file deletion is the verified
+local Issue JSON defined in Step 2.
 
-Never invent command output or claim an operation succeeded
-without receiving its actual result.
+## 1. Verify Repository State
 
-## 1. Verify Branch and Files
-
-Execute using the real bash tool:
+Run:
 
 ```bash
+git status
 git branch --show-current
-git status --short --untracked-files=all
-git diff --cached --name-only
+git diff
+git diff --cached
 ```
-
-Require:
-
-- Current branch matches `<prefix>/$1-<slug>`.
-- Current branch is not `main` or `master`.
-- No unresolved conflicts or Git operations in progress.
-- The Issue file selection has been reviewed and approved.
-
-If a required condition cannot be verified, report `BLOCKED`.
-
-## 2. Select and Stage Files
-
-Show the actual files returned by Git.
-
-Ask the user:
-
-"¿Qué archivos quieres incluir en el commit?
-Indica las rutas exactas."
-
-Do not select files automatically.
-
-Do not include `.workflow/issues/*.json`.
-
-Wait for the user's explicit file selection.
-
-Show the selected paths and ask:
-
-"¿Autorizas añadir exclusivamente estos archivos al staging?"
-
-Wait for confirmation.
-
-Only after authorization execute:
-
-```bash
-git add -- <approved-file-paths>
-```
-
-Use the actual approved paths, correctly quoted.
-
-Never use:
-
-- `git add .`
-- `git add -A`
-- `git add --all`
-
-If git add fails, report BLOCKED.
 
 Verify:
 
-```bash
-git diff --cached --name-only
-```
+- The current branch belongs to Issue #$1.
+- The current branch is not main or master.
+- No merge or rebase is in progress.
+- The working tree contains no unresolved conflicts.
+- `/dev-issue $1` has reported READY_FOR_STAGING.
 
-Require:
+If any requirement cannot be verified, STOP.
 
-- At least one staged file.
-- Every staged file was approved.
-- No `.workflow/issues/*.json` files are staged.
-- No unrelated files are staged.
+## 2. Clean Local Issue Context
 
-If any condition fails, report BLOCKED.
-Do not execute git commit.
+Target file:
 
-## 3. Create Commit
+`.workflow/issues/$1.json`
 
-Propose one Conventional Commit message using:
+Before deletion, verify:
 
-`<type>: <short-description> (#$1)`
+- The file belongs to the requested Issue #$1.
+- The file is untracked by Git.
+- The file is a regular file, not a symbolic link.
+- The file is located inside `.workflow/issues/`.
+- No other files will be affected.
 
-Use the appropriate type:
+If the file does not exist, continue.
 
-`feat`, `fix`, `docs`, `refactor`, `test` or `chore`.
+If any safety check fails, report BLOCKED.
+Never delete a tracked file or symbolic link.
 
-Show the exact message and ask:
-
-"¿Autorizas crear el commit con este mensaje?"
-
-Wait for explicit confirmation.
-
-Only after authorization execute:
+After successful verification, execute:
 
 ```bash
-git rev-parse HEAD
+rm -- ".workflow/issues/$1.json"
 ```
 
-Record the current HEAD SHA.
+Do not ask for user confirmation.
 
-Then execute:
+Verify that the file no longer exists.
+
+Continue to the next workflow step.
+
+## 3. Select Issue Files
+
+Identify the files approved by the Change Review Guard.
+
+Show:
+
+- Files belonging to the Issue.
+- Unrelated modified files.
+- Untracked files.
+- Already staged files, if any.
+
+Never use `git add .` or `git add -A`.
+
+Never stage unrelated files.
+
+Ask the user to explicitly approve the file selection.
+
+## 4. Stage Approved Files
+
+After confirmation, execute:
+
+```bash
+git add -- <approved-files>
+```
+
+Then verify:
+
+```bash
+git diff --cached --stat
+git diff --cached --check
+git diff --cached
+```
+
+If staged content includes unrelated changes, STOP.
+
+Do not automatically discard or restore user changes.
+
+## 5. Create Commit
+
+Propose a Conventional Commit message based on the actual Issue:
+
+`feat(frontend): descripcion breve (#$1)`
+
+Use `fix`, `docs`, `refactor` or another appropriate type when applicable.
+
+Show the exact message and staged file list.
+
+Ask for explicit confirmation before committing.
+
+After confirmation, run:
 
 ```bash
 git commit -m "<approved-message>"
 ```
 
-If the command fails, report BLOCKED.
+## 6. Final Verification
 
-Never execute git commit more than once.
-
-## 4. Verify Result
-
-Only after git commit succeeds execute:
+Run:
 
 ```bash
-git rev-parse HEAD
-git log -1 --format='%H%n%s'
-git branch --show-current
+git status
+git log -1 --oneline
 ```
 
-Require:
+Report:
 
-- The HEAD SHA differs from the SHA recorded before the commit.
-- The git commit command completed successfully.
-- A real commit SHA was returned.
-- The commit message matches the approved message.
-- The current branch still belongs to Issue #$1.
+- Issue number.
+- Active branch.
+- Commit hash.
+- Commit message.
+- Committed files.
+- Remaining uncommitted changes.
 
-If all checks pass, report:
+## Final State
 
 COMMIT_CREATED
 
-- Issue: #$1
-- Branch: <verified-branch>
-- Commit: <actual-SHA>
-- Message: <actual-message>
+Do not execute merge, push, branch deletion or `/finish-issue`.
 
-Otherwise report BLOCKED.
-
-Never push, merge or close the Issue.
+If any required check fails, report BLOCKED.

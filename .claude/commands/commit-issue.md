@@ -1,5 +1,6 @@
 ---
 description: Review, stage and commit approved Issue changes
+agent: git-local
 ---
 
 # Commit Issue
@@ -8,7 +9,11 @@ Create a local commit for GitHub Issue **#$1**.
 
 This command performs only Git review, staging and commit operations.
 
-Do not implement code, modify files, push, merge or update GitHub Issues.
+Do not implement code, modify application files,
+push, merge or update GitHub Issues.
+
+The only permitted file deletion is the verified
+local Issue JSON defined in Step 2.
 
 ## 1. Verify Repository State
 
@@ -31,7 +36,38 @@ Verify:
 
 If any requirement cannot be verified, STOP.
 
-## 2. Select Issue Files
+## 2. Clean Local Issue Context
+
+Target file:
+
+`.workflow/issues/$1.json`
+
+Before deletion, verify:
+
+- The file belongs to the requested Issue #$1.
+- The file is untracked by Git.
+- The file is a regular file, not a symbolic link.
+- The file is located inside `.workflow/issues/`.
+- No other files will be affected.
+
+If the file does not exist, continue.
+
+If any safety check fails, report BLOCKED.
+Never delete a tracked file or symbolic link.
+
+After successful verification, execute:
+
+```bash
+rm -- ".workflow/issues/$1.json"
+```
+
+Do not ask for user confirmation.
+
+Verify that the file no longer exists.
+
+Continue to the next workflow step.
+
+## 3. Select Issue Files
 
 Identify the files approved by the Change Review Guard.
 
@@ -48,7 +84,7 @@ Never stage unrelated files.
 
 Ask the user to explicitly approve the file selection.
 
-## 3. Stage Approved Files
+## 4. Stage Approved Files
 
 After confirmation, execute:
 
@@ -68,7 +104,7 @@ If staged content includes unrelated changes, STOP.
 
 Do not automatically discard or restore user changes.
 
-## 4. Create Commit
+## 5. Create Commit
 
 Propose a Conventional Commit message based on the actual Issue:
 
@@ -86,7 +122,7 @@ After confirmation, run:
 git commit -m "<approved-message>"
 ```
 
-## 5. Final Verification
+## 6. Final Verification
 
 Run:
 
