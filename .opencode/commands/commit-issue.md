@@ -60,24 +60,35 @@ be completed, report BLOCKED and stop.
 
 ## 1. Verify Repository State
 
-Run:
+Execute using the real bash tool:
 
 ```bash
 git status
 git branch --show-current
 git diff
 git diff --cached
+git ls-files -u
 ```
 
 Verify:
 
-- The current branch belongs to Issue #$1.
-- The current branch is not main or master.
-- No merge or rebase is in progress.
-- The working tree contains no unresolved conflicts.
-- `/dev-issue $1` has reported READY_FOR_STAGING.
+- The active branch is not empty (no detached HEAD).
+- The active branch is not `main` or `master`.
+- The active branch matches `<prefix>/$1-<slug>`.
+- The prefix and slug are non-empty.
+- The Issue number matches exactly.
+- The slug does not need to match the Issue title.
+- No merge, rebase, cherry-pick or revert is in progress.
+- No unresolved conflicts exist.
+- `/dev-issue $1` has reported READY_FOR_STAGING
+  with verifiable evidence.
 
-If any requirement cannot be verified, STOP.
+Never switch branches.
+
+If the branch is valid, continue to Step 2.
+
+If any check fails or evidence is missing,
+report BLOCKED and stop.
 
 ## 2. Review and Stage Issue Files
 
@@ -207,5 +218,3 @@ If the user declines authorization, report CANCELLED.
 If any required check fails, report BLOCKED.
 
 Never execute merge, push, branch deletion .
-
-Ya puedes pasar a mergear
