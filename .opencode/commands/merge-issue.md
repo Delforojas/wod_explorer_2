@@ -42,6 +42,7 @@ Never stage, modify or delete these JSON files.
 
 If verification fails, report `BLOCKED`.
 
+
 ## 2. Identify Issue Branch
 
 Execute:
@@ -52,11 +53,11 @@ git branch --list "*/$1-*"
 
 Require:
 
-- Exactly one existing local Issue branch.
-- The branch matches `<prefix>/$1-<slug>`.
+- Exactly one matching local branch.
+- The branch follows `<prefix>/$1-<slug>`.
 - The branch is not `main` or `master`.
 
-Record the exact branch name.
+Record the exact branch name returned by Git.
 
 Execute:
 
@@ -64,11 +65,19 @@ Execute:
 git rev-parse <issue-branch>
 ```
 
+Replace `<issue-branch>` with the exact branch name returned by Git.
+
 Require a valid commit SHA.
 
-Never invent a branch name or select between multiple matches.
+If no branch is found, report `BLOCKED`.
 
-If the branch is missing or ambiguous, report `BLOCKED`.
+If multiple branches are found, report `BLOCKED`.
+
+If any Git command fails, report `BLOCKED`.
+
+Never create, guess or manually reconstruct a branch name.
+
+Never skip this step or continue without a verified branch SHA.
 
 ## 3. Prepare Main
 
