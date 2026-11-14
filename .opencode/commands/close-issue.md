@@ -101,30 +101,39 @@ BLOCKED: main is not synchronized with origin/main.
 
 Do not attempt to resolve synchronization automatically.
 
+
 ## 5. Identify Issue Branch
 
 Execute:
 
 ```bash
-git for-each-ref --format='%(refname:short)' refs/heads/
+git branch --list "*/$1-*"
 ```
 
-Identify exactly one local branch matching:
+Require:
 
-`<prefix>/$1-<slug>`
+- Exactly one matching local branch.
+- The branch matches `<prefix>/$1-<slug>`.
+- The branch is not `main` or `master`.
 
-Rules:
+If zero or multiple branches match, report BLOCKED and stop.
 
-- Do not create branches.
-- Do not guess a branch name.
-- Do not select the first match automatically.
-- If zero or multiple branches match, report BLOCKED.
+Record the exact branch name returned by Git.
 
-Record the exact branch name and SHA:
+Execute:
 
 ```bash
 git rev-parse <issue-branch>
 ```
+
+Replace `<issue-branch>` with the exact branch name returned by Git.
+
+Require a valid commit SHA.
+
+Never invent, assume or reconstruct branch names.
+
+Never continue without successful branch verification.
+
 
 ## 6. Verify Published Integration
 
