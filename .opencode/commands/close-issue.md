@@ -106,7 +106,7 @@ Do not attempt to resolve synchronization automatically.
 Execute:
 
 ```bash
-git branch --list "*/$1-*"
+git for-each-ref --format='%(refname:short)' refs/heads/
 ```
 
 Identify exactly one local branch matching:
